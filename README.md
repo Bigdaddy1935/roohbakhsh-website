@@ -74,3 +74,5 @@ pnpm dev           # web → :3000/ar   |   api → :3001/api/docs
 import { Course, AuthResponse, Paginated } from "@roohbakhsh/shared";
 ```
 اگر بک‌اندکار شکل `Course` را عوض کند، ادیتور فرانت‌کار **فوراً خطا می‌دهد**. این تضمین می‌کند فرانت و بک همیشه همگام بمانند.
+
+<!-- تست ریویوی خودکار Claude -->
