@@ -10,9 +10,10 @@ export default async function LocaleLayout({
   params,
 }: {
   children: ReactNode;
-  params: { locale: Locale };
+  // Next 15/16: params حالا async است (Promise) → باید await شود
+  params: Promise<{ locale: Locale }>;
 }) {
-  const { locale } = params;
+  const { locale } = await params;
   const messages = await getMessages();
 
   return (
