@@ -6,9 +6,10 @@ import { getCourses } from "../../lib/api";
 export default async function HomePage({
   params,
 }: {
-  params: { locale: Locale };
+  // Next 15/16: params حالا async است (Promise) → باید await شود
+  params: Promise<{ locale: Locale }>;
 }) {
-  const { locale } = params;
+  const { locale } = await params;
 
   // اگر بک‌اند بالا نباشد، صفحه خالی نشود
   let courses;
