@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Delete, UseGuards, Request } from "@nestjs/common";
+import { Controller, Post, Body, Get, Delete, UseGuards, Request, HttpCode, HttpStatus } from "@nestjs/common";
 import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
@@ -29,6 +29,7 @@ export class AuthController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete("logout")
   logout(@Body() dto: RefreshDto) {
     return this.authService.logout(dto.refreshToken);

@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsOptional, IsString, MinLength } from "class-validator";
+import { IsEmail, IsIn, IsOptional, IsString, MinLength } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import type { RegisterRequest } from "@roohbakhsh/shared";
 
@@ -22,6 +22,6 @@ export class RegisterDto implements RegisterRequest {
   password!: string;
 
   @ApiProperty({ enum: ["ar", "ur"], default: "ar" })
-  @IsEnum(["ar", "ur"])
+  @IsIn(["ar", "ur"], { message: "preferredLocale must be one of: ar, ur" })
   preferredLocale!: "ar" | "ur";
 }
