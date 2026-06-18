@@ -13,7 +13,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
         port: config.get<number>("DB_PORT"),
         username: config.get<string>("DB_USERNAME"),
         password: config.get<string>("DB_PASSWORD"),
-        database: config.get<string>("DB_NAME"),
+        database: config.get<string>("DB_DATABASE"),
         synchronize: config.get<boolean>("DB_SYNCHRONIZE"),
         autoLoadEntities: true,
         migrations: ["dist/db/migrations/*.js"],
@@ -22,4 +22,4 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
     }),
   ],
 })
-export class DatabaseModule {}
+export class DatabaseModule { }
