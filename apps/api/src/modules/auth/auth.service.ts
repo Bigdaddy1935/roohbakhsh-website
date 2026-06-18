@@ -142,7 +142,9 @@ export class AuthService {
       role: user.role,
       preferredLocale: user.preferredLocale,
       avatarUrl: user.avatarUrl,
+      isActive: user.isActive,
       createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString(),
     };
   }
 

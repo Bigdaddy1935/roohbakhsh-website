@@ -84,7 +84,19 @@
 
 ---
 
-# بخش ۳ — دسته‌بندی (منبع: NestJS)
+# بخش ۳ — کاربران (منبع: NestJS)
+
+> همه عملیات فقط برای `role: admin` مجاز است.
+
+### `GET /api/users` 🔒 admin
+لیست صفحه‌بندی‌شده کاربران سیستم.
+- **Query:** `page` (پیش‌فرض ۱)، `limit` (پیش‌فرض ۱۲، حداکثر ۱۰۰)
+- **پاسخ:** `200 Paginated<User>`
+- **خطاها:** `401 Unauthorized` | `403 FORBIDDEN`
+
+---
+
+# بخش ۳-ب — دسته‌بندی (منبع: NestJS)
 
 > عملیات نوشتن (POST / PATCH / DELETE) فقط برای `role: admin` مجاز است.
 > خواندن (GET) برای همه (بدون توکن) آزاد است.
@@ -164,8 +176,9 @@
 > `level` یکی از: `"beginner" | "intermediate" | "advanced"`.
 
 ### `GET /api/courses`
-لیست همه دوره‌ها با اطلاعات خلاصه استاد.
-- **پاسخ:** `200 CourseRecord[]`
+لیست صفحه‌بندی‌شده دوره‌ها با اطلاعات خلاصه استاد.
+- **Query:** `page` (پیش‌فرض ۱)، `limit` (پیش‌فرض ۱۲، حداکثر ۱۰۰)
+- **پاسخ:** `200 Paginated<CourseRecord>`
 
 ### `GET /api/courses/:id`
 مشخصات یک دوره.
@@ -198,8 +211,9 @@
 > `title` از نوع `Localized` است.
 
 ### `GET /api/courses/:courseId/lessons`
-لیست درس‌های یک دوره به‌ترتیب `order`.
-- **پاسخ:** `200 Lesson[]`
+لیست صفحه‌بندی‌شده درس‌های یک دوره به‌ترتیب `order`.
+- **Query:** `page` (پیش‌فرض ۱)، `limit` (پیش‌فرض ۱۲، حداکثر ۱۰۰)
+- **پاسخ:** `200 Paginated<Lesson>`
 - **خطا:** `404 COURSE_NOT_FOUND`
 
 ### `GET /api/courses/:courseId/lessons/:lessonId`

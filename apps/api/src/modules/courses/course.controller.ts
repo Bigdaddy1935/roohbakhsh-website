@@ -1,6 +1,6 @@
 import {
   Controller, Get, Post, Patch, Delete,
-  Param, Body, UseGuards, HttpCode, HttpStatus,
+  Param, Body, Query, UseGuards, HttpCode, HttpStatus,
 } from "@nestjs/common";
 import {
   ApiTags, ApiOperation, ApiResponse,
@@ -14,6 +14,7 @@ import { RolesGuard, Roles } from "../../common/guards/roles.guard";
 import { ApiErrorSchema } from "../../common/swagger/api-error.schema";
 import { CourseSchema } from "../../common/swagger/course.schema";
 import { LANG_HEADER } from "../../common/swagger/lang-header";
+import { PaginationDto } from "../../common/dto/pagination.dto";
 
 @ApiTags("courses")
 @ApiCookieAuth("access_token")
@@ -25,15 +26,15 @@ export class CourseController {
   @Public()
   @Get()
   @ApiOperation({
-    summary: "لیست همه دوره‌ها",
+    summary: "لیست صفحه‌بندی‌شده دوره‌ها",
     description:
-      "همه دوره‌ها را به‌صورت آرایه برمی‌گرداند. " +
+      "دوره‌ها را صفحه‌بندی‌شده برمی‌گرداند. " +
       "هر دوره شامل اطلاعات خلاصه استاد است. نیازی به احراز هویت نیست.",
   })
   @ApiHeader(LANG_HEADER)
-  @ApiResponse({ status: 200, description: "لیست دوره‌ها", type: [CourseSchema] })
-  findAll() {
-    return this.courseService.findAll();
+  @ApiResponse({ status: 200, description: "لیست صفحه‌بندی‌شده دوره‌ها — Paginated<CourseRecord>" })
+  findAll(@Query() query: PaginationDto) {
+    return this.courseService.findAll(query.page ?? 1, query.limit ?? 12);
   }
 
   @Public()

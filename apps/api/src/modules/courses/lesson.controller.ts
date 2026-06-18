@@ -1,6 +1,6 @@
 import {
   Controller, Get, Post, Patch, Delete,
-  Param, Body, UseGuards, HttpCode, HttpStatus,
+  Param, Body, Query, UseGuards, HttpCode, HttpStatus,
 } from "@nestjs/common";
 import {
   ApiTags, ApiOperation, ApiResponse,
@@ -14,6 +14,7 @@ import { RolesGuard, Roles } from "../../common/guards/roles.guard";
 import { ApiErrorSchema } from "../../common/swagger/api-error.schema";
 import { LessonSchema } from "../../common/swagger/course.schema";
 import { LANG_HEADER } from "../../common/swagger/lang-header";
+import { PaginationDto } from "../../common/dto/pagination.dto";
 
 @ApiTags("lessons")
 @ApiCookieAuth("access_token")
@@ -25,15 +26,15 @@ export class LessonController {
   @Public()
   @Get()
   @ApiOperation({
-    summary: "لیست درس‌های یک دوره",
-    description: "تمام درس‌های یک دوره را به‌ترتیب `order` برمی‌گرداند. نیازی به احراز هویت نیست.",
+    summary: "لیست صفحه‌بندی‌شده درس‌های یک دوره",
+    description: "درس‌های یک دوره را صفحه‌بندی‌شده و به‌ترتیب `order` برمی‌گرداند. نیازی به احراز هویت نیست.",
   })
   @ApiHeader(LANG_HEADER)
   @ApiParam({ name: "courseId", description: "UUID دوره" })
-  @ApiResponse({ status: 200, description: "لیست درس‌ها", type: [LessonSchema] })
+  @ApiResponse({ status: 200, description: "لیست صفحه‌بندی‌شده درس‌ها — Paginated<Lesson>" })
   @ApiResponse({ status: 404, description: "دوره پیدا نشد — کد: COURSE_NOT_FOUND", type: ApiErrorSchema })
-  findAll(@Param("courseId") courseId: string) {
-    return this.lessonService.findByCourse(courseId);
+  findAll(@Param("courseId") courseId: string, @Query() query: PaginationDto) {
+    return this.lessonService.findByCourse(courseId, query.page ?? 1, query.limit ?? 12);
   }
 
   @Public()

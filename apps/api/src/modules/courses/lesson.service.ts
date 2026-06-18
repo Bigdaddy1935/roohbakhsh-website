@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import type { Lesson as LessonContract } from "@roohbakhsh/shared";
+import type { Lesson as LessonContract, Paginated } from "@roohbakhsh/shared";
+import { toPaginated } from "../../common/utils/paginate";
 import { Lesson } from "./entities/lesson.entity";
 import { Course } from "./entities/course.entity";
 import { CreateLessonDto } from "./dto/create-lesson.dto";
@@ -16,15 +17,17 @@ export class LessonService {
     private readonly courseRepo: Repository<Course>,
   ) {}
 
-  async findByCourse(courseId: string): Promise<LessonContract[]> {
+  async findByCourse(courseId: string, page: number, limit: number): Promise<Paginated<LessonContract>> {
     const course = await this.courseRepo.findOne({ where: { id: courseId } });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
 
-    const lessons = await this.lessonRepo.find({
+    const [lessons, total] = await this.lessonRepo.findAndCount({
       where: { courseId },
       order: { order: "ASC" },
+      take: limit,
+      skip: (page - 1) * limit,
     });
-    return lessons.map(this.toContract);
+    return toPaginated(lessons.map(this.toContract), total, page, limit);
   }
 
   async findOne(courseId: string, lessonId: string): Promise<LessonContract> {

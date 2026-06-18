@@ -5,7 +5,8 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import type { CourseRecord } from "@roohbakhsh/shared";
+import type { CourseRecord, Paginated } from "@roohbakhsh/shared";
+import { toPaginated } from "../../common/utils/paginate";
 import { Course } from "./entities/course.entity";
 import { Instructor } from "../instructor/entities/instructor.entity";
 import { Category } from "../category/entities/category.entity";
@@ -23,12 +24,14 @@ export class CourseService {
     private readonly categoryRepo: Repository<Category>,
   ) {}
 
-  async findAll(): Promise<CourseRecord[]> {
-    const all = await this.repo.find({
+  async findAll(page: number, limit: number): Promise<Paginated<CourseRecord>> {
+    const [items, total] = await this.repo.findAndCount({
       relations: { instructor: true },
       order: { createdAt: "DESC" },
+      take: limit,
+      skip: (page - 1) * limit,
     });
-    return all.map(this.toContract);
+    return toPaginated(items.map(this.toContract), total, page, limit);
   }
 
   async findOne(id: string): Promise<CourseRecord> {
