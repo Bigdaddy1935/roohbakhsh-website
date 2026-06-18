@@ -21,7 +21,7 @@ export class User {
   @Column({ name: "full_name" })
   fullName!: string;
 
-  @Column({ nullable: true, default: null })
+  @Column({ type: "varchar", nullable: true, default: null })
   phone!: string | null;
 
   @Column({
@@ -39,7 +39,7 @@ export class User {
   })
   role!: UserRole;
 
-  @Column({ name: "avatar_url", nullable: true, default: null })
+  @Column({ name: "avatar_url", type: "varchar", nullable: true, default: null })
   avatarUrl!: string | null;
 
   @Column({ name: "is_active", default: true })
