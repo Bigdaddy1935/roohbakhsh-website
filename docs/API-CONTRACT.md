@@ -13,6 +13,7 @@
   - **کوکی (توصیه‌شده برای مرورگر):** سرور پس از login/register به‌صورت خودکار کوکی `access_token` (httpOnly, 7d) و `refresh_token` (httpOnly, 30d, فقط روی `/api/auth/refresh`) ست می‌کند. فرانت نیازی به ذخیره‌ی دستی ندارد.
   - **Bearer header (برای کلاینت‌های غیرمرورگر):** `Authorization: Bearer <accessToken>`
 - زبان درخواست با هدر: `Accept-Language: ar` یا `ur` (پیش‌فرض `ar`).
+- **پیام‌های خطا (`message` و `fields`) بر اساس `Accept-Language` به عربی یا اردو برگردانده می‌شوند.** فیلد `code` همیشه ثابت و ماشین‌خوان است و برای منطق frontend استفاده می‌شود.
 - شکل خطا همیشه یکسان است (تایپ `ApiError` در `packages/shared`):
   ```json
   { "statusCode": 400, "code": "EMAIL_TAKEN", "message": "...", "fields": { "email": "..." } }

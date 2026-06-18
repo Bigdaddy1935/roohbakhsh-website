@@ -5,14 +5,22 @@ import {
   HttpException,
   HttpStatus,
 } from "@nestjs/common";
-import type { Response } from "express";
+import type { Request, Response } from "express";
 import type { ApiError } from "@roohbakhsh/shared";
+import {
+  localizeErrorCode,
+  localizeValidationMessage,
+  parseLocale,
+} from "../i18n/error-messages";
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
+    const req = ctx.getRequest<Request>();
+    const res = ctx.getResponse<Response>();
+
+    const locale = parseLocale(req.headers["accept-language"]);
 
     const status =
       exception instanceof HttpException
@@ -33,17 +41,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
       const messages = raw["message"] as string[];
       const fields: Record<string, string> = {};
       for (const msg of messages) {
-        // "fieldName must be ..." — extract field from first word
         const field = msg.split(" ")[0] ?? "unknown";
-        fields[field] = msg;
+        fields[field] = localizeValidationMessage(msg, locale);
       }
       const body: ApiError = {
         statusCode: status,
         code: "VALIDATION_ERROR",
-        message: "Validation failed",
+        message: localizeErrorCode("VALIDATION_ERROR", locale),
         fields,
       };
-      response.status(status).json(body);
+      res.status(status).json(body);
       return;
     }
 
@@ -53,7 +60,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
         : (raw as Record<string, unknown> | null)?.message?.toString() ??
           "INTERNAL_ERROR";
 
-    const body: ApiError = { statusCode: status, code, message: code };
-    response.status(status).json(body);
+    const body: ApiError = {
+      statusCode: status,
+      code,
+      message: localizeErrorCode(code, locale),
+    };
+    res.status(status).json(body);
   }
 }
