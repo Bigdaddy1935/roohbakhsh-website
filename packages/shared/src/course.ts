@@ -86,6 +86,16 @@ export interface UpdateLessonRequest {
   isFreePreview?: boolean;
 }
 
+/** اطلاعات تخفیف فعال روی یک دوره. */
+export interface CourseDiscount {
+  /** قیمت پس از تخفیف. */
+  discountedPrice: Money;
+  /** تاریخ انقضا — null یعنی تخفیف دائمی است. */
+  expiresAt: ISODate | null;
+  /** آیا تخفیف الان فعال است؟ (محاسبه‌شده: بدون انقضا یا انقضا در آینده) */
+  isActive: boolean;
+}
+
 /** پاسخ API بک‌اند برای یک دوره. */
 export interface CourseRecord {
   id: ID;
@@ -93,7 +103,12 @@ export interface CourseRecord {
   slug: string;
   description: Localized;
   thumbnailUrl: string | null;
+  /** قیمت اصلی دوره — null یعنی رایگان. */
   price: Money | null;
+  /** اطلاعات تخفیف — null یعنی بدون تخفیف. */
+  discount: CourseDiscount | null;
+  /** قیمت واقعی که کاربر پرداخت می‌کند (price یا discountedPrice بسته به فعال بودن تخفیف). */
+  effectivePrice: Money | null;
   durationMinutes: number;
   lessonCount: number;
   level: CourseLevel;
@@ -128,4 +143,8 @@ export interface UpdateCourseRequest {
   isPublished?: boolean;
   instructorId?: ID;
   categoryId?: ID | null;
+  /** قیمت تخفیف‌خورده — null برای حذف تخفیف. */
+  discountPrice?: Money | null;
+  /** تاریخ انقضای تخفیف (ISO 8601) — null یعنی تخفیف دائمی. */
+  discountExpiresAt?: ISODate | null;
 }

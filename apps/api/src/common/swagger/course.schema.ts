@@ -17,13 +17,21 @@ class InstructorSummarySchema {
   @ApiProperty({ example: "https://cdn.roohbakhsh.com/avatars/ahmad.webp" }) avatarUrl!: string;
 }
 
+class CourseDiscountSchema {
+  @ApiProperty({ type: MoneySchema, description: "قیمت پس از تخفیف" }) discountedPrice!: MoneySchema;
+  @ApiProperty({ example: "2026-09-01T00:00:00.000Z", nullable: true, description: "تاریخ انقضا — null یعنی دائمی" }) expiresAt!: string | null;
+  @ApiProperty({ example: true, description: "آیا تخفیف الان فعال است؟" }) isActive!: boolean;
+}
+
 export class CourseSchema {
   @ApiProperty({ example: "3fa85f64-5717-4562-b3fc-2c963f66afa6" }) id!: string;
   @ApiProperty({ type: LocalizedSchema }) title!: LocalizedSchema;
   @ApiProperty({ example: "tafsir-quran-mobtadi" }) slug!: string;
   @ApiProperty({ type: LocalizedSchema }) description!: LocalizedSchema;
   @ApiProperty({ example: "https://cdn.roohbakhsh.com/courses/c01.webp", nullable: true }) thumbnailUrl!: string | null;
-  @ApiProperty({ type: MoneySchema, nullable: true }) price!: MoneySchema | null;
+  @ApiProperty({ type: MoneySchema, nullable: true, description: "قیمت اصلی — null یعنی رایگان" }) price!: MoneySchema | null;
+  @ApiProperty({ type: CourseDiscountSchema, nullable: true, description: "تخفیف فعال — null یعنی بدون تخفیف" }) discount!: CourseDiscountSchema | null;
+  @ApiProperty({ type: MoneySchema, nullable: true, description: "قیمت واقعی پرداختی (با لحاظ تخفیف فعال)" }) effectivePrice!: MoneySchema | null;
   @ApiProperty({ example: 720 }) durationMinutes!: number;
   @ApiProperty({ example: 12 }) lessonCount!: number;
   @ApiProperty({ example: "beginner", enum: ["beginner", "intermediate", "advanced"] }) level!: string;

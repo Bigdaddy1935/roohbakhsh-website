@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import type { CourseRecord, Paginated } from "@roohbakhsh/shared";
+import type { CourseRecord, CourseDiscount, Money, Paginated } from "@roohbakhsh/shared";
 import { toPaginated } from "../../common/utils/paginate";
 import { Course } from "./entities/course.entity";
 import { Instructor } from "../instructor/entities/instructor.entity";
@@ -31,7 +31,7 @@ export class CourseService {
       take: limit,
       skip: (page - 1) * limit,
     });
-    return toPaginated(items.map(this.toContract), total, page, limit);
+    return toPaginated(items.map((c) => this.toContract(c)), total, page, limit);
   }
 
   async findOne(id: string): Promise<CourseRecord> {
@@ -99,6 +99,10 @@ export class CourseService {
     if (dto.durationMinutes !== undefined) course.durationMinutes = dto.durationMinutes;
     if (dto.level !== undefined) course.level = dto.level;
     if (dto.isPublished !== undefined) course.isPublished = dto.isPublished;
+    if (dto.discountPrice !== undefined) course.discountPrice = dto.discountPrice ?? null;
+    if (dto.discountExpiresAt !== undefined) {
+      course.discountExpiresAt = dto.discountExpiresAt ? new Date(dto.discountExpiresAt) : null;
+    }
 
     return this.toContract(await this.repo.save(course));
   }
@@ -114,7 +118,22 @@ export class CourseService {
     if (exists) throw new ConflictException("COURSE_SLUG_TAKEN");
   }
 
+  private buildDiscount(course: Course): CourseDiscount | null {
+    if (!course.discountPrice) return null;
+    const isActive =
+      !course.discountExpiresAt || course.discountExpiresAt > new Date();
+    return {
+      discountedPrice: course.discountPrice,
+      expiresAt: course.discountExpiresAt?.toISOString() ?? null,
+      isActive,
+    };
+  }
+
   private toContract(course: Course): CourseRecord {
+    const discount = this.buildDiscount(course);
+    const effectivePrice: Money | null =
+      discount?.isActive ? discount.discountedPrice : course.price;
+
     return {
       id: course.id,
       title: course.title,
@@ -122,6 +141,8 @@ export class CourseService {
       description: course.description,
       thumbnailUrl: course.thumbnailUrl,
       price: course.price,
+      discount,
+      effectivePrice,
       durationMinutes: course.durationMinutes,
       lessonCount: course.lessonCount,
       level: course.level,

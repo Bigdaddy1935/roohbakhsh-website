@@ -50,6 +50,12 @@ export class Course {
   @Column({ name: "is_published", default: false })
   isPublished!: boolean;
 
+  @Column({ name: "discount_price", type: "json", nullable: true, default: null })
+  discountPrice!: Money | null;
+
+  @Column({ name: "discount_expires_at", type: "datetime", nullable: true, default: null })
+  discountExpiresAt!: Date | null;
+
   @ManyToOne(() => Instructor, { onDelete: "RESTRICT", eager: false, nullable: false })
   @JoinColumn({ name: "instructor_id" })
   instructor!: Instructor;

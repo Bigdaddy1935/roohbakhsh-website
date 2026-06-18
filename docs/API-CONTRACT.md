@@ -193,9 +193,24 @@
 
 ### `PATCH /api/courses/:id` 🔒 admin
 ویرایش جزئی دوره. برای انتشار `isPublished: true` بفرست.
+
+**تنظیم تخفیف:**
+- `discountPrice: Money` — قیمت تخفیف‌خورده؛ `null` برای حذف تخفیف
+- `discountExpiresAt: ISODate` — تاریخ انقضا؛ `null` یعنی تخفیف دائمی
+
 - **بدنه:** `UpdateCourseRequest` (همه فیلدها اختیاری)
 - **پاسخ:** `200 CourseRecord`
 - **خطاها:** `404 COURSE_NOT_FOUND / INSTRUCTOR_NOT_FOUND` | `409 COURSE_SLUG_TAKEN`
+
+**فیلدهای تخفیف در پاسخ دوره:**
+```
+discount: {
+  discountedPrice: Money,   // قیمت تخفیف‌خورده
+  expiresAt: ISODate|null,  // null = دائمی
+  isActive: boolean         // true اگر انقضا نداشته باشد یا منقضی نشده باشد
+}
+effectivePrice: Money|null  // قیمت واقعی: discountedPrice (اگر isActive) وگرنه price
+```
 
 ### `DELETE /api/courses/:id` 🔒 admin
 حذف دوره و تمام درس‌های آن (cascade).
