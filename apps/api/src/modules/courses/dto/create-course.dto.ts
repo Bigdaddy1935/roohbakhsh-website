@@ -1,6 +1,6 @@
 import {
   IsString, IsOptional, ValidateNested, IsObject,
-  IsUrl, IsInt, Min, IsUUID, IsIn, IsISO8601,
+  IsUrl, IsInt, Min, IsUUID, IsIn, IsISO8601, IsBoolean,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
@@ -54,12 +54,6 @@ export class CreateCourseDto implements CreateCourseRequest {
   @ValidateNested()
   @Type(() => MoneyDto)
   price?: Money | null;
-
-  @ApiPropertyOptional({ example: 720, description: "مدت زمان کل دوره به دقیقه" })
-  @IsOptional()
-  @IsInt()
-  @Min(0)
-  durationMinutes?: number;
 
   @ApiPropertyOptional({ example: "beginner", enum: ["beginner", "intermediate", "advanced"], description: "سطح دوره" })
   @IsOptional()

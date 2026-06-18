@@ -18,7 +18,7 @@ class InstructorSummarySchema {
 }
 
 class CourseDiscountSchema {
-  @ApiProperty({ type: MoneySchema, description: "قیمت پس از تخفیف" }) discountedPrice!: MoneySchema;
+  @ApiProperty({ type: MoneySchema, description: "قیمت تخفیف‌خورده" }) price!: MoneySchema;
   @ApiProperty({ example: "2026-09-01T00:00:00.000Z", nullable: true, description: "تاریخ انقضا — null یعنی دائمی" }) expiresAt!: string | null;
   @ApiProperty({ example: true, description: "آیا تخفیف الان فعال است؟" }) isActive!: boolean;
 }

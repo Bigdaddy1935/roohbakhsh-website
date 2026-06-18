@@ -57,7 +57,8 @@ export class CourseService {
       description: dto.description,
       thumbnailUrl: dto.thumbnailUrl ?? null,
       price: dto.price ?? null,
-      durationMinutes: dto.durationMinutes ?? 0,
+      durationMinutes: 0,
+      lessonCount: 0,
       level: dto.level ?? "beginner",
       instructorId: dto.instructorId,
       instructor,
@@ -98,7 +99,6 @@ export class CourseService {
     if (dto.description !== undefined) course.description = dto.description;
     if (dto.thumbnailUrl !== undefined) course.thumbnailUrl = dto.thumbnailUrl ?? null;
     if (dto.price !== undefined) course.price = dto.price ?? null;
-    if (dto.durationMinutes !== undefined) course.durationMinutes = dto.durationMinutes;
     if (dto.level !== undefined) course.level = dto.level;
     if (dto.isPublished !== undefined) course.isPublished = dto.isPublished;
     if (dto.discountPrice !== undefined) course.discountPrice = dto.discountPrice ?? null;
@@ -125,7 +125,7 @@ export class CourseService {
     const isActive =
       !course.discountExpiresAt || course.discountExpiresAt > new Date();
     return {
-      discountedPrice: course.discountPrice,
+      price: course.discountPrice,
       expiresAt: course.discountExpiresAt?.toISOString() ?? null,
       isActive,
     };
@@ -134,7 +134,7 @@ export class CourseService {
   private toContract(course: Course): CourseRecord {
     const discount = this.buildDiscount(course);
     const effectivePrice: Money | null =
-      discount?.isActive ? discount.discountedPrice : course.price;
+      discount?.isActive ? discount.price : course.price;
 
     return {
       id: course.id,

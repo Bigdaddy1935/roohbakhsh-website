@@ -88,8 +88,8 @@ export interface UpdateLessonRequest {
 
 /** اطلاعات تخفیف فعال روی یک دوره. */
 export interface CourseDiscount {
-  /** قیمت پس از تخفیف. */
-  discountedPrice: Money;
+  /** قیمت تخفیف‌خورده. */
+  price: Money;
   /** تاریخ انقضا — null یعنی تخفیف دائمی است. */
   expiresAt: ISODate | null;
   /** آیا تخفیف الان فعال است؟ (محاسبه‌شده: بدون انقضا یا انقضا در آینده) */
@@ -126,7 +126,6 @@ export interface CreateCourseRequest {
   description: Localized;
   thumbnailUrl?: string;
   price?: Money | null;
-  durationMinutes?: number;
   level?: CourseLevel;
   instructorId: ID;
   categoryId?: ID | null;
@@ -140,7 +139,6 @@ export interface UpdateCourseRequest {
   description?: Localized;
   thumbnailUrl?: string | null;
   price?: Money | null;
-  durationMinutes?: number;
   level?: CourseLevel;
   isPublished?: boolean;
   instructorId?: ID;

@@ -58,12 +58,6 @@ export class UpdateCourseDto implements UpdateCourseRequest {
   @Type(() => MoneyDto)
   price?: Money | null;
 
-  @ApiPropertyOptional({ example: 720 })
-  @IsOptional()
-  @IsInt()
-  @Min(0)
-  durationMinutes?: number;
-
   @ApiPropertyOptional({ example: "beginner", enum: ["beginner", "intermediate", "advanced"] })
   @IsOptional()
   @IsIn(["beginner", "intermediate", "advanced"])
