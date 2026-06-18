@@ -29,7 +29,7 @@ class EnvConfig {
   DB_PORT: number = 3306;
 
   @IsString()
-  DB_NAME!: string;
+  DB_DATABASE!: string;
 
   @IsString()
   DB_USERNAME!: string;
