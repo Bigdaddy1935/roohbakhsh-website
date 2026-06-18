@@ -50,7 +50,13 @@ packages/shared → تایپ‌های مشترک. منبع حقیقت قرارد
 - Connection string دیتابیس فقط از `.env.developer` یا `.env.production` خوانده می‌شود، نه hard-code.
 - برای query های پیچیده از `QueryBuilder` استفاده کن، نه raw SQL بی‌پشتیبانی.
 
-## قانون شماره ۶ — کیفیت کد
+## قانون شماره ۶ — مستندسازی Swagger
+- هر endpoint باید `@ApiOperation({ summary, description })` داشته باشد.
+- همه‌ی حالات پاسخ (موفق + خطاها) با `@ApiResponse({ status, description, type })` ثبت شوند.
+- هدر `Accept-Language` با `@ApiHeader` روی هر endpoint مستند شود.
+- فیلدهای DTO باید `description` و `example` واقعی داشته باشند.
+
+## قانون شماره ۷ — کیفیت کد
 - TypeScript strict. از `any` استفاده نکن؛ اگر مجبوری، با کامنت دلیلش را بنویس.
 - نام‌گذاری و سبک کد را با کد اطراف هماهنگ کن.
 - هر API بک‌اند باید ورودی را با DTO اعتبارسنجی کند و خطا را به شکل `ApiError` برگرداند.
