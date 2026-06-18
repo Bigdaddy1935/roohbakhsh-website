@@ -7,5 +7,6 @@ export * from "./common";
 export * from "./course";
 export * from "./instructor";
 export * from "./auth";
+export * from "./category";
 export * from "./lead";
 export * from "./ticket";

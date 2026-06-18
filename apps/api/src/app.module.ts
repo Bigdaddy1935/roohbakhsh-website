@@ -5,8 +5,10 @@ import { validate } from "./config/env";
 import { DatabaseModule } from "./db/database.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { CoursesModule } from "./modules/courses/courses.module";
+import { CategoryModule } from "./modules/category/category.module";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { JwtAuthGuard } from "./modules/auth/guards/jwt-auth.guard";
+import { RolesGuard } from "./common/guards/roles.guard";
 
 @Module({
   imports: [
@@ -21,11 +23,13 @@ import { JwtAuthGuard } from "./modules/auth/guards/jwt-auth.guard";
     DatabaseModule,
     AuthModule,
     CoursesModule,
+    CategoryModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
     // JwtAuthGuard به‌صورت سراسری — مسیرهای عمومی با @Public() علامت می‌خورند
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    RolesGuard,
   ],
 })
 export class AppModule {}

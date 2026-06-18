@@ -84,7 +84,45 @@
 
 ---
 
-# بخش ۳ — سرنخ و رویداد (منبع: NestJS — فاز ۱)
+# بخش ۳ — دسته‌بندی (منبع: NestJS)
+
+> عملیات نوشتن (POST / PATCH / DELETE) فقط برای `role: admin` مجاز است.
+> خواندن (GET) برای همه (بدون توکن) آزاد است.
+> `name` و `description` از نوع `Localized` هستند: `{ ar: string, ur: string }`.
+
+### `GET /api/categories`
+لیست مسطح همه دسته‌ها.
+- **پاسخ:** `200 Category[]`
+
+### `GET /api/categories/tree`
+درخت کامل دسته‌ها با زیردسته‌های تو در تو (عمق نامحدود).
+- **پاسخ:** `200 CategoryTree[]`
+
+### `GET /api/categories/:id`
+یک دسته با تمام زیردسته‌هایش.
+- **پاسخ:** `200 CategoryTree`
+- **خطا:** `404 CATEGORY_NOT_FOUND`
+
+### `POST /api/categories` 🔒 admin
+ساخت دسته جدید. اگر `parentId` نباشد → دسته ریشه.
+- **بدنه:** `CreateCategoryRequest`
+- **پاسخ:** `201 Category`
+- **خطاها:** `409 SLUG_TAKEN` | `404 PARENT_CATEGORY_NOT_FOUND` | `400 VALIDATION_ERROR`
+
+### `PATCH /api/categories/:id` 🔒 admin
+ویرایش جزئی. `parentId: null` → دسته به ریشه تبدیل می‌شود.
+- **بدنه:** `UpdateCategoryRequest` (همه فیلدها اختیاری)
+- **پاسخ:** `200 Category`
+- **خطاها:** `404 CATEGORY_NOT_FOUND / PARENT_CATEGORY_NOT_FOUND` | `409 SLUG_TAKEN` | `400 CIRCULAR_PARENT_REFERENCE / CANNOT_SET_SELF_AS_PARENT`
+
+### `DELETE /api/categories/:id` 🔒 admin
+حذف دسته. اگر زیردسته داشته باشد خطا برمی‌گردد.
+- **پاسخ:** `204 No Content`
+- **خطاها:** `404 CATEGORY_NOT_FOUND` | `400 CATEGORY_HAS_CHILDREN`
+
+---
+
+# بخش ۴ — سرنخ و رویداد (منبع: NestJS — فاز ۱)
 
 ### `POST /api/leads`
 فرم جمع‌آوری ایمیل/شماره.
@@ -98,7 +136,7 @@
 
 ---
 
-# بخش ۴ — تیکتینگ (منبع: NestJS — فاز ۱)
+# بخش ۵ — تیکتینگ (منبع: NestJS — فاز ۱)
 
 ### `POST /api/tickets`
 - **بدنه:** `CreateTicketRequest` (مهمان هم می‌تواند با `guestEmail`)
