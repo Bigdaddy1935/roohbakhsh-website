@@ -130,6 +130,8 @@ export interface CreateCourseRequest {
   level?: CourseLevel;
   instructorId: ID;
   categoryId?: ID | null;
+  discountPrice?: Money | null;
+  discountExpiresAt?: ISODate | null;
 }
 
 export interface UpdateCourseRequest {

@@ -62,6 +62,8 @@ export class CourseService {
       instructorId: dto.instructorId,
       instructor,
       categoryId: dto.categoryId ?? null,
+      discountPrice: dto.discountPrice ?? null,
+      discountExpiresAt: dto.discountExpiresAt ? new Date(dto.discountExpiresAt) : null,
     });
 
     const saved = await this.repo.save(course);
