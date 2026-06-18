@@ -9,7 +9,9 @@
 - **Base URL (لوکال):** `http://localhost:3001`
 - **Base URL (سرور آلمان / Staging):** `https://api-dev.roohbakhsh.com`
 - همه‌ی بدنه‌ها JSON اند.
-- احراز هویت با هدر: `Authorization: Bearer <accessToken>`
+- احراز هویت به **دو روش** (هر دو معتبر، اولویت با کوکی):
+  - **کوکی (توصیه‌شده برای مرورگر):** سرور پس از login/register به‌صورت خودکار کوکی `access_token` (httpOnly, 7d) و `refresh_token` (httpOnly, 30d, فقط روی `/api/auth/refresh`) ست می‌کند. فرانت نیازی به ذخیره‌ی دستی ندارد.
+  - **Bearer header (برای کلاینت‌های غیرمرورگر):** `Authorization: Bearer <accessToken>`
 - زبان درخواست با هدر: `Accept-Language: ar` یا `ur` (پیش‌فرض `ar`).
 - شکل خطا همیشه یکسان است (تایپ `ApiError` در `packages/shared`):
   ```json
@@ -56,17 +58,28 @@
 
 ### `POST /api/auth/register`
 - **بدنه:** `RegisterRequest`
-- **پاسخ:** `AuthResponse` (شامل `accessToken`)
-- **خطا:** `409 EMAIL_TAKEN`
+- **پاسخ:** `201 AuthResponse` — توکن‌ها هم در بدنه و هم در کوکی برمی‌گردند.
+- **خطاها:** `409 EMAIL_TAKEN` | `400 VALIDATION_ERROR`
 
 ### `POST /api/auth/login`
 - **بدنه:** `LoginRequest`
-- **پاسخ:** `AuthResponse`
-- **خطا:** `401 INVALID_CREDENTIALS`
+- **پاسخ:** `200 AuthResponse` — توکن‌ها هم در بدنه و هم در کوکی برمی‌گردند.
+- **خطاها:** `401 INVALID_CREDENTIALS` | `400 VALIDATION_ERROR`
 
-### `GET /api/auth/me`  🔒 (نیازمند توکن)
+### `POST /api/auth/refresh`
+توکن‌های جدید صادر می‌کند و refresh token قدیمی را باطل می‌کند (rotation).
+- **بدنه:** `{ refreshToken: string }` — اگر کوکی در مرورگر موجود باشد و `Path=/api/auth/refresh` match کند، به‌صورت خودکار ارسال می‌شود.
+- **پاسخ:** `200 AuthResponse` — کوکی‌های جدید ست می‌شوند.
+- **خطا:** `401 INVALID_REFRESH_TOKEN`
+
+### `DELETE /api/auth/logout`  🔒
+- **بدنه:** `{ refreshToken: string }`
+- **پاسخ:** `204 No Content` — کوکی‌ها پاک می‌شوند.
+
+### `GET /api/auth/me`  🔒
 کاربر فعلی برای داشبورد.
-- **پاسخ:** `User`
+- **پاسخ:** `200 User`
+- **خطا:** `401 Unauthorized`
 
 ---
 
