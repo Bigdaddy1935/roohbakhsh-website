@@ -5,6 +5,7 @@ import { validate } from "./config/env";
 import { DatabaseModule } from "./db/database.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { CoursesModule } from "./modules/courses/courses.module";
+import { InstructorModule } from "./modules/instructor/instructor.module";
 import { CategoryModule } from "./modules/category/category.module";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { JwtAuthGuard } from "./modules/auth/guards/jwt-auth.guard";
@@ -22,6 +23,7 @@ import { RolesGuard } from "./common/guards/roles.guard";
     }),
     DatabaseModule,
     AuthModule,
+    InstructorModule,
     CoursesModule,
     CategoryModule,
   ],

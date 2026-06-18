@@ -122,7 +122,111 @@
 
 ---
 
-# بخش ۴ — سرنخ و رویداد (منبع: NestJS — فاز ۱)
+# بخش ۴ — اساتید (منبع: NestJS)
+
+> عملیات نوشتن (POST / PATCH / DELETE) فقط برای `role: admin` مجاز است.
+> خواندن (GET) برای همه (بدون توکن) آزاد است.
+> `name` و `bio` از نوع `Localized` هستند: `{ ar: string, ur: string }`.
+
+### `GET /api/instructors`
+لیست همه اساتید.
+- **پاسخ:** `200 InstructorRecord[]`
+
+### `GET /api/instructors/:id`
+مشخصات یک استاد.
+- **پاسخ:** `200 InstructorRecord`
+- **خطا:** `404 INSTRUCTOR_NOT_FOUND`
+
+### `POST /api/instructors` 🔒 admin
+ایجاد استاد جدید.
+- **بدنه:** `CreateInstructorRequest`
+- **پاسخ:** `201 InstructorRecord`
+- **خطاها:** `409 INSTRUCTOR_SLUG_TAKEN` | `400 VALIDATION_ERROR`
+
+### `PATCH /api/instructors/:id` 🔒 admin
+ویرایش جزئی استاد.
+- **بدنه:** `UpdateInstructorRequest` (همه فیلدها اختیاری)
+- **پاسخ:** `200 InstructorRecord`
+- **خطاها:** `404 INSTRUCTOR_NOT_FOUND` | `409 INSTRUCTOR_SLUG_TAKEN`
+
+### `DELETE /api/instructors/:id` 🔒 admin
+حذف استاد.
+- **پاسخ:** `204 No Content`
+- **خطا:** `404 INSTRUCTOR_NOT_FOUND`
+
+---
+
+# بخش ۵ — دوره‌ها (منبع: NestJS)
+
+> عملیات نوشتن فقط برای `role: admin` مجاز است. خواندن برای همه آزاد است.
+> `title`، `description` از نوع `Localized` هستند.
+> `price` از نوع `Money`: `{ amountMinor: number, currency: "USD"|"EUR" }` — `null` یعنی رایگان.
+> `level` یکی از: `"beginner" | "intermediate" | "advanced"`.
+
+### `GET /api/courses`
+لیست همه دوره‌ها با اطلاعات خلاصه استاد.
+- **پاسخ:** `200 CourseRecord[]`
+
+### `GET /api/courses/:id`
+مشخصات یک دوره.
+- **پاسخ:** `200 CourseRecord`
+- **خطا:** `404 COURSE_NOT_FOUND`
+
+### `POST /api/courses` 🔒 admin
+ایجاد دوره جدید. دوره در حالت پنهان (`isPublished: false`) ایجاد می‌شود.
+- **بدنه:** `CreateCourseRequest`
+- **پاسخ:** `201 CourseRecord`
+- **خطاها:** `409 COURSE_SLUG_TAKEN` | `404 INSTRUCTOR_NOT_FOUND / CATEGORY_NOT_FOUND` | `400 VALIDATION_ERROR`
+
+### `PATCH /api/courses/:id` 🔒 admin
+ویرایش جزئی دوره. برای انتشار `isPublished: true` بفرست.
+- **بدنه:** `UpdateCourseRequest` (همه فیلدها اختیاری)
+- **پاسخ:** `200 CourseRecord`
+- **خطاها:** `404 COURSE_NOT_FOUND / INSTRUCTOR_NOT_FOUND` | `409 COURSE_SLUG_TAKEN`
+
+### `DELETE /api/courses/:id` 🔒 admin
+حذف دوره و تمام درس‌های آن (cascade).
+- **پاسخ:** `204 No Content`
+- **خطا:** `404 COURSE_NOT_FOUND`
+
+---
+
+# بخش ۶ — درس‌ها (منبع: NestJS)
+
+> عملیات نوشتن فقط برای `role: admin` مجاز است. خواندن برای همه آزاد است.
+> پس از هر تغییر درس، `lessonCount` و `durationMinutes` دوره به‌صورت خودکار sync می‌شوند.
+> `title` از نوع `Localized` است.
+
+### `GET /api/courses/:courseId/lessons`
+لیست درس‌های یک دوره به‌ترتیب `order`.
+- **پاسخ:** `200 Lesson[]`
+- **خطا:** `404 COURSE_NOT_FOUND`
+
+### `GET /api/courses/:courseId/lessons/:lessonId`
+مشخصات یک درس.
+- **پاسخ:** `200 Lesson`
+- **خطاها:** `404 COURSE_NOT_FOUND / LESSON_NOT_FOUND`
+
+### `POST /api/courses/:courseId/lessons` 🔒 admin
+افزودن درس به دوره.
+- **بدنه:** `CreateLessonRequest`
+- **پاسخ:** `201 Lesson`
+- **خطاها:** `404 COURSE_NOT_FOUND` | `400 VALIDATION_ERROR`
+
+### `PATCH /api/courses/:courseId/lessons/:lessonId` 🔒 admin
+ویرایش جزئی درس.
+- **بدنه:** `UpdateLessonRequest` (همه فیلدها اختیاری)
+- **پاسخ:** `200 Lesson`
+- **خطاها:** `404 COURSE_NOT_FOUND / LESSON_NOT_FOUND`
+
+### `DELETE /api/courses/:courseId/lessons/:lessonId` 🔒 admin
+حذف درس.
+- **پاسخ:** `204 No Content`
+- **خطاها:** `404 COURSE_NOT_FOUND / LESSON_NOT_FOUND`
+
+---
+
+# بخش ۷ — سرنخ و رویداد (منبع: NestJS — فاز ۱)
 
 ### `POST /api/leads`
 فرم جمع‌آوری ایمیل/شماره.
@@ -136,7 +240,7 @@
 
 ---
 
-# بخش ۵ — تیکتینگ (منبع: NestJS — فاز ۱)
+# بخش ۸ — تیکتینگ (منبع: NestJS — فاز ۱)
 
 ### `POST /api/tickets`
 - **بدنه:** `CreateTicketRequest` (مهمان هم می‌تواند با `guestEmail`)
