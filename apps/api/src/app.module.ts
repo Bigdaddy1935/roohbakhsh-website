@@ -8,6 +8,10 @@ import { CoursesModule } from "./modules/courses/courses.module";
 import { InstructorModule } from "./modules/instructor/instructor.module";
 import { CategoryModule } from "./modules/category/category.module";
 import { UsersModule } from "./modules/users/users.module";
+import { CouponModule } from "./modules/coupon/coupon.module";
+import { CartModule } from "./modules/cart/cart.module";
+import { OrdersModule } from "./modules/orders/orders.module";
+import { PaymentsModule } from "./modules/payments/payments.module";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { JwtAuthGuard } from "./modules/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "./common/guards/roles.guard";
@@ -28,6 +32,10 @@ import { RolesGuard } from "./common/guards/roles.guard";
     CoursesModule,
     CategoryModule,
     UsersModule,
+    CouponModule,
+    CartModule,
+    OrdersModule,
+    PaymentsModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: HttpExceptionFilter },

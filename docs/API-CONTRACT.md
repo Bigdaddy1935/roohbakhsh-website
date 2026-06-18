@@ -318,6 +318,149 @@ Accept-Language: ar
 
 ---
 
+## §7 — Coupons
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/coupons` | Admin | Paginated list of all coupons |
+| GET | `/coupons/:id` | Admin | Get coupon by ID |
+| POST | `/coupons` | Admin | Create a coupon |
+| PATCH | `/coupons/:id` | Admin | Update maxUses / expiresAt / isActive |
+| DELETE | `/coupons/:id` | Admin | Delete coupon |
+| POST | `/coupons/validate` | Public | Validate a coupon code + compute discount |
+
+### Coupon object
+```json
+{
+  "id": "uuid",
+  "code": "RAMADAN30",
+  "discountType": "percentage",
+  "discountValue": 30,
+  "currency": null,
+  "maxUses": 100,
+  "usedCount": 12,
+  "expiresAt": "2026-09-01T00:00:00.000Z",
+  "isActive": true,
+  "createdAt": "...", "updatedAt": "..."
+}
+```
+
+### POST /coupons/validate — request
+```json
+{ "code": "RAMADAN30", "orderTotal": { "amountMinor": 500000, "currency": "IRR" } }
+```
+### POST /coupons/validate — response
+```json
+{
+  "valid": true, "couponId": "uuid", "code": "RAMADAN30",
+  "discountAmount": { "amountMinor": 150000, "currency": "IRR" },
+  "finalTotal": { "amountMinor": 350000, "currency": "IRR" }
+}
+```
+
+---
+
+## §8 — Cart
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/cart` | User | Get current user cart |
+| POST | `/cart/items` | User | Add course to cart |
+| DELETE | `/cart/items/:courseId` | User | Remove course from cart |
+| DELETE | `/cart` | User | Clear entire cart |
+
+### Cart response
+```json
+{
+  "items": [
+    {
+      "courseId": "uuid",
+      "title": { "ar": "...", "ur": "..." },
+      "thumbnailUrl": "https://...",
+      "effectivePrice": { "amountMinor": 350000, "currency": "IRR" },
+      "addedAt": "2026-06-18T10:00:00.000Z"
+    }
+  ],
+  "total": { "amountMinor": 350000, "currency": "IRR" }
+}
+```
+
+---
+
+## §9 — Orders
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/orders` | User | Create order from cart (optional couponCode) |
+| GET | `/orders/mine` | User | List current user orders (paginated) |
+| GET | `/orders/mine/:id` | User | Get order detail |
+| GET | `/orders` | Admin | List all orders (paginated) |
+
+### POST /orders — request
+```json
+{ "couponCode": "RAMADAN30" }
+```
+
+### Order object
+```json
+{
+  "id": "uuid", "userId": "uuid", "status": "pending",
+  "items": [
+    {
+      "id": "uuid", "courseId": "uuid",
+      "titleSnapshot": { "ar": "...", "ur": "..." },
+      "priceSnapshot": { "amountMinor": 500000, "currency": "IRR" }
+    }
+  ],
+  "subtotal":       { "amountMinor": 500000, "currency": "IRR" },
+  "discountAmount": { "amountMinor": 150000, "currency": "IRR" },
+  "total":          { "amountMinor": 350000, "currency": "IRR" },
+  "couponId": "uuid", "couponCode": "RAMADAN30",
+  "createdAt": "...", "updatedAt": "..."
+}
+```
+**Order statuses:** `pending` → `paid` | `failed` | `cancelled` | `refunded`
+
+---
+
+## §10 — Payments (ZarinPal)
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/payments/initiate/:orderId` | User | Start payment — returns ZarinPal gateway URL |
+| GET | `/payments/verify` | Public | ZarinPal callback — verifies payment |
+| GET | `/payments/logs` | Admin | All payment logs (paginated) |
+| GET | `/payments/mine` | User | Current user payment history |
+
+### POST /payments/initiate/:orderId — response
+```json
+{ "paymentId": "uuid", "gatewayUrl": "https://www.zarinpal.com/pg/StartPay/AUTHORITY" }
+```
+→ Frontend redirects user to `gatewayUrl`.
+
+### GET /payments/verify?Authority=...&Status=OK — response
+```json
+{ "message": "PAYMENT_SUCCESS", "refId": "123456789" }
+```
+ZarinPal posts `Authority` + `Status` (OK | NOK) to this URL.  
+Amount must be in **Rials (IRR)**. Use `Money.amountMinor` with `currency: "IRR"` for course pricing.
+
+### Payment log object
+```json
+{
+  "id": "uuid", "orderId": "uuid", "userId": "uuid",
+  "amount": { "amountMinor": 350000, "currency": "IRR" },
+  "status": "paid",
+  "authority": "A00000000000000000000000000000000000",
+  "refId": "123456789",
+  "gatewayUrl": "https://www.zarinpal.com/pg/StartPay/...",
+  "description": "Order uuid",
+  "createdAt": "...", "updatedAt": "..."
+}
+```
+
+---
+
 ## فرایند تغییر قرارداد (مهم)
 
 اگر وسط کار نیاز به تغییر یک API بود:

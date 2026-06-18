@@ -45,6 +45,15 @@ class EnvConfig {
 
   @IsString()
   JWT_EXPIRES_IN: string = "7d";
+
+  @IsString()
+  ZARINPAL_MERCHANT_ID!: string;
+
+  @IsBoolean()
+  ZARINPAL_SANDBOX: boolean = true;
+
+  @IsString()
+  PAYMENT_CALLBACK_BASE_URL!: string;
 }
 
 function validate(config: Record<string, unknown>): EnvConfig {
