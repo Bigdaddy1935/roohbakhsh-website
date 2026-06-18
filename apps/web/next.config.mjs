@@ -1,10 +1,11 @@
 import createNextIntlPlugin from "next-intl/plugin";
 
-const withNextIntl = createNextIntlPlugin("./lib/i18n.ts");
+const withNextIntl = createNextIntlPlugin(
+  './src/i18n/request.ts'
+);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // پکیج مشترک را در همین مونوریپو ترنسپایل کن
   transpilePackages: ["@roohbakhsh/shared"],
 };
 

@@ -1,16 +1,14 @@
-import type { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import type { Locale } from "@roohbakhsh/shared";
-import { dirForLocale } from "../../lib/dir";
-import "./globals.css";
+import { dirForLocale } from "@/core/utils/dir";
+import "@/core/styles/globals.css";
 
 export default async function LocaleLayout({
   children,
   params,
 }: {
-  children: ReactNode;
-  // Next 15/16: params حالا async است (Promise) → باید await شود
+  children: React.ReactNode;
   params: Promise<{ locale: Locale }>;
 }) {
   const { locale } = await params;
@@ -18,7 +16,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={dirForLocale(locale)}>
-      <body>
+      <body cz-shortcut-listen="true">
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>
