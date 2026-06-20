@@ -560,6 +560,46 @@ Amount must be in **Rials (IRR)**. Use `Money.amountMinor` with `currency: "IRR"
 
 ---
 
+## §11 — Articles (مقالات)
+
+### روت‌ها
+
+| Method | Path | Auth | توضیح |
+|--------|------|------|-------|
+| `GET` | `/articles` | Public | لیست مقالات published (صفحه‌بندی) |
+| `GET` | `/articles/:slug` | Public | دریافت مقاله با slug (فقط published) |
+| `GET` | `/articles/admin/all` | Admin | لیست همه مقالات (draft + published) |
+| `POST` | `/articles` | Admin | ایجاد مقاله جدید |
+| `PATCH` | `/articles/:id` | Admin | ویرایش مقاله |
+| `DELETE` | `/articles/:id` | Admin | حذف مقاله |
+
+### شیء ArticleRecord
+
+```ts
+interface ArticleRecord {
+  id: string;            // UUID
+  title: Localized;      // { ar, ur }
+  slug: string;          // URL-friendly، یکتا
+  summary: Localized;    // { ar, ur } — خلاصه کوتاه
+  body: Localized;       // { ar, ur } — متن کامل
+  thumbnailUrl: string | null;
+  authorId: string;      // UUID کاربر ایجادکننده
+  status: "draft" | "published";
+  publishedAt: ISODate | null;  // null اگر هنوز draft باشد
+  createdAt: ISODate;
+  updatedAt: ISODate;
+}
+```
+
+### نکات
+
+- `GET /articles/:slug` فقط مقالات `published` را برمی‌گرداند؛ draft → 404
+- در `POST /articles` اگر `status: "published"` باشد، `publishedAt` همان لحظه ست می‌شود
+- `PATCH /articles/:id` می‌تواند slug را تغییر دهد؛ اگر slug تکراری باشد → 409 `SLUG_ALREADY_EXISTS`
+- `publishedAt` فقط یک‌بار (اولین publish) ست می‌شود و با PATCH دستی تغییر نمی‌کند
+
+---
+
 ## فرایند تغییر قرارداد (مهم)
 
 اگر وسط کار نیاز به تغییر یک API بود:
