@@ -22,9 +22,9 @@ class MoneyDto implements Money {
   @Min(0)
   amountMinor!: number;
 
-  @ApiProperty({ example: "USD", enum: ["USD", "EUR"] })
-  @IsIn(["USD", "EUR"])
-  currency!: "USD" | "EUR";
+  @ApiProperty({ example: "IRR", enum: ["USD", "EUR", "IRR"] })
+  @IsIn(["USD", "EUR", "IRR"])
+  currency!: "USD" | "EUR" | "IRR";
 }
 
 export class CreateCourseDto implements CreateCourseRequest {
