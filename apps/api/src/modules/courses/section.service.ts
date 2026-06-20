@@ -72,7 +72,18 @@ export class SectionService {
     const section = await this.sectionRepo.findOne({ where: { id: sectionId, courseId: course.id } });
     if (!section) throw new NotFoundException("SECTION_NOT_FOUND");
     await this.sectionRepo.remove(section);
+    await this.reorderSections(course.id);
     await this.syncCourseStats(course.id);
+  }
+
+  private async reorderSections(courseId: string): Promise<void> {
+    const remaining = await this.sectionRepo.find({
+      where: { courseId },
+      order: { order: "ASC" },
+    });
+    await Promise.all(
+      remaining.map((s, i) => this.sectionRepo.update(s.id, { order: i + 1 })),
+    );
   }
 
   private async syncCourseStats(courseId: string): Promise<void> {
