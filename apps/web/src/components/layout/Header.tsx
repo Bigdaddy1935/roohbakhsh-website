@@ -144,19 +144,19 @@ export default function Header() {
           {/* Desktop actions */}
           <div className="hidden md:flex items-center gap-x-3">
 
-            {/* Language switcher — no flags, subtle pill */}
+            {/* Language switcher — fixed width to prevent layout shift */}
             <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden text-[12px] font-semibold">
               <button
                 type="button"
                 onClick={() => switchLocale("ar")}
-                className={`px-3 py-1.5 transition-colors cursor-pointer ${locale === "ar" ? "bg-[var(--brand)] text-white" : "text-gray-500 hover:bg-gray-100"}`}
+                className={`w-8 text-center py-1.5 transition-colors cursor-pointer ${locale === "ar" ? "bg-[var(--brand)] text-white" : "text-gray-500 hover:bg-gray-100"}`}
               >
                 ع
               </button>
               <button
                 type="button"
                 onClick={() => switchLocale("ur")}
-                className={`px-3 py-1.5 transition-colors cursor-pointer ${locale === "ur" ? "bg-[var(--brand)] text-white" : "text-gray-500 hover:bg-gray-100"}`}
+                className={`w-[52px] text-center py-1.5 transition-colors cursor-pointer ${locale === "ur" ? "bg-[var(--brand)] text-white" : "text-gray-500 hover:bg-gray-100"}`}
               >
                 اردو
               </button>

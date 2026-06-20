@@ -41,10 +41,10 @@
   :lang(ur) { font-family: var(--font-urdu); line-height: 2; }
 }
 
-@layer components {
-  .container {
-    max-width: 1260px;
-    margin-inline: auto;
-    padding-inline: 24px;
-  }
+/* Outside any @layer — overrides everything from Tailwind/HeroUI */
+.container {
+  max-width: 1260px !important;
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 24px;
 }

@@ -37,13 +37,10 @@ export default function Footer() {
   const t = useTranslations("Footer");
 
   return (
-    /* Outer wrapper: padding bottom so footer floats above page edge */
-    <div className="px-4 pb-6 mt-8">
-      {/* Footer card — rounded, max-width 1260px, centered */}
-      <footer className="max-w-[1260px] mx-auto bg-[#1a1f36] text-gray-300 rounded-3xl overflow-hidden shadow-2xl shadow-black/20">
+    <footer className="bg-[#1a1f36] text-gray-300 mt-8">
 
         {/* Main grid */}
-        <div className="px-8 lg:px-12 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+        <div className="container py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
 
           {/* About */}
           <div className="flex flex-col gap-y-5">
@@ -113,12 +110,13 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/[0.06] px-8 lg:px-12 py-5 flex flex-col sm:flex-row items-center justify-between gap-y-2 text-xs text-gray-600">
-          <span>© {new Date().getFullYear()} — {t("copyright")}</span>
-          <span>{t("built_by")}</span>
+        <div className="border-t border-white/[0.06]">
+          <div className="container py-5 flex flex-col sm:flex-row items-center justify-between gap-y-2 text-xs text-gray-600">
+            <span>© {new Date().getFullYear()} — {t("copyright")}</span>
+            <span>{t("built_by")}</span>
+          </div>
         </div>
 
-      </footer>
-    </div>
+    </footer>
   );
 }
