@@ -67,6 +67,7 @@ export interface Lesson {
   order: number;
   durationMinutes: number;
   isFreePreview: boolean;
+  sectionId: ID;
   courseId: ID;
   createdAt: ISODate;
   updatedAt: ISODate;
@@ -84,6 +85,27 @@ export interface UpdateLessonRequest {
   order?: number;
   durationMinutes?: number;
   isFreePreview?: boolean;
+}
+
+/** یک سرفصل از دوره — پاسخ API بک‌اند. */
+export interface SectionRecord {
+  id: ID;
+  courseId: ID;
+  title: Localized;
+  order: number;
+  lessons: Lesson[];
+  createdAt: ISODate;
+  updatedAt: ISODate;
+}
+
+export interface CreateSectionRequest {
+  title: Localized;
+  order?: number;
+}
+
+export interface UpdateSectionRequest {
+  title?: Localized;
+  order?: number;
 }
 
 /** اطلاعات تخفیف فعال روی یک دوره. */

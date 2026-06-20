@@ -219,39 +219,101 @@ effectivePrice: Money|null  // قیمت واقعی: discountedPrice (اگر isAc
 
 ---
 
-# بخش ۶ — درس‌ها (منبع: NestJS)
+# بخش ۶ — سرفصل‌ها (منبع: NestJS)
 
+> ساختار محتوا: **دوره → سرفصل → درس**
+> هر دوره یک یا چند سرفصل دارد. هر سرفصل یک یا چند درس دارد.
 > عملیات نوشتن فقط برای `role: admin` مجاز است. خواندن برای همه آزاد است.
+> `title` از نوع `Localized` است: `{ ar: string, ur: string }`.
+
+### `GET /api/courses/:courseSlug/sections`
+تمام سرفصل‌های یک دوره به‌ترتیب `order`، همراه با درس‌هایشان.
+- **پاسخ:** `200 SectionRecord[]`
+- **خطا:** `404 COURSE_NOT_FOUND`
+
+### `GET /api/courses/:courseSlug/sections/:sectionId`
+یک سرفصل با تمام درس‌هایش.
+- **پاسخ:** `200 SectionRecord`
+- **خطاها:** `404 COURSE_NOT_FOUND / SECTION_NOT_FOUND`
+
+### `POST /api/courses/:courseSlug/sections` 🔒 admin
+ایجاد سرفصل جدید برای دوره.
+- **بدنه:** `CreateSectionRequest` — `{ title: Localized, order?: number }`
+- **پاسخ:** `201 SectionRecord`
+- **خطاها:** `404 COURSE_NOT_FOUND` | `400 VALIDATION_ERROR`
+
+### `PATCH /api/courses/:courseSlug/sections/:sectionId` 🔒 admin
+ویرایش عنوان یا ترتیب سرفصل.
+- **بدنه:** `UpdateSectionRequest` — `{ title?: Localized, order?: number }`
+- **پاسخ:** `200 SectionRecord`
+- **خطاها:** `404 COURSE_NOT_FOUND / SECTION_NOT_FOUND` | `400 VALIDATION_ERROR`
+
+### `DELETE /api/courses/:courseSlug/sections/:sectionId` 🔒 admin
+حذف سرفصل و تمام درس‌های آن (cascade).
+- **پاسخ:** `204 No Content`
+- **خطاها:** `404 COURSE_NOT_FOUND / SECTION_NOT_FOUND`
+
+### SectionRecord
+```json
+{
+  "id": "uuid",
+  "courseId": "uuid",
+  "title": { "ar": "مقدمة", "ur": "تعارف" },
+  "order": 1,
+  "lessons": [ /* Lesson[] — بدون pagination */ ],
+  "createdAt": "...", "updatedAt": "..."
+}
+```
+
+---
+
+# بخش ۶-ب — درس‌ها (منبع: NestJS)
+
+> درس‌ها زیر سرفصل قرار دارند. مسیر کامل: `/api/courses/:courseSlug/sections/:sectionId/lessons`
 > پس از هر تغییر درس، `lessonCount` و `durationMinutes` دوره به‌صورت خودکار sync می‌شوند.
 > `title` از نوع `Localized` است.
 
-### `GET /api/courses/:courseSlug/lessons`
-لیست صفحه‌بندی‌شده درس‌های یک دوره به‌ترتیب `order`.
-- **Query:** `page` (پیش‌فرض ۱)، `limit` (پیش‌فرض ۱۲، حداکثر ۱۰۰)
+### `GET /api/courses/:courseSlug/sections/:sectionId/lessons`
+لیست صفحه‌بندی‌شده درس‌های یک سرفصل به‌ترتیب `order`.
+- **Query:** `page` (پیش‌فرض ۱)، `limit` (پیش‌فرض ۵۰، حداکثر ۱۰۰)
 - **پاسخ:** `200 Paginated<Lesson>`
-- **خطا:** `404 COURSE_NOT_FOUND`
+- **خطاها:** `404 COURSE_NOT_FOUND / SECTION_NOT_FOUND`
 
-### `GET /api/courses/:courseSlug/lessons/:lessonId`
+### `GET /api/courses/:courseSlug/sections/:sectionId/lessons/:lessonId`
 مشخصات یک درس.
 - **پاسخ:** `200 Lesson`
-- **خطاها:** `404 COURSE_NOT_FOUND / LESSON_NOT_FOUND`
+- **خطاها:** `404 COURSE_NOT_FOUND / SECTION_NOT_FOUND / LESSON_NOT_FOUND`
 
-### `POST /api/courses/:courseSlug/lessons` 🔒 admin
-افزودن درس به دوره.
+### `POST /api/courses/:courseSlug/sections/:sectionId/lessons` 🔒 admin
+افزودن درس به سرفصل.
 - **بدنه:** `CreateLessonRequest`
 - **پاسخ:** `201 Lesson`
-- **خطاها:** `404 COURSE_NOT_FOUND` | `400 VALIDATION_ERROR`
+- **خطاها:** `404 COURSE_NOT_FOUND / SECTION_NOT_FOUND` | `400 VALIDATION_ERROR`
 
-### `PATCH /api/courses/:courseSlug/lessons/:lessonId` 🔒 admin
+### `PATCH /api/courses/:courseSlug/sections/:sectionId/lessons/:lessonId` 🔒 admin
 ویرایش جزئی درس.
 - **بدنه:** `UpdateLessonRequest` (همه فیلدها اختیاری)
 - **پاسخ:** `200 Lesson`
-- **خطاها:** `404 COURSE_NOT_FOUND / LESSON_NOT_FOUND`
+- **خطاها:** `404 COURSE_NOT_FOUND / SECTION_NOT_FOUND / LESSON_NOT_FOUND`
 
-### `DELETE /api/courses/:courseSlug/lessons/:lessonId` 🔒 admin
+### `DELETE /api/courses/:courseSlug/sections/:sectionId/lessons/:lessonId` 🔒 admin
 حذف درس.
 - **پاسخ:** `204 No Content`
-- **خطاها:** `404 COURSE_NOT_FOUND / LESSON_NOT_FOUND`
+- **خطاها:** `404 COURSE_NOT_FOUND / SECTION_NOT_FOUND / LESSON_NOT_FOUND`
+
+### Lesson object
+```json
+{
+  "id": "uuid",
+  "title": { "ar": "الدرس الأول", "ur": "پہلا سبق" },
+  "order": 1,
+  "durationMinutes": 20,
+  "isFreePreview": true,
+  "sectionId": "uuid",
+  "courseId": "uuid",
+  "createdAt": "...", "updatedAt": "..."
+}
+```
 
 ---
 

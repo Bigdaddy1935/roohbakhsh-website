@@ -86,6 +86,10 @@ export const ERROR_MESSAGES: Record<string, LocalizedMsg> = {
     ar: "الدرس المطلوب غير موجود",
     ur: "مطلوبہ سبق موجود نہیں",
   },
+  SECTION_NOT_FOUND: {
+    ar: "القسم (السرفصل) المطلوب غير موجود",
+    ur: "مطلوبہ سیکشن موجود نہیں",
+  },
   // coupon
   COUPON_NOT_FOUND: {
     ar: "رمز الخصم غير موجود أو غير فعّال",

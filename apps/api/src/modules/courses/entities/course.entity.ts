@@ -13,6 +13,7 @@ import type { CourseLevel } from "@roohbakhsh/shared";
 import { Instructor } from "../../instructor/entities/instructor.entity";
 import { Category } from "../../category/entities/category.entity";
 import { Lesson } from "./lesson.entity";
+import { Section } from "./section.entity";
 
 @Entity("courses")
 export class Course {
@@ -69,6 +70,9 @@ export class Course {
 
   @Column({ name: "category_id", type: "varchar", nullable: true, default: null })
   categoryId!: string | null;
+
+  @OneToMany(() => Section, (section) => section.course, { cascade: ["insert", "update"] })
+  sections!: Section[];
 
   @OneToMany(() => Lesson, (lesson) => lesson.course, { cascade: ["insert", "update"] })
   lessons!: Lesson[];

@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import type { Lesson as LessonContract, Paginated } from "@roohbakhsh/shared";
 import { toPaginated } from "../../common/utils/paginate";
 import { Lesson } from "./entities/lesson.entity";
+import { Section } from "./entities/section.entity";
 import { Course } from "./entities/course.entity";
 import { CreateLessonDto } from "./dto/create-lesson.dto";
 import { UpdateLessonDto } from "./dto/update-lesson.dto";
@@ -13,14 +14,21 @@ export class LessonService {
   constructor(
     @InjectRepository(Lesson)
     private readonly lessonRepo: Repository<Lesson>,
+    @InjectRepository(Section)
+    private readonly sectionRepo: Repository<Section>,
     @InjectRepository(Course)
     private readonly courseRepo: Repository<Course>,
   ) {}
 
-  async findByCourse(courseSlug: string, page: number, limit: number): Promise<Paginated<LessonContract>> {
-    const course = await this.courseBySlug(courseSlug);
+  async findBySection(
+    courseSlug: string,
+    sectionId: string,
+    page: number,
+    limit: number,
+  ): Promise<Paginated<LessonContract>> {
+    const section = await this.sectionByIdAndCourseSlug(courseSlug, sectionId);
     const [lessons, total] = await this.lessonRepo.findAndCount({
-      where: { courseId: course.id },
+      where: { sectionId: section.id },
       order: { order: "ASC" },
       take: limit,
       skip: (page - 1) * limit,
@@ -28,34 +36,39 @@ export class LessonService {
     return toPaginated(lessons.map(this.toContract), total, page, limit);
   }
 
-  async findOne(courseSlug: string, lessonId: string): Promise<LessonContract> {
-    const course = await this.courseBySlug(courseSlug);
-    const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, courseId: course.id } });
+  async findOne(courseSlug: string, sectionId: string, lessonId: string): Promise<LessonContract> {
+    const section = await this.sectionByIdAndCourseSlug(courseSlug, sectionId);
+    const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, sectionId: section.id } });
     if (!lesson) throw new NotFoundException("LESSON_NOT_FOUND");
     return this.toContract(lesson);
   }
 
-  async create(courseSlug: string, dto: CreateLessonDto): Promise<LessonContract> {
-    const course = await this.courseBySlug(courseSlug);
-    const courseId = course.id;
+  async create(courseSlug: string, sectionId: string, dto: CreateLessonDto): Promise<LessonContract> {
+    const section = await this.sectionByIdAndCourseSlug(courseSlug, sectionId);
 
     const lesson = this.lessonRepo.create({
       title: dto.title,
       order: dto.order ?? 0,
       durationMinutes: dto.durationMinutes,
       isFreePreview: dto.isFreePreview ?? false,
-      courseId,
+      sectionId: section.id,
+      courseId: section.courseId,
     });
 
     const saved = await this.lessonRepo.save(lesson);
-    await this.syncCourseStats(courseId);
+    await this.syncCourseStats(section.courseId);
 
     return this.toContract(saved);
   }
 
-  async update(courseSlug: string, lessonId: string, dto: UpdateLessonDto): Promise<LessonContract> {
-    const course = await this.courseBySlug(courseSlug);
-    const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, courseId: course.id } });
+  async update(
+    courseSlug: string,
+    sectionId: string,
+    lessonId: string,
+    dto: UpdateLessonDto,
+  ): Promise<LessonContract> {
+    const section = await this.sectionByIdAndCourseSlug(courseSlug, sectionId);
+    const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, sectionId: section.id } });
     if (!lesson) throw new NotFoundException("LESSON_NOT_FOUND");
 
     if (dto.title !== undefined) lesson.title = dto.title;
@@ -64,24 +77,28 @@ export class LessonService {
     if (dto.isFreePreview !== undefined) lesson.isFreePreview = dto.isFreePreview;
 
     const saved = await this.lessonRepo.save(lesson);
-    await this.syncCourseStats(course.id);
+    await this.syncCourseStats(section.courseId);
 
     return this.toContract(saved);
   }
 
-  async remove(courseSlug: string, lessonId: string): Promise<void> {
-    const course = await this.courseBySlug(courseSlug);
-    const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, courseId: course.id } });
+  async remove(courseSlug: string, sectionId: string, lessonId: string): Promise<void> {
+    const section = await this.sectionByIdAndCourseSlug(courseSlug, sectionId);
+    const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, sectionId: section.id } });
     if (!lesson) throw new NotFoundException("LESSON_NOT_FOUND");
 
     await this.lessonRepo.remove(lesson);
-    await this.syncCourseStats(course.id);
+    await this.syncCourseStats(section.courseId);
   }
 
-  private async courseBySlug(slug: string): Promise<Course> {
-    const course = await this.courseRepo.findOne({ where: { slug } });
+  private async sectionByIdAndCourseSlug(courseSlug: string, sectionId: string): Promise<Section> {
+    const course = await this.courseRepo.findOne({ where: { slug: courseSlug } });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
-    return course;
+
+    const section = await this.sectionRepo.findOne({ where: { id: sectionId, courseId: course.id } });
+    if (!section) throw new NotFoundException("SECTION_NOT_FOUND");
+
+    return section;
   }
 
   private async syncCourseStats(courseId: string): Promise<void> {
@@ -98,6 +115,7 @@ export class LessonService {
       order: lesson.order,
       durationMinutes: lesson.durationMinutes,
       isFreePreview: lesson.isFreePreview,
+      sectionId: lesson.sectionId,
       courseId: lesson.courseId,
       createdAt: lesson.createdAt.toISOString(),
       updatedAt: lesson.updatedAt.toISOString(),

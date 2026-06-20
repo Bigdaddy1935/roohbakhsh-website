@@ -3,7 +3,7 @@ import { TypeOrmModule, InjectDataSource } from "@nestjs/typeorm";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { DataSource } from "typeorm";
 
-const SET_NAMES_SQL = "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci";
+const SET_NAMES_SQL = "SET NAMES utf8mb4";
 
 /**
  * Ensures every mysql2 pool connection uses utf8mb4.
@@ -54,7 +54,8 @@ class Utf8mb4Initializer implements OnApplicationBootstrap {
     }
     await Promise.all(promises);
 
-    this.logger.log(`SET NAMES utf8mb4 applied to ${limit} pool connections`);
+    this.logger.log(`SET NAMES utf8mb4 applied to ${limit} pool connections (collation: db default)`);
+
   }
 }
 
@@ -74,7 +75,6 @@ class Utf8mb4Initializer implements OnApplicationBootstrap {
         autoLoadEntities: true,
         migrations: ["dist/db/migrations/*.js"],
         migrationsRun: false,
-        charset: "utf8mb4_unicode_ci",
       }),
     }),
   ],
