@@ -137,6 +137,13 @@ export class OrdersService {
     await this.orderRepo.update(id, { status });
   }
 
+  /** Used by InvoicesService — returns raw entity with items */
+  async findEntity(id: string): Promise<Order> {
+    const order = await this.orderRepo.findOne({ where: { id } });
+    if (!order) throw new NotFoundException("ORDER_NOT_FOUND");
+    return order;
+  }
+
   private effectivePrice(course: Course): Money | null {
     if (course.discountPrice) {
       const isActive =

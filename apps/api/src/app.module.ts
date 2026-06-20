@@ -12,6 +12,7 @@ import { CouponModule } from "./modules/coupon/coupon.module";
 import { CartModule } from "./modules/cart/cart.module";
 import { OrdersModule } from "./modules/orders/orders.module";
 import { PaymentsModule } from "./modules/payments/payments.module";
+import { InvoicesModule } from "./modules/invoices/invoices.module";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { JwtAuthGuard } from "./modules/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "./common/guards/roles.guard";
@@ -36,6 +37,7 @@ import { RolesGuard } from "./common/guards/roles.guard";
     CartModule,
     OrdersModule,
     PaymentsModule,
+    InvoicesModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: HttpExceptionFilter },

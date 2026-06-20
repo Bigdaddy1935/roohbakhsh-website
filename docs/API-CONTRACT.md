@@ -525,6 +525,41 @@ Amount must be in **Rials (IRR)**. Use `Money.amountMinor` with `currency: "IRR"
 
 ---
 
+## ۸. Invoices (فاکتور)
+
+فاکتور به‌صورت خودکار پس از تأیید موفق پرداخت ساخته می‌شود.  
+شماره فاکتور: `INV-YYYYMMDD-XXXX`
+
+| روت | Auth | توضیح |
+|-----|------|-------|
+| `GET /invoices/mine` | user | لیست فاکتورهای کاربر (paginated) |
+| `GET /invoices/mine/:invoiceNumber` | user (owner) | جزئیات یک فاکتور |
+
+### Invoice object
+```json
+{
+  "id": "uuid",
+  "invoiceNumber": "INV-20260620-0001",
+  "orderId": "uuid",
+  "userId": "uuid",
+  "items": [
+    {
+      "courseId": "uuid",
+      "titleSnapshot": { "ar": "...", "ur": "..." },
+      "priceSnapshot": { "amountMinor": 1000000, "currency": "IRR" }
+    }
+  ],
+  "subtotal":      { "amountMinor": 3000000, "currency": "IRR" },
+  "discountAmount":{ "amountMinor":  600000, "currency": "IRR" },
+  "total":         { "amountMinor": 2400000, "currency": "IRR" },
+  "couponCode": "ROOH20",
+  "paymentRefId": "123456789",
+  "issuedAt": "2026-06-20T10:00:00.000Z"
+}
+```
+
+---
+
 ## فرایند تغییر قرارداد (مهم)
 
 اگر وسط کار نیاز به تغییر یک API بود:

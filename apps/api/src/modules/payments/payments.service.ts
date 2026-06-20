@@ -13,6 +13,7 @@ import type { PaymentRecord, InitiatePaymentResponse, Paginated } from "@roohbak
 import { toPaginated } from "../../common/utils/paginate";
 import { Payment } from "./entities/payment.entity";
 import { OrdersService } from "../orders/orders.service";
+import { InvoicesService } from "../invoices/invoices.service";
 import { EnvConfig } from "../../config/env";
 
 const ZARINPAL_REQUEST_URL = "https://api.zarinpal.com/pg/v4/payment/request.json";
@@ -31,6 +32,7 @@ export class PaymentsService {
     @InjectRepository(Payment)
     private readonly repo: Repository<Payment>,
     private readonly ordersService: OrdersService,
+    private readonly invoicesService: InvoicesService,
     private readonly config: ConfigService<EnvConfig>,
   ) {}
 
@@ -145,6 +147,8 @@ export class PaymentsService {
       const refId = String(verifyRes.data.ref_id);
       await this.repo.update(payment.id, { status: "paid", refId });
       await this.ordersService.updateStatus(payment.orderId, "paid");
+      const order = await this.ordersService.findEntity(payment.orderId);
+      await this.invoicesService.createFromOrder(order, refId);
       this.logger.log(`Payment ${payment.id} verified. RefID: ${refId}`);
       return { message: "PAYMENT_SUCCESS", refId };
     }
