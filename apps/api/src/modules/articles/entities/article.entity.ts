@@ -27,8 +27,8 @@ export class Article {
   @Column({ type: "longtext", name: "body_ur" })
   bodyUr!: string;
 
-  @Column({ name: "thumbnail_url", type: "varchar", nullable: true, default: null })
-  thumbnailUrl!: string | null;
+  @Column({ name: "thumbnail_url", type: "json", nullable: true, default: null })
+  thumbnailUrl!: import("@roohbakhsh/shared").Localized<string | null> | null;
 
   @Column({ name: "author_id" })
   authorId!: string;

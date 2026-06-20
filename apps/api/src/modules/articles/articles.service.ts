@@ -110,7 +110,7 @@ export class ArticlesService {
       slug: a.slug,
       summary: a.summary,
       body: { ar: a.bodyAr, ur: a.bodyUr },
-      thumbnailUrl: a.thumbnailUrl,
+      thumbnailUrl: a.thumbnailUrl ?? { ar: null, ur: null },
       authorId: a.authorId,
       status: a.status,
       publishedAt: a.publishedAt ? a.publishedAt.toISOString() : null,

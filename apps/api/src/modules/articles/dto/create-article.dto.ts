@@ -1,7 +1,19 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsObject, ValidateNested } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsObject, ValidateNested, IsUrl } from "class-validator";
 import { Type } from "class-transformer";
 import type { ArticleStatus, Localized } from "@roohbakhsh/shared";
+
+class LocalizedNullableDto {
+  @ApiPropertyOptional({ example: "https://cdn.example.com/ar/img.jpg", nullable: true })
+  @IsOptional()
+  @IsUrl()
+  ar!: string | null;
+
+  @ApiPropertyOptional({ example: "https://cdn.example.com/ur/img.jpg", nullable: true })
+  @IsOptional()
+  @IsUrl()
+  ur!: string | null;
+}
 
 class LocalizedDto {
   @ApiProperty({ example: "العنوان" })
@@ -39,10 +51,16 @@ export class CreateArticleDto {
   @Type(() => LocalizedDto)
   body!: Localized;
 
-  @ApiPropertyOptional({ example: "https://cdn.example.com/img.jpg" })
+  @ApiPropertyOptional({
+    type: LocalizedNullableDto,
+    description: "تصویر شاخص مقاله — می‌تواند per locale متفاوت باشد",
+    example: { ar: "https://cdn.example.com/ar/img.jpg", ur: "https://cdn.example.com/ur/img.jpg" },
+  })
   @IsOptional()
-  @IsString()
-  thumbnailUrl?: string;
+  @ValidateNested()
+  @Type(() => LocalizedNullableDto)
+  @IsObject()
+  thumbnailUrl?: Localized<string | null>;
 
   @ApiPropertyOptional({ enum: ["draft", "published"], default: "draft" })
   @IsOptional()

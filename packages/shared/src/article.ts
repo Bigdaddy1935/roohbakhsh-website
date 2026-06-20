@@ -8,7 +8,7 @@ export interface ArticleRecord {
   slug: string;
   summary: Localized;
   body: Localized;
-  thumbnailUrl: string | null;
+  thumbnailUrl: Localized<string | null>;
   authorId: string;
   status: ArticleStatus;
   publishedAt: ISODate | null;
