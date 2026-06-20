@@ -13,14 +13,28 @@
   --font-urdu:   "Noto Nastaliq Urdu", "Amar Nastaleeq", serif;
 }
 
+/* ── Custom thin scrollbar ────────────────────────────────── */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+.scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
+.scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
 @layer base {
   * { box-sizing: border-box; }
+
+  html, body { overflow-x: hidden; }
 
   body {
     margin: 0;
     background: var(--bg);
     color: var(--ink);
+    scrollbar-width: none;
   }
+  body::-webkit-scrollbar { display: none; }
 
   /* per-locale font */
   :lang(ar) { font-family: var(--font-arabic); }

@@ -9,8 +9,6 @@ import {
   RiCloseLine,
   RiArrowDownSLine,
   RiArrowLeftSLine,
-  RiUserLine,
-  RiShoppingCart2Line,
   RiBookOpenLine,
   RiScales2Line,
   RiMoonLine,
@@ -18,6 +16,8 @@ import {
   RiPenNibLine,
   RiHeartLine,
 } from "react-icons/ri";
+import { CgShoppingBag } from "react-icons/cg";
+import { HiOutlineUser } from "react-icons/hi2";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -78,21 +78,36 @@ export default function Header() {
   return (
     <>
       {/* ── HEADER ──────────────────────────────────────────────────── */}
-      <header className="bg-[#F7F7F7] border-b border-gray-200 h-[100px]">
+      <header className="bg-[#F7F7F7] border-b border-gray-200 h-[85px] md:h-[100px]">
         <div className="container h-full flex items-center gap-x-6">
 
-          {/* Mobile hamburger */}
-          <button
-            type="button"
-            onClick={() => setDrawerOpen(true)}
-            className="flex md:hidden items-center justify-center text-[var(--ink)] cursor-pointer"
-            aria-label="open menu"
-          >
-            <RiMenu2Line size={26} />
-          </button>
+          {/* Mobile layout: hamburger | logo (center) | cart */}
+          <div className="flex md:hidden w-full items-center justify-between">
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(true)}
+              className="text-[var(--ink)] cursor-pointer"
+              aria-label="open menu"
+            >
+              <RiMenu2Line size={26} />
+            </button>
+            <Link href="/">
+              <Image
+                src="https://roohbakhshac.ir/logo.png"
+                alt="روح‌بخش"
+                width={150}
+                height={48}
+                className="object-contain h-12 w-auto"
+                priority
+              />
+            </Link>
+            <Link href="/cart" aria-label={t("cart")}>
+              <CgShoppingBag size={26} className="text-[var(--ink)] hover:text-[var(--brand)] transition-colors" />
+            </Link>
+          </div>
 
-          {/* Logo */}
-          <Link href="/" className="shrink-0">
+          {/* Desktop logo */}
+          <Link href="/" className="hidden md:block shrink-0">
             <Image
               src="https://roohbakhshac.ir/logo.png"
               alt="روح‌بخش"
@@ -180,11 +195,11 @@ export default function Header() {
             </Link>
           </nav>
 
-          {/* Spacer */}
-          <div className="flex-1" />
+          {/* Spacer — desktop only */}
+          <div className="hidden md:block flex-1" />
 
-          {/* Actions */}
-          <div className="flex items-center gap-x-4">
+          {/* Actions — desktop only */}
+          <div className="hidden md:flex items-center gap-x-4">
 
             {/* Locale switcher */}
             {locale !== "ar" && (
@@ -210,15 +225,15 @@ export default function Header() {
 
             {/* Cart icon */}
             <Link href="/cart" aria-label={t("cart")}>
-              <RiShoppingCart2Line
+              <CgShoppingBag
                 size={26}
                 className="text-[var(--ink)] hover:text-[var(--brand)] transition-colors cursor-pointer"
               />
             </Link>
 
-            {/* User / auth icon */}
+            {/* User / auth icon — desktop only */}
             <Link href="/auth/signin" aria-label={t("signin")}>
-              <RiUserLine
+              <HiOutlineUser
                 size={26}
                 className="text-[var(--ink)] hover:text-[var(--brand)] transition-colors cursor-pointer"
               />

@@ -25,11 +25,11 @@ export type CourseCardData = {
   category: string;
 };
 
-export default function CourseCard({ course }: { course: CourseCardData }) {
+export default function CourseCard({ course, fluid }: { course: CourseCardData; fluid?: boolean }) {
   return (
     <Link
       href={course.href}
-      className="group flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-[var(--brand)]/20 transition-all duration-300 overflow-hidden w-72 shrink-0"
+      className={`group flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-[var(--brand)]/20 transition-all duration-300 overflow-hidden ${fluid ? "w-full" : "w-72 shrink-0"}`}
     >
       {/* Thumbnail */}
       <div className="relative h-44 overflow-hidden bg-gray-100">
