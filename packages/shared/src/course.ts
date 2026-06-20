@@ -9,6 +9,12 @@ export type CourseLevel = "beginner" | "intermediate" | "advanced";
 
 export type CourseStatus = "draft" | "published" | "archived";
 
+/** وضعیت برگزاری دوره — مستقل از isPublished */
+export type CourseRunStatus = "ongoing" | "upcoming" | "completed";
+
+/** نحوه دسترسی به محتوای دوره */
+export type AccessType = "online_only" | "downloadable";
+
 /** نسخه‌ی سبک دوره — برای کارت‌ها و لیست‌ها (صفحه‌ی دوره‌ها). */
 export interface CourseListItem {
   id: ID;
@@ -134,6 +140,10 @@ export interface CourseRecord {
   durationMinutes: number;
   lessonCount: number;
   level: CourseLevel;
+  /** وضعیت برگزاری: ongoing=در حال برگزاری، upcoming=به زودی، completed=پایان‌یافته */
+  runStatus: CourseRunStatus;
+  /** نحوه دسترسی: online_only=فقط آنلاین، downloadable=قابل دانلود */
+  accessType: AccessType;
   isPublished: boolean;
   instructorId: ID;
   instructor: InstructorSummary;
@@ -149,6 +159,8 @@ export interface CreateCourseRequest {
   thumbnailUrl?: string;
   price?: Money | null;
   level?: CourseLevel;
+  runStatus?: CourseRunStatus;
+  accessType?: AccessType;
   instructorId: ID;
   categoryId?: ID | null;
   discountPrice?: Money | null;
@@ -162,6 +174,8 @@ export interface UpdateCourseRequest {
   thumbnailUrl?: string | null;
   price?: Money | null;
   level?: CourseLevel;
+  runStatus?: CourseRunStatus;
+  accessType?: AccessType;
   isPublished?: boolean;
   instructorId?: ID;
   categoryId?: ID | null;

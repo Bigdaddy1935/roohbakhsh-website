@@ -60,6 +60,8 @@ export class CourseService {
       durationMinutes: 0,
       lessonCount: 0,
       level: dto.level ?? "beginner",
+      runStatus: dto.runStatus ?? "upcoming",
+      accessType: dto.accessType ?? "online_only",
       instructorId: dto.instructorId,
       instructor,
       categoryId: dto.categoryId ?? null,
@@ -100,6 +102,8 @@ export class CourseService {
     if (dto.thumbnailUrl !== undefined) course.thumbnailUrl = dto.thumbnailUrl ?? null;
     if (dto.price !== undefined) course.price = dto.price ?? null;
     if (dto.level !== undefined) course.level = dto.level;
+    if (dto.runStatus !== undefined) course.runStatus = dto.runStatus;
+    if (dto.accessType !== undefined) course.accessType = dto.accessType;
     if (dto.isPublished !== undefined) course.isPublished = dto.isPublished;
     if (dto.discountPrice !== undefined) course.discountPrice = dto.discountPrice ?? null;
     if (dto.discountExpiresAt !== undefined) {
@@ -148,6 +152,8 @@ export class CourseService {
       durationMinutes: course.durationMinutes,
       lessonCount: course.lessonCount,
       level: course.level,
+      runStatus: course.runStatus,
+      accessType: course.accessType,
       isPublished: course.isPublished,
       instructorId: course.instructorId,
       instructor: {

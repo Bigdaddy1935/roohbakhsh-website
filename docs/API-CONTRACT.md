@@ -172,8 +172,10 @@
 
 > عملیات نوشتن فقط برای `role: admin` مجاز است. خواندن برای همه آزاد است.
 > `title`، `description` از نوع `Localized` هستند.
-> `price` از نوع `Money`: `{ amountMinor: number, currency: "USD"|"EUR" }` — `null` یعنی رایگان.
+> `price` از نوع `Money`: `{ amountMinor: number, currency: "USD"|"EUR"|"IRR" }` — `null` یعنی رایگان.
 > `level` یکی از: `"beginner" | "intermediate" | "advanced"`.
+> `runStatus` یکی از: `"ongoing"` (در حال برگزاری) | `"upcoming"` (به زودی) | `"completed"` (پایان‌یافته). پیش‌فرض: `upcoming`.
+> `accessType` یکی از: `"online_only"` (فقط آنلاین) | `"downloadable"` (قابل دانلود). پیش‌فرض: `online_only`.
 
 ### `GET /api/courses`
 لیست صفحه‌بندی‌شده دوره‌ها با اطلاعات خلاصه استاد.

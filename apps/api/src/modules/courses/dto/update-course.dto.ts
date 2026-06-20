@@ -4,7 +4,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import type { UpdateCourseRequest, Localized, Money, ISODate } from "@roohbakhsh/shared";
+import type { UpdateCourseRequest, Localized, Money, ISODate, CourseRunStatus, AccessType } from "@roohbakhsh/shared";
 
 class LocalizedDto implements Localized {
   @ApiPropertyOptional({ example: "تفسير القرآن للمبتدئين" })
@@ -62,6 +62,24 @@ export class UpdateCourseDto implements UpdateCourseRequest {
   @IsOptional()
   @IsIn(["beginner", "intermediate", "advanced"])
   level?: "beginner" | "intermediate" | "advanced";
+
+  @ApiPropertyOptional({
+    example: "ongoing",
+    enum: ["ongoing", "upcoming", "completed"],
+    description: "وضعیت برگزاری دوره",
+  })
+  @IsOptional()
+  @IsIn(["ongoing", "upcoming", "completed"])
+  runStatus?: CourseRunStatus;
+
+  @ApiPropertyOptional({
+    example: "online_only",
+    enum: ["online_only", "downloadable"],
+    description: "نحوه دسترسی به محتوا",
+  })
+  @IsOptional()
+  @IsIn(["online_only", "downloadable"])
+  accessType?: AccessType;
 
   @ApiPropertyOptional({ example: true, description: "انتشار یا پنهان کردن دوره" })
   @IsOptional()

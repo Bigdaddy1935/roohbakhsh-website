@@ -8,8 +8,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from "typeorm";
-import type { Localized, Money } from "@roohbakhsh/shared";
-import type { CourseLevel } from "@roohbakhsh/shared";
+import type { Localized, Money, CourseLevel, CourseRunStatus, AccessType } from "@roohbakhsh/shared";
 import { Instructor } from "../../instructor/entities/instructor.entity";
 import { Category } from "../../category/entities/category.entity";
 import { Lesson } from "./lesson.entity";
@@ -47,6 +46,22 @@ export class Course {
     default: "beginner",
   })
   level!: CourseLevel;
+
+  @Column({
+    name: "run_status",
+    type: "enum",
+    enum: ["ongoing", "upcoming", "completed"],
+    default: "upcoming",
+  })
+  runStatus!: CourseRunStatus;
+
+  @Column({
+    name: "access_type",
+    type: "enum",
+    enum: ["online_only", "downloadable"],
+    default: "online_only",
+  })
+  accessType!: AccessType;
 
   @Column({ name: "is_published", default: false })
   isPublished!: boolean;
