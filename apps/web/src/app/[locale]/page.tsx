@@ -8,8 +8,6 @@ import NewestCourses from "@/components/home/NewestCourses";
 import LatestArticles from "@/components/home/LatestArticles";
 import Testimonials from "@/components/home/Testimonials";
 import AboutMission from "@/components/home/AboutMission";
-import CtaBanner from "@/components/home/CtaBanner";
-
 export default function HomePage() {
   return (
     <>
@@ -23,7 +21,6 @@ export default function HomePage() {
       <LatestArticles />
       <Testimonials />
       <AboutMission />
-      <CtaBanner />
     </>
   );
 }
