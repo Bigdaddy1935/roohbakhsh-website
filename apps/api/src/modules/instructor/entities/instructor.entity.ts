@@ -18,8 +18,8 @@ export class Instructor {
   @Column({ unique: true })
   slug!: string;
 
-  @Column({ name: "avatar_url", type: "varchar" })
-  avatarUrl!: string;
+  @Column({ name: "avatar_url", type: "varchar", nullable: true, default: null })
+  avatarUrl!: string | null;
 
   @Column({ type: "json", nullable: true, default: null })
   bio!: Localized | null;

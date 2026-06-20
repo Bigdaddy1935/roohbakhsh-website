@@ -24,9 +24,10 @@ export class CreateInstructorDto implements CreateInstructorRequest {
   @IsString()
   slug!: string;
 
-  @ApiProperty({ example: "https://cdn.roohbakhsh.com/avatars/ahmad.webp", description: "لینک تصویر پروفایل استاد" })
+  @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/avatars/ahmad.webp", description: "لینک تصویر پروفایل استاد (اختیاری)" })
+  @IsOptional()
   @IsUrl()
-  avatarUrl!: string;
+  avatarUrl?: string;
 
   @ApiPropertyOptional({ type: LocalizedDto, description: "بیوگرافی کوتاه استاد (اختیاری)" })
   @IsOptional()

@@ -9,7 +9,7 @@ export interface InstructorSummary {
   id: ID;
   slug: string;
   name: Localized;
-  avatarUrl: string;
+  avatarUrl: string | null;
 }
 
 /** نسخه‌ی کامل — برای صفحه‌ی معرفی استاد. */
@@ -30,7 +30,7 @@ export interface InstructorRecord {
   id: ID;
   name: Localized;
   slug: string;
-  avatarUrl: string;
+  avatarUrl: string | null;
   bio: Localized | null;
   createdAt: ISODate;
   updatedAt: ISODate;
@@ -39,7 +39,7 @@ export interface InstructorRecord {
 export interface CreateInstructorRequest {
   name: Localized;
   slug: string;
-  avatarUrl: string;
+  avatarUrl?: string;
   bio?: Localized;
 }
 
