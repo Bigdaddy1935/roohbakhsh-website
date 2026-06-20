@@ -16,6 +16,18 @@ class LocalizedDto implements Localized {
   ur!: string;
 }
 
+class LocalizedNullableDto {
+  @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/ar/c01.webp", nullable: true })
+  @IsOptional()
+  @IsUrl()
+  ar!: string | null;
+
+  @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/ur/c01.webp", nullable: true })
+  @IsOptional()
+  @IsUrl()
+  ur!: string | null;
+}
+
 class MoneyDto implements Money {
   @ApiPropertyOptional({ example: 5000 })
   @IsInt()
@@ -47,10 +59,17 @@ export class UpdateCourseDto implements UpdateCourseRequest {
   @IsObject()
   description?: Localized;
 
-  @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/courses/c01.webp", nullable: true })
+  @ApiPropertyOptional({
+    type: LocalizedNullableDto,
+    nullable: true,
+    description: "تصویر شاخص دوره — می‌تواند per locale متفاوت باشد",
+    example: { ar: "https://cdn.roohbakhsh.com/ar/c01.webp", ur: null },
+  })
   @IsOptional()
-  @IsUrl()
-  thumbnailUrl?: string | null;
+  @ValidateNested()
+  @Type(() => LocalizedNullableDto)
+  @IsObject()
+  thumbnailUrl?: Localized<string | null>;
 
   @ApiPropertyOptional({ type: MoneyDto, nullable: true })
   @IsOptional()

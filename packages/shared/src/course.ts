@@ -21,7 +21,7 @@ export interface CourseListItem {
   slug: string;
   title: Localized;
   excerpt: Localized;
-  thumbnailUrl: string;
+  thumbnailUrl: Localized<string | null>;
   level: CourseLevel;
   price: Money | null;
   instructor: InstructorSummary;
@@ -130,7 +130,7 @@ export interface CourseRecord {
   title: Localized;
   slug: string;
   description: Localized;
-  thumbnailUrl: string | null;
+  thumbnailUrl: Localized<string | null>;
   /** قیمت اصلی دوره — null یعنی رایگان. */
   price: Money | null;
   /** اطلاعات تخفیف — null یعنی بدون تخفیف. */
@@ -156,7 +156,7 @@ export interface CreateCourseRequest {
   title: Localized;
   slug: string;
   description: Localized;
-  thumbnailUrl?: string;
+  thumbnailUrl?: Localized<string | null>;
   price?: Money | null;
   level?: CourseLevel;
   runStatus?: CourseRunStatus;
@@ -171,7 +171,7 @@ export interface UpdateCourseRequest {
   title?: Localized;
   slug?: string;
   description?: Localized;
-  thumbnailUrl?: string | null;
+  thumbnailUrl?: Localized<string | null>;
   price?: Money | null;
   level?: CourseLevel;
   runStatus?: CourseRunStatus;

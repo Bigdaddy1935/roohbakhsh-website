@@ -28,8 +28,8 @@ export class Course {
   @Column({ type: "json" })
   description!: Localized;
 
-  @Column({ name: "thumbnail_url", type: "varchar", nullable: true, default: null })
-  thumbnailUrl!: string | null;
+  @Column({ name: "thumbnail_url", type: "json", nullable: true, default: null })
+  thumbnailUrl!: Localized<string | null> | null;
 
   @Column({ type: "json", nullable: true, default: null })
   price!: Money | null;

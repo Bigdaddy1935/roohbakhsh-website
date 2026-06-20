@@ -3,7 +3,7 @@ import type { ISODate, Money, Localized } from "./common";
 export interface CartItemRecord {
   courseId: string;
   title: Localized;
-  thumbnailUrl: string | null;
+  thumbnailUrl: Localized<string | null>;
   effectivePrice: Money | null;
   addedAt: ISODate;
 }

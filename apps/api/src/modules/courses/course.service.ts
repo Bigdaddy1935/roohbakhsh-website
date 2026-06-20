@@ -145,7 +145,7 @@ export class CourseService {
       title: course.title,
       slug: course.slug,
       description: course.description,
-      thumbnailUrl: course.thumbnailUrl,
+      thumbnailUrl: course.thumbnailUrl ?? { ar: null, ur: null },
       price: course.price,
       discount,
       effectivePrice,

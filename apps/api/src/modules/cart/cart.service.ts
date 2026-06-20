@@ -69,7 +69,7 @@ export class CartService {
     const cartItems = items.map((item) => ({
       courseId: item.courseId,
       title: item.course.title,
-      thumbnailUrl: item.course.thumbnailUrl,
+      thumbnailUrl: item.course.thumbnailUrl ?? { ar: null, ur: null },
       effectivePrice: this.effectivePrice(item.course),
       addedAt: item.addedAt.toISOString(),
     }));
