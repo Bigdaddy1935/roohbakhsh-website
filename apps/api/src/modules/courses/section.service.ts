@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import type { SectionRecord } from "@roohbakhsh/shared";
 import { Section } from "./entities/section.entity";
+import { Lesson } from "./entities/lesson.entity";
 import { Course } from "./entities/course.entity";
 import { CreateSectionDto } from "./dto/create-section.dto";
 import { UpdateSectionDto } from "./dto/update-section.dto";
@@ -14,6 +15,8 @@ export class SectionService {
     private readonly sectionRepo: Repository<Section>,
     @InjectRepository(Course)
     private readonly courseRepo: Repository<Course>,
+    @InjectRepository(Lesson)
+    private readonly lessonRepo: Repository<Lesson>,
   ) {}
 
   async findByCourse(courseSlug: string): Promise<SectionRecord[]> {
@@ -69,6 +72,14 @@ export class SectionService {
     const section = await this.sectionRepo.findOne({ where: { id: sectionId, courseId: course.id } });
     if (!section) throw new NotFoundException("SECTION_NOT_FOUND");
     await this.sectionRepo.remove(section);
+    await this.syncCourseStats(course.id);
+  }
+
+  private async syncCourseStats(courseId: string): Promise<void> {
+    const lessons = await this.lessonRepo.find({ where: { courseId } });
+    const lessonCount = lessons.length;
+    const durationMinutes = lessons.reduce((sum, l) => sum + l.durationMinutes, 0);
+    await this.courseRepo.update(courseId, { lessonCount, durationMinutes });
   }
 
   private async courseBySlug(slug: string): Promise<Course> {
