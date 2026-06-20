@@ -38,17 +38,17 @@ export class CourseController {
   }
 
   @Public()
-  @Get(":id")
+  @Get(":slug")
   @ApiOperation({
     summary: "مشخصات یک دوره",
-    description: "یک دوره را با UUID آن برمی‌گرداند. شامل اطلاعات استاد.",
+    description: "یک دوره را با slug آن برمی‌گرداند. شامل اطلاعات استاد.",
   })
   @ApiHeader(LANG_HEADER)
-  @ApiParam({ name: "id", description: "UUID دوره", example: "3fa85f64-5717-4562-b3fc-2c963f66afa6" })
+  @ApiParam({ name: "slug", description: "slug دوره", example: "tafsir-quran-mobtadi" })
   @ApiResponse({ status: 200, description: "دوره پیدا شد", type: CourseSchema })
   @ApiResponse({ status: 404, description: "دوره پیدا نشد — کد: COURSE_NOT_FOUND", type: ApiErrorSchema })
-  findOne(@Param("id") id: string) {
-    return this.courseService.findOne(id);
+  findOne(@Param("slug") slug: string) {
+    return this.courseService.findOne(slug);
   }
 
   @UseGuards(RolesGuard)

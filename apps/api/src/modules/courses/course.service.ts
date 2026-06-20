@@ -34,8 +34,8 @@ export class CourseService {
     return toPaginated(items.map((c) => this.toContract(c)), total, page, limit);
   }
 
-  async findOne(id: string): Promise<CourseRecord> {
-    const course = await this.repo.findOne({ where: { id }, relations: { instructor: true } });
+  async findOne(slug: string): Promise<CourseRecord> {
+    const course = await this.repo.findOne({ where: { slug }, relations: { instructor: true } });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
     return this.toContract(course);
   }

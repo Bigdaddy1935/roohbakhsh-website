@@ -19,7 +19,7 @@ import { PaginationDto } from "../../common/dto/pagination.dto";
 @ApiTags("lessons")
 @ApiCookieAuth("access_token")
 @ApiBearerAuth()
-@Controller("courses/:courseId/lessons")
+@Controller("courses/:courseSlug/lessons")
 export class LessonController {
   constructor(private readonly lessonService: LessonService) {}
 
@@ -30,11 +30,11 @@ export class LessonController {
     description: "درس‌های یک دوره را صفحه‌بندی‌شده و به‌ترتیب `order` برمی‌گرداند. نیازی به احراز هویت نیست.",
   })
   @ApiHeader(LANG_HEADER)
-  @ApiParam({ name: "courseId", description: "UUID دوره" })
+  @ApiParam({ name: "courseSlug", description: "slug دوره", example: "tafsir-quran-mobtadi" })
   @ApiResponse({ status: 200, description: "لیست صفحه‌بندی‌شده درس‌ها — Paginated<Lesson>" })
   @ApiResponse({ status: 404, description: "دوره پیدا نشد — کد: COURSE_NOT_FOUND", type: ApiErrorSchema })
-  findAll(@Param("courseId") courseId: string, @Query() query: PaginationDto) {
-    return this.lessonService.findByCourse(courseId, query.page ?? 1, query.limit ?? 12);
+  findAll(@Param("courseSlug") courseSlug: string, @Query() query: PaginationDto) {
+    return this.lessonService.findByCourse(courseSlug, query.page ?? 1, query.limit ?? 12);
   }
 
   @Public()
@@ -44,15 +44,15 @@ export class LessonController {
     description: "یک درس مشخص از یک دوره را برمی‌گرداند.",
   })
   @ApiHeader(LANG_HEADER)
-  @ApiParam({ name: "courseId", description: "UUID دوره" })
+  @ApiParam({ name: "courseSlug", description: "slug دوره", example: "tafsir-quran-mobtadi" })
   @ApiParam({ name: "lessonId", description: "UUID درس" })
   @ApiResponse({ status: 200, description: "درس پیدا شد", type: LessonSchema })
   @ApiResponse({ status: 404, description: "دوره یا درس پیدا نشد — کد: COURSE_NOT_FOUND / LESSON_NOT_FOUND", type: ApiErrorSchema })
   findOne(
-    @Param("courseId") courseId: string,
+    @Param("courseSlug") courseSlug: string,
     @Param("lessonId") lessonId: string,
   ) {
-    return this.lessonService.findOne(courseId, lessonId);
+    return this.lessonService.findOne(courseSlug, lessonId);
   }
 
   @UseGuards(RolesGuard)
@@ -65,15 +65,15 @@ export class LessonController {
       "`lessonCount` و `durationMinutes` دوره به‌صورت خودکار آپدیت می‌شوند.",
   })
   @ApiHeader(LANG_HEADER)
-  @ApiParam({ name: "courseId", description: "UUID دوره" })
+  @ApiParam({ name: "courseSlug", description: "slug دوره", example: "tafsir-quran-mobtadi" })
   @ApiResponse({ status: 201, description: "درس ساخته شد", type: LessonSchema })
   @ApiResponse({ status: 404, description: "دوره پیدا نشد — کد: COURSE_NOT_FOUND", type: ApiErrorSchema })
   @ApiResponse({ status: 400, description: "خطای اعتبارسنجی — کد: VALIDATION_ERROR", type: ApiErrorSchema })
   create(
-    @Param("courseId") courseId: string,
+    @Param("courseSlug") courseSlug: string,
     @Body() dto: CreateLessonDto,
   ) {
-    return this.lessonService.create(courseId, dto);
+    return this.lessonService.create(courseSlug, dto);
   }
 
   @UseGuards(RolesGuard)
@@ -84,17 +84,17 @@ export class LessonController {
     description: "فیلدهای ارسال‌شده را آپدیت می‌کند. آمار دوره خودکار sync می‌شود.",
   })
   @ApiHeader(LANG_HEADER)
-  @ApiParam({ name: "courseId", description: "UUID دوره" })
+  @ApiParam({ name: "courseSlug", description: "slug دوره", example: "tafsir-quran-mobtadi" })
   @ApiParam({ name: "lessonId", description: "UUID درس" })
   @ApiResponse({ status: 200, description: "درس آپدیت شد", type: LessonSchema })
   @ApiResponse({ status: 404, description: "دوره یا درس پیدا نشد", type: ApiErrorSchema })
   @ApiResponse({ status: 400, description: "خطای اعتبارسنجی — کد: VALIDATION_ERROR", type: ApiErrorSchema })
   update(
-    @Param("courseId") courseId: string,
+    @Param("courseSlug") courseSlug: string,
     @Param("lessonId") lessonId: string,
     @Body() dto: UpdateLessonDto,
   ) {
-    return this.lessonService.update(courseId, lessonId, dto);
+    return this.lessonService.update(courseSlug, lessonId, dto);
   }
 
   @UseGuards(RolesGuard)
@@ -106,14 +106,14 @@ export class LessonController {
     description: "درس را حذف می‌کند. `lessonCount` و `durationMinutes` دوره خودکار آپدیت می‌شوند.",
   })
   @ApiHeader(LANG_HEADER)
-  @ApiParam({ name: "courseId", description: "UUID دوره" })
+  @ApiParam({ name: "courseSlug", description: "slug دوره", example: "tafsir-quran-mobtadi" })
   @ApiParam({ name: "lessonId", description: "UUID درس" })
   @ApiResponse({ status: 204, description: "درس حذف شد" })
   @ApiResponse({ status: 404, description: "دوره یا درس پیدا نشد", type: ApiErrorSchema })
   remove(
-    @Param("courseId") courseId: string,
+    @Param("courseSlug") courseSlug: string,
     @Param("lessonId") lessonId: string,
   ) {
-    return this.lessonService.remove(courseId, lessonId);
+    return this.lessonService.remove(courseSlug, lessonId);
   }
 }

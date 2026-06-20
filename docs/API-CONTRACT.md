@@ -180,8 +180,8 @@
 - **Query:** `page` (پیش‌فرض ۱)، `limit` (پیش‌فرض ۱۲، حداکثر ۱۰۰)
 - **پاسخ:** `200 Paginated<CourseRecord>`
 
-### `GET /api/courses/:id`
-مشخصات یک دوره.
+### `GET /api/courses/:slug`
+مشخصات یک دوره با slug آن.
 - **پاسخ:** `200 CourseRecord`
 - **خطا:** `404 COURSE_NOT_FOUND`
 
@@ -225,30 +225,30 @@ effectivePrice: Money|null  // قیمت واقعی: discountedPrice (اگر isAc
 > پس از هر تغییر درس، `lessonCount` و `durationMinutes` دوره به‌صورت خودکار sync می‌شوند.
 > `title` از نوع `Localized` است.
 
-### `GET /api/courses/:courseId/lessons`
+### `GET /api/courses/:courseSlug/lessons`
 لیست صفحه‌بندی‌شده درس‌های یک دوره به‌ترتیب `order`.
 - **Query:** `page` (پیش‌فرض ۱)، `limit` (پیش‌فرض ۱۲، حداکثر ۱۰۰)
 - **پاسخ:** `200 Paginated<Lesson>`
 - **خطا:** `404 COURSE_NOT_FOUND`
 
-### `GET /api/courses/:courseId/lessons/:lessonId`
+### `GET /api/courses/:courseSlug/lessons/:lessonId`
 مشخصات یک درس.
 - **پاسخ:** `200 Lesson`
 - **خطاها:** `404 COURSE_NOT_FOUND / LESSON_NOT_FOUND`
 
-### `POST /api/courses/:courseId/lessons` 🔒 admin
+### `POST /api/courses/:courseSlug/lessons` 🔒 admin
 افزودن درس به دوره.
 - **بدنه:** `CreateLessonRequest`
 - **پاسخ:** `201 Lesson`
 - **خطاها:** `404 COURSE_NOT_FOUND` | `400 VALIDATION_ERROR`
 
-### `PATCH /api/courses/:courseId/lessons/:lessonId` 🔒 admin
+### `PATCH /api/courses/:courseSlug/lessons/:lessonId` 🔒 admin
 ویرایش جزئی درس.
 - **بدنه:** `UpdateLessonRequest` (همه فیلدها اختیاری)
 - **پاسخ:** `200 Lesson`
 - **خطاها:** `404 COURSE_NOT_FOUND / LESSON_NOT_FOUND`
 
-### `DELETE /api/courses/:courseId/lessons/:lessonId` 🔒 admin
+### `DELETE /api/courses/:courseSlug/lessons/:lessonId` 🔒 admin
 حذف درس.
 - **پاسخ:** `204 No Content`
 - **خطاها:** `404 COURSE_NOT_FOUND / LESSON_NOT_FOUND`
