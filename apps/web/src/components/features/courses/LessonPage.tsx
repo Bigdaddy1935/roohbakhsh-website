@@ -319,15 +319,29 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
   return (
     <div className="min-h-screen bg-[var(--bg)]">
 
-      {/* ══ Player — constrained to container ══ */}
-      <div className="container px-0 sm:px-4">
-        <div className="bg-black shadow-2xl sm:rounded-2xl overflow-hidden">
+      {/* ══ Breadcrumb + Player ══ */}
+      <div className="container pt-6 pb-4 px-4">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-x-2 text-sm text-gray-400 mb-4 overflow-x-auto">
+          <Link href="/" className="text-nowrap hover:text-[var(--brand)] transition-colors">{t("breadcrumb_home")}</Link>
+          <RiArrowRightSLine size={14} className="rotate-180 text-gray-300 shrink-0" />
+          <Link href="/courses" className="text-nowrap hover:text-[var(--brand)] transition-colors">{t("breadcrumb_courses")}</Link>
+          <RiArrowRightSLine size={14} className="rotate-180 text-gray-300 shrink-0" />
+          <Link href={`/courses/${courseId}`} className="text-nowrap hover:text-[var(--brand)] transition-colors max-w-[160px] truncate">
+            {course.title[locale]}
+          </Link>
+          <RiArrowRightSLine size={14} className="rotate-180 text-gray-300 shrink-0" />
+          <span className="text-[var(--ink)] font-semibold truncate max-w-[160px]">{lesson.title[locale]}</span>
+        </nav>
+
+        {/* Player */}
+        <div className="bg-black shadow-2xl rounded-2xl overflow-hidden">
           <VideoPlayer url={videoUrl} />
         </div>
       </div>
 
       {/* ══ Content below player ══ */}
-      <div className="container py-6">
+      <div className="container pb-10">
         {/*
           RTL flex-row: first element → RIGHT side, second element → LEFT side.
           We want sidebar on LEFT → aside must be SECOND in DOM.
@@ -426,7 +440,7 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
                 <RiListCheck2 size={20} className="text-[var(--brand)] shrink-0" />
                 <h2 className="font-bold text-[var(--ink)]">{t("lesson_list")}</h2>
               </div>
-              <div className="p-3 max-h-[480px] overflow-y-auto flex flex-col gap-y-1">
+              <div className="p-3 max-h-[480px] overflow-y-auto flex flex-col gap-y-1 scrollbar-thin">
                 {course.chapters.map((ch, ci) => (
                   <SidebarChapter
                     key={ch.id}

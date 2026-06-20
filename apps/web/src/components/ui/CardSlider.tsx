@@ -37,6 +37,7 @@ export default function CardSlider({
   const onMouseDown = useCallback((e: React.MouseEvent) => {
     const el = scrollRef.current;
     if (!el) return;
+    e.preventDefault(); // prevent native image/link drag
     isDragging.current = true;
     hasDragged.current = false;
     startX.current = e.pageX;

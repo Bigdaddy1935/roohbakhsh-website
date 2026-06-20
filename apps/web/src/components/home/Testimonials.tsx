@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { RiStarFill, RiArrowRightSLine, RiArrowLeftSLine, RiDoubleQuotesL } from "react-icons/ri";
 
@@ -78,6 +78,21 @@ export default function Testimonials() {
     return () => clearInterval(id);
   }, [next]);
 
+  /* Drag-to-swipe */
+  const dragStartX = useRef(0);
+  const dragging = useRef(false);
+  const onPointerDown = (e: React.PointerEvent) => {
+    dragStartX.current = e.clientX;
+    dragging.current = true;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    const diff = e.clientX - dragStartX.current;
+    if (Math.abs(diff) > 50) diff > 0 ? prev() : next();
+  };
+
   const item = TESTIMONIALS[current];
 
   return (
@@ -92,7 +107,11 @@ export default function Testimonials() {
 
         {/* Card */}
         <div className="relative max-w-2xl mx-auto">
-          <div className="bg-white rounded-3xl shadow-xl shadow-black/5 p-8 lg:p-10 transition-all duration-500">
+          <div
+            className="bg-white rounded-3xl shadow-xl shadow-black/5 p-8 lg:p-10 transition-all duration-500 cursor-grab active:cursor-grabbing select-none"
+            onPointerDown={onPointerDown}
+            onPointerUp={onPointerUp}
+          >
 
             {/* Quote icon */}
             <RiDoubleQuotesL size={40} className="text-[var(--brand)]/15 mb-4" />

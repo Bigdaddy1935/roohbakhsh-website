@@ -113,12 +113,12 @@ function CourseDetailContent({ courseId }: { courseId: string }) {
   const totalLessons = course.chapters.reduce((s, c) => s + c.lessonCount, 0);
 
   const stats = [
-    { icon: <RiCheckboxCircleLine size={40} className="text-[var(--brand)]" />, val: t("status_complete"), label: t("rating") },
-    { icon: <RiTimeLine size={40} className="text-[var(--brand)]" />, val: `${course.hoursTotal}`, label: t("hours") },
-    { icon: <RiUserLine size={40} className="text-[var(--brand)]" />, val: fmt(course.students), label: t("students") },
-    { icon: <RiStarFill size={40} className="text-amber-400" />, val: course.rating.toString(), label: t("rating") },
-    { icon: <RiCalendarLine size={40} className="text-[var(--brand)]" />, val: course.updatedAt[locale], label: t("updated") },
-    { icon: <RiWifiLine size={40} className="text-[var(--brand)]" />, val: t("watch_mode"), label: "" },
+    { icon: <RiCheckboxCircleLine size={28} className="text-[var(--brand)]" />, val: t("status_complete"), label: t("status_label") },
+    { icon: <RiTimeLine size={28} className="text-[var(--brand)]" />, val: `${course.hoursTotal}`, label: t("hours") },
+    { icon: <RiUserLine size={28} className="text-[var(--brand)]" />, val: fmt(course.students), label: t("students") },
+    { icon: <RiStarFill size={28} className="text-amber-400" />, val: course.rating.toString(), label: t("rating") },
+    { icon: <RiCalendarLine size={28} className="text-[var(--brand)]" />, val: course.updatedAt[locale], label: t("updated") },
+    { icon: <RiWifiLine size={28} className="text-[var(--brand)]" />, val: t("watch_mode"), label: t("watch_label") },
   ];
 
   return (
@@ -219,11 +219,11 @@ function CourseDetailContent({ courseId }: { courseId: string }) {
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
               {stats.map(({ icon, val, label }, i) => (
                 <div key={i}
-                  className="flex flex-col md:flex-row items-center gap-x-4 gap-y-2 bg-white py-4 md:px-6 rounded-xl cursor-default border border-gray-50">
+                  className="flex flex-col md:flex-row items-center gap-x-3 gap-y-1.5 bg-white py-3.5 md:px-4 rounded-xl cursor-default border border-gray-50">
                   <span className="shrink-0">{icon}</span>
-                  <div className="flex flex-col items-center md:items-start text-center md:text-start gap-y-0.5 text-sm md:text-base">
-                    <span className="font-bold text-[var(--ink)]">{val}</span>
-                    {label && <span className="text-gray-400 text-xs md:text-sm">{label}</span>}
+                  <div className="flex flex-col items-center md:items-start text-center md:text-start gap-y-0.5">
+                    <span className="font-bold text-sm text-[var(--ink)] leading-tight">{val}</span>
+                    {label && <span className="text-gray-400 text-xs">{label}</span>}
                   </div>
                 </div>
               ))}

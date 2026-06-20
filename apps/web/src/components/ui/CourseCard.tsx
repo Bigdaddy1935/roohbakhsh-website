@@ -37,7 +37,8 @@ export default function CourseCard({ course, fluid }: { course: CourseCardData; 
           src={course.image}
           alt={course.title}
           fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          draggable={false}
+          className="object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
           sizes="288px"
         />
         {/* Category badge */}
