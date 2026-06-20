@@ -87,13 +87,11 @@ export default function HeroSection() {
 
             {/* ── Hero image ── */}
             <div className="flex-1 w-full max-w-md lg:max-w-none flex items-end justify-center">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src="/hero-student.png"
                 alt="طالب يتعلم العلوم الإسلامية"
-                width={560}
-                height={520}
                 className="w-full max-w-[520px] object-contain drop-shadow-2xl"
-                priority
               />
             </div>
 
