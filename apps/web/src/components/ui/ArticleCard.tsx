@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
@@ -17,7 +17,7 @@ export type ArticleCardData = {
 
 export default function ArticleCard({ article }: { article: ArticleCardData }) {
   return (
-    <div className="group flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-[var(--brand)]/20 transition-all duration-300 overflow-hidden w-72 shrink-0">
+    <div className="group flex flex-col bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-[var(--brand)]/20 transition-all duration-300 overflow-hidden w-72 shrink-0">
       {/* Image */}
       <div className="relative h-44 overflow-hidden bg-gray-100">
         <Image

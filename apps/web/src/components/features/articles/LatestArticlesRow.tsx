@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
@@ -31,7 +31,7 @@ export default function LatestArticlesRow() {
               <Link
                 key={article.id}
                 href={`/articles/${article.id}`}
-                className="group flex gap-x-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[var(--brand)]/20 transition-all overflow-hidden"
+                className="group flex gap-x-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[var(--brand)]/20 transition-all overflow-hidden"
               >
                 {/* Thumbnail */}
                 <div className="relative w-32 shrink-0 bg-gray-100">

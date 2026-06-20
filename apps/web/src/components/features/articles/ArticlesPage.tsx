@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -40,7 +40,7 @@ function ArticlesContent() {
             <span className="text-[var(--ink)]">{t("breadcrumb_articles")}</span>
           </div>
           <div className="flex items-center gap-x-4">
-            <div className="size-12 rounded-2xl bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
+            <div className="size-12 rounded-xl bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
               <RiArticleLine size={24} className="text-[var(--brand)]" />
             </div>
             <div>
@@ -80,7 +80,7 @@ function ArticlesContent() {
       {/* Desktop: sidebar (right) + grid (left) */}
       <div className="container py-10">
         {/* grid-cols-[300px_1fr] → first col (sidebar) on RIGHT in RTL */}
-        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 items-start">
           <ArticlesSidebar />
           <ArticleGrid />
         </div>

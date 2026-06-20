@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -9,7 +9,7 @@ export default function AboutCta() {
   return (
     <section className="py-16">
       <div className="container">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[var(--brand)] to-[#077a61] px-8 py-14 text-center">
+        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-[var(--brand)] to-[#077a61] px-8 py-14 text-center">
           <span className="pointer-events-none absolute -top-16 -end-16 size-64 rounded-full bg-white/5 blur-2xl" />
           <h2 className="text-2xl lg:text-3xl font-extrabold text-white mb-4">{t("title")}</h2>
           <p className="text-white/70 text-sm leading-7 max-w-lg mx-auto mb-8">{t("desc")}</p>

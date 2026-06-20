@@ -51,7 +51,7 @@ export default function Footer() {
             <div className="flex items-center gap-x-2.5 mt-1">
               {SOCIALS.map(({ Icon, href, label }) => (
                 <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
-                  className="flex items-center justify-center size-9 rounded-xl bg-white/5 hover:bg-[var(--brand)] text-gray-400 hover:text-white transition-all duration-200">
+                  className="flex items-center justify-center size-9 rounded-lg bg-white/5 hover:bg-[var(--brand)] text-gray-400 hover:text-white transition-all duration-200">
                   <Icon size={17} />
                 </a>
               ))}

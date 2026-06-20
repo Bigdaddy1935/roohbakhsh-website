@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -10,14 +10,14 @@ export default function CtaBanner() {
   return (
     <section className="py-16">
       <div className="container">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[var(--brand)] to-[#077a61] px-8 py-14 lg:px-16 text-center lg:text-start">
+        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-[var(--brand)] to-[#077a61] px-8 py-14 lg:px-16 text-center lg:text-start">
 
           {/* Decorative */}
           <span className="pointer-events-none absolute -top-16 -end-16 size-64 rounded-full bg-white/5 blur-2xl" />
           <span className="pointer-events-none absolute -bottom-10 start-10 size-48 rounded-full bg-white/8 blur-2xl" />
 
           <div className="relative flex flex-col lg:flex-row items-center gap-8">
-            <div className="size-20 rounded-2xl bg-white/15 flex items-center justify-center shrink-0">
+            <div className="size-20 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
               <RiGraduationCapLine size={40} className="text-white" />
             </div>
 

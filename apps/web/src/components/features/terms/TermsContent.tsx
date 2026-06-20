@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useTranslations } from "next-intl";
 import { RiShieldCheckLine, RiArrowLeftSLine } from "react-icons/ri";
@@ -29,7 +29,7 @@ export default function TermsContent() {
             <span className="text-[var(--ink)]">{t("breadcrumb_terms")}</span>
           </div>
           <div className="flex items-center gap-x-5">
-            <div className="size-14 rounded-2xl bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
+            <div className="size-14 rounded-xl bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
               <RiShieldCheckLine size={28} className="text-[var(--brand)]" />
             </div>
             <div>
@@ -44,14 +44,14 @@ export default function TermsContent() {
       <div className="container py-12">
         <div className="max-w-3xl mx-auto">
           {/* Intro */}
-          <p className="text-[var(--ink)] leading-8 text-[15px] mb-10 p-6 rounded-2xl bg-white border border-gray-100 shadow-sm">
+          <p className="text-[var(--ink)] leading-8 text-[15px] mb-10 p-6 rounded-xl bg-white border border-gray-100 shadow-sm">
             {t("intro")}
           </p>
 
           {/* Sections */}
           <div className="flex flex-col gap-y-8">
             {SECTION_KEYS.map((key, i) => (
-              <div key={key} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div key={key} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                 <div className="flex items-center gap-x-4 px-6 py-4 border-b border-gray-50">
                   <span className="size-8 rounded-xl bg-[var(--brand)]/10 text-[var(--brand)] text-sm font-bold flex items-center justify-center shrink-0">
                     {i + 1}
@@ -66,7 +66,7 @@ export default function TermsContent() {
           </div>
 
           {/* Contact note */}
-          <div className="mt-10 p-6 rounded-2xl bg-[var(--brand)]/5 border border-[var(--brand)]/15 text-center">
+          <div className="mt-10 p-6 rounded-xl bg-[var(--brand)]/5 border border-[var(--brand)]/15 text-center">
             <p className="text-sm text-gray-600 leading-7">{t("contact_note")}</p>
             <Link
               href="/contact"

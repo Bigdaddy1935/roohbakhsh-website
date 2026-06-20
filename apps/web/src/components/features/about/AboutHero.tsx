@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -28,7 +28,7 @@ export default function AboutHero() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center lg:justify-start mt-2">
               {(["stat_1","stat_2","stat_3"] as const).map(k => (
-                <div key={k} className="bg-white rounded-2xl border border-gray-100 px-5 py-3 text-center shadow-sm">
+                <div key={k} className="bg-white rounded-xl border border-gray-100 px-5 py-3 text-center shadow-sm">
                   <p className="text-xl font-extrabold text-[var(--brand)]">{t(`${k}_value`)}</p>
                   <p className="text-xs text-gray-400 mt-0.5">{t(`${k}_label`)}</p>
                 </div>
@@ -36,7 +36,7 @@ export default function AboutHero() {
             </div>
           </div>
           <div className="flex-1 w-full max-w-sm lg:max-w-none">
-            <div className="rounded-3xl bg-gradient-to-br from-[var(--brand)] to-[#077a61] aspect-[4/3] flex items-center justify-center shadow-2xl shadow-[var(--brand)]/20">
+            <div className="rounded-xl bg-gradient-to-br from-[var(--brand)] to-[#077a61] aspect-[4/3] flex items-center justify-center shadow-2xl shadow-[var(--brand)]/20">
               <RiGraduationCapLine size={96} className="text-white/30" />
             </div>
           </div>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
@@ -53,7 +53,7 @@ export default function ArticleGrid() {
         return (
           <div
             key={article.id}
-            className="group flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-[var(--brand)]/20 transition-all duration-300 overflow-hidden"
+            className="group flex flex-col bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-[var(--brand)]/20 transition-all duration-300 overflow-hidden"
           >
             {/* Image */}
             <div className="relative h-44 overflow-hidden bg-gray-100">

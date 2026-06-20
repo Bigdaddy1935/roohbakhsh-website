@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -72,9 +72,9 @@ export default function CategoriesSection() {
             <Link
               key={id}
               href={href}
-              className="group flex flex-col items-center gap-y-3 p-6 rounded-2xl border border-gray-100 bg-white hover:border-transparent hover:shadow-lg transition-all duration-200 text-center w-44 shrink-0"
+              className="group flex flex-col items-center gap-y-3 p-6 rounded-xl border border-gray-100 bg-white hover:border-transparent hover:shadow-lg transition-all duration-200 text-center w-44 shrink-0"
             >
-              <div className={`size-16 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-200`}>
+              <div className={`size-16 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-200`}>
                 <Icon size={28} className={iconColor} />
               </div>
               <div>

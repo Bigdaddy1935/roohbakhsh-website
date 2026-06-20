@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import {
   RiPlayCircleLine,
-  RiArrowLeftSLine,
+  RiSearchLine,
   RiAwardLine,
   RiUserStarLine,
   RiGiftLine,
@@ -17,7 +17,9 @@ const VIDEO_URL =
 
 export default function HeroSection() {
   const t = useTranslations("Home.hero");
+  const router = useRouter();
   const [videoOpen, setVideoOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <>
@@ -45,24 +47,31 @@ export default function HeroSection() {
                 {t("description")}
               </p>
 
-              {/* CTAs */}
-              <div className="flex flex-wrap items-center gap-4 justify-center lg:justify-start">
-                <Link
-                  href="/courses"
-                  className="flex items-center gap-x-2 h-12 px-7 rounded-xl bg-[var(--cta)] text-white font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-[var(--cta)]/30"
-                >
-                  {t("cta_primary")}
-                  <RiArrowLeftSLine size={18} />
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setVideoOpen(true)}
-                  className="flex items-center gap-x-2 h-12 px-7 rounded-xl border-2 border-[var(--brand)] text-[var(--brand)] font-bold text-sm hover:bg-[var(--brand)] hover:text-white transition-all cursor-pointer"
-                >
-                  <RiPlayCircleLine size={20} />
-                  {t("cta_secondary")}
-                </button>
-              </div>
+              {/* Search box */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (searchQuery.trim()) router.push(`/courses?q=${encodeURIComponent(searchQuery.trim())}`);
+                }}
+                className="w-full max-w-md"
+              >
+                <div className="relative flex items-center bg-white rounded-xl shadow-lg shadow-black/8 border border-gray-200 focus-within:border-[var(--brand)] focus-within:shadow-[var(--brand)]/15 transition-all duration-200">
+                  <RiSearchLine size={20} className="absolute start-4 text-gray-400 pointer-events-none shrink-0" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder={t("search_placeholder")}
+                    className="w-full h-13 ps-11 pe-32 text-sm text-[var(--ink)] placeholder:text-gray-400 bg-transparent outline-none"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute end-2 h-9 px-5 rounded-lg bg-[var(--cta)] text-white text-sm font-bold hover:opacity-90 transition-opacity whitespace-nowrap shadow-md shadow-[var(--cta)]/25"
+                  >
+                    {t("search_btn")}
+                  </button>
+                </div>
+              </form>
 
               {/* Trust indicators */}
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3 justify-center lg:justify-start mt-1">
@@ -84,7 +93,7 @@ export default function HeroSection() {
             {/* ── Video thumbnail ── */}
             <div className="flex-1 w-full max-w-md lg:max-w-none">
               <div
-                className="relative rounded-3xl overflow-hidden aspect-[4/3] shadow-2xl shadow-[var(--brand)]/20 cursor-pointer group bg-black"
+                className="relative rounded-xl overflow-hidden aspect-[4/3] shadow-2xl shadow-[var(--brand)]/20 cursor-pointer group bg-black"
                 onClick={() => setVideoOpen(true)}
               >
                 {/* Show real video first frame as poster */}
@@ -106,7 +115,7 @@ export default function HeroSection() {
                 </div>
 
                 {/* Floating info card */}
-                <div className="absolute bottom-5 start-5 end-5 rounded-2xl bg-white/95 backdrop-blur p-4 flex items-center gap-x-3 shadow-xl">
+                <div className="absolute bottom-5 start-5 end-5 rounded-xl bg-white/95 backdrop-blur p-4 flex items-center gap-x-3 shadow-xl">
                   <div className="size-10 rounded-xl bg-[var(--cta)]/15 flex items-center justify-center shrink-0">
                     <RiAwardLine size={20} className="text-[var(--cta)]" />
                   </div>
@@ -129,7 +138,7 @@ export default function HeroSection() {
           onClick={() => setVideoOpen(false)}
         >
           <div
-            className="relative w-full max-w-3xl rounded-2xl overflow-hidden shadow-2xl"
+            className="relative w-full max-w-3xl rounded-xl overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button

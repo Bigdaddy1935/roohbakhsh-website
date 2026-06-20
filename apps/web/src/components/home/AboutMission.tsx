@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
@@ -11,7 +11,7 @@ export default function AboutMission() {
   return (
     <section className="py-14">
       <div className="container">
-        <div className="rounded-3xl border border-[var(--brand)]/15 bg-white overflow-hidden shadow-sm">
+        <div className="rounded-xl border border-[var(--brand)]/15 bg-white overflow-hidden shadow-sm">
 
           {/* Top bar */}
           <div className="flex items-center gap-x-4 px-8 py-6 border-b border-gray-50">

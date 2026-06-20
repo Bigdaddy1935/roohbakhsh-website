@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useTranslations } from "next-intl";
 import {
@@ -33,11 +33,11 @@ export default function ServicesSection() {
           {SERVICES.map(({ key, Icon, color, shadow }) => (
             <div
               key={key}
-              className="group flex flex-col items-center text-center gap-y-4 p-7 rounded-2xl border border-gray-100 bg-white hover:border-transparent hover:shadow-xl transition-all duration-300"
+              className="group flex flex-col items-center text-center gap-y-4 p-7 rounded-xl border border-gray-100 bg-white hover:border-transparent hover:shadow-xl transition-all duration-300"
             >
               {/* Icon bubble */}
               <div
-                className={`size-16 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center shadow-lg ${shadow} group-hover:scale-110 transition-transform duration-300`}
+                className={`size-16 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shadow-lg ${shadow} group-hover:scale-110 transition-transform duration-300`}
               >
                 <Icon size={28} className="text-white" />
               </div>

@@ -48,6 +48,8 @@ function VideoPlayer({ url }: { url: string }) {
   const [fullscreen, setFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+  const [speed, setSpeed] = useState(1);
 
   /* show/hide controls */
   const revealControls = useCallback(() => {
@@ -178,15 +180,15 @@ function VideoPlayer({ url }: { url: string }) {
       <div
         className={`absolute inset-x-0 bottom-0 px-5 pb-4 pt-10 pointer-events-none transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"}`}
       >
-        {/* Progress */}
-        <div className="relative h-1 mb-4 group/bar pointer-events-auto cursor-pointer">
+        {/* Progress — dir=ltr so bar fills left→right even in RTL pages */}
+        <div dir="ltr" className="relative h-1 mb-4 group/bar pointer-events-auto cursor-pointer">
           <div className="absolute inset-0 bg-white/20 rounded-full" />
           <div
-            className="absolute inset-y-0 start-0 bg-white/40 rounded-full pointer-events-none"
+            className="absolute inset-y-0 left-0 bg-white/40 rounded-full pointer-events-none"
             style={{ width: `${buffered * 100}%` }}
           />
           <div
-            className="absolute inset-y-0 start-0 bg-[var(--brand)] rounded-full pointer-events-none"
+            className="absolute inset-y-0 left-0 bg-[var(--brand)] rounded-full pointer-events-none"
             style={{ width: `${progress * 100}%` }}
           />
           <input
@@ -198,7 +200,7 @@ function VideoPlayer({ url }: { url: string }) {
           {/* Thumb */}
           <div
             className="absolute top-1/2 -translate-y-1/2 size-3.5 rounded-full bg-white shadow-lg opacity-0 group-hover/bar:opacity-100 transition-opacity pointer-events-none"
-            style={{ insetInlineStart: `calc(${progress * 100}% - 7px)` }}
+            style={{ left: `calc(${progress * 100}% - 7px)` }}
           />
         </div>
 
@@ -230,9 +232,36 @@ function VideoPlayer({ url }: { url: string }) {
           </div>
 
           <div className="flex items-center gap-x-3">
-            <button className="text-white/60 hover:text-white transition-colors">
-              <RiSettings3Line size={20} />
-            </button>
+            {/* Settings */}
+            <div className="relative">
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowSettings((s) => !s); }}
+                className={`transition-colors ${showSettings ? "text-[var(--brand)]" : "text-white/60 hover:text-white"}`}
+              >
+                <RiSettings3Line size={20} />
+              </button>
+              {showSettings && (
+                <div
+                  className="absolute bottom-8 end-0 bg-[#1a1a2e]/95 backdrop-blur rounded-lg border border-white/10 shadow-2xl py-2 min-w-[140px] z-10"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <p className="text-white/50 text-[11px] font-semibold px-3 pb-1.5 border-b border-white/10 mb-1">سرعة التشغيل</p>
+                  {[0.5, 0.75, 1, 1.25, 1.5, 2].map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => {
+                        if (videoRef.current) videoRef.current.playbackRate = s;
+                        setSpeed(s);
+                        setShowSettings(false);
+                      }}
+                      className={`w-full text-start px-3 py-1.5 text-sm transition-colors ${speed === s ? "text-[var(--brand)] font-semibold" : "text-white/80 hover:text-white hover:bg-white/5"}`}
+                    >
+                      {s === 1 ? "عادي (1×)" : `${s}×`}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <button onClick={toggleFullscreen} className="text-white hover:text-[var(--brand)] transition-colors">
               {fullscreen ? <RiFullscreenExitLine size={22} /> : <RiFullscreenLine size={22} />}
             </button>
@@ -322,7 +351,7 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
       {/* ══ Breadcrumb + Player ══ */}
       <div className="container pt-10 pb-5 px-4">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-x-2 text-sm text-gray-400 mb-7 overflow-x-auto">
+        <nav className="flex items-center gap-x-2 text-sm text-gray-400 mb-7 overflow-x-hidden">
           <Link href="/" className="text-nowrap hover:text-[var(--brand)] transition-colors">{t("breadcrumb_home")}</Link>
           <RiArrowRightSLine size={14} className="rotate-180 text-gray-300 shrink-0" />
           <Link href="/courses" className="text-nowrap hover:text-[var(--brand)] transition-colors">{t("breadcrumb_courses")}</Link>
@@ -335,7 +364,7 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
         </nav>
 
         {/* Player */}
-        <div className="bg-black shadow-2xl rounded-2xl overflow-hidden">
+        <div className="bg-black shadow-2xl rounded-xl overflow-hidden">
           <VideoPlayer url={videoUrl} />
         </div>
       </div>
@@ -348,7 +377,7 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
           <main className="flex-1 flex flex-col gap-y-4 min-w-0">
 
             {/* Lesson title card */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 md:p-6">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 md:p-6">
               <div className="flex items-start gap-x-3 mb-4">
                 <span className="shrink-0 size-9 rounded-xl bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center font-bold text-sm">
                   {lessonIndex + 1}
@@ -412,13 +441,13 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
             </div>
 
             {/* Q&A */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 md:p-6">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 md:p-6">
               <div className="flex items-center gap-x-2.5 mb-5 pb-4 border-b border-gray-100">
                 <RiQuestionLine size={20} className="text-[var(--brand)] shrink-0" />
                 <h2 className="font-bold text-[var(--ink)]">{t("qa_title")}</h2>
               </div>
               <div className="flex flex-col items-center gap-y-3 py-8 text-center">
-                <div className="size-16 rounded-2xl bg-gray-100 flex items-center justify-center">
+                <div className="size-16 rounded-xl bg-gray-100 flex items-center justify-center">
                   <RiQuestionLine size={32} className="text-gray-300" />
                 </div>
                 <p className="font-semibold text-[var(--ink)]">{t("qa_disabled_title")}</p>
@@ -431,7 +460,7 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
           <aside className="lg:w-[300px] xl:w-[320px] shrink-0 flex flex-col gap-y-4">
 
             {/* Lesson list */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
               <div className="flex items-center gap-x-2.5 px-4 py-4 border-b border-gray-100">
                 <RiListCheck2 size={20} className="text-[var(--brand)] shrink-0" />
                 <h2 className="font-bold text-[var(--ink)]">{t("lesson_list")}</h2>
@@ -451,24 +480,24 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
             </div>
 
             {/* Stats */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
               <div className="grid grid-cols-3 divide-x divide-x-reverse divide-gray-100">
                 {[
-                  { icon: <RiPlayCircleLine size={20} className="text-[var(--brand)]" />, val: totalLessons.toString(), label: t("total_lessons") },
-                  { icon: <RiSkipForwardLine size={20} className="text-[var(--brand)]" />, val: `${course.hoursTotal}`, label: t("course_duration") },
-                  { icon: <RiCheckLine size={20} className="text-[var(--brand)]" />, val: t("status_val"), label: t("status_label") },
+                  { icon: <RiPlayCircleLine size={22} className="text-[var(--brand)]" />, val: totalLessons.toString(), label: t("total_lessons") },
+                  { icon: <RiSkipForwardLine size={22} className="text-[var(--brand)]" />, val: `${course.hoursTotal}`, label: t("course_duration") },
+                  { icon: <RiCheckLine size={22} className="text-[var(--brand)]" />, val: t("status_val"), label: t("status_label") },
                 ].map((s, i) => (
-                  <div key={i} className="flex flex-col items-center gap-y-1 py-4 px-2 text-center">
+                  <div key={i} className="flex flex-col items-center gap-y-2 py-6 px-4 text-center">
                     {s.icon}
-                    <span className="font-bold text-[var(--ink)] text-sm">{s.val}</span>
-                    <span className="text-xs text-gray-400">{s.label}</span>
+                    <span className="font-bold text-[var(--ink)]">{s.val}</span>
+                    <span className="text-xs text-gray-400 leading-4">{s.label}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Instructor */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
               <p className="text-xs text-gray-400 text-center mb-3">{t("instructor_label")}</p>
               <div className="flex items-center gap-x-3 mb-3">
                 <Image

@@ -108,7 +108,7 @@ export default function Testimonials() {
         {/* Card */}
         <div className="relative max-w-2xl mx-auto">
           <div
-            className="bg-white rounded-3xl shadow-xl shadow-black/5 p-8 lg:p-10 transition-all duration-500 cursor-grab active:cursor-grabbing select-none"
+            className="bg-white rounded-xl shadow-xl shadow-black/5 p-8 lg:p-10 transition-all duration-500 cursor-grab active:cursor-grabbing select-none"
             onPointerDown={onPointerDown}
             onPointerUp={onPointerUp}
           >
@@ -130,7 +130,7 @@ export default function Testimonials() {
 
             {/* Author */}
             <div className="flex items-center gap-x-4">
-              <div className={`size-12 rounded-2xl ${item.color} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
+              <div className={`size-12 rounded-xl ${item.color} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
                 {item.initials}
               </div>
               <div>

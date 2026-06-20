@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Suspense } from "react";
 import { useLocale, useTranslations } from "next-intl";
@@ -40,7 +40,7 @@ function CoursesContent() {
               { Icon: RiCalendarLine, value: "+٩٧",       label: t("stat_courses")  },
               { Icon: RiTimeLine,     value: "+٢١٦٤",     label: t("stat_hours")    },
             ].map(({ Icon, value, label }) => (
-              <div key={label} className="flex flex-col items-center gap-y-2 bg-white/10 rounded-2xl p-4">
+              <div key={label} className="flex flex-col items-center gap-y-2 bg-white/10 rounded-xl p-4">
                 <div className="size-10 rounded-xl bg-white/10 flex items-center justify-center">
                   <Icon size={20} className="text-[var(--cta)]" />
                 </div>
@@ -72,7 +72,7 @@ function CoursesContent() {
 
       {/* Desktop layout */}
       <div className="container py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 items-start">
           <CoursesSidebar />
           <CourseGrid />
         </div>

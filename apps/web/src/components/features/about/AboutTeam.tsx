@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useLocale, useTranslations } from "next-intl";
 import { RiUserLine } from "react-icons/ri";
@@ -25,7 +25,7 @@ export default function AboutTeam() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {TEAM.map(({ key, name, role, color }) => (
-            <div key={key} className="flex flex-col items-center text-center gap-y-3 p-6 rounded-2xl border border-gray-100 hover:shadow-lg transition-all">
+            <div key={key} className="flex flex-col items-center text-center gap-y-3 p-6 rounded-xl border border-gray-100 hover:shadow-lg transition-all">
               <div className={`size-20 rounded-full bg-gradient-to-br ${color} flex items-center justify-center shadow-lg`}>
                 <RiUserLine size={36} className="text-white" />
               </div>

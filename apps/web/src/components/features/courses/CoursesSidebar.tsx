@@ -26,7 +26,7 @@ export default function CoursesSidebar() {
     <aside className="hidden lg:flex flex-col gap-y-6 sticky top-24 self-start">
 
       {/* Search */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
         <p className="text-sm font-extrabold text-[var(--ink)] mb-3">{t("search_label")}</p>
         <div className="relative">
           <RiSearchLine size={16} className="absolute top-1/2 -translate-y-1/2 start-3 text-gray-400 pointer-events-none" />
@@ -41,7 +41,7 @@ export default function CoursesSidebar() {
       </div>
 
       {/* Categories */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
         <p className="text-sm font-extrabold text-[var(--ink)] mb-4">{t("filter_label")}</p>
         <div className="flex flex-col gap-y-4 max-h-64 overflow-y-auto scrollbar-thin pe-1">
           {COURSE_CATEGORIES.map((cat) => (
@@ -60,7 +60,7 @@ export default function CoursesSidebar() {
       </div>
 
       {/* Sort */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
         <p className="text-sm font-extrabold text-[var(--ink)] mb-4">{t("sort_label")}</p>
         <RadioGroup value={sort} onChange={setSort} className="flex flex-col gap-y-2">
           {COURSE_SORT_OPTIONS.map((opt) => (

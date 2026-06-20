@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useTranslations } from "next-intl";
 import {
@@ -26,8 +26,8 @@ export default function AboutValues() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {VALUES.map(({ key, Icon, color }) => (
-            <div key={key} className="flex flex-col items-center text-center gap-y-4 p-7 rounded-2xl bg-white border border-gray-100 hover:shadow-xl transition-all duration-300">
-              <div className={`size-14 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center shadow-lg`}>
+            <div key={key} className="flex flex-col items-center text-center gap-y-4 p-7 rounded-xl bg-white border border-gray-100 hover:shadow-xl transition-all duration-300">
+              <div className={`size-14 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shadow-lg`}>
                 <Icon size={26} className="text-white" />
               </div>
               <h3 className="font-extrabold text-[var(--ink)]">{t(`${key}_title`)}</h3>

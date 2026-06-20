@@ -105,30 +105,30 @@ export default function Header() {
                 <RiArrowDownSLine size={18} className="transition-transform duration-200 group-hover:rotate-180" />
               </Link>
               <div className="absolute top-full right-0 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-150 pt-4 z-50">
-                <div className="flex bg-white border border-gray-200 rounded-2xl shadow-xl shadow-black/[0.08] overflow-hidden">
-                  <div className="flex flex-col gap-y-0.5 p-3 w-60 shrink-0">
+                <div className="flex bg-white border border-gray-200 rounded-xl shadow-xl shadow-black/[0.08] overflow-hidden">
+                  <div className="flex flex-col gap-y-1 p-4 w-72 shrink-0">
                     {CATEGORIES.map(({ id, href, Icon }) => (
                       <Link key={id} href={href} onMouseEnter={() => setActiveCategory(id)}
-                        className={`flex items-center justify-between rounded-xl px-3 py-2.5 transition-colors ${activeCategory === id ? "bg-gray-100" : "hover:bg-gray-50"}`}>
-                        <span className="flex items-center gap-x-2.5">
-                          <Icon size={18} className={`shrink-0 ${activeCategory === id ? "text-[var(--brand)]" : "text-gray-400"}`} />
-                          <span className="text-[13px]">{catNames[id]}</span>
+                        className={`flex items-center justify-between rounded-lg px-4 py-3 transition-colors ${activeCategory === id ? "bg-gray-100" : "hover:bg-gray-50"}`}>
+                        <span className="flex items-center gap-x-3">
+                          <Icon size={22} className={`shrink-0 ${activeCategory === id ? "text-[var(--brand)]" : "text-gray-400"}`} />
+                          <span className="text-sm font-medium">{catNames[id]}</span>
                         </span>
-                        <RiArrowLeftSLine size={16} className="text-gray-300 shrink-0" />
+                        <RiArrowLeftSLine size={18} className="text-gray-300 shrink-0" />
                       </Link>
                     ))}
                   </div>
-                  <div className="flex flex-col justify-between bg-gray-50 w-56 p-4 border-s border-gray-100">
-                    <div className="flex flex-col gap-y-2.5">
+                  <div className="flex flex-col justify-between bg-gray-50 w-64 p-5 border-s border-gray-100">
+                    <div className="flex flex-col gap-y-3.5">
                       {mockCourses.map((course) => (
-                        <Link key={course} href={`/courses/${activeCategory}`} className="text-[13px] text-[var(--ink)] hover:text-[var(--brand)] transition-colors">
+                        <Link key={course} href={`/courses/${activeCategory}`} className="text-sm text-[var(--ink)] hover:text-[var(--brand)] transition-colors">
                           {course}
                         </Link>
                       ))}
                     </div>
-                    <Link href={`/courses/${activeCategory}`} className="flex items-center gap-x-1 text-[12px] font-medium text-[var(--brand)] hover:underline mt-4">
+                    <Link href={`/courses/${activeCategory}`} className="flex items-center gap-x-1 text-[13px] font-semibold text-[var(--brand)] hover:underline mt-5">
                       {t("viewAll")}
-                      <RiArrowLeftSLine size={14} />
+                      <RiArrowLeftSLine size={15} />
                     </Link>
                   </div>
                 </div>
@@ -178,7 +178,7 @@ export default function Header() {
                 className="flex items-center gap-x-1.5 h-9 px-4 rounded-xl bg-[var(--brand)] text-white text-[13px] font-semibold hover:bg-[var(--brand)]/90 transition-colors whitespace-nowrap"
               >
                 <RiLoginBoxLine size={16} />
-                {locale === "ar" ? "دخول | تسجيل" : "ورود | ثبت‌نام"}
+                {locale === "ar" ? "دخول | تسجيل" : "لاگ ان | رجسٹر"}
               </Link>
             )}
           </div>

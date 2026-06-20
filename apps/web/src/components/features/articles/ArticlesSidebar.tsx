@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
@@ -28,7 +28,7 @@ export default function ArticlesSidebar() {
     <aside className="hidden lg:flex flex-col gap-y-6 sticky top-24 self-start">
 
       {/* Search */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
         <p className="text-sm font-extrabold text-[var(--ink)] mb-3">{t("search_label")}</p>
         <div className="relative">
           <RiSearchLine
@@ -46,7 +46,7 @@ export default function ArticlesSidebar() {
       </div>
 
       {/* Categories */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
         <p className="text-sm font-extrabold text-[var(--ink)] mb-4">{t("filter_label")}</p>
         <div className="flex flex-col gap-y-3 max-h-64 overflow-y-auto scrollbar-thin pe-1">
           {ARTICLE_CATEGORIES.map((cat) => (
@@ -67,7 +67,7 @@ export default function ArticlesSidebar() {
       </div>
 
       {/* Sort */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
         <p className="text-sm font-extrabold text-[var(--ink)] mb-4">{t("sort_label")}</p>
         <RadioGroup value={sort} onChange={setSort} className="flex flex-col gap-y-2">
           <Radio value="newest">

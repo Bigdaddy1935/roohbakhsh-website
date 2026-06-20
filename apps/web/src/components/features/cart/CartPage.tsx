@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, Suspense } from "react";
 import Image from "next/image";
@@ -39,7 +39,7 @@ function CartContent() {
         {items.length === 0 ? (
           /* Empty state */
           <div className="flex flex-col items-center justify-center py-32 gap-y-4 text-center">
-            <div className="size-20 rounded-2xl bg-[var(--brand)]/10 flex items-center justify-center">
+            <div className="size-20 rounded-xl bg-[var(--brand)]/10 flex items-center justify-center">
               <RiShoppingBag3Line size={36} className="text-[var(--brand)]" />
             </div>
             <p className="text-lg font-extrabold text-[var(--ink)]">{t("empty")}</p>
@@ -62,7 +62,7 @@ function CartContent() {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex gap-x-4 items-start"
+                  className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex gap-x-4 items-start"
                 >
                   {/* Thumbnail */}
                   <div className="relative h-24 w-36 shrink-0 rounded-xl overflow-hidden bg-gray-100">
@@ -112,7 +112,7 @@ function CartContent() {
             <div className="flex flex-col gap-y-4 sticky top-24 self-start">
 
               {/* Order summary */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-y-4">
+              <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex flex-col gap-y-4">
                 {/* Green accent header */}
                 <div className="-mx-5 -mt-5 px-5 py-4 rounded-t-2xl bg-[var(--brand)] text-white font-extrabold text-[15px]">
                   {t("summary_title")}
@@ -160,7 +160,7 @@ function CartContent() {
               </div>
 
               {/* Coupon */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                 <button
                   onClick={() => setCouponOpen((o) => !o)}
                   className="w-full flex items-center justify-between px-5 py-4 text-[13px] font-bold text-[var(--ink)]"
