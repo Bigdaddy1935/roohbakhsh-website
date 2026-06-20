@@ -40,7 +40,7 @@ export class PaymentsService {
     if (order.status === "paid") {
       throw new BadRequestException("ORDER_ALREADY_PAID");
     }
-    if (order.status === "cancelled" || order.status === "refunded") {
+    if (order.status === "cancelled" || order.status === "refunded" || order.status === "failed") {
       throw new BadRequestException("ORDER_NOT_PAYABLE");
     }
 
@@ -139,7 +139,8 @@ export class PaymentsService {
       throw new InternalServerErrorException("PAYMENT_GATEWAY_ERROR");
     }
 
-    if (verifyRes.data.code === 100 || verifyRes.data.code === 101) {
+    const verifyCode = verifyRes?.data?.code;
+    if (verifyCode === 100 || verifyCode === 101) {
       // 100 = paid, 101 = already verified (idempotent)
       const refId = String(verifyRes.data.ref_id);
       await this.repo.update(payment.id, { status: "paid", refId });
@@ -148,12 +149,13 @@ export class PaymentsService {
       return { message: "PAYMENT_SUCCESS", refId };
     }
 
+    const errCode = verifyCode ?? "UNKNOWN";
     await this.repo.update(payment.id, {
       status: "failed",
-      description: `ZarinPal verify code: ${verifyRes.data.code}`,
+      description: `ZarinPal verify code: ${errCode}`,
     });
     await this.ordersService.updateStatus(payment.orderId, "failed");
-    throw new BadRequestException(`ZARINPAL_VERIFY_ERROR_${verifyRes.data.code}`);
+    throw new BadRequestException(`ZARINPAL_VERIFY_ERROR_${errCode}`);
   }
 
   async findLogs(page: number, limit: number): Promise<Paginated<PaymentRecord>> {
