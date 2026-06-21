@@ -9,29 +9,27 @@ import {
   RiExchangeDollarLine,
   RiCustomerService2Line,
   RiAccountCircleLine,
+  RiSettings4Line,
   RiLogoutBoxLine,
-  RiCloseLine,
 } from "react-icons/ri";
 import { MOCK_USER_PROFILE } from "@/data/dashboard.mock";
 
 const UI = {
   ar: {
-    nav: "القائمة",
+    quickAccess: "دسترسی سریع",
     home: "الرئيسية",
     myCourses: "دوراتي",
     transactions: "المعاملات",
     tickets: "التيكيت",
     account: "تفاصيل الحساب",
-    logout: "تسجيل الخروج",
   },
   ur: {
-    nav: "مینو",
+    quickAccess: "فوری رسائی",
     home: "ہوم",
     myCourses: "میرے کورسز",
     transactions: "لین دین",
     tickets: "ٹکٹس",
     account: "اکاؤنٹ کی تفصیلات",
-    logout: "لاگ آؤٹ",
   },
 };
 
@@ -45,7 +43,7 @@ const NAV = [
 
 type Props = { open: boolean; onClose: () => void };
 
-export default function DashboardSidebar({ open, onClose }: Props) {
+function SidebarContent({ onClose }: { onClose: () => void }) {
   const locale = useLocale() as "ar" | "ur";
   const pathname = usePathname();
   const ui = UI[locale];
@@ -56,28 +54,9 @@ export default function DashboardSidebar({ open, onClose }: Props) {
 
   return (
     <>
-      {/* Mobile overlay */}
-      {open && (
-        <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={onClose} />
-      )}
-
-      {/* Sidebar */}
-      <aside className={`
-        fixed top-0 bottom-0 end-0 z-50 w-60 bg-white border-s border-gray-100 flex flex-col
-        transition-transform duration-300
-        lg:static lg:translate-x-0 lg:z-auto
-        ${open ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
-      `}>
-        {/* Mobile close */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 lg:hidden">
-          <span className="text-sm font-bold text-[var(--ink)]">{ui.nav}</span>
-          <button onClick={onClose} className="text-gray-400 hover:text-[var(--ink)]">
-            <RiCloseLine size={22} />
-          </button>
-        </div>
-
-        {/* User card */}
-        <div className="flex items-center gap-x-3 px-4 py-4 border-b border-gray-100">
+      {/* User info */}
+      <div className="flex items-center justify-between pb-5 mb-5 border-b border-gray-100">
+        <div className="flex items-center gap-x-2">
           <Image
             src={user.avatar}
             alt="avatar"
@@ -85,45 +64,87 @@ export default function DashboardSidebar({ open, onClose }: Props) {
             height={44}
             className="size-11 rounded-full object-cover shrink-0"
           />
-          <div className="min-w-0">
-            <p className="text-sm font-bold text-[var(--ink)] truncate">{user.name[locale]}</p>
-            <p className="text-xs text-gray-400 truncate mt-0.5">{user.phone}</p>
+          <div className="flex flex-col text-sm">
+            <span className="font-semibold max-w-28 truncate text-[var(--ink)]">
+              {user.name[locale]}
+            </span>
+            <span className="text-gray-400 text-xs mt-0.5">{user.phone}</span>
           </div>
         </div>
-
-        {/* Nav */}
-        <nav className="flex-1 overflow-y-auto py-3 px-2">
-          {NAV.map(({ key, href, Icon }) => {
-            const active = isActive(href);
-            return (
-              <Link
-                key={key}
-                href={href}
-                onClick={onClose}
-                className={`flex items-center gap-x-3 px-3 py-2.5 rounded-lg mb-0.5 transition-colors text-sm font-medium
-                  ${active
-                    ? "bg-[var(--brand)]/10 text-[var(--brand)]"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-[var(--ink)]"
-                  }`}
-              >
-                {active && <span className="absolute end-2 w-0.5 h-5 bg-[var(--brand)] rounded-full" />}
-                <Icon size={19} className={active ? "text-[var(--brand)]" : "text-gray-400"} />
-                {ui[key]}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Logout */}
-        <div className="px-2 pb-4 border-t border-gray-100 pt-3">
-          <button
-            type="button"
-            className="flex items-center gap-x-3 w-full px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors text-sm font-medium"
+        <div className="flex items-center gap-x-3">
+          <Link
+            href="/dashboard/account"
+            className="text-gray-400 hover:text-[var(--ink)] transition-colors"
+            onClick={onClose}
           >
-            <RiLogoutBoxLine size={19} />
-            {ui.logout}
+            <RiSettings4Line size={18} />
+          </Link>
+          <button type="button" className="text-gray-400 hover:text-red-500 transition-colors">
+            <RiLogoutBoxLine size={18} />
           </button>
         </div>
+      </div>
+
+      {/* Quick access label */}
+      <span className="text-xs text-gray-400 select-none mb-2.5 block">{ui.quickAccess}</span>
+
+      {/* Nav items */}
+      <div className="flex flex-col gap-y-0.5">
+        {NAV.map(({ key, href, Icon }) => {
+          const active = isActive(href);
+          return (
+            <Link
+              key={key}
+              href={href}
+              onClick={onClose}
+              className="flex items-center gap-x-2.5 py-1.5 group"
+            >
+              {/* Active badge — first in DOM = rightmost in RTL flex */}
+              <span
+                className={`block w-0.5 h-5 ml-1 rounded-full transition-colors shrink-0 ${
+                  active ? "bg-[var(--brand)]" : "bg-transparent"
+                }`}
+              />
+              <Icon
+                size={20}
+                className={`transition-colors shrink-0 ${
+                  active ? "text-[var(--brand)]" : "text-gray-400 group-hover:text-[var(--brand)]"
+                }`}
+              />
+              <span
+                className={`text-sm transition-colors ${
+                  active
+                    ? "text-[var(--ink)] font-semibold"
+                    : "text-gray-600 group-hover:text-[var(--brand)]"
+                }`}
+              >
+                {ui[key]}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+const BASE = "w-64 shrink-0 bg-white border-s border-gray-100 px-7 py-5 overflow-y-auto";
+
+export default function DashboardSidebar({ open, onClose }: Props) {
+  return (
+    <>
+      {/* Mobile: fixed drawer, hidden off-screen to the right when closed */}
+      <aside
+        className={`md:hidden fixed top-0 bottom-0 right-0 z-50 ${BASE} transition-all duration-300 ${
+          open ? "opacity-100 visible" : "opacity-0 invisible translate-x-full"
+        }`}
+      >
+        <SidebarContent onClose={onClose} />
+      </aside>
+
+      {/* Desktop: static in flex flow, sticky */}
+      <aside className={`hidden md:block lg:sticky lg:top-5 lg:h-max lg:rounded-lg ${BASE}`}>
+        <SidebarContent onClose={onClose} />
       </aside>
     </>
   );

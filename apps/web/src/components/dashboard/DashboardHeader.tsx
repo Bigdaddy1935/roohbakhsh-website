@@ -2,82 +2,59 @@
 
 import Image from "next/image";
 import { useLocale } from "next-intl";
-import { useState } from "react";
-import { RiBellLine, RiShoppingCartLine, RiMoonLine, RiMenu2Line, RiSearchLine } from "react-icons/ri";
-import { MOCK_USER_PROFILE } from "@/data/dashboard.mock";
+import { Link } from "@/i18n/navigation";
+import { RiBellLine, RiShoppingCartLine, RiMenu2Line } from "react-icons/ri";
 
 const UI = {
-  ar: { search: "البحث في دوراتي، التيكيت، المالية...", today: "الإثنين ٢١ يونيو ٢٠٢٦" },
-  ur: { search: "میرے کورسز، ٹکٹس، مالی...", today: "پیر ۲۱ جون ۲۰۲۶" },
+  ar: { today: () => new Date().toLocaleDateString("ar-SA-u-ca-gregory", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) },
+  ur: { today: () => new Date().toLocaleDateString("ur", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) },
 };
 
 type Props = { onMenuClick: () => void };
 
 export default function DashboardHeader({ onMenuClick }: Props) {
   const locale = useLocale() as "ar" | "ur";
-  const ui = UI[locale];
-  const user = MOCK_USER_PROFILE;
-  const [search, setSearch] = useState("");
 
   return (
-    <header className="bg-white border-b border-gray-100 h-[68px] flex items-center px-4 gap-x-3 shrink-0">
-      {/* Mobile menu button */}
+    <header className="flex items-center justify-between shrink-0 w-full h-[88px] px-5 sm:px-7 bg-white max-lg:border-b max-lg:border-b-gray-100 lg:rounded-lg">
+      {/* Hamburger — mobile only */}
       <button
         type="button"
         onClick={onMenuClick}
-        className="lg:hidden text-gray-500 hover:text-[var(--ink)] transition-colors"
+        className="md:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors"
       >
-        <RiMenu2Line size={22} />
+        <RiMenu2Line size={24} />
       </button>
 
-      {/* User info — visible on desktop, start side (right in RTL) */}
-      <div className="hidden lg:flex items-center gap-x-2.5 shrink-0">
-        <Image
-          src={user.avatar}
-          alt="avatar"
-          width={36}
-          height={36}
-          className="size-9 rounded-full object-cover"
-        />
-        <div>
-          <p className="text-sm font-bold text-[var(--ink)] leading-tight">{user.name[locale]}</p>
-          <p className="text-xs text-gray-400">{user.phone}</p>
-        </div>
+      {/* Logo — desktop */}
+      <div className="hidden md:flex items-center">
+        <Image src="/logo.svg" alt="روح‌بخش" width={130} height={44} className="h-11 w-auto" />
       </div>
 
-      <div className="hidden lg:block w-px h-8 bg-gray-100 mx-1" />
+      {/* End side: icons + date */}
+      <div className="flex items-center gap-x-3">
+        {/* Cart — navigates to cart page */}
+        <Link
+          href="/cart"
+          className="size-10 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+        >
+          <RiShoppingCartLine size={22} />
+        </Link>
 
-      {/* Search */}
-      <div className="flex-1 relative max-w-md">
-        <RiSearchLine size={16} className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={ui.search}
-          className="w-full h-9 rounded-lg border border-gray-200 bg-gray-50 ps-4 pe-9 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors"
-        />
+        {/* Bell */}
+        <button
+          type="button"
+          className="size-10 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 transition-colors relative"
+        >
+          <RiBellLine size={22} />
+          <span className="absolute top-2 end-2 size-2 rounded-full bg-[var(--cta)]" />
+        </button>
+
+        <div className="hidden lg:block w-px h-6 bg-gray-100 mx-1" />
+        <time className="hidden lg:block text-sm text-gray-400 select-none whitespace-nowrap">
+          {UI[locale].today()}
+        </time>
       </div>
-
-      <div className="flex-1" />
-
-      {/* Icons */}
-      <div className="flex items-center gap-x-1.5">
-        <button type="button" className="size-9 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 transition-colors relative">
-          <RiBellLine size={20} />
-          <span className="absolute top-1.5 end-1.5 size-2 rounded-full bg-[var(--cta)]" />
-        </button>
-        <button type="button" className="size-9 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
-          <RiShoppingCartLine size={20} />
-        </button>
-        <button type="button" className="size-9 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
-          <RiMoonLine size={20} />
-        </button>
-      </div>
-
-      {/* Date — end side (left in RTL) desktop only */}
-      <div className="hidden lg:block w-px h-8 bg-gray-100 mx-1" />
-      <p className="hidden lg:block text-xs text-gray-400 whitespace-nowrap shrink-0">{ui.today}</p>
     </header>
   );
 }
