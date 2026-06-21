@@ -1,5 +1,3 @@
-import { MOCK_COURSES } from "./courses.mock";
-
 export type Teacher = {
   slug: string;
   name: { ar: string; ur: string };
@@ -33,4 +31,3 @@ export function getTeacher(slug: string): Teacher | undefined {
   return TEACHERS[slug];
 }
 
-export { MOCK_COURSES };
