@@ -50,7 +50,7 @@ export default function ResetPasswordForm() {
   };
 
   return (
-    <AuthCard locale={locale}>
+    <AuthCard>
       {done ? (
         <div className="flex flex-col items-center text-center gap-y-4 py-4">
           <div className="size-16 rounded-full bg-[var(--brand)]/10 flex items-center justify-center">
@@ -58,34 +58,32 @@ export default function ResetPasswordForm() {
           </div>
           <h1 className="text-xl font-extrabold text-[var(--ink)]">{ui.successTitle}</h1>
           <p className="text-sm text-gray-400">{ui.successSub}</p>
-          <button onClick={() => router.push("/auth/signin")}
-            className="w-full h-11 rounded-xl bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity mt-2">
+          <button onClick={() => router.push("/signin")}
+            className="w-full h-11 rounded-lg bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity mt-2">
             {ui.goLogin}
           </button>
         </div>
       ) : (
         <>
-          <h1 className="text-xl font-extrabold text-[var(--ink)] mb-1">{ui.title}</h1>
-          <p className="text-sm text-gray-400 mb-6">{ui.sub}</p>
+          <h1 className="text-xl font-extrabold text-[var(--ink)] mb-1 text-center">{ui.title}</h1>
+          <p className="text-sm text-gray-400 mb-6 text-center">{ui.sub}</p>
           <form onSubmit={handleSubmit} className="flex flex-col gap-y-3">
-            {/* New password */}
             <div className="relative">
               <RiLockLine size={17} className="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               <input type={showNew ? "text" : "password"} placeholder={ui.newPass} value={newPass}
                 onChange={(e) => setNewPass(e.target.value)} required minLength={8}
-                className="w-full h-11 rounded-xl border border-gray-200 ps-10 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white" />
+                className="w-full h-11 rounded-lg border border-gray-200 ps-10 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white" />
               <button type="button" onClick={() => setShowNew((s) => !s)}
                 className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                 {showNew ? <RiEyeOffLine size={17} /> : <RiEyeLine size={17} />}
               </button>
             </div>
 
-            {/* Confirm password */}
             <div className="relative">
               <RiLockLine size={17} className="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               <input type={showConfirm ? "text" : "password"} placeholder={ui.confirmPass} value={confirmPass}
                 onChange={(e) => setConfirmPass(e.target.value)} required
-                className={`w-full h-11 rounded-xl border ps-10 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white ${error ? "border-red-400" : "border-gray-200"}`} />
+                className={`w-full h-11 rounded-lg border ps-10 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white ${error ? "border-red-400" : "border-gray-200"}`} />
               <button type="button" onClick={() => setShowConfirm((s) => !s)}
                 className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                 {showConfirm ? <RiEyeOffLine size={17} /> : <RiEyeLine size={17} />}
@@ -95,7 +93,7 @@ export default function ResetPasswordForm() {
             {error && <p className="text-xs text-red-500 px-1">{error}</p>}
 
             <button type="submit"
-              className="w-full h-11 rounded-xl bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity mt-1">
+              className="w-full h-11 rounded-lg bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity mt-1">
               {ui.submit}
             </button>
           </form>

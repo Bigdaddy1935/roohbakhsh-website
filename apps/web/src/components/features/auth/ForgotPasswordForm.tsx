@@ -18,7 +18,6 @@ const UI = {
     otpResendLink: "إعادة الإرسال",
     otpSubmit: "تأكيد ومتابعة",
     back: "رجوع",
-    timer: "انتهاء الصلاحية خلال",
   },
   ur: {
     title: "پاسورڈ بازیابی",
@@ -31,7 +30,6 @@ const UI = {
     otpResendLink: "دوبارہ بھیجیں",
     otpSubmit: "تصدیق اور جاری رہیں",
     back: "واپس",
-    timer: "میعاد ختم",
   },
 };
 
@@ -80,24 +78,24 @@ export default function ForgotPasswordForm() {
   const fmt = (s: number) => `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
 
   return (
-    <AuthCard locale={locale}>
+    <AuthCard>
       {step === "email" ? (
         <>
-          <h1 className="text-xl font-extrabold text-[var(--ink)] mb-1">{ui.title}</h1>
-          <p className="text-sm text-gray-400 mb-6">{ui.sub}</p>
+          <h1 className="text-xl font-extrabold text-[var(--ink)] mb-1 text-center">{ui.title}</h1>
+          <p className="text-sm text-gray-400 mb-6 text-center">{ui.sub}</p>
           <form onSubmit={handleEmailSubmit} className="flex flex-col gap-y-4">
             <div className="relative">
               <RiMailLine size={17} className="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               <input type="email" placeholder={ui.email} value={email} onChange={(e) => setEmail(e.target.value)} required
-                className="w-full h-11 rounded-xl border border-gray-200 ps-10 pe-4 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white" />
+                className="w-full h-11 rounded-lg border border-gray-200 ps-10 pe-4 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white" />
             </div>
             <button type="submit"
-              className="w-full h-11 rounded-xl bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity">
+              className="w-full h-11 rounded-lg bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity">
               {ui.submit}
             </button>
           </form>
           <div className="mt-4 flex justify-center">
-            <Link href="/auth/signin" className="flex items-center gap-x-1 text-sm text-gray-400 hover:text-[var(--ink)] transition-colors">
+            <Link href="/signin" className="flex items-center gap-x-1 text-sm text-gray-400 hover:text-[var(--ink)] transition-colors">
               <RiArrowRightSLine size={16} />
               {ui.back}
             </Link>
@@ -109,11 +107,10 @@ export default function ForgotPasswordForm() {
             <RiArrowRightSLine size={16} />
             {ui.back}
           </button>
-          <h1 className="text-xl font-extrabold text-[var(--ink)] mb-1">{ui.otpTitle}</h1>
-          <p className="text-sm text-gray-400 mb-1">{ui.otpSub}</p>
-          <p className="text-sm text-[var(--brand)] font-semibold mb-6">{fmt(seconds)}</p>
+          <h1 className="text-xl font-extrabold text-[var(--ink)] mb-1 text-center">{ui.otpTitle}</h1>
+          <p className="text-sm text-gray-400 mb-1 text-center">{ui.otpSub}</p>
+          <p className="text-sm text-[var(--brand)] font-semibold mb-6 text-center">{fmt(seconds)}</p>
 
-          {/* OTP inputs — LTR so digits fill left→right */}
           <div dir="ltr" className="flex items-center justify-center gap-x-2.5 mb-6">
             {otp.map((digit, i) => (
               <input
@@ -125,14 +122,14 @@ export default function ForgotPasswordForm() {
                 value={digit}
                 onChange={(e) => handleOtpChange(i, e.target.value)}
                 onKeyDown={(e) => handleOtpKey(i, e)}
-                className="size-11 rounded-xl border border-gray-200 text-center text-lg font-bold text-[var(--ink)] outline-none focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/15 transition-all bg-white"
+                className="size-11 rounded-lg border border-gray-200 text-center text-lg font-bold text-[var(--ink)] outline-none focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/15 transition-all bg-white"
               />
             ))}
           </div>
 
           <button type="button"
             onClick={() => { /* submit OTP */ }}
-            className="w-full h-11 rounded-xl bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity">
+            className="w-full h-11 rounded-lg bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity">
             {ui.otpSubmit}
           </button>
 
