@@ -24,15 +24,15 @@ export class Payment {
   @Column({ type: "enum", enum: ["pending", "paid", "failed"], default: "pending" })
   status!: PaymentStatus;
 
-  /** ZarinPal authority code — set after initiation */
+  /** Gateway authority/reference code — set after initiation */
   @Column({ type: "varchar", nullable: true, default: null })
   authority!: string | null;
 
-  /** ZarinPal RefID — set after successful verification */
+  /** Gateway transaction RefID — set after successful verification */
   @Column({ name: "ref_id", type: "varchar", nullable: true, default: null })
   refId!: string | null;
 
-  /** Full ZarinPal payment page URL — set after initiation */
+  /** Full gateway payment page URL — set after initiation */
   @Column({ name: "gateway_url", type: "varchar", length: 512, nullable: true, default: null })
   gatewayUrl!: string | null;
 
