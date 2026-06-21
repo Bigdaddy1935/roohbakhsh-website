@@ -174,7 +174,7 @@ export default function Header() {
               </button>
             ) : (
               <Link
-                href="/auth/signin"
+                href="/signin"
                 className="flex items-center gap-x-1.5 h-9 px-4 rounded-xl bg-[var(--brand)] text-white text-[13px] font-semibold hover:bg-[var(--brand)]/90 transition-colors whitespace-nowrap"
               >
                 <RiLoginBoxLine size={16} />
@@ -210,12 +210,12 @@ export default function Header() {
             </div>
           ) : (
             <div className="flex gap-x-2">
-              <Link href="/auth/signup" onClick={() => setDrawerOpen(false)} className="flex-1">
+              <Link href="/signup" onClick={() => setDrawerOpen(false)} className="flex-1">
                 <button type="button" className="w-full h-10 rounded-xl text-sm font-semibold text-white hover:opacity-90 transition-opacity" style={{ background: "var(--cta)" }}>
                   {t("signup")}
                 </button>
               </Link>
-              <Link href="/auth/signin" onClick={() => setDrawerOpen(false)} className="flex-1">
+              <Link href="/signin" onClick={() => setDrawerOpen(false)} className="flex-1">
                 <button type="button" className="w-full h-10 rounded-xl text-sm font-semibold border transition-colors" style={{ borderColor: "var(--brand)", color: "var(--brand)" }}>
                   {t("signin")}
                 </button>
