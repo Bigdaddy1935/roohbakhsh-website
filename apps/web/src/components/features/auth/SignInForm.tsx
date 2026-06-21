@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import { useLocale } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { RiMailLine, RiEyeLine, RiEyeOffLine } from "react-icons/ri";
 import AuthCard from "./AuthCard";
+import { useLogin } from "@/hooks/queries/use-auth";
+import type { ApiError } from "@roohbakhsh/shared";
 
 const UI = {
   ar: {
@@ -41,9 +44,21 @@ function openGoogleAuth() {
 export default function SignInForm() {
   const locale = useLocale() as "ar" | "ur";
   const ui = UI[locale];
+  const router = useRouter();
+  const { mutate: login, isPending, error } = useLogin();
+
   const [showPass, setShowPass] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const apiError = error as ApiError | null;
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    login({ email, password }, {
+      onSuccess: () => router.push("/dashboard"),
+    });
+  }
 
   return (
     <AuthCard>
@@ -53,8 +68,13 @@ export default function SignInForm() {
         <Link href="/signup" className="text-[var(--brand)] font-semibold hover:underline">{ui.subLink}</Link>
       </p>
 
-      <form className="flex flex-col gap-y-3" onSubmit={(e) => e.preventDefault()}>
-        {/* Email — icon on end (left in RTL) */}
+      {apiError && (
+        <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+          {apiError.message}
+        </div>
+      )}
+
+      <form className="flex flex-col gap-y-3" onSubmit={handleSubmit}>
         <div className="relative">
           <RiMailLine size={17} className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
           <input
@@ -63,11 +83,11 @@ export default function SignInForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white"
+            disabled={isPending}
+            className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white disabled:opacity-60"
           />
         </div>
 
-        {/* Password — only eye toggle on end (left in RTL) */}
         <div className="relative">
           <input
             type={showPass ? "text" : "password"}
@@ -75,7 +95,8 @@ export default function SignInForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white"
+            disabled={isPending}
+            className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white disabled:opacity-60"
           />
           <button type="button" onClick={() => setShowPass((s) => !s)}
             className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -87,9 +108,9 @@ export default function SignInForm() {
           <Link href="/forgoat-password" className="text-xs text-[var(--brand)] hover:underline">{ui.forgot}</Link>
         </div>
 
-        <button type="submit"
-          className="w-full h-11 rounded-lg bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity mt-1">
-          {ui.submit}
+        <button type="submit" disabled={isPending}
+          className="w-full h-11 rounded-lg bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity mt-1 disabled:opacity-60">
+          {isPending ? "..." : ui.submit}
         </button>
       </form>
 

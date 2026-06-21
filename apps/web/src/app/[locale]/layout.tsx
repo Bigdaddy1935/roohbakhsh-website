@@ -1,4 +1,5 @@
 import { NextIntlClientProvider } from "next-intl";
+import QueryProvider from "@/providers/QueryProvider";
 import { getMessages } from "next-intl/server";
 import { Almarai, Noto_Nastaliq_Urdu } from "next/font/google";
 import type { Locale } from "@roohbakhsh/shared";
@@ -37,9 +38,11 @@ export default async function LocaleLayout({
       className={`${almarai.variable} ${nastaliq.variable}`}
     >
       <body>
-        <NextIntlClientProvider messages={messages}>
-          {children}
-        </NextIntlClientProvider>
+        <QueryProvider>
+          <NextIntlClientProvider messages={messages}>
+            {children}
+          </NextIntlClientProvider>
+        </QueryProvider>
       </body>
     </html>
   );

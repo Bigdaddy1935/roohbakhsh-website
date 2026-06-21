@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import { useLocale } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { RiUserLine, RiPhoneLine, RiMailLine, RiEyeLine, RiEyeOffLine } from "react-icons/ri";
 import AuthCard from "./AuthCard";
+import { useRegister } from "@/hooks/queries/use-auth";
+import type { ApiError } from "@roohbakhsh/shared";
 
 const UI = {
   ar: {
@@ -43,13 +46,23 @@ function openGoogleAuth() {
 export default function SignUpForm() {
   const locale = useLocale() as "ar" | "ur";
   const ui = UI[locale];
-  const [showPass, setShowPass] = useState(false);
+  const router = useRouter();
+  const { mutate: register, isPending, error } = useRegister();
 
-  const textFields = [
-    { icon: <RiUserLine size={17} />, placeholder: ui.name, type: "text" },
-    { icon: <RiPhoneLine size={17} />, placeholder: ui.phone, type: "tel" },
-    { icon: <RiMailLine size={17} />, placeholder: ui.email, type: "email" },
-  ];
+  const [showPass, setShowPass] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const apiError = error as ApiError | null;
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    register({ fullName, phone: phone || undefined, email, password, preferredLocale: locale }, {
+      onSuccess: () => router.push("/dashboard"),
+    });
+  }
 
   return (
     <AuthCard>
@@ -59,30 +72,40 @@ export default function SignUpForm() {
         <Link href="/signin" className="text-[var(--brand)] font-semibold hover:underline">{ui.subLink}</Link>
       </p>
 
-      <form className="flex flex-col gap-y-3" onSubmit={(e) => e.preventDefault()}>
-        {/* Text fields — icon on end (left in RTL), placeholder RTL */}
-        {textFields.map((f, i) => (
-          <div key={i} className="relative">
-            <span className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">{f.icon}</span>
-            <input type={f.type} placeholder={f.placeholder} required
-              dir={f.type === "tel" ? "rtl" : undefined}
-              className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white" />
-          </div>
-        ))}
+      {apiError && (
+        <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+          {apiError.message}
+        </div>
+      )}
 
-        {/* Password — eye toggle on end (left in RTL) */}
+      <form className="flex flex-col gap-y-3" onSubmit={handleSubmit}>
         <div className="relative">
-          <input type={showPass ? "text" : "password"} placeholder={ui.password} required
-            className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white" />
+          <span className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><RiUserLine size={17} /></span>
+          <input type="text" placeholder={ui.name} value={fullName} onChange={(e) => setFullName(e.target.value)} required disabled={isPending}
+            className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white disabled:opacity-60" />
+        </div>
+        <div className="relative">
+          <span className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><RiPhoneLine size={17} /></span>
+          <input type="tel" placeholder={ui.phone} value={phone} onChange={(e) => setPhone(e.target.value)} dir="rtl" disabled={isPending}
+            className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white disabled:opacity-60" />
+        </div>
+        <div className="relative">
+          <span className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><RiMailLine size={17} /></span>
+          <input type="email" placeholder={ui.email} value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isPending}
+            className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white disabled:opacity-60" />
+        </div>
+        <div className="relative">
+          <input type={showPass ? "text" : "password"} placeholder={ui.password} value={password} onChange={(e) => setPassword(e.target.value)} required disabled={isPending}
+            className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white disabled:opacity-60" />
           <button type="button" onClick={() => setShowPass((s) => !s)}
             className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
             {showPass ? <RiEyeOffLine size={17} /> : <RiEyeLine size={17} />}
           </button>
         </div>
 
-        <button type="submit"
-          className="w-full h-11 rounded-lg bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity mt-1">
-          {ui.submit}
+        <button type="submit" disabled={isPending}
+          className="w-full h-11 rounded-lg bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity mt-1 disabled:opacity-60">
+          {isPending ? "..." : ui.submit}
         </button>
       </form>
 
