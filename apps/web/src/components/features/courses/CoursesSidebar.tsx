@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Checkbox, RadioGroup, Radio } from "@heroui/react";
 import { RiSearchLine } from "react-icons/ri";
-import { COURSE_CATEGORIES, COURSE_SORT_OPTIONS } from "@/data/courses.mock";
+import { useCategories } from "@/hooks/queries/use-categories";
 import { useCourseFilters } from "@/hooks/useCourseFilters";
 
 export default function CoursesSidebar() {
   const t = useTranslations("Courses");
   const locale = useLocale() as "ar" | "ur";
   const { cats, sort, q, toggleCategory, setSort, setSearch } = useCourseFilters();
+  const { data: categories } = useCategories();
 
   const [localSearch, setLocalSearch] = useState(q);
 
@@ -21,6 +22,12 @@ export default function CoursesSidebar() {
   }, [localSearch]);
 
   useEffect(() => { setLocalSearch(q); }, [q]);
+
+  const sortOptions = [
+    { value: "newest",   label: t("sort_newest")  },
+    { value: "popular",  label: t("sort_popular") },
+    { value: "advanced", label: t("sort_advanced") },
+  ];
 
   return (
     <aside className="hidden lg:flex flex-col gap-y-6 sticky top-24 self-start">
@@ -44,15 +51,15 @@ export default function CoursesSidebar() {
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
         <p className="text-sm font-extrabold text-[var(--ink)] mb-4">{t("filter_label")}</p>
         <div className="flex flex-col gap-y-4 max-h-64 overflow-y-auto scrollbar-thin pe-1">
-          {COURSE_CATEGORIES.map((cat) => (
+          {(categories ?? []).map((cat) => (
             <Checkbox
-              key={cat.value}
-              isSelected={cats.includes(cat.value)}
-              onChange={() => toggleCategory(cat.value)}
+              key={cat.id}
+              isSelected={cats.includes(cat.id)}
+              onChange={() => toggleCategory(cat.id)}
             >
               <Checkbox.Content>
                 <Checkbox.Control><Checkbox.Indicator /></Checkbox.Control>
-                <span className="text-[13px] text-[var(--ink)]">{cat[locale]}</span>
+                <span className="text-[13px] text-[var(--ink)]">{cat.name[locale]}</span>
               </Checkbox.Content>
             </Checkbox>
           ))}
@@ -63,11 +70,11 @@ export default function CoursesSidebar() {
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
         <p className="text-sm font-extrabold text-[var(--ink)] mb-4">{t("sort_label")}</p>
         <RadioGroup value={sort} onChange={setSort} className="flex flex-col gap-y-2">
-          {COURSE_SORT_OPTIONS.map((opt) => (
+          {sortOptions.map((opt) => (
             <Radio key={opt.value} value={opt.value}>
               <Radio.Content>
                 <Radio.Control><Radio.Indicator /></Radio.Control>
-                <span className="text-[13px] text-[var(--ink)]">{opt[locale]}</span>
+                <span className="text-[13px] text-[var(--ink)]">{opt.label}</span>
               </Radio.Content>
             </Radio>
           ))}

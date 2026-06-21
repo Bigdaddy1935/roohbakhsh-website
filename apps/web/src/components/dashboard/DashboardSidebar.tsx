@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useLocale } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import {
@@ -10,8 +9,9 @@ import {
   RiCustomerService2Line,
   RiAccountCircleLine,
   RiLogoutBoxLine,
+  RiUserLine,
 } from "react-icons/ri";
-import { MOCK_USER_PROFILE } from "@/data/dashboard.mock";
+import { useMe } from "@/hooks/queries/use-auth";
 
 const UI = {
   ar: {
@@ -48,7 +48,7 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
   const locale = useLocale() as "ar" | "ur";
   const pathname = usePathname();
   const ui = UI[locale];
-  const user = MOCK_USER_PROFILE;
+  const { data: user } = useMe();
 
   const isActive = (href: string) =>
     href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
@@ -58,18 +58,14 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
       {/* User info */}
       <div className="flex items-center justify-between pb-5 mb-5 border-b border-gray-100">
         <div className="flex items-center gap-x-2">
-          <Image
-            src={user.avatar}
-            alt="avatar"
-            width={44}
-            height={44}
-            className="size-11 rounded-full object-cover shrink-0"
-          />
+          <div className="size-11 rounded-full bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
+            <RiUserLine size={22} className="text-[var(--brand)]" />
+          </div>
           <div className="flex flex-col text-sm">
             <span className="font-semibold max-w-28 truncate text-[var(--ink)]">
-              {user.name[locale]}
+              {user?.fullName ?? "—"}
             </span>
-            <span className="text-gray-400 text-xs mt-0.5">{user.phone}</span>
+            <span className="text-gray-400 text-xs mt-0.5">{user?.phone ?? user?.email ?? ""}</span>
           </div>
         </div>
       </div>

@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { RiArrowLeftSLine, RiBookOpenLine, RiTimeLine, RiUserLine, RiCalendarLine } from "react-icons/ri";
-import { COURSE_CATEGORIES, COURSE_SORT_OPTIONS } from "@/data/courses.mock";
+import { useCategories } from "@/hooks/queries/use-categories";
 import { useCourseFilters } from "@/hooks/useCourseFilters";
 import FilterSortBar from "@/components/ui/FilterSortBar";
 import CoursesSidebar from "./CoursesSidebar";
@@ -14,9 +14,14 @@ function CoursesContent() {
   const t = useTranslations("Courses");
   const locale = useLocale() as "ar" | "ur";
   const { cats, sort, toggleCategory, setSort } = useCourseFilters();
+  const { data: categories } = useCategories();
 
-  const categoryOptions = COURSE_CATEGORIES.map((c) => ({ value: c.value, label: c[locale] }));
-  const sortOptions = COURSE_SORT_OPTIONS.map((o) => ({ value: o.value, label: o[locale] }));
+  const categoryOptions = (categories ?? []).map((c) => ({ value: c.id, label: c.name[locale] }));
+  const sortOptions = [
+    { value: "newest",  label: t("sort_newest")  },
+    { value: "popular", label: t("sort_popular") },
+    { value: "advanced", label: t("sort_advanced") },
+  ];
 
   return (
     <div className="bg-[var(--bg)] min-h-screen">
