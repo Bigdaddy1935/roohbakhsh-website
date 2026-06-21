@@ -1,3 +1,2 @@
-export default function SignInPage() {
-  return null;
-}
+import SignInForm from "@/components/features/auth/SignInForm";
+export default function SignInPage() { return <SignInForm />; }
