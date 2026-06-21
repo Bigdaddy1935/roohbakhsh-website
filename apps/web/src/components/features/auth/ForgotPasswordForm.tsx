@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { RiMailLine, RiArrowLeftSLine } from "react-icons/ri";
+import { RiMailLine, RiArrowRightSLine } from "react-icons/ri";
 import AuthCard from "./AuthCard";
 
 const UI = {
@@ -96,15 +96,15 @@ export default function ForgotPasswordForm() {
           </form>
           <div className="mt-4 flex justify-center">
             <Link href="/signin" className="flex items-center gap-x-1 text-sm text-gray-400 hover:text-[var(--ink)] transition-colors">
+              <RiArrowRightSLine size={16} />
               {ui.back}
-              <RiArrowLeftSLine size={16} />
             </Link>
           </div>
         </>
       ) : (
         <>
           <button onClick={() => setStep("email")} className="absolute top-6 end-6 flex items-center gap-x-1 text-sm text-gray-400 hover:text-[var(--ink)] transition-colors">
-            <RiArrowLeftSLine size={16} />
+            <RiArrowRightSLine size={16} />
             {ui.back}
           </button>
           <h1 className="text-2xl font-extrabold text-[var(--ink)] mb-1 text-center">{ui.otpTitle}</h1>
