@@ -96,8 +96,8 @@ export default function ForgotPasswordForm() {
           </form>
           <div className="mt-4 flex justify-center">
             <Link href="/signin" className="flex items-center gap-x-1 text-sm text-gray-400 hover:text-[var(--ink)] transition-colors">
-              <RiArrowLeftSLine size={16} />
               {ui.back}
+              <RiArrowLeftSLine size={16} />
             </Link>
           </div>
         </>
