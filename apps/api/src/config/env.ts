@@ -46,14 +46,8 @@ class EnvConfig {
   @IsString()
   JWT_EXPIRES_IN: string = "7d";
 
-  @IsString()
-  ZARINPAL_MERCHANT_ID!: string;
-
-  @IsBoolean()
-  ZARINPAL_SANDBOX: boolean = true;
-
-  @IsString()
-  PAYMENT_CALLBACK_BASE_URL!: string;
+  // درگاه پرداخت ارزی (Stripe/PayPal/...) بعداً اینجا اضافه می‌شود.
+  // متغیرهای ZarinPal حذف شدند.
 }
 
 function validate(config: Record<string, unknown>): EnvConfig {
