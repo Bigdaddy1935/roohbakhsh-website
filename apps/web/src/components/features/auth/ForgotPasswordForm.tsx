@@ -103,7 +103,7 @@ export default function ForgotPasswordForm() {
         </>
       ) : (
         <>
-          <button onClick={() => setStep("email")} className="flex items-center gap-x-1 text-sm text-gray-400 hover:text-[var(--ink)] mb-5 transition-colors">
+          <button onClick={() => setStep("email")} className="absolute top-6 end-6 flex items-center gap-x-1 text-sm text-gray-400 hover:text-[var(--ink)] transition-colors">
             <RiArrowLeftSLine size={16} />
             {ui.back}
           </button>
