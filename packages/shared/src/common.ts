@@ -16,11 +16,11 @@ export const DEFAULT_LOCALE: Locale = "ar";
  */
 export type Localized<T = string> = Record<Locale, T>;
 
-/** پول — برای پرداخت ارزی فاز ۳. مبلغ همیشه به کوچک‌ترین واحد (سنت) ذخیره شود. */
+/** پول — برای پرداخت ارزی فاز ۳. مبلغ همیشه به کوچک‌ترین واحد ذخیره شود. */
 export interface Money {
-  /** مبلغ به کوچک‌ترین واحد ارز، مثلاً 1000 یعنی 10.00 دلار */
+  /** مبلغ به کوچک‌ترین واحد ارز (سنت برای USD/EUR، ریال برای IRR) */
   amountMinor: number;
-  currency: "USD" | "EUR";
+  currency: "USD" | "EUR" | "IRR";
 }
 
 /** پارامترهای صفحه‌بندی که فرانت به API می‌فرستد. */
