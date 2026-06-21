@@ -1,3 +1,5 @@
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
 import StatsBar from "@/components/home/StatsBar";
 import FreeCourses from "@/components/home/FreeCourses";
@@ -11,6 +13,8 @@ import AboutMission from "@/components/home/AboutMission";
 export default function HomePage() {
   return (
     <>
+      <Header />
+      <main>
       <HeroSection />
       <StatsBar />
       <FreeCourses />
@@ -21,6 +25,8 @@ export default function HomePage() {
       <LatestArticles />
       <Testimonials />
       <AboutMission />
+      </main>
+      <Footer />
     </>
   );
 }

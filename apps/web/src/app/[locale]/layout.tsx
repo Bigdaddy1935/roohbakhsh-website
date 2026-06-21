@@ -3,8 +3,6 @@ import { getMessages } from "next-intl/server";
 import { Almarai, Noto_Nastaliq_Urdu } from "next/font/google";
 import type { Locale } from "@roohbakhsh/shared";
 import { dirForLocale } from "@/core/utils/dir";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import "@/core/styles/globals.css";
 
 const almarai = Almarai({
@@ -40,9 +38,7 @@ export default async function LocaleLayout({
     >
       <body>
         <NextIntlClientProvider messages={messages}>
-          <Header />
-          <main>{children}</main>
-          <Footer />
+          {children}
         </NextIntlClientProvider>
       </body>
     </html>
