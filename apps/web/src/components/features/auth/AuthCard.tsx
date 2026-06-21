@@ -35,7 +35,7 @@ export default function AuthCard({ children }: Props) {
       </div>
 
       {/* Language switcher — fixed top bar */}
-      <div className="fixed top-0 start-0 end-0 z-50 flex justify-center gap-2 bg-white/80 backdrop-blur-sm border-b border-gray-100 py-2.5 px-4">
+      <div className="fixed top-0 start-0 end-0 z-50 flex justify-center gap-2 py-2.5 px-4">
         {(["ar", "ur"] as const).map((l) => (
           <button
             key={l}
@@ -64,7 +64,7 @@ export default function AuthCard({ children }: Props) {
       </Link>
 
       {/* Card */}
-      <div className="relative z-10 w-full max-w-sm bg-white rounded-xl shadow-xl">
+      <div className="relative z-10 w-full max-w-sm bg-white rounded-xl shadow-md">
         <div className="px-8 pt-8 pb-7">
           {children}
         </div>

@@ -65,15 +65,14 @@ export default function SignUpForm() {
             className="w-full h-11 rounded-lg border border-gray-200 ps-10 pe-4 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white" />
         </div>
 
-        {/* Phone — LTR so digits align left */}
+        {/* Phone */}
         <div className="relative">
-          <RiPhoneLine size={17} className="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+          <RiPhoneLine size={17} className="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
           <input
             type="tel"
             placeholder={ui.phone}
             required
-            dir="ltr"
-            className="w-full h-11 rounded-lg border border-gray-200 ps-10 pe-4 text-sm text-[var(--ink)] placeholder:text-start placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white"
+            className="w-full h-11 rounded-lg border border-gray-200 ps-10 pe-4 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white"
           />
         </div>
 
