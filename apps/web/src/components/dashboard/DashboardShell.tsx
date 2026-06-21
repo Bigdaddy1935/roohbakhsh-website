@@ -24,7 +24,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         {/* Main content */}
         <section className="flex flex-col lg:gap-y-6 w-full overflow-hidden">
           <DashboardHeader onMenuClick={() => setSidebarOpen(true)} />
-          <main className="flex-1 p-4 sm:p-6 lg:p-0 pb-10">
+          <main className="flex-1 pb-10">
             {children}
           </main>
         </section>

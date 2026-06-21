@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { RiBellLine, RiShoppingCartLine, RiMenu2Line } from "react-icons/ri";
+import { RiNotification3Line, RiShoppingCartLine, RiMenu2Line } from "react-icons/ri";
 
 const UI = {
   ar: { today: () => new Date().toLocaleDateString("ar-SA-u-ca-gregory", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) },
@@ -46,7 +46,7 @@ export default function DashboardHeader({ onMenuClick }: Props) {
           type="button"
           className="size-10 flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 transition-colors relative"
         >
-          <RiBellLine size={22} />
+          <RiNotification3Line size={22} />
           <span className="absolute top-2 end-2 size-2 rounded-full bg-[var(--cta)]" />
         </button>
 

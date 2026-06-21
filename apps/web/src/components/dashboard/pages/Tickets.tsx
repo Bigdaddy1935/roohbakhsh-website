@@ -2,17 +2,20 @@
 
 import { useState } from "react";
 import { useLocale } from "next-intl";
-import { RiAddLine, RiCustomerService2Line, RiCloseLine } from "react-icons/ri";
+import { Select, Label, ListBox } from "@heroui/react";
+import { RiAddLine, RiCloseLine, RiArrowLeftSLine, RiFolderOpenLine, RiFileTextLine, RiTimeLine, RiRefreshLine } from "react-icons/ri";
 import { MOCK_TICKETS, type TicketStatus } from "@/data/dashboard.mock";
 
 const UI = {
   ar: {
     title: "تيكيتاتي",
     newTicket: "إنشاء تيكيت جديد",
-    cols: { id: "رقم التيكيت", subject: "الموضوع", dept: "القسم", date: "تاريخ الإنشاء", status: "الحالة" },
-    status: { open: "مفتوح", answered: "تمت الإجابة", closed: "مغلق" },
-    viewDetails: "عرض",
-    // New ticket form
+    status: { open: "مفتوح", answered: "پاسخ داده شده", closed: "مغلق" },
+    viewDetails: "مشاهده جزییات",
+    ticketNo: "شماره تیکت",
+    dept: "دپارتمان",
+    date: "تاریخ ثبت",
+    statusLabel: "وضعیت",
     formTitle: "إنشاء تيكيت جديد",
     deptLabel: "القسم",
     subjectLabel: "الموضوع",
@@ -20,14 +23,21 @@ const UI = {
     bodyPlaceholder: "اكتب تفاصيل مشكلتك أو سؤالك...",
     submit: "إرسال التيكيت",
     cancel: "إلغاء",
-    depts: ["الدعم الفني", "الدعم المالي", "الدعم التعليمي"],
+    depts: [
+      { id: "support", label: "الدعم الفني" },
+      { id: "financial", label: "الدعم المالي" },
+      { id: "educational", label: "الدعم التعليمي" },
+    ],
   },
   ur: {
     title: "میرے ٹکٹس",
     newTicket: "نیا ٹکٹ بنائیں",
-    cols: { id: "ٹکٹ نمبر", subject: "موضوع", dept: "محکمہ", date: "تاریخ", status: "حیثیت" },
     status: { open: "کھلا", answered: "جواب دیا", closed: "بند" },
-    viewDetails: "دیکھیں",
+    viewDetails: "تفصیلات دیکھیں",
+    ticketNo: "ٹکٹ نمبر",
+    dept: "محکمہ",
+    date: "تاریخ",
+    statusLabel: "حیثیت",
     formTitle: "نیا ٹکٹ بنائیں",
     deptLabel: "محکمہ",
     subjectLabel: "موضوع",
@@ -35,14 +45,24 @@ const UI = {
     bodyPlaceholder: "اپنے مسئلے یا سوال کی تفصیل لکھیں...",
     submit: "ٹکٹ بھیجیں",
     cancel: "منسوخ",
-    depts: ["تکنیکی سپورٹ", "مالی سپورٹ", "تعلیمی سپورٹ"],
+    depts: [
+      { id: "support", label: "تکنیکی سپورٹ" },
+      { id: "financial", label: "مالی سپورٹ" },
+      { id: "educational", label: "تعلیمی سپورٹ" },
+    ],
   },
 };
 
 const STATUS_CLS: Record<TicketStatus, string> = {
-  open:     "bg-blue-50 text-blue-600",
-  answered: "bg-green-50 text-green-600",
+  open:     "bg-blue-50/10 text-blue-600",
+  answered: "bg-[var(--brand)]/10 text-[var(--brand)]",
   closed:   "bg-gray-100 text-gray-500",
+};
+
+const DOT_CLS: Record<TicketStatus, string> = {
+  open:     "bg-blue-400",
+  answered: "bg-[var(--brand)]",
+  closed:   "bg-gray-400",
 };
 
 export default function Tickets() {
@@ -50,27 +70,81 @@ export default function Tickets() {
   const ui = UI[locale];
   const [showForm, setShowForm] = useState(false);
   const [subject, setSubject] = useState("");
-  const [dept, setDept] = useState("");
+  const [dept, setDept] = useState<string>("");
   const [body, setBody] = useState("");
 
   return (
-    <div className="max-w-5xl mx-auto w-full">
+    <div className="bg-white p-4 sm:p-5 lg:rounded-md lg:p-7 min-h-full">
+      {/* Header */}
       <div className="flex items-center justify-between mb-5">
-        <h1 className="text-lg font-extrabold text-[var(--ink)]">{ui.title}</h1>
+        <h1 className="text-base font-bold text-[var(--ink)]">{ui.title}</h1>
         <button
           type="button"
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-x-1.5 h-9 px-4 rounded-lg bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+          className="flex items-center gap-x-1.5 h-9 px-4 rounded-md bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
         >
           <RiAddLine size={18} />
           {ui.newTicket}
         </button>
       </div>
 
+      {/* Ticket cards */}
+      <div className="flex flex-col gap-y-3">
+        {MOCK_TICKETS.map((tk) => (
+          <div
+            key={tk.id}
+            className="p-5 border border-gray-100 hover:border-gray-300 hover:lg:-translate-x-1 transition-all rounded-md"
+          >
+            {/* Top row: subject + view button */}
+            <div className="flex items-center justify-between gap-x-5 mb-4">
+              <div className="flex items-center gap-x-2.5 min-w-0">
+                <span className={`size-1.5 shrink-0 rounded-full ${DOT_CLS[tk.status]}`} />
+                <span className="text-sm font-semibold text-[var(--ink)] line-clamp-2">
+                  {tk.subject[locale]}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="flex items-center gap-x-1.5 shrink-0 h-8 px-3 rounded-md border border-[var(--brand)] text-[var(--brand)] text-xs font-semibold hover:bg-[var(--brand)]/5 transition-colors"
+              >
+                <span className="hidden sm:inline">{ui.viewDetails}</span>
+                <RiArrowLeftSLine size={15} />
+              </button>
+            </div>
+
+            {/* Meta row */}
+            <div className="flex flex-wrap gap-x-7 gap-y-2.5">
+              <div className="flex items-center gap-x-2 text-xs">
+                <RiFolderOpenLine size={14} className="text-gray-400 shrink-0" />
+                <span className="text-gray-400">{ui.ticketNo}:</span>
+                <span className="text-[var(--ink)]">{tk.id}</span>
+              </div>
+              <div className="flex items-center gap-x-2 text-xs">
+                <RiFileTextLine size={14} className="text-gray-400 shrink-0" />
+                <span className="text-gray-400">{ui.dept}:</span>
+                <span className="text-[var(--ink)]">{tk.dept[locale]}</span>
+              </div>
+              <div className="flex items-center gap-x-2 text-xs">
+                <RiTimeLine size={14} className="text-gray-400 shrink-0" />
+                <span className="text-gray-400">{ui.date}:</span>
+                <span className="text-[var(--ink)]">{tk.date[locale]}</span>
+              </div>
+              <div className="flex items-center gap-x-2 text-xs">
+                <RiRefreshLine size={14} className="text-gray-400 shrink-0" />
+                <span className="text-gray-400">{ui.statusLabel}:</span>
+                <span className={`px-2 py-0.5 rounded-md font-semibold ${STATUS_CLS[tk.status]}`}>
+                  {ui.status[tk.status]}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* New ticket modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+          <div className="bg-white rounded-lg w-full max-w-lg" dir="rtl">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <h2 className="text-base font-bold text-[var(--ink)]">{ui.formTitle}</h2>
               <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-[var(--ink)] transition-colors">
@@ -81,91 +155,68 @@ export default function Tickets() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5">{ui.subjectLabel}</label>
-                  <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)}
-                    className="w-full h-10 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-[var(--brand)] transition-colors" />
+                  <input
+                    type="text"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    className="w-full h-10 rounded-md border border-gray-200 px-3 text-sm outline-none focus:border-[var(--brand)] transition-colors"
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5">{ui.deptLabel}</label>
-                  <select value={dept} onChange={(e) => setDept(e.target.value)}
-                    className="w-full h-10 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-[var(--brand)] transition-colors bg-white">
-                    <option value="">—</option>
-                    {ui.depts.map((d) => <option key={d} value={d}>{d}</option>)}
-                  </select>
+                  <Select
+                    fullWidth
+                    placeholder="—"
+                    value={dept}
+                    onChange={(v) => setDept(v as string)}
+                    className="h-10"
+                  >
+                    <Select.Trigger className="h-10 rounded-md border border-gray-200 px-3 text-sm bg-white">
+                      <Select.Value />
+                      <Select.Indicator />
+                    </Select.Trigger>
+                    <Select.Popover>
+                      <ListBox>
+                        {ui.depts.map((d) => (
+                          <ListBox.Item key={d.id} id={d.id} textValue={d.label}>
+                            {d.label}
+                            <ListBox.ItemIndicator />
+                          </ListBox.Item>
+                        ))}
+                      </ListBox>
+                    </Select.Popover>
+                  </Select>
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5">{ui.bodyLabel}</label>
-                <textarea value={body} onChange={(e) => setBody(e.target.value)}
-                  rows={5} placeholder={ui.bodyPlaceholder}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-none" />
+                <textarea
+                  value={body}
+                  onChange={(e) => setBody(e.target.value)}
+                  rows={5}
+                  placeholder={ui.bodyPlaceholder}
+                  className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-none"
+                />
               </div>
             </div>
             <div className="flex items-center gap-x-3 px-6 pb-6">
-              <button type="button" onClick={() => setShowForm(false)}
-                className="h-10 px-5 rounded-lg border border-gray-200 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition-colors">
+              <button
+                type="button"
+                onClick={() => setShowForm(false)}
+                className="h-10 px-5 rounded-md border border-gray-200 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition-colors"
+              >
                 {ui.cancel}
               </button>
-              <button type="button"
-                className="flex-1 h-10 rounded-lg bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity">
+              <button
+                type="button"
+                className="flex-1 h-10 rounded-md bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+              >
                 {ui.submit}
               </button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Ticket list — desktop */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden hidden md:block">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-100 bg-gray-50">
-              {Object.values(ui.cols).map((col) => (
-                <th key={col} className="text-start px-5 py-3.5 text-xs font-bold text-gray-500">{col}</th>
-              ))}
-              <th className="px-5 py-3.5" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {MOCK_TICKETS.map((tk) => (
-              <tr key={tk.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-5 py-3.5 text-xs text-gray-400 font-mono">{tk.id}</td>
-                <td className="px-5 py-3.5 font-medium text-[var(--ink)]">{tk.subject[locale]}</td>
-                <td className="px-5 py-3.5 text-gray-500 text-xs">{tk.dept[locale]}</td>
-                <td className="px-5 py-3.5 text-gray-400 text-xs">{tk.date[locale]}</td>
-                <td className="px-5 py-3.5">
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${STATUS_CLS[tk.status]}`}>
-                    {ui.status[tk.status]}
-                  </span>
-                </td>
-                <td className="px-5 py-3.5">
-                  <button type="button" className="flex items-center gap-x-1 text-xs text-[var(--brand)] hover:underline font-semibold">
-                    <RiCustomerService2Line size={14} />
-                    {ui.viewDetails}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile cards */}
-      <div className="flex flex-col gap-y-3 md:hidden">
-        {MOCK_TICKETS.map((tk) => (
-          <div key={tk.id} className="bg-white rounded-xl shadow-sm p-4">
-            <div className="flex items-start justify-between gap-x-2 mb-2">
-              <p className="text-sm font-bold text-[var(--ink)]">{tk.subject[locale]}</p>
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-lg shrink-0 ${STATUS_CLS[tk.status]}`}>
-                {ui.status[tk.status]}
-              </span>
-            </div>
-            <div className="flex items-center justify-between text-xs text-gray-400">
-              <span>{tk.dept[locale]}</span>
-              <span>{tk.date[locale]}</span>
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

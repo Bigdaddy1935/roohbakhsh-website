@@ -9,7 +9,6 @@ import {
   RiExchangeDollarLine,
   RiCustomerService2Line,
   RiAccountCircleLine,
-  RiSettings4Line,
   RiLogoutBoxLine,
 } from "react-icons/ri";
 import { MOCK_USER_PROFILE } from "@/data/dashboard.mock";
@@ -22,6 +21,7 @@ const UI = {
     transactions: "المعاملات",
     tickets: "التيكيت",
     account: "تفاصيل الحساب",
+    logout: "تسجيل الخروج",
   },
   ur: {
     quickAccess: "فوری رسائی",
@@ -30,6 +30,7 @@ const UI = {
     transactions: "لین دین",
     tickets: "ٹکٹس",
     account: "اکاؤنٹ کی تفصیلات",
+    logout: "لاگ آؤٹ",
   },
 };
 
@@ -71,25 +72,13 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
             <span className="text-gray-400 text-xs mt-0.5">{user.phone}</span>
           </div>
         </div>
-        <div className="flex items-center gap-x-3">
-          <Link
-            href="/dashboard/account"
-            className="text-gray-400 hover:text-[var(--ink)] transition-colors"
-            onClick={onClose}
-          >
-            <RiSettings4Line size={18} />
-          </Link>
-          <button type="button" className="text-gray-400 hover:text-red-500 transition-colors">
-            <RiLogoutBoxLine size={18} />
-          </button>
-        </div>
       </div>
 
       {/* Quick access label */}
-      <span className="text-xs text-gray-400 select-none mb-2.5 block">{ui.quickAccess}</span>
+      <span className="text-xs text-gray-400 select-none mb-3 block">{ui.quickAccess}</span>
 
       {/* Nav items */}
-      <div className="flex flex-col gap-y-0.5">
+      <div className="flex flex-col gap-y-1">
         {NAV.map(({ key, href, Icon }) => {
           const active = isActive(href);
           return (
@@ -97,7 +86,7 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
               key={key}
               href={href}
               onClick={onClose}
-              className="flex items-center gap-x-2.5 py-1.5 group"
+              className="flex items-center gap-x-2.5 py-2.5 group"
             >
               {/* Active badge — first in DOM = rightmost in RTL flex */}
               <span
@@ -124,6 +113,23 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
           );
         })}
       </div>
+
+      {/* Logout — below nav */}
+      <div className="mt-6 pt-5 border-t border-gray-100">
+        <button
+          type="button"
+          className="flex items-center gap-x-2.5 py-2 w-full group"
+        >
+          <span className="block w-0.5 h-5 ml-1 rounded-full bg-transparent shrink-0" />
+          <RiLogoutBoxLine
+            size={20}
+            className="text-red-400 group-hover:text-red-500 transition-colors shrink-0"
+          />
+          <span className="text-sm text-red-400 group-hover:text-red-500 transition-colors">
+            {ui.logout}
+          </span>
+        </button>
+      </div>
     </>
   );
 }
@@ -133,7 +139,7 @@ const BASE = "w-64 shrink-0 bg-white border-s border-gray-100 px-7 py-5 overflow
 export default function DashboardSidebar({ open, onClose }: Props) {
   return (
     <>
-      {/* Mobile: fixed drawer, hidden off-screen to the right when closed */}
+      {/* Mobile: fixed drawer */}
       <aside
         className={`md:hidden fixed top-0 bottom-0 right-0 z-50 ${BASE} transition-all duration-300 ${
           open ? "opacity-100 visible" : "opacity-0 invisible translate-x-full"

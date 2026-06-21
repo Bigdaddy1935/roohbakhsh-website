@@ -4,8 +4,8 @@
     {
       "name": "web",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@roohbakhsh/web", "preview"],
-      "port": 3002
+      "runtimeArgs": ["--filter", "@roohbakhsh/web", "dev"],
+      "port": 3000
     }
   ]
 }

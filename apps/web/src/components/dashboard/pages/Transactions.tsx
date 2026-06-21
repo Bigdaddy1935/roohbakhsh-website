@@ -7,20 +7,18 @@ const UI = {
   ar: {
     title: "المعاملات",
     cols: ["المعرف", "وصف المعاملة", "التاريخ", "المبلغ", "الحالة"],
-    paid: "مدفوع", cancelled: "ملغي",
     unit: "ريال",
   },
   ur: {
     title: "لین دین",
     cols: ["شناخت", "تفصیل", "تاریخ", "رقم", "حیثیت"],
-    paid: "ادا شدہ", cancelled: "منسوخ",
     unit: "روپے",
   },
 };
 
 const STATUS: Record<string, { ar: string; ur: string; cls: string }> = {
   paid:      { ar: "مدفوع",  ur: "ادا شدہ", cls: "bg-green-50 text-green-600" },
-  cancelled: { ar: "ملغي",   ur: "منسوخ",  cls: "bg-red-50 text-red-500" },
+  cancelled: { ar: "ملغي",   ur: "منسوخ",   cls: "bg-red-50 text-red-500" },
 };
 
 export default function Transactions() {
@@ -28,11 +26,11 @@ export default function Transactions() {
   const ui = UI[locale];
 
   return (
-    <div className="max-w-5xl mx-auto w-full">
-      <h1 className="text-lg font-extrabold text-[var(--ink)] mb-5">{ui.title}</h1>
+    <div className="bg-white p-4 sm:p-5 lg:rounded-md lg:p-7 min-h-full">
+      <h1 className="text-base font-bold text-[var(--ink)] mb-5">{ui.title}</h1>
 
       {/* Desktop table */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden hidden md:block">
+      <div className="rounded-md border border-gray-100 overflow-hidden hidden md:block">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
@@ -51,7 +49,7 @@ export default function Transactions() {
                   {tx.amount.toLocaleString()} {ui.unit}
                 </td>
                 <td className="px-5 py-3.5">
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${STATUS[tx.status].cls}`}>
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-md ${STATUS[tx.status].cls}`}>
                     {STATUS[tx.status][locale]}
                   </span>
                 </td>
@@ -64,10 +62,10 @@ export default function Transactions() {
       {/* Mobile cards */}
       <div className="flex flex-col gap-y-3 md:hidden">
         {MOCK_TRANSACTIONS.map((tx) => (
-          <div key={tx.id} className="bg-white rounded-xl shadow-sm p-4 flex flex-col gap-y-2">
+          <div key={tx.id} className="bg-white rounded-md border border-gray-100 p-4 flex flex-col gap-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm font-bold text-[var(--ink)]">{tx.desc[locale]}</span>
-              <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${STATUS[tx.status].cls}`}>
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded-md ${STATUS[tx.status].cls}`}>
                 {STATUS[tx.status][locale]}
               </span>
             </div>
