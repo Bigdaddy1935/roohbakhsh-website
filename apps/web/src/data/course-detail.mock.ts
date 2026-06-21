@@ -31,6 +31,7 @@ export type CourseDetail = {
   title: { ar: string; ur: string };
   description: { ar: string; ur: string };
   instructor: {
+    slug: string;
     name: { ar: string; ur: string };
     title: { ar: string; ur: string };
     avatar: string;
@@ -69,9 +70,10 @@ export const COURSE_DETAILS: Record<string, CourseDetail> = {
 قرآن کریم کی تلاوت میں مہارت حاصل کرنے کے خواہشمند ہر شخص کے لیے، خواہ مبتدی ہو یا درمیانی سطح کا طالب علم۔`,
     },
     instructor: {
+      slug: "sheikh_ahmad",
       name: { ar: "الشيخ أحمد الحسن", ur: "شیخ احمد حسن" },
       title: { ar: "مجاز في رواية حفص — خبير تجويد", ur: "روایت حفص میں مجاز — ماہر تجوید" },
-      avatar: "https://roohbakhshac.ir/logo.png",
+      avatar: "https://s3.eseminar.tv/upload/teacher/1595422681_64.jpg",
     },
     rating: 5,
     students: 1309221,

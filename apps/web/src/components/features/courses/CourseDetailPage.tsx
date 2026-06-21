@@ -374,10 +374,14 @@ function CourseDetailContent({ courseId }: { courseId: string }) {
 
             {/* Instructor */}
             <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
-              <div className="size-20 mx-auto rounded-full bg-[var(--brand)]/10 flex items-center justify-center border-2 border-[var(--brand)]/20">
-                <RiUserLine size={32} className="text-[var(--brand)]" />
-              </div>
-              <div className="text-center space-y-1 mt-5">
+              <Image
+                src={course.instructor.avatar}
+                alt={course.instructor.name[locale]}
+                width={80} height={80}
+                style={{ width: 80, height: 80 }}
+                className="rounded-full object-cover border-2 border-[var(--brand)]/20 mx-auto"
+              />
+              <div className="text-center space-y-1 mt-4">
                 <h2 className="font-bold text-base sm:text-lg text-[var(--ink)]">
                   {course.instructor.name[locale]}
                 </h2>
@@ -385,10 +389,13 @@ function CourseDetailContent({ courseId }: { courseId: string }) {
                   {course.instructor.title[locale]}
                 </p>
               </div>
-              <button className="flex items-center justify-center gap-x-2 w-full mt-6 h-10 rounded-xl border border-[var(--brand)]/30 text-[var(--brand)] text-sm font-semibold hover:bg-[var(--brand)]/5 transition-colors">
+              <Link
+                href={`/teacher/${course.instructor.slug}`}
+                className="flex items-center justify-center gap-x-2 w-full mt-6 h-10 rounded-xl border border-[var(--brand)]/30 text-[var(--brand)] text-sm font-semibold hover:bg-[var(--brand)]/5 transition-colors"
+              >
                 <RiArrowLeftSLine size={16} />
-                {t("share")}
-              </button>
+                {locale === "ar" ? "عرض ملف المدرس" : "استاد کا پروفائل"}
+              </Link>
             </div>
 
             {/* Share */}
