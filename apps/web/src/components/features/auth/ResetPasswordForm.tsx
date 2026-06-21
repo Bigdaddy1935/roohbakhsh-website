@@ -72,9 +72,9 @@ export default function ResetPasswordForm() {
             <div className="relative">
               <input type={showNew ? "text" : "password"} placeholder={ui.newPass} value={newPass}
                 onChange={(e) => setNewPass(e.target.value)} required minLength={8}
-                className="w-full h-11 rounded-lg border border-gray-200 ps-10 pe-4 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white" />
+                className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white" />
               <button type="button" onClick={() => setShowNew((s) => !s)}
-                className="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                 {showNew ? <RiEyeOffLine size={17} /> : <RiEyeLine size={17} />}
               </button>
             </div>
@@ -83,9 +83,9 @@ export default function ResetPasswordForm() {
             <div className="relative">
               <input type={showConfirm ? "text" : "password"} placeholder={ui.confirmPass} value={confirmPass}
                 onChange={(e) => setConfirmPass(e.target.value)} required
-                className={`w-full h-11 rounded-lg border ps-10 pe-4 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white ${error ? "border-red-400" : "border-gray-200"}`} />
+                className={`w-full h-11 rounded-lg border ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white ${error ? "border-red-400" : "border-gray-200"}`} />
               <button type="button" onClick={() => setShowConfirm((s) => !s)}
-                className="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                 {showConfirm ? <RiEyeOffLine size={17} /> : <RiEyeLine size={17} />}
               </button>
             </div>

@@ -65,16 +65,17 @@ export default function SignUpForm() {
           <div key={i} className="relative">
             <span className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">{f.icon}</span>
             <input type={f.type} placeholder={f.placeholder} required
+              dir={f.type === "tel" ? "rtl" : undefined}
               className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white" />
           </div>
         ))}
 
-        {/* Password — only eye toggle on start (right in RTL) */}
+        {/* Password — eye toggle on end (left in RTL) */}
         <div className="relative">
           <input type={showPass ? "text" : "password"} placeholder={ui.password} required
-            className="w-full h-11 rounded-lg border border-gray-200 ps-10 pe-4 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white" />
+            className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white" />
           <button type="button" onClick={() => setShowPass((s) => !s)}
-            className="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
             {showPass ? <RiEyeOffLine size={17} /> : <RiEyeLine size={17} />}
           </button>
         </div>

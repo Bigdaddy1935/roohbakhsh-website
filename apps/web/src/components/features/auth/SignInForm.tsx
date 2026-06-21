@@ -67,7 +67,7 @@ export default function SignInForm() {
           />
         </div>
 
-        {/* Password — only eye toggle, no lock icon */}
+        {/* Password — only eye toggle on end (left in RTL) */}
         <div className="relative">
           <input
             type={showPass ? "text" : "password"}
@@ -75,10 +75,10 @@ export default function SignInForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full h-11 rounded-lg border border-gray-200 ps-10 pe-4 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white"
+            className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white"
           />
           <button type="button" onClick={() => setShowPass((s) => !s)}
-            className="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
             {showPass ? <RiEyeOffLine size={17} /> : <RiEyeLine size={17} />}
           </button>
         </div>
