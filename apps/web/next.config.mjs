@@ -9,6 +9,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "roohbakhshac.ir" },
       { protocol: "https", hostname: "dl.poshtybanman.ir" },
+      { protocol: "https", hostname: "s3.eseminar.tv" },
     ],
   },
 };

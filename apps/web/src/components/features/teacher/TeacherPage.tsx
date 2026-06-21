@@ -1,16 +1,21 @@
 "use client";
 
 import Image from "next/image";
-import { useLocale, useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { RiArrowRightSLine, RiUserStarLine, RiBookOpenLine, RiStarFill, RiGroupLine } from "react-icons/ri";
 import { getTeacher } from "@/data/teacher.mock";
 import { COURSE_DETAILS } from "@/data/course-detail.mock";
 import CourseCard from "@/components/ui/CourseCard";
 
+const UI = {
+  ar: { home: "الرئيسية", courses: "الدورات", teacherCourses: "دورات المدرس", noCoures: "لا توجد دورات بعد", viewProfile: "عرض ملف المدرس", student: "طالب", course: "دورة", rating: "تقييم" },
+  ur: { home: "ہوم", courses: "کورسز", teacherCourses: "استاد کے کورسز", noCoures: "ابھی کوئی کورس نہیں", viewProfile: "استاد کا پروفائل", student: "طلباء", course: "کورسز", rating: "ریٹنگ" },
+};
+
 export default function TeacherPage({ slug }: { slug: string }) {
   const locale = useLocale() as "ar" | "ur";
-  const t = useTranslations("Header");
+  const ui = UI[locale];
   const teacher = getTeacher(slug);
 
   if (!teacher) {
@@ -31,9 +36,9 @@ export default function TeacherPage({ slug }: { slug: string }) {
 
         {/* Breadcrumb */}
         <nav className="flex items-center gap-x-2 text-sm text-gray-400 mb-8 overflow-x-hidden">
-          <Link href="/" className="hover:text-[var(--brand)] transition-colors whitespace-nowrap">{t("home") ?? "الرئيسية"}</Link>
+          <Link href="/" className="hover:text-[var(--brand)] transition-colors whitespace-nowrap">{ui.home}</Link>
           <RiArrowRightSLine size={14} className="rotate-180 text-gray-300 shrink-0" />
-          <Link href="/courses" className="hover:text-[var(--brand)] transition-colors whitespace-nowrap">{t("courses")}</Link>
+          <Link href="/courses" className="hover:text-[var(--brand)] transition-colors whitespace-nowrap">{ui.courses}</Link>
           <RiArrowRightSLine size={14} className="rotate-180 text-gray-300 shrink-0" />
           <span className="text-[var(--ink)] font-semibold truncate">{teacher.name[locale]}</span>
         </nav>
