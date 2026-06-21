@@ -107,10 +107,10 @@ export default function Header() {
   const mockCourses = MOCK_COURSES[activeCategory][locale];
 
   const userMenuItems = [
-    { href: "/",             icon: RiHomeLine,            label: ui.home },
-    { href: "/my-courses",   icon: RiBookmarkLine,        label: ui.myCourses },
-    { href: "/account",      icon: RiAccountCircleLine,   label: ui.account },
-    { href: "/transactions", icon: RiExchangeDollarLine,  label: ui.transactions },
+    { href: "/dashboard",              icon: RiHomeLine,            label: ui.home },
+    { href: "/dashboard/my-courses",   icon: RiBookmarkLine,        label: ui.myCourses },
+    { href: "/dashboard/account",      icon: RiAccountCircleLine,   label: ui.account },
+    { href: "/dashboard/transactions", icon: RiExchangeDollarLine,  label: ui.transactions },
   ];
 
   return (
