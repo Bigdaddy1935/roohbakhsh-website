@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { RiMailLine, RiArrowRightSLine } from "react-icons/ri";
+import { RiMailLine, RiArrowLeftSLine } from "react-icons/ri";
 import AuthCard from "./AuthCard";
 
 const UI = {
@@ -81,13 +81,13 @@ export default function ForgotPasswordForm() {
     <AuthCard>
       {step === "email" ? (
         <>
-          <h1 className="text-xl font-extrabold text-[var(--ink)] mb-1 text-center">{ui.title}</h1>
-          <p className="text-sm text-gray-400 mb-6 text-center">{ui.sub}</p>
+          <h1 className="text-2xl font-extrabold text-[var(--ink)] mb-1 text-center">{ui.title}</h1>
+          <p className="text-sm text-gray-400 mt-2 mb-7 text-center">{ui.sub}</p>
           <form onSubmit={handleEmailSubmit} className="flex flex-col gap-y-4">
             <div className="relative">
-              <RiMailLine size={17} className="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <RiMailLine size={17} className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               <input type="email" placeholder={ui.email} value={email} onChange={(e) => setEmail(e.target.value)} required
-                className="w-full h-11 rounded-lg border border-gray-200 ps-10 pe-4 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white" />
+                className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white" />
             </div>
             <button type="submit"
               className="w-full h-11 rounded-lg bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity">
@@ -96,7 +96,7 @@ export default function ForgotPasswordForm() {
           </form>
           <div className="mt-4 flex justify-center">
             <Link href="/signin" className="flex items-center gap-x-1 text-sm text-gray-400 hover:text-[var(--ink)] transition-colors">
-              <RiArrowRightSLine size={16} />
+              <RiArrowLeftSLine size={16} />
               {ui.back}
             </Link>
           </div>
@@ -104,10 +104,10 @@ export default function ForgotPasswordForm() {
       ) : (
         <>
           <button onClick={() => setStep("email")} className="flex items-center gap-x-1 text-sm text-gray-400 hover:text-[var(--ink)] mb-5 transition-colors">
-            <RiArrowRightSLine size={16} />
+            <RiArrowLeftSLine size={16} />
             {ui.back}
           </button>
-          <h1 className="text-xl font-extrabold text-[var(--ink)] mb-1 text-center">{ui.otpTitle}</h1>
+          <h1 className="text-2xl font-extrabold text-[var(--ink)] mb-1 text-center">{ui.otpTitle}</h1>
           <p className="text-sm text-gray-400 mb-1 text-center">{ui.otpSub}</p>
           <p className="text-sm text-[var(--brand)] font-semibold mb-6 text-center">{fmt(seconds)}</p>
 
@@ -127,8 +127,7 @@ export default function ForgotPasswordForm() {
             ))}
           </div>
 
-          <button type="button"
-            onClick={() => { /* submit OTP */ }}
+          <button type="button" onClick={() => {}}
             className="w-full h-11 rounded-lg bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity">
             {ui.otpSubmit}
           </button>
