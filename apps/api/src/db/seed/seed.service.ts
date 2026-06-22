@@ -283,8 +283,17 @@ export class SeedService implements OnApplicationBootstrap {
         await this.lessonRepo.save(lessons);
       }
 
+      await this.syncCourseStats(course.id);
       this.logger.log(`✓ دوره نمونه ساخته شد: ${def.slug} (${def.sections.length} سرفصل)`);
     }
+  }
+
+  /** lessonCount و durationMinutes دوره را از روی درس‌های واقعی محاسبه می‌کند (مثل section.service.ts). */
+  private async syncCourseStats(courseId: string): Promise<void> {
+    const lessons = await this.lessonRepo.find({ where: { courseId } });
+    const lessonCount = lessons.length;
+    const durationMinutes = lessons.reduce((sum, l) => sum + l.durationMinutes, 0);
+    await this.courseRepo.update(courseId, { lessonCount, durationMinutes });
   }
 
   private articleDefs(): SeedArticleDef[] {
