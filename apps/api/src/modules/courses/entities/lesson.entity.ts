@@ -19,6 +19,9 @@ export class Lesson {
   @Column({ type: "json" })
   title!: Localized;
 
+  @Column({ name: "video_url", type: "json", nullable: true })
+  videoUrl!: Localized<string | null> | null;
+
   @Column({ type: "int", unsigned: true, default: 0 })
   order!: number;
 

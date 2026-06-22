@@ -70,6 +70,7 @@ export interface CourseListQuery {
 export interface Lesson {
   id: ID;
   title: Localized;
+  videoUrl: Localized<string | null>;
   order: number;
   durationMinutes: number;
   isFreePreview: boolean;
@@ -81,6 +82,7 @@ export interface Lesson {
 
 export interface CreateLessonRequest {
   title: Localized;
+  videoUrl?: Localized<string | null>;
   order?: number;
   durationMinutes: number;
   isFreePreview?: boolean;
@@ -88,6 +90,7 @@ export interface CreateLessonRequest {
 
 export interface UpdateLessonRequest {
   title?: Localized;
+  videoUrl?: Localized<string | null>;
   order?: number;
   durationMinutes?: number;
   isFreePreview?: boolean;

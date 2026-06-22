@@ -324,6 +324,7 @@ effectivePrice: Money|null  // قیمت واقعی: discountedPrice (اگر isAc
 {
   "id": "uuid",
   "title": { "ar": "الدرس الأول", "ur": "پہلا سبق" },
+  "videoUrl": { "ar": "https://cdn.roohbakhsh.com/videos/ar/lesson01.mp4", "ur": "https://cdn.roohbakhsh.com/videos/ur/lesson01.mp4" },
   "order": 1,
   "durationMinutes": 20,
   "isFreePreview": true,
@@ -332,6 +333,7 @@ effectivePrice: Money|null  // قیمت واقعی: discountedPrice (اگر isAc
   "createdAt": "...", "updatedAt": "..."
 }
 ```
+`videoUrl` می‌تواند `null` باشد (هنوز ویدیو آپلود نشده) — مثل `thumbnailUrl` دوره دو زبانه است.
 
 ---
 

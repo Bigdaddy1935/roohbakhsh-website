@@ -30,6 +30,16 @@ function randomThumbnail(): string {
   return SAMPLE_THUMBNAILS[Math.floor(Math.random() * SAMPLE_THUMBNAILS.length)]!;
 }
 
+const SAMPLE_VIDEOS = [
+  "https://dl.poshtybanman.ir/webinar/Marriage/229c04047af1982d763783881b2ab31f34747377-720p.mp4",
+  "https://dl.poshtybanman.ir/dore-angize/%D9%87%D8%AF%D9%81%20%DA%AF%D8%B0%D8%A7%D8%B1%DB%8C%20%D8%AF%D9%82%DB%8C%D9%82.mp4",
+  "https://dl.poshtybanman.ir/dore-angize/%D8%A7%D8%B1%D8%B2%DB%8C%D8%A7%D8%A8%DB%8C%20%DA%A9%D9%86.mp4",
+];
+
+function randomVideoUrl(): string {
+  return SAMPLE_VIDEOS[Math.floor(Math.random() * SAMPLE_VIDEOS.length)]!;
+}
+
 interface SeedCourseDef {
   slug: string;
   title: Localized;
@@ -442,6 +452,7 @@ export class SeedService implements OnApplicationBootstrap {
               ar: `${sectionDef.title.ar} — الدرس ${i + 1}`,
               ur: `${sectionDef.title.ur} — درس ${i + 1}`,
             },
+            videoUrl: { ar: randomVideoUrl(), ur: randomVideoUrl() },
             order: i + 1,
             durationMinutes: 10 + ((i * 5) % 25),
             isFreePreview: s === 0 && i === 0,

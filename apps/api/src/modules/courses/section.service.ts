@@ -97,6 +97,7 @@ export class SectionService {
       lessons: (section.lessons ?? []).map((l) => ({
         id: l.id,
         title: l.title,
+        videoUrl: l.videoUrl ?? { ar: null, ur: null },
         order: l.order,
         durationMinutes: l.durationMinutes,
         isFreePreview: l.isFreePreview,

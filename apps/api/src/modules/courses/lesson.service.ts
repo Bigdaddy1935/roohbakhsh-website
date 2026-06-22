@@ -48,6 +48,7 @@ export class LessonService {
 
     const lesson = this.lessonRepo.create({
       title: dto.title,
+      videoUrl: dto.videoUrl ?? null,
       order: dto.order ?? 0,
       durationMinutes: dto.durationMinutes,
       isFreePreview: dto.isFreePreview ?? false,
@@ -71,6 +72,7 @@ export class LessonService {
     if (!lesson) throw new NotFoundException("LESSON_NOT_FOUND");
 
     if (dto.title !== undefined) lesson.title = dto.title;
+    if (dto.videoUrl !== undefined) lesson.videoUrl = dto.videoUrl ?? null;
     if (dto.order !== undefined) lesson.order = dto.order;
     if (dto.durationMinutes !== undefined) lesson.durationMinutes = dto.durationMinutes;
     if (dto.isFreePreview !== undefined) lesson.isFreePreview = dto.isFreePreview;
@@ -102,6 +104,7 @@ export class LessonService {
     return {
       id: lesson.id,
       title: lesson.title,
+      videoUrl: lesson.videoUrl ?? { ar: null, ur: null },
       order: lesson.order,
       durationMinutes: lesson.durationMinutes,
       isFreePreview: lesson.isFreePreview,
