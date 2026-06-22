@@ -17,6 +17,7 @@ import { TicketMessage } from "../../modules/tickets/entities/ticket-message.ent
 import { RecentView } from "../../modules/recently-viewed/entities/recent-view.entity";
 import { Favorite } from "../../modules/favorites/entities/favorite.entity";
 import { LessonProgress } from "../../modules/progress/entities/lesson-progress.entity";
+import { Notification } from "../../modules/notifications/entities/notification.entity";
 
 const SAMPLE_THUMBNAILS = [
   "https://storage.sabzlearn.ir/legacy-statics/2025/07/21-1.webp",
@@ -71,6 +72,7 @@ export class SeedService implements OnApplicationBootstrap {
     @InjectRepository(RecentView) private readonly recentViewRepo: Repository<RecentView>,
     @InjectRepository(Favorite) private readonly favoriteRepo: Repository<Favorite>,
     @InjectRepository(LessonProgress) private readonly lessonProgressRepo: Repository<LessonProgress>,
+    @InjectRepository(Notification) private readonly notificationRepo: Repository<Notification>,
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
@@ -80,7 +82,7 @@ export class SeedService implements OnApplicationBootstrap {
     const instructor = await this.seedInstructor();
     const categories = await this.seedCategories();
     const students = await this.seedStudents();
-    await this.seedCoupons();
+    const couponIds = await this.seedCoupons();
     const courseIds = await this.seedCourses(instructor.id, categories.map((c) => c.id));
     const articleIds = await this.seedArticles(instructor.id, categories.map((c) => c.id));
     await this.seedReviews(courseIds, students.map((s) => s.id));
@@ -89,6 +91,7 @@ export class SeedService implements OnApplicationBootstrap {
     await this.seedLessonProgress(courseIds, students.map((s) => s.id));
     await this.seedRecentViews(courseIds, students.map((s) => s.id));
     await this.seedFavorites(courseIds, articleIds, students.map((s) => s.id));
+    await this.seedNotifications(courseIds, articleIds, couponIds);
 
     this.logger.log("seed داده‌های نمونه تمام شد.");
   }
@@ -270,7 +273,7 @@ export class SeedService implements OnApplicationBootstrap {
     return categories;
   }
 
-  private async seedCoupons(): Promise<void> {
+  private async seedCoupons(): Promise<string[]> {
     const defs: Partial<Coupon>[] = [
       {
         code: "ROOH20",
@@ -289,12 +292,18 @@ export class SeedService implements OnApplicationBootstrap {
       },
     ];
 
+    const couponIds: string[] = [];
     for (const def of defs) {
       const existing = await this.couponRepo.findOne({ where: { code: def.code } });
-      if (existing) continue;
-      await this.couponRepo.save(this.couponRepo.create(def));
+      if (existing) {
+        couponIds.push(existing.id);
+        continue;
+      }
+      const saved = await this.couponRepo.save(this.couponRepo.create(def));
+      couponIds.push(saved.id);
       this.logger.log(`✓ کوپن نمونه ساخته شد: ${def.code}`);
     }
+    return couponIds;
   }
 
   private courseDefs(): SeedCourseDef[] {
@@ -777,5 +786,36 @@ export class SeedService implements OnApplicationBootstrap {
       }
     }
     this.logger.log(`✓ علاقه‌مندی‌های نمونه ساخته شدند (${studentIds.length} کاربر)`);
+  }
+
+  /** یک اعلان نمونه برای اولین دوره، اولین مقاله‌ی منتشرشده، و اولین کوپن — برای تست «اعلانات». */
+  private async seedNotifications(courseIds: string[], articleIds: string[], couponIds: string[]): Promise<void> {
+    const firstCourseId = courseIds[0];
+    const firstArticleId = articleIds[0];
+    const firstCouponId = couponIds[0];
+    let created = 0;
+
+    if (firstCourseId) {
+      const existing = await this.notificationRepo.findOne({ where: { type: "course", targetId: firstCourseId } });
+      if (!existing) {
+        await this.notificationRepo.save(this.notificationRepo.create({ type: "course", targetId: firstCourseId }));
+        created++;
+      }
+    }
+    if (firstArticleId) {
+      const existing = await this.notificationRepo.findOne({ where: { type: "article", targetId: firstArticleId } });
+      if (!existing) {
+        await this.notificationRepo.save(this.notificationRepo.create({ type: "article", targetId: firstArticleId }));
+        created++;
+      }
+    }
+    if (firstCouponId) {
+      const existing = await this.notificationRepo.findOne({ where: { type: "coupon", targetId: firstCouponId } });
+      if (!existing) {
+        await this.notificationRepo.save(this.notificationRepo.create({ type: "coupon", targetId: firstCouponId }));
+        created++;
+      }
+    }
+    this.logger.log(`✓ اعلانات نمونه ساخته شدند (${created} مورد جدید)`);
   }
 }

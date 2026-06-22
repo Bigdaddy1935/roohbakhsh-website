@@ -7,6 +7,7 @@ import { Instructor } from "../instructor/entities/instructor.entity";
 import { Category } from "../category/entities/category.entity";
 import { OrderItem } from "../orders/entities/order-item.entity";
 import { ReviewsModule } from "../reviews/reviews.module";
+import { NotificationsModule } from "../notifications/notifications.module";
 import { CourseService } from "./course.service";
 import { SectionService } from "./section.service";
 import { LessonService } from "./lesson.service";
@@ -18,6 +19,7 @@ import { LessonController } from "./lesson.controller";
   imports: [
     TypeOrmModule.forFeature([Course, Section, Lesson, Instructor, Category, OrderItem]),
     ReviewsModule,
+    NotificationsModule,
   ],
   controllers: [CourseController, SectionController, LessonController],
   providers: [CourseService, SectionService, LessonService],

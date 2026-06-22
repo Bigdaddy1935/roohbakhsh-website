@@ -14,6 +14,7 @@ import { TicketMessage } from "../../modules/tickets/entities/ticket-message.ent
 import { RecentView } from "../../modules/recently-viewed/entities/recent-view.entity";
 import { Favorite } from "../../modules/favorites/entities/favorite.entity";
 import { LessonProgress } from "../../modules/progress/entities/lesson-progress.entity";
+import { Notification } from "../../modules/notifications/entities/notification.entity";
 import { SeedService } from "./seed.service";
 
 @Module({
@@ -33,6 +34,7 @@ import { SeedService } from "./seed.service";
       RecentView,
       Favorite,
       LessonProgress,
+      Notification,
     ]),
   ],
   providers: [SeedService],

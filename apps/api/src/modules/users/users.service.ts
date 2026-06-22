@@ -8,6 +8,7 @@ import { TicketsService } from "../tickets/tickets.service";
 import { RecentlyViewedService } from "../recently-viewed/recently-viewed.service";
 import { FavoritesService } from "../favorites/favorites.service";
 import { ProgressService } from "../progress/progress.service";
+import { NotificationsService } from "../notifications/notifications.service";
 import { toPaginated } from "../../common/utils/paginate";
 
 @Injectable()
@@ -21,6 +22,7 @@ export class UsersService {
     private readonly recentlyViewedService: RecentlyViewedService,
     private readonly favoritesService: FavoritesService,
     private readonly progressService: ProgressService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async findAll(page: number, limit: number): Promise<Paginated<UserContract>> {
@@ -46,13 +48,16 @@ export class UsersService {
 
     const courseIds = [...new Set(paidOrders.flatMap((o) => o.items.map((i) => i.courseId)))];
 
-    const [ticketsCount, recentTickets, recentViews, favorites, progressMap] = await Promise.all([
-      this.ticketsService.countMine(userId),
-      this.ticketsService.recentForUser(userId, 3),
-      this.recentlyViewedService.findRecent(userId, 5),
-      this.favoritesService.findMine(userId),
-      this.progressService.progressForCourses(userId, courseIds),
-    ]);
+    const [ticketsCount, recentTickets, recentViews, favorites, progressMap, unreadNotificationsCount, recentNotifications] =
+      await Promise.all([
+        this.ticketsService.countMine(userId),
+        this.ticketsService.recentForUser(userId, 3),
+        this.recentlyViewedService.findRecent(userId, 5),
+        this.favoritesService.findMine(userId),
+        this.progressService.progressForCourses(userId, courseIds),
+        this.notificationsService.unreadCount(userId),
+        this.notificationsService.recentForUser(userId, 5),
+      ]);
 
     return {
       totalSpent,
@@ -62,6 +67,8 @@ export class UsersService {
       recentViews,
       favorites,
       coursesProgress: [...progressMap.values()],
+      unreadNotificationsCount,
+      recentNotifications,
     };
   }
 

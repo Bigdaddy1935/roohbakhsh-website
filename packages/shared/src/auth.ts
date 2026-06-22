@@ -8,6 +8,7 @@ import type { Ticket } from "./ticket";
 import type { RecentViewItem } from "./recently-viewed";
 import type { FavoriteItem } from "./favorite";
 import type { CourseProgress } from "./progress";
+import type { NotificationItem } from "./notification";
 
 export type UserRole = "user" | "instructor" | "admin";
 
@@ -65,4 +66,8 @@ export interface UserDashboard {
   favorites: FavoriteItem[];
   /** درصد پیشرفت برای دوره‌هایی که کاربر خریده. */
   coursesProgress: CourseProgress[];
+  /** تعداد اعلانات خوانده‌نشده. */
+  unreadNotificationsCount: number;
+  /** آخرین اعلانات — خبر/دوره/کد تخفیف جدید، حداکثر ۵ مورد. */
+  recentNotifications: NotificationItem[];
 }

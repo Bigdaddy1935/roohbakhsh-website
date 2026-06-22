@@ -14,6 +14,7 @@ import type {
 } from "@roohbakhsh/shared";
 import { toPaginated } from "../../common/utils/paginate";
 import { Coupon } from "./entities/coupon.entity";
+import { NotificationsService } from "../notifications/notifications.service";
 import { CreateCouponDto } from "./dto/create-coupon.dto";
 import { UpdateCouponDto } from "./dto/update-coupon.dto";
 import { ValidateCouponDto } from "./dto/validate-coupon.dto";
@@ -23,6 +24,7 @@ export class CouponService {
   constructor(
     @InjectRepository(Coupon)
     private readonly repo: Repository<Coupon>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async findAll(page: number, limit: number): Promise<Paginated<CouponRecord>> {
@@ -60,7 +62,11 @@ export class CouponService {
       expiresAt: dto.expiresAt ? new Date(dto.expiresAt) : null,
       isActive: dto.isActive ?? true,
     });
-    return this.toContract(await this.repo.save(coupon));
+    const saved = await this.repo.save(coupon);
+    if (saved.isActive) {
+      await this.notificationsService.create("coupon", saved.id);
+    }
+    return this.toContract(saved);
   }
 
   async update(id: string, dto: UpdateCouponDto): Promise<CouponRecord> {

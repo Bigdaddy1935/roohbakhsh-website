@@ -717,6 +717,8 @@ interface UserDashboard {
   recentViews: RecentViewItem[];    // آخرین ۵ بازدید — دوره یا درس
   favorites: FavoriteItem[];        // همه‌ی علاقه‌مندی‌ها — دوره یا مقاله
   coursesProgress: CourseProgress[]; // پیشرفت برای دوره‌هایی که کاربر خریده
+  unreadNotificationsCount: number; // تعداد اعلانات خوانده‌نشده
+  recentNotifications: NotificationItem[]; // آخرین ۵ اعلان
 }
 ```
 
@@ -818,6 +820,44 @@ interface CourseProgress {
 ### `GET /courses/:courseSlug/progress` 🔒
 خروجی: `CourseProgress` برای کاربر لاگین‌شده.
 خطا: `404 COURSE_NOT_FOUND`
+
+---
+
+## §18 — Notifications (اعلانات)
+
+اعلان global است — یک رکورد برای همه‌ی کاربران مشترک، وضعیت خوانده‌شدن per-user در جدول جدا (`notification_reads`) نگه داشته می‌شود.
+سه نوع رویداد به‌صورت خودکار اعلان می‌سازند: انتشار دوره (`isPublished: false→true`)، انتشار مقاله (`status→published`)، ساخت کد تخفیف فعال جدید.
+
+```ts
+type NotificationType = "course" | "article" | "coupon";
+
+interface NotificationItem {
+  id: ID;
+  type: NotificationType;
+  targetId: ID;
+  title: Localized;
+  slug: string | null; // course/article: اسلاگ برای لینک‌دهی — coupon: کد تخفیف
+  createdAt: ISODate;
+  isRead: boolean;
+}
+
+interface NotificationsSummary {
+  unreadCount: number;
+}
+```
+
+### `GET /notifications?page=1&limit=12` 🔒
+خروجی: `Paginated<NotificationItem>` — جدیدترین اول، برای صفحه‌ی کامل «اعلانات».
+
+### `GET /notifications/unread-count` 🔒
+خروجی: `NotificationsSummary`
+
+### `POST /notifications/:id/read` 🔒
+وضعیت خوانده‌شدن این اعلان را برای کاربر ثبت می‌کند. idempotent. پاسخ: `204`
+خطا: `404 NOTIFICATION_NOT_FOUND`
+
+### `POST /notifications/read-all` 🔒
+همه‌ی اعلانات را برای کاربر خوانده‌شده علامت می‌زند. پاسخ: `204`
 
 ---
 

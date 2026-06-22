@@ -6,6 +6,7 @@ import { TicketsModule } from "../tickets/tickets.module";
 import { RecentlyViewedModule } from "../recently-viewed/recently-viewed.module";
 import { FavoritesModule } from "../favorites/favorites.module";
 import { ProgressModule } from "../progress/progress.module";
+import { NotificationsModule } from "../notifications/notifications.module";
 import { UsersService } from "./users.service";
 import { UsersController } from "./users.controller";
 
@@ -16,6 +17,7 @@ import { UsersController } from "./users.controller";
     RecentlyViewedModule,
     FavoritesModule,
     ProgressModule,
+    NotificationsModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],
