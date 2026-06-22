@@ -582,8 +582,9 @@ interface ArticleRecord {
   slug: string;          // URL-friendly، یکتا
   summary: Localized;    // { ar, ur } — خلاصه کوتاه
   body: Localized;       // { ar, ur } — متن کامل
-  thumbnailUrl: string | null;
-  authorId: string;      // UUID کاربر ایجادکننده
+  thumbnailUrl: Localized<string | null>;
+  instructorId: string;        // UUID استاد نویسنده — از همان جدول instructors که دوره‌ها استفاده می‌کنند
+  instructor: InstructorSummary;
   status: "draft" | "published";
   publishedAt: ISODate | null;  // null اگر هنوز draft باشد
   createdAt: ISODate;
@@ -593,6 +594,7 @@ interface ArticleRecord {
 
 ### نکات
 
+- `instructorId` باید UUID یک استاد موجود در `/instructors` باشد؛ وگرنه `404 INSTRUCTOR_NOT_FOUND`
 - `GET /articles/:slug` فقط مقالات `published` را برمی‌گرداند؛ draft → 404
 - در `POST /articles` اگر `status: "published"` باشد، `publishedAt` همان لحظه ست می‌شود
 - `PATCH /articles/:id` می‌تواند slug را تغییر دهد؛ اگر slug تکراری باشد → 409 `SLUG_ALREADY_EXISTS`

@@ -2,10 +2,13 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  ManyToOne,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
 } from "typeorm";
 import type { Localized, ArticleStatus } from "@roohbakhsh/shared";
+import { Instructor } from "../../instructor/entities/instructor.entity";
 
 @Entity("articles")
 export class Article {
@@ -28,10 +31,14 @@ export class Article {
   bodyUr!: string;
 
   @Column({ name: "thumbnail_url", type: "json", nullable: true, default: null })
-  thumbnailUrl!: import("@roohbakhsh/shared").Localized<string | null> | null;
+  thumbnailUrl!: Localized<string | null> | null;
 
-  @Column({ name: "author_id" })
-  authorId!: string;
+  @ManyToOne(() => Instructor, { onDelete: "RESTRICT", eager: false, nullable: false })
+  @JoinColumn({ name: "instructor_id" })
+  instructor!: Instructor;
+
+  @Column({ name: "instructor_id", type: "varchar" })
+  instructorId!: string;
 
   @Column({
     type: "enum",

@@ -64,12 +64,12 @@ export class SeedService implements OnApplicationBootstrap {
   async onApplicationBootstrap(): Promise<void> {
     this.logger.log("شروع seed داده‌های نمونه...");
 
-    const admin = await this.seedAdmin();
+    await this.seedAdmin();
     const instructor = await this.seedInstructor();
     const category = await this.seedCategory();
     await this.seedCoupons();
     await this.seedCourses(instructor.id, category.id);
-    await this.seedArticles(admin.id);
+    await this.seedArticles(instructor.id);
 
     this.logger.log("seed داده‌های نمونه تمام شد.");
   }
@@ -388,7 +388,7 @@ export class SeedService implements OnApplicationBootstrap {
     ];
   }
 
-  private async seedArticles(authorId: string): Promise<void> {
+  private async seedArticles(instructorId: string): Promise<void> {
     for (const def of this.articleDefs()) {
       const existing = await this.articleRepo.findOne({ where: { slug: def.slug } });
       if (existing) continue;
@@ -403,7 +403,7 @@ export class SeedService implements OnApplicationBootstrap {
           thumbnailUrl: def.hasThumbnail
             ? { ar: randomThumbnail(), ur: randomThumbnail() }
             : null,
-          authorId,
+          instructorId,
           status: def.status,
           publishedAt: def.status === "published" ? new Date() : null,
         }),

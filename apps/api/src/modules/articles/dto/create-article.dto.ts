@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsObject, ValidateNested, IsUrl } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsObject, ValidateNested, IsUrl, IsUUID } from "class-validator";
 import { Type } from "class-transformer";
 import type { ArticleStatus, Localized } from "@roohbakhsh/shared";
 
@@ -66,4 +66,8 @@ export class CreateArticleDto {
   @IsOptional()
   @IsEnum(["draft", "published"])
   status?: ArticleStatus;
+
+  @ApiProperty({ example: "3fa85f64-5717-4562-b3fc-2c963f66afa6", description: "UUID استاد نویسنده مقاله" })
+  @IsUUID()
+  instructorId!: string;
 }
