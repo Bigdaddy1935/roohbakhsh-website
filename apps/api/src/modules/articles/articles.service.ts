@@ -11,7 +11,6 @@ import { Article } from "./entities/article.entity";
 import { Instructor } from "../instructor/entities/instructor.entity";
 import { Category } from "../category/entities/category.entity";
 import { ReviewsService } from "../reviews/reviews.service";
-import { NotificationsService } from "../notifications/notifications.service";
 import { CreateArticleDto } from "./dto/create-article.dto";
 import { UpdateArticleDto } from "./dto/update-article.dto";
 
@@ -27,7 +26,6 @@ export class ArticlesService {
     @InjectRepository(Category)
     private readonly categoryRepo: Repository<Category>,
     private readonly reviewsService: ReviewsService,
-    private readonly notificationsService: NotificationsService,
   ) {}
 
   async create(dto: CreateArticleDto): Promise<ArticleRecord> {
@@ -57,9 +55,6 @@ export class ArticlesService {
     });
 
     const saved = await this.repo.save(article);
-    if (saved.status === "published") {
-      await this.notificationsService.create("article", saved.id);
-    }
     return this.toContract(saved, EMPTY_RATING);
   }
 
@@ -145,7 +140,6 @@ export class ArticlesService {
       article.bodyUr = dto.body.ur;
     }
     if (dto.thumbnailUrl !== undefined) article.thumbnailUrl = dto.thumbnailUrl ?? null;
-    const wasPublished = article.status === "published";
     if (dto.status && dto.status !== article.status) {
       article.status = dto.status;
       if (dto.status === "published" && !article.publishedAt) {
@@ -154,9 +148,6 @@ export class ArticlesService {
     }
 
     const saved = await this.repo.save(article);
-    if (!wasPublished && saved.status === "published") {
-      await this.notificationsService.create("article", saved.id);
-    }
     const rating = await this.reviewsService.articleRatingSummary(saved.id);
     return this.toContract(saved, rating);
   }

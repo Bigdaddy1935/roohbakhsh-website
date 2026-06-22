@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Param, Query, Request, HttpCode, HttpStatus } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, Query, Request, UseGuards, HttpCode, HttpStatus } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiResponse, ApiHeader, ApiBearerAuth, ApiCookieAuth } from "@nestjs/swagger";
 import { NotificationsService } from "./notifications.service";
+import { CreateNotificationDto } from "./dto/create-notification.dto";
 import { PaginationDto } from "../../common/dto/pagination.dto";
+import { RolesGuard, Roles } from "../../common/guards/roles.guard";
 import { ApiErrorSchema } from "../../common/swagger/api-error.schema";
 import { LANG_HEADER } from "../../common/swagger/lang-header";
 
@@ -12,11 +14,26 @@ import { LANG_HEADER } from "../../common/swagger/lang-header";
 export class NotificationsController {
   constructor(private readonly svc: NotificationsService) {}
 
+  @UseGuards(RolesGuard)
+  @Roles("admin")
+  @Post()
+  @ApiHeader(LANG_HEADER)
+  @ApiOperation({
+    summary: "ارسال اعلان جدید برای همه‌ی کاربران 🔒 admin",
+    description: "ادمین یک پیام دلخواه (عنوان + متن + لینک اختیاری) برای همه‌ی کاربران ارسال می‌کند.",
+  })
+  @ApiResponse({ status: 201, description: "NotificationItem" })
+  @ApiResponse({ status: 400, description: "خطای اعتبارسنجی — کد: VALIDATION_ERROR", type: ApiErrorSchema })
+  @ApiResponse({ status: 403, description: "دسترسی ندارید — کد: FORBIDDEN", type: ApiErrorSchema })
+  create(@Body() dto: CreateNotificationDto) {
+    return this.svc.create(dto);
+  }
+
   @Get()
   @ApiHeader(LANG_HEADER)
   @ApiOperation({
     summary: "اعلانات من (صفحه‌بندی‌شده)",
-    description: "همه‌ی اعلانات — خبر/مقاله‌ی جدید، دوره‌ی جدید، کد تخفیف جدید — جدیدترین اول.",
+    description: "همه‌ی اعلاناتی که ادمین برای کاربران ارسال کرده — جدیدترین اول.",
   })
   @ApiResponse({ status: 200, description: "Paginated<NotificationItem>" })
   findMine(@Query() query: PaginationDto, @Request() req: { user: { id: string } }) {

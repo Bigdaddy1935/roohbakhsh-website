@@ -874,25 +874,34 @@ interface CourseProgress {
 ## §18 — Notifications (اعلانات)
 
 اعلان global است — یک رکورد برای همه‌ی کاربران مشترک، وضعیت خوانده‌شدن per-user در جدول جدا (`notification_reads`) نگه داشته می‌شود.
-سه نوع رویداد به‌صورت خودکار اعلان می‌سازند: انتشار دوره (`isPublished: false→true`)، انتشار مقاله (`status→published`)، ساخت کد تخفیف فعال جدید.
+محتوای اعلان آزاد است — ادمین هر پیامی (عنوان + متن + لینک اختیاری) که بخواهد می‌سازد و برای همه‌ی کاربران ارسال می‌شود. هیچ trigger خودکاری روی انتشار دوره/مقاله/کوپن وجود ندارد.
 
 ```ts
-type NotificationType = "course" | "article" | "coupon";
-
 interface NotificationItem {
   id: ID;
-  type: NotificationType;
-  targetId: ID;
   title: Localized;
-  slug: string | null; // course/article: اسلاگ برای لینک‌دهی — coupon: کد تخفیف
+  body: Localized;
+  link: string | null; // لینکی که با کلیک روی اعلان باز می‌شود — اختیاری
   createdAt: ISODate;
   isRead: boolean;
+}
+
+interface CreateNotificationRequest {
+  title: Localized;
+  body: Localized;
+  link?: string | null;
 }
 
 interface NotificationsSummary {
   unreadCount: number;
 }
 ```
+
+### `POST /notifications` 🔒 admin
+ادمین یک پیام دلخواه برای همه‌ی کاربران ارسال می‌کند.
+- **بدنه:** `CreateNotificationRequest`
+- **پاسخ:** `201 NotificationItem`
+- **خطاها:** `400 VALIDATION_ERROR` | `403 FORBIDDEN`
 
 ### `GET /notifications?page=1&limit=12` 🔒
 خروجی: `Paginated<NotificationItem>` — جدیدترین اول، برای صفحه‌ی کامل «اعلانات».

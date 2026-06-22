@@ -13,7 +13,6 @@ import { Instructor } from "../instructor/entities/instructor.entity";
 import { Category } from "../category/entities/category.entity";
 import { OrderItem } from "../orders/entities/order-item.entity";
 import { ReviewsService } from "../reviews/reviews.service";
-import { NotificationsService } from "../notifications/notifications.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
 
@@ -47,7 +46,6 @@ export class CourseService {
     @InjectRepository(OrderItem)
     private readonly orderItemRepo: Repository<OrderItem>,
     private readonly reviewsService: ReviewsService,
-    private readonly notificationsService: NotificationsService,
   ) {}
 
   async findAll(page: number, limit: number): Promise<Paginated<CourseRecord>> {
@@ -213,8 +211,6 @@ export class CourseService {
       course.categoryId = dto.categoryId ?? null;
     }
 
-    const wasPublished = course.isPublished;
-
     if (dto.title !== undefined) course.title = dto.title;
     if (dto.slug !== undefined) course.slug = dto.slug;
     if (dto.description !== undefined) course.description = dto.description;
@@ -230,9 +226,6 @@ export class CourseService {
     }
 
     const saved = await this.repo.save(course);
-    if (!wasPublished && saved.isPublished) {
-      await this.notificationsService.create("course", saved.id);
-    }
     const stats = await this.statsForCourse(saved.id);
     return this.toContract(saved, stats);
   }

@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm";
-import type { NotificationType } from "@roohbakhsh/shared";
+import type { Localized } from "@roohbakhsh/shared";
 
 /** اعلان global — برای همه‌ی کاربران یکسان. وضعیت خوانده‌شدن در NotificationRead است. */
 @Entity("notifications")
@@ -7,11 +7,14 @@ export class Notification {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ type: "enum", enum: ["course", "article", "coupon"] })
-  type!: NotificationType;
+  @Column({ type: "json" })
+  title!: Localized;
 
-  @Column({ name: "target_id", type: "varchar" })
-  targetId!: string;
+  @Column({ type: "json" })
+  body!: Localized;
+
+  @Column({ type: "varchar", nullable: true, default: null })
+  link!: string | null;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt!: Date;

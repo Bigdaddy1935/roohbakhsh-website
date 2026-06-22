@@ -92,7 +92,7 @@ export class SeedService implements OnApplicationBootstrap {
     const instructor = await this.seedInstructor();
     const categories = await this.seedCategories();
     const students = await this.seedStudents();
-    const couponIds = await this.seedCoupons();
+    await this.seedCoupons();
     const courseIds = await this.seedCourses(instructor.id, categories.map((c) => c.id));
     const articleIds = await this.seedArticles(instructor.id, categories.map((c) => c.id));
     await this.seedReviews(courseIds, students.map((s) => s.id));
@@ -101,7 +101,7 @@ export class SeedService implements OnApplicationBootstrap {
     await this.seedLessonProgress(courseIds, students.map((s) => s.id));
     await this.seedRecentViews(courseIds, students.map((s) => s.id));
     await this.seedFavorites(courseIds, articleIds, students.map((s) => s.id));
-    await this.seedNotifications(courseIds, articleIds, couponIds);
+    await this.seedNotifications();
 
     this.logger.log("seed داده‌های نمونه تمام شد.");
   }
@@ -801,34 +801,31 @@ export class SeedService implements OnApplicationBootstrap {
     this.logger.log(`✓ علاقه‌مندی‌های نمونه ساخته شدند (${studentIds.length} کاربر)`);
   }
 
-  /** یک اعلان نمونه برای اولین دوره، اولین مقاله‌ی منتشرشده، و اولین کوپن — برای تست «اعلانات». */
-  private async seedNotifications(courseIds: string[], articleIds: string[], couponIds: string[]): Promise<void> {
-    const firstCourseId = courseIds[0];
-    const firstArticleId = articleIds[0];
-    const firstCouponId = couponIds[0];
-    let created = 0;
+  /** چند پیام نمونه که ادمین برای همه‌ی کاربران ارسال کرده — برای تست «اعلانات». idempotent بر اساس عنوان. */
+  private async seedNotifications(): Promise<void> {
+    const defs: { title: Localized; body: Localized; link: string | null }[] = [
+      {
+        title: { ar: "مرحباً بكم في أكاديمية روح‌بخش", ur: "روح بخش اکیڈمی میں خوش آمدید" },
+        body: {
+          ar: "نتمنى لكم رحلة تعليمية مباركة في دوراتنا. لا تنسوا زيارة قسم الدورات الجديدة بانتظام.",
+          ur: "ہماری اکیڈمی میں آپ کا تعلیمی سفر بابرکت ہو۔ نئے کورسز باقاعدگی سے چیک کرتے رہیں۔",
+        },
+        link: null,
+      },
+      {
+        title: { ar: "كود خصم جديد متاح الآن", ur: "نیا ڈسکاؤنٹ کوڈ دستیاب ہے" },
+        body: {
+          ar: "استخدم الكود ROOH20 للحصول على خصم 20% على أي دورة.",
+          ur: "کسی بھی کورس پر 20% رعایت کے لیے کوڈ ROOH20 استعمال کریں۔",
+        },
+        link: null,
+      },
+    ];
 
-    if (firstCourseId) {
-      const existing = await this.notificationRepo.findOne({ where: { type: "course", targetId: firstCourseId } });
-      if (!existing) {
-        await this.notificationRepo.save(this.notificationRepo.create({ type: "course", targetId: firstCourseId }));
-        created++;
-      }
-    }
-    if (firstArticleId) {
-      const existing = await this.notificationRepo.findOne({ where: { type: "article", targetId: firstArticleId } });
-      if (!existing) {
-        await this.notificationRepo.save(this.notificationRepo.create({ type: "article", targetId: firstArticleId }));
-        created++;
-      }
-    }
-    if (firstCouponId) {
-      const existing = await this.notificationRepo.findOne({ where: { type: "coupon", targetId: firstCouponId } });
-      if (!existing) {
-        await this.notificationRepo.save(this.notificationRepo.create({ type: "coupon", targetId: firstCouponId }));
-        created++;
-      }
-    }
-    this.logger.log(`✓ اعلانات نمونه ساخته شدند (${created} مورد جدید)`);
+    const existingCount = await this.notificationRepo.count();
+    if (existingCount > 0) return;
+
+    await this.notificationRepo.save(defs.map((def) => this.notificationRepo.create(def)));
+    this.logger.log(`✓ اعلانات نمونه ساخته شدند (${defs.length} مورد)`);
   }
 }
