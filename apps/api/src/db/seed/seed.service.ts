@@ -68,10 +68,10 @@ export class SeedService implements OnApplicationBootstrap {
 
     await this.seedAdmin();
     const instructor = await this.seedInstructor();
-    const category = await this.seedCategory();
+    const categories = await this.seedCategories();
     const students = await this.seedStudents();
     await this.seedCoupons();
-    const courseIds = await this.seedCourses(instructor.id, category.id);
+    const courseIds = await this.seedCourses(instructor.id, categories.map((c) => c.id));
     await this.seedArticles(instructor.id);
     await this.seedReviews(courseIds, students.map((s) => s.id));
 
@@ -145,24 +145,114 @@ export class SeedService implements OnApplicationBootstrap {
     return saved;
   }
 
-  private async seedCategory(): Promise<Category> {
-    const slug = "fiqh-and-tafsir";
-    const existing = await this.categoryRepo.findOne({ where: { slug } });
-    if (existing) return existing;
-
-    const category = this.categoryRepo.create({
-      name: { ar: "الفقه والتفسير", ur: "فقہ اور تفسیر" },
-      slug,
-      description: {
-        ar: "دوره‌های مرتبط با فقه اسلامی و تفسیر قرآن کریم.",
-        ur: "اسلامی فقہ اور قرآن کریم کی تفسیر سے متعلق کورسز۔",
+  private categoryDefs(): { slug: string; name: Localized; description: Localized }[] {
+    return [
+      {
+        slug: "fiqh-and-tafsir",
+        name: { ar: "الفقه والتفسير", ur: "فقہ اور تفسیر" },
+        description: {
+          ar: "دوره‌های مرتبط با فقه اسلامی و تفسیر قرآن کریم.",
+          ur: "اسلامی فقہ اور قرآن کریم کی تفسیر سے متعلق کورسز۔",
+        },
       },
-      thumbnailUrl: { ar: randomThumbnail(), ur: randomThumbnail() },
-      order: 1,
-    });
-    const saved = await this.categoryRepo.save(category);
-    this.logger.log(`✓ دسته‌بندی نمونه ساخته شد: ${slug}`);
-    return saved;
+      {
+        slug: "hadith-sciences-category",
+        name: { ar: "علوم الحديث", ur: "علوم حدیث" },
+        description: {
+          ar: "دوره‌های مرتبط با مصطلح الحدیث و علم رجال.",
+          ur: "اصطلاح حدیث اور علم رجال سے متعلق کورسز۔",
+        },
+      },
+      {
+        slug: "islamic-history-category",
+        name: { ar: "التاريخ الإسلامي", ur: "اسلامی تاریخ" },
+        description: {
+          ar: "دوره‌های مرتبط با تاریخ اسلام از بعثت تا امروز.",
+          ur: "بعثت سے آج تک اسلامی تاریخ سے متعلق کورسز۔",
+        },
+      },
+      {
+        slug: "arabic-language-category",
+        name: { ar: "اللغة العربية", ur: "عربی زبان" },
+        description: {
+          ar: "دوره‌های آموزش زبان عربی برای فهم بهتر متون دینی.",
+          ur: "دینی متون کو بہتر سمجھنے کے لیے عربی زبان کے کورسز۔",
+        },
+      },
+      {
+        slug: "aqeedah-category",
+        name: { ar: "العقيدة", ur: "عقیدہ" },
+        description: {
+          ar: "دوره‌های مرتبط با اصول عقاید اسلامی.",
+          ur: "اسلامی عقائد کے اصولوں سے متعلق کورسز۔",
+        },
+      },
+      {
+        slug: "quran-recitation-category",
+        name: { ar: "تلاوة وتجويد القرآن", ur: "قرآن کی تلاوت و تجوید" },
+        description: {
+          ar: "دوره‌های تلاوت صحیح و تجوید قرآن کریم.",
+          ur: "قرآن کریم کی صحیح تلاوت اور تجوید کے کورسز۔",
+        },
+      },
+      {
+        slug: "fiqh-of-worship-category",
+        name: { ar: "فقه العبادات", ur: "فقہ عبادات" },
+        description: {
+          ar: "دوره‌های مرتبط با احکام نماز، روزه، زکات و حج.",
+          ur: "نماز، روزہ، زکوۃ اور حج کے احکام سے متعلق کورسز۔",
+        },
+      },
+      {
+        slug: "islamic-ethics-category",
+        name: { ar: "الأخلاق والآداب الإسلامية", ur: "اسلامی اخلاق و آداب" },
+        description: {
+          ar: "دوره‌های مرتبط با اخلاق و آداب اسلامی در زندگی روزمره.",
+          ur: "روزمرہ زندگی میں اسلامی اخلاق و آداب سے متعلق کورسز۔",
+        },
+      },
+      {
+        slug: "seerah-category",
+        name: { ar: "السيرة النبوية", ur: "سیرت نبوی" },
+        description: {
+          ar: "دوره‌های مرتبط با زندگی و سیره‌ی پیامبر اسلام.",
+          ur: "نبی اکرم کی زندگی اور سیرت سے متعلق کورسز۔",
+        },
+      },
+      {
+        slug: "islamic-jurisprudence-comparative",
+        name: { ar: "الفقه المقارن", ur: "تقابلی فقہ" },
+        description: {
+          ar: "دوره‌های مقایسه‌ی مذاهب فقهی اسلامی.",
+          ur: "اسلامی فقہی مذاہب کے تقابلی مطالعہ کے کورسز۔",
+        },
+      },
+    ];
+  }
+
+  private async seedCategories(): Promise<Category[]> {
+    const categories: Category[] = [];
+    for (let i = 0; i < this.categoryDefs().length; i++) {
+      const def = this.categoryDefs()[i]!;
+      const existing = await this.categoryRepo.findOne({ where: { slug: def.slug } });
+      if (existing) {
+        categories.push(existing);
+        continue;
+      }
+
+      const saved = await this.categoryRepo.save(
+        this.categoryRepo.create({
+          name: def.name,
+          slug: def.slug,
+          description: def.description,
+          thumbnailUrl: { ar: randomThumbnail(), ur: randomThumbnail() },
+          order: i + 1,
+        }),
+      );
+      categories.push(saved);
+      this.logger.log(`✓ دسته‌بندی نمونه ساخته شد: ${def.slug}`);
+    }
+    return categories;
   }
 
   private async seedCoupons(): Promise<void> {
@@ -272,7 +362,7 @@ export class SeedService implements OnApplicationBootstrap {
     ];
   }
 
-  private async seedCourses(instructorId: string, categoryId: string): Promise<string[]> {
+  private async seedCourses(instructorId: string, categoryIds: string[]): Promise<string[]> {
     const courseIds: string[] = [];
 
     for (const def of this.courseDefs()) {
@@ -282,6 +372,7 @@ export class SeedService implements OnApplicationBootstrap {
         continue;
       }
 
+      const randomCategoryId = categoryIds[Math.floor(Math.random() * categoryIds.length)]!;
       const course = await this.courseRepo.save(
         this.courseRepo.create({
           title: def.title,
@@ -294,7 +385,7 @@ export class SeedService implements OnApplicationBootstrap {
           accessType: "online_only",
           isPublished: true,
           instructorId,
-          categoryId,
+          categoryId: randomCategoryId,
         }),
       );
 
