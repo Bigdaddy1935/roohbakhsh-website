@@ -673,11 +673,14 @@ interface ArticleRecord {
 | `POST` | `/courses/:courseSlug/reviews` | کاربر لاگین‌شده | ثبت نظر — هر کاربر فقط یک‌بار در هر دوره |
 | `PATCH` | `/courses/:courseSlug/reviews/:reviewId` | صاحب نظر | ویرایش نظر خودم |
 | `DELETE` | `/courses/:courseSlug/reviews/:reviewId` | صاحب نظر یا admin | حذف نظر |
+| `POST` | `/courses/:courseSlug/reviews/:reviewId/reply` | فقط admin | ثبت/ویرایش پاسخ روی یک نظر (بازنویسی می‌شود اگر قبلاً پاسخی بوده) |
 | `GET` | `/articles/:articleSlug/reviews` | Public | لیست نظرات مقاله (صفحه‌بندی) |
 | `POST` | `/articles/:articleSlug/reviews` | کاربر لاگین‌شده | ثبت نظر — هر کاربر فقط یک‌بار در هر مقاله |
 | `PATCH` | `/articles/:articleSlug/reviews/:reviewId` | صاحب نظر | ویرایش نظر خودم |
 | `DELETE` | `/articles/:articleSlug/reviews/:reviewId` | صاحب نظر یا admin | حذف نظر |
-| `GET` | `/reviews` | Public | همه‌ی نظرات دوره و مقاله با هم (صفحه‌بندی)، شامل اطلاعات هدف هر نظر |
+| `GET` | `/reviews` | Public | همه‌ی نظرات **تأیید‌شده** دوره و مقاله با هم (صفحه‌بندی)، شامل اطلاعات هدف هر نظر |
+| `GET` | `/reviews/pending` | فقط admin | صف نظرات در انتظار تأیید (`isApproved: false`)، قدیمی‌ترین اول |
+| `POST` | `/reviews/:id/approve` | فقط admin | تأیید یک نظر — بعد از آن در لیست‌های عمومی نمایش داده می‌شود |
 
 ### شیء ReviewRecord
 
@@ -690,8 +693,19 @@ interface ReviewRecord {
   user: { id: string; fullName: string; avatarUrl: string | null };
   rating: number;          // ۱ تا ۵
   comment: string | null;
+  instructorReply: string | null;  // پاسخ admin — null یعنی هنوز پاسخی ثبت نشده
+  repliedAt: ISODate | null;
+  isApproved: boolean;     // تا admin تأیید نکند (true)، در لیست‌های عمومی نمایش داده نمی‌شود
   createdAt: ISODate;
   updatedAt: ISODate;
+}
+```
+
+### شیء ReplyToReviewRequest (بدنه‌ی `POST .../reviews/:reviewId/reply`)
+
+```ts
+interface ReplyToReviewRequest {
+  reply: string;
 }
 ```
 
@@ -711,9 +725,10 @@ interface ReviewWithTarget extends ReviewRecord {
 ### نکات
 
 - یک کاربر فقط یک نظر روی هر دوره/مقاله می‌تواند ثبت کند؛ تلاش دوم → `409 REVIEW_ALREADY_EXISTS` (باید PATCH بزند)
-- `CourseRecord` و `ArticleRecord` هر دو دو فیلد `averageRating: number | null` و `reviewCount: number` دارند که مستقیماً از جدول `reviews` محاسبه می‌شوند (denormalize نشده، مثل `lessonCount`/`durationMinutes`)
+- `CourseRecord` و `ArticleRecord` هر دو دو فیلد `averageRating: number | null` و `reviewCount: number` دارند که مستقیماً از جدول `reviews` محاسبه می‌شوند (denormalize نشده، مثل `lessonCount`/`durationMinutes`) — **فقط نظرات تأیید‌شده در این محاسبه و در لیست‌های عمومی در نظر گرفته می‌شوند.**
 - `averageRating` تا یک رقم اعشار رند می‌شود؛ اگر هیچ نظری نباشد `null` است
 - نظرات دوره و مقاله مستقل از هم هستند — یک رکورد `Review` یا `courseId` دارد یا `articleId`، هرگز هر دو
+- هر نظر تازه‌ثبت‌شده با `isApproved: false` ساخته می‌شود و در هیچ لیست عمومی (`GET /courses/:slug/reviews`, `GET /articles/:slug/reviews`, `GET /reviews`) نمایش داده نمی‌شود تا admin آن را با `POST /reviews/:id/approve` تأیید کند
 
 ---
 

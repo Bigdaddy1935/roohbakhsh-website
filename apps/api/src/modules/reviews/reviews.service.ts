@@ -13,6 +13,7 @@ import { Course } from "../courses/entities/course.entity";
 import { Article } from "../articles/entities/article.entity";
 import { CreateReviewDto } from "./dto/create-review.dto";
 import { UpdateReviewDto } from "./dto/update-review.dto";
+import { ReplyReviewDto } from "./dto/reply-review.dto";
 
 @Injectable()
 export class ReviewsService {
@@ -51,6 +52,17 @@ export class ReviewsService {
   async removeCourseReview(courseSlug: string, reviewId: string, userId: string, isAdmin: boolean): Promise<void> {
     const course = await this.courseBySlug(courseSlug);
     await this.removeOwnReview({ id: reviewId, courseId: course.id }, userId, isAdmin);
+  }
+
+  /** ثبت/ویرایش پاسخ مدیر روی نظر یک دوره — فقط admin. */
+  async replyToCourseReview(courseSlug: string, reviewId: string, dto: ReplyReviewDto): Promise<ReviewRecord> {
+    const course = await this.courseBySlug(courseSlug);
+    const review = await this.repo.findOne({ where: { id: reviewId, courseId: course.id }, relations: { user: true } });
+    if (!review) throw new NotFoundException("REVIEW_NOT_FOUND");
+
+    review.instructorReply = dto.reply;
+    review.repliedAt = new Date();
+    return this.toContract(await this.repo.save(review));
   }
 
   /** میانگین امتیاز و تعداد نظرات یک دوره — برای نمایش در CourseRecord. */
@@ -103,15 +115,37 @@ export class ReviewsService {
 
   // ── همه‌ی نظرات (دوره + مقاله) ───────────────────────────────────────────
 
-  /** کل نظرات (دوره و مقاله با هم) به‌همراه اطلاعات هدف هر نظر — صفحه‌بندی‌شده. */
+  /** کل نظرات تأیید‌شده (دوره و مقاله با هم) به‌همراه اطلاعات هدف هر نظر — صفحه‌بندی‌شده. */
   async findAll(page: number, limit: number): Promise<Paginated<ReviewWithTarget>> {
     const [items, total] = await this.repo.findAndCount({
+      where: { isApproved: true },
       relations: { user: true, course: true, article: true },
       order: { createdAt: "DESC" },
       take: limit,
       skip: (page - 1) * limit,
     });
     return toPaginated(items.map((r) => this.toContractWithTarget(r)), total, page, limit);
+  }
+
+  /** نظرات هنوز تأییدنشده (دوره و مقاله با هم) برای صف بررسی admin — صفحه‌بندی‌شده. */
+  async findPending(page: number, limit: number): Promise<Paginated<ReviewWithTarget>> {
+    const [items, total] = await this.repo.findAndCount({
+      where: { isApproved: false },
+      relations: { user: true, course: true, article: true },
+      order: { createdAt: "ASC" },
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+    return toPaginated(items.map((r) => this.toContractWithTarget(r)), total, page, limit);
+  }
+
+  /** تأیید یک نظر توسط admin — پس از آن در لیست‌های عمومی نمایش داده می‌شود. */
+  async approve(reviewId: string): Promise<ReviewRecord> {
+    const review = await this.repo.findOne({ where: { id: reviewId }, relations: { user: true } });
+    if (!review) throw new NotFoundException("REVIEW_NOT_FOUND");
+
+    review.isApproved = true;
+    return this.toContract(await this.repo.save(review));
   }
 
   // ── منطق مشترک ────────────────────────────────────────────────────────────
@@ -122,7 +156,7 @@ export class ReviewsService {
     limit: number,
   ): Promise<Paginated<ReviewRecord>> {
     const [items, total] = await this.repo.findAndCount({
-      where,
+      where: { ...where, isApproved: true },
       relations: { user: true },
       order: { createdAt: "DESC" },
       take: limit,
@@ -158,7 +192,7 @@ export class ReviewsService {
   }
 
   private async summaryFor(where: { courseId: string } | { articleId: string }): Promise<CourseRatingSummary> {
-    const reviews = await this.repo.find({ where });
+    const reviews = await this.repo.find({ where: { ...where, isApproved: true } });
     if (reviews.length === 0) return { averageRating: null, reviewCount: 0 };
 
     const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
@@ -182,6 +216,7 @@ export class ReviewsService {
       .addSelect("COUNT(*)", "reviewCount")
       .addSelect("AVG(review.rating)", "averageRating")
       .where(`${dbColumn} IN (:...ids)`, { ids })
+      .andWhere("review.isApproved = :isApproved", { isApproved: true })
       .groupBy(dbColumn)
       .getRawMany<{ targetId: string; reviewCount: string; averageRating: string }>();
 
@@ -223,6 +258,9 @@ export class ReviewsService {
       },
       rating: review.rating,
       comment: review.comment,
+      instructorReply: review.instructorReply,
+      repliedAt: review.repliedAt ? review.repliedAt.toISOString() : null,
+      isApproved: review.isApproved,
       createdAt: review.createdAt.toISOString(),
       updatedAt: review.updatedAt.toISOString(),
     };

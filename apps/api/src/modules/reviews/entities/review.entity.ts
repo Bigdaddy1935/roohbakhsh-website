@@ -51,6 +51,16 @@ export class Review {
   @Column({ type: "text", nullable: true, default: null })
   comment!: string | null;
 
+  @Column({ name: "instructor_reply", type: "text", nullable: true, default: null })
+  instructorReply!: string | null;
+
+  @Column({ name: "replied_at", type: "datetime", nullable: true, default: null })
+  repliedAt!: Date | null;
+
+  /** تا admin تأیید نکند (true)، نظر در لیست‌های عمومی نمایش داده نمی‌شود. */
+  @Column({ name: "is_approved", default: false })
+  isApproved!: boolean;
+
   @CreateDateColumn({ name: "created_at" })
   createdAt!: Date;
 

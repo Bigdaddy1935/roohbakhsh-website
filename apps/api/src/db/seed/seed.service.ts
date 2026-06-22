@@ -416,6 +416,11 @@ export class SeedService implements OnApplicationBootstrap {
       const def = defs[i]!;
       const existing = await this.courseRepo.findOne({ where: { slug: def.slug } });
       if (existing) {
+        if (!existing.introVideoUrl) {
+          existing.introVideoUrl = { ar: randomVideoUrl(), ur: randomVideoUrl() };
+          await this.courseRepo.save(existing);
+          this.logger.log(`✓ introVideoUrl برای دوره‌ی موجود بک‌فیل شد: ${def.slug}`);
+        }
         courseIds.push(existing.id);
         continue;
       }
@@ -622,15 +627,25 @@ export class SeedService implements OnApplicationBootstrap {
       for (let i = 0; i < studentIds.length; i++) {
         const studentId = studentIds[i]!;
         const existing = await this.reviewRepo.findOne({ where: { courseId, userId: studentId } });
-        if (existing) continue;
+        if (existing) {
+          if (!existing.isApproved) {
+            existing.isApproved = true;
+            await this.reviewRepo.save(existing);
+          }
+          continue;
+        }
 
         const sample = sampleReviews[(courseIds.indexOf(courseId) + i) % sampleReviews.length]!;
+        const isFirstReview = i === 0;
         await this.reviewRepo.save(
           this.reviewRepo.create({
             courseId,
             userId: studentId,
             rating: sample.rating,
             comment: sample.comment,
+            instructorReply: isFirstReview ? "شكراً لتقييمك، سعداء أن الدورة كانت مفيدة لك." : null,
+            repliedAt: isFirstReview ? new Date() : null,
+            isApproved: true,
           }),
         );
       }
@@ -650,7 +665,13 @@ export class SeedService implements OnApplicationBootstrap {
       for (let i = 0; i < studentIds.length; i++) {
         const studentId = studentIds[i]!;
         const existing = await this.reviewRepo.findOne({ where: { articleId, userId: studentId } });
-        if (existing) continue;
+        if (existing) {
+          if (!existing.isApproved) {
+            existing.isApproved = true;
+            await this.reviewRepo.save(existing);
+          }
+          continue;
+        }
 
         const sample = sampleReviews[(articleIds.indexOf(articleId) + i) % sampleReviews.length]!;
         await this.reviewRepo.save(
@@ -659,6 +680,7 @@ export class SeedService implements OnApplicationBootstrap {
             userId: studentId,
             rating: sample.rating,
             comment: sample.comment,
+            isApproved: true,
           }),
         );
       }

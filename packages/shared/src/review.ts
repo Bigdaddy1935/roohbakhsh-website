@@ -15,6 +15,12 @@ export interface ReviewRecord {
   user: ReviewUser;
   rating: number; // 1 تا 5
   comment: string | null;
+  /** پاسخ مدیر/مدرس به این نظر — null یعنی هنوز پاسخی ثبت نشده. */
+  instructorReply: string | null;
+  /** تاریخ ثبت پاسخ — null یعنی هنوز پاسخی ثبت نشده. */
+  repliedAt: ISODate | null;
+  /** تأیید مدیر — تا true نشود در لیست‌های عمومی (GET) نمایش داده نمی‌شود. هنگام ساخت همیشه false است. */
+  isApproved: boolean;
   createdAt: ISODate;
   updatedAt: ISODate;
 }
@@ -27,6 +33,11 @@ export interface CreateReviewRequest {
 export interface UpdateReviewRequest {
   rating?: number;
   comment?: string | null;
+}
+
+/** ثبت/ویرایش پاسخ مدیر روی یک نظر — فقط admin. */
+export interface ReplyToReviewRequest {
+  reply: string;
 }
 
 export interface CourseRatingSummary {
