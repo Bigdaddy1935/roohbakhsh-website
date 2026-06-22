@@ -8,16 +8,24 @@ import { Repository } from "typeorm";
 import type { CourseRecord, CourseDiscount, Money, Paginated } from "@roohbakhsh/shared";
 import { toPaginated } from "../../common/utils/paginate";
 import { Course } from "./entities/course.entity";
+import { Lesson } from "./entities/lesson.entity";
 import { Instructor } from "../instructor/entities/instructor.entity";
 import { Category } from "../category/entities/category.entity";
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
+
+interface CourseStats {
+  lessonCount: number;
+  durationMinutes: number;
+}
 
 @Injectable()
 export class CourseService {
   constructor(
     @InjectRepository(Course)
     private readonly repo: Repository<Course>,
+    @InjectRepository(Lesson)
+    private readonly lessonRepo: Repository<Lesson>,
     @InjectRepository(Instructor)
     private readonly instructorRepo: Repository<Instructor>,
     @InjectRepository(Category)
@@ -31,13 +39,51 @@ export class CourseService {
       take: limit,
       skip: (page - 1) * limit,
     });
-    return toPaginated(items.map((c) => this.toContract(c)), total, page, limit);
+    const statsByCourseId = await this.statsForCourses(items.map((c) => c.id));
+    return toPaginated(
+      items.map((c) => this.toContract(c, statsByCourseId.get(c.id))),
+      total,
+      page,
+      limit,
+    );
   }
 
   async findOne(slug: string): Promise<CourseRecord> {
     const course = await this.repo.findOne({ where: { slug }, relations: { instructor: true } });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
-    return this.toContract(course);
+    const stats = await this.statsForCourse(course.id);
+    return this.toContract(course, stats);
+  }
+
+  /** lessonCount و durationMinutes را مستقیماً از جدول lessons محاسبه می‌کند (denormalize نشده). */
+  private async statsForCourse(courseId: string): Promise<CourseStats> {
+    const lessons = await this.lessonRepo.find({ where: { courseId } });
+    return {
+      lessonCount: lessons.length,
+      durationMinutes: lessons.reduce((sum, l) => sum + l.durationMinutes, 0),
+    };
+  }
+
+  private async statsForCourses(courseIds: string[]): Promise<Map<string, CourseStats>> {
+    const map = new Map<string, CourseStats>();
+    if (courseIds.length === 0) return map;
+
+    const rows = await this.lessonRepo
+      .createQueryBuilder("lesson")
+      .select("lesson.courseId", "courseId")
+      .addSelect("COUNT(*)", "lessonCount")
+      .addSelect("SUM(lesson.durationMinutes)", "durationMinutes")
+      .where("lesson.courseId IN (:...courseIds)", { courseIds })
+      .groupBy("lesson.courseId")
+      .getRawMany<{ courseId: string; lessonCount: string; durationMinutes: string }>();
+
+    for (const row of rows) {
+      map.set(row.courseId, {
+        lessonCount: Number(row.lessonCount),
+        durationMinutes: Number(row.durationMinutes),
+      });
+    }
+    return map;
   }
 
   async create(dto: CreateCourseDto): Promise<CourseRecord> {
@@ -57,8 +103,6 @@ export class CourseService {
       description: dto.description,
       thumbnailUrl: dto.thumbnailUrl ?? null,
       price: dto.price ?? null,
-      durationMinutes: 0,
-      lessonCount: 0,
       level: dto.level ?? "beginner",
       runStatus: dto.runStatus ?? "upcoming",
       accessType: dto.accessType ?? "online_only",
@@ -70,7 +114,7 @@ export class CourseService {
     });
 
     const saved = await this.repo.save(course);
-    return this.toContract(saved);
+    return this.toContract(saved, { lessonCount: 0, durationMinutes: 0 });
   }
 
   async update(id: string, dto: UpdateCourseDto): Promise<CourseRecord> {
@@ -110,7 +154,9 @@ export class CourseService {
       course.discountExpiresAt = dto.discountExpiresAt ? new Date(dto.discountExpiresAt) : null;
     }
 
-    return this.toContract(await this.repo.save(course));
+    const saved = await this.repo.save(course);
+    const stats = await this.statsForCourse(saved.id);
+    return this.toContract(saved, stats);
   }
 
   async remove(id: string): Promise<void> {
@@ -135,7 +181,7 @@ export class CourseService {
     };
   }
 
-  private toContract(course: Course): CourseRecord {
+  private toContract(course: Course, stats?: CourseStats): CourseRecord {
     const discount = this.buildDiscount(course);
     const effectivePrice: Money | null =
       discount?.isActive ? discount.price : course.price;
@@ -149,8 +195,8 @@ export class CourseService {
       price: course.price,
       discount,
       effectivePrice,
-      durationMinutes: course.durationMinutes,
-      lessonCount: course.lessonCount,
+      durationMinutes: stats?.durationMinutes ?? 0,
+      lessonCount: stats?.lessonCount ?? 0,
       level: course.level,
       runStatus: course.runStatus,
       accessType: course.accessType,

@@ -34,12 +34,6 @@ export class Course {
   @Column({ type: "json", nullable: true, default: null })
   price!: Money | null;
 
-  @Column({ name: "duration_minutes", type: "int", unsigned: true, default: 0 })
-  durationMinutes!: number;
-
-  @Column({ name: "lesson_count", type: "int", unsigned: true, default: 0 })
-  lessonCount!: number;
-
   @Column({
     type: "enum",
     enum: ["beginner", "intermediate", "advanced"],

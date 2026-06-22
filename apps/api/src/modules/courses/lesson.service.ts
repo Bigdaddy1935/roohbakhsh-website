@@ -56,7 +56,6 @@ export class LessonService {
     });
 
     const saved = await this.lessonRepo.save(lesson);
-    await this.syncCourseStats(section.courseId);
 
     return this.toContract(saved);
   }
@@ -77,7 +76,6 @@ export class LessonService {
     if (dto.isFreePreview !== undefined) lesson.isFreePreview = dto.isFreePreview;
 
     const saved = await this.lessonRepo.save(lesson);
-    await this.syncCourseStats(section.courseId);
 
     return this.toContract(saved);
   }
@@ -88,7 +86,6 @@ export class LessonService {
     if (!lesson) throw new NotFoundException("LESSON_NOT_FOUND");
 
     await this.lessonRepo.remove(lesson);
-    await this.syncCourseStats(section.courseId);
   }
 
   private async sectionByIdAndCourseSlug(courseSlug: string, sectionId: string): Promise<Section> {
@@ -99,13 +96,6 @@ export class LessonService {
     if (!section) throw new NotFoundException("SECTION_NOT_FOUND");
 
     return section;
-  }
-
-  private async syncCourseStats(courseId: string): Promise<void> {
-    const lessons = await this.lessonRepo.find({ where: { courseId } });
-    const lessonCount = lessons.length;
-    const durationMinutes = lessons.reduce((sum, l) => sum + l.durationMinutes, 0);
-    await this.courseRepo.update(courseId, { lessonCount, durationMinutes });
   }
 
   private toContract(lesson: Lesson): LessonContract {
