@@ -6,7 +6,7 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import type { ReviewRecord, Paginated, CourseRatingSummary } from "@roohbakhsh/shared";
+import type { ReviewRecord, ReviewWithTarget, Paginated, CourseRatingSummary } from "@roohbakhsh/shared";
 import { toPaginated } from "../../common/utils/paginate";
 import { Review } from "./entities/review.entity";
 import { Course } from "../courses/entities/course.entity";
@@ -99,6 +99,19 @@ export class ReviewsService {
   /** میانگین امتیاز چند مقاله با یک کوئری گروه‌بندی‌شده — برای لیست مقالات (بدون N+1). */
   async articleRatingSummaries(articleIds: string[]): Promise<Map<string, CourseRatingSummary>> {
     return this.summariesFor("articleId", articleIds);
+  }
+
+  // ── همه‌ی نظرات (دوره + مقاله) ───────────────────────────────────────────
+
+  /** کل نظرات (دوره و مقاله با هم) به‌همراه اطلاعات هدف هر نظر — صفحه‌بندی‌شده. */
+  async findAll(page: number, limit: number): Promise<Paginated<ReviewWithTarget>> {
+    const [items, total] = await this.repo.findAndCount({
+      relations: { user: true, course: true, article: true },
+      order: { createdAt: "DESC" },
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+    return toPaginated(items.map((r) => this.toContractWithTarget(r)), total, page, limit);
   }
 
   // ── منطق مشترک ────────────────────────────────────────────────────────────
@@ -213,5 +226,13 @@ export class ReviewsService {
       createdAt: review.createdAt.toISOString(),
       updatedAt: review.updatedAt.toISOString(),
     };
+  }
+
+  private toContractWithTarget(review: Review): ReviewWithTarget {
+    const target = review.course
+      ? { type: "course" as const, id: review.course.id, slug: review.course.slug, title: review.course.title }
+      : { type: "article" as const, id: review.article!.id, slug: review.article!.slug, title: review.article!.title };
+
+    return { ...this.toContract(review), target };
   }
 }

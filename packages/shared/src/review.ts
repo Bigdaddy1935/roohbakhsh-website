@@ -1,4 +1,4 @@
-import type { ID, ISODate, Paginated } from "./common";
+import type { ID, ISODate, Localized, Paginated } from "./common";
 
 export interface ReviewUser {
   id: ID;
@@ -35,3 +35,17 @@ export interface CourseRatingSummary {
 }
 
 export type PaginatedReviews = Paginated<ReviewRecord>;
+
+/** دوره یا مقاله‌ای که این نظر متعلق به آن است — برای روت سراسری GET /reviews. */
+export interface ReviewTarget {
+  type: "course" | "article";
+  id: ID;
+  slug: string;
+  title: Localized;
+}
+
+export interface ReviewWithTarget extends ReviewRecord {
+  target: ReviewTarget;
+}
+
+export type PaginatedReviewsWithTarget = Paginated<ReviewWithTarget>;

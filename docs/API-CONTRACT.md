@@ -620,6 +620,7 @@ interface ArticleRecord {
 | `POST` | `/articles/:articleSlug/reviews` | کاربر لاگین‌شده | ثبت نظر — هر کاربر فقط یک‌بار در هر مقاله |
 | `PATCH` | `/articles/:articleSlug/reviews/:reviewId` | صاحب نظر | ویرایش نظر خودم |
 | `DELETE` | `/articles/:articleSlug/reviews/:reviewId` | صاحب نظر یا admin | حذف نظر |
+| `GET` | `/reviews` | Public | همه‌ی نظرات دوره و مقاله با هم (صفحه‌بندی)، شامل اطلاعات هدف هر نظر |
 
 ### شیء ReviewRecord
 
@@ -634,6 +635,19 @@ interface ReviewRecord {
   comment: string | null;
   createdAt: ISODate;
   updatedAt: ISODate;
+}
+```
+
+### شیء ReviewWithTarget (پاسخ `GET /reviews`)
+
+```ts
+interface ReviewWithTarget extends ReviewRecord {
+  target: {
+    type: "course" | "article";
+    id: string;
+    slug: string;
+    title: Localized;
+  };
 }
 ```
 
