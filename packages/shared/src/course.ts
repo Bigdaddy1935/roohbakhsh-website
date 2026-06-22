@@ -139,6 +139,10 @@ export interface CourseRecord {
   effectivePrice: Money | null;
   durationMinutes: number;
   lessonCount: number;
+  /** میانگین امتیاز نظرات (۱ تا ۵) — null یعنی هنوز نظری ثبت نشده. */
+  averageRating: number | null;
+  /** تعداد کل نظرات ثبت‌شده روی این دوره. */
+  reviewCount: number;
   level: CourseLevel;
   /** وضعیت برگزاری: ongoing=در حال برگزاری، upcoming=به زودی، completed=پایان‌یافته */
   runStatus: CourseRunStatus;

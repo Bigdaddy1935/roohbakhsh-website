@@ -602,6 +602,40 @@ interface ArticleRecord {
 
 ---
 
+## §12 — Reviews (نظر و امتیاز دوره)
+
+### روت‌ها
+
+| Method | Path | Auth | توضیح |
+|--------|------|------|-------|
+| `GET` | `/courses/:courseSlug/reviews` | Public | لیست نظرات دوره (صفحه‌بندی) |
+| `POST` | `/courses/:courseSlug/reviews` | کاربر لاگین‌شده | ثبت نظر — هر کاربر فقط یک‌بار در هر دوره |
+| `PATCH` | `/courses/:courseSlug/reviews/:reviewId` | صاحب نظر | ویرایش نظر خودم |
+| `DELETE` | `/courses/:courseSlug/reviews/:reviewId` | صاحب نظر یا admin | حذف نظر |
+
+### شیء ReviewRecord
+
+```ts
+interface ReviewRecord {
+  id: string;
+  courseId: string;
+  userId: string;
+  user: { id: string; fullName: string; avatarUrl: string | null };
+  rating: number;          // ۱ تا ۵
+  comment: string | null;
+  createdAt: ISODate;
+  updatedAt: ISODate;
+}
+```
+
+### نکات
+
+- یک کاربر فقط یک نظر روی هر دوره می‌تواند ثبت کند؛ تلاش دوم → `409 REVIEW_ALREADY_EXISTS` (باید PATCH بزند)
+- `CourseRecord` حالا دو فیلد `averageRating: number | null` و `reviewCount: number` دارد که مستقیماً از جدول `reviews` محاسبه می‌شوند (denormalize نشده، مثل `lessonCount`/`durationMinutes`)
+- `averageRating` تا یک رقم اعشار رند می‌شود؛ اگر دوره هیچ نظری نداشته باشد `null` است
+
+---
+
 ## فرایند تغییر قرارداد (مهم)
 
 اگر وسط کار نیاز به تغییر یک API بود:

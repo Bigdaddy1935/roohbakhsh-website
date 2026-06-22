@@ -11,13 +11,23 @@ import { Course } from "./entities/course.entity";
 import { Lesson } from "./entities/lesson.entity";
 import { Instructor } from "../instructor/entities/instructor.entity";
 import { Category } from "../category/entities/category.entity";
+import { ReviewsService } from "../reviews/reviews.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
 
 interface CourseStats {
   lessonCount: number;
   durationMinutes: number;
+  averageRating: number | null;
+  reviewCount: number;
 }
+
+const EMPTY_STATS: CourseStats = {
+  lessonCount: 0,
+  durationMinutes: 0,
+  averageRating: null,
+  reviewCount: 0,
+};
 
 @Injectable()
 export class CourseService {
@@ -30,6 +40,7 @@ export class CourseService {
     private readonly instructorRepo: Repository<Instructor>,
     @InjectRepository(Category)
     private readonly categoryRepo: Repository<Category>,
+    private readonly reviewsService: ReviewsService,
   ) {}
 
   async findAll(page: number, limit: number): Promise<Paginated<CourseRecord>> {
@@ -39,9 +50,13 @@ export class CourseService {
       take: limit,
       skip: (page - 1) * limit,
     });
-    const statsByCourseId = await this.statsForCourses(items.map((c) => c.id));
+    const courseIds = items.map((c) => c.id);
+    const [lessonStats, ratingStats] = await Promise.all([
+      this.lessonStatsForCourses(courseIds),
+      this.reviewsService.ratingSummaries(courseIds),
+    ]);
     return toPaginated(
-      items.map((c) => this.toContract(c, statsByCourseId.get(c.id))),
+      items.map((c) => this.toContract(c, this.mergeStats(c.id, lessonStats, ratingStats))),
       total,
       page,
       limit,
@@ -55,17 +70,22 @@ export class CourseService {
     return this.toContract(course, stats);
   }
 
-  /** lessonCount و durationMinutes را مستقیماً از جدول lessons محاسبه می‌کند (denormalize نشده). */
+  /** lessonCount/durationMinutes از جدول lessons و averageRating/reviewCount از جدول reviews — هیچ‌کدام denormalize نشده. */
   private async statsForCourse(courseId: string): Promise<CourseStats> {
     const lessons = await this.lessonRepo.find({ where: { courseId } });
+    const rating = await this.reviewsService.ratingSummary(courseId);
     return {
       lessonCount: lessons.length,
       durationMinutes: lessons.reduce((sum, l) => sum + l.durationMinutes, 0),
+      averageRating: rating.averageRating,
+      reviewCount: rating.reviewCount,
     };
   }
 
-  private async statsForCourses(courseIds: string[]): Promise<Map<string, CourseStats>> {
-    const map = new Map<string, CourseStats>();
+  private async lessonStatsForCourses(
+    courseIds: string[],
+  ): Promise<Map<string, { lessonCount: number; durationMinutes: number }>> {
+    const map = new Map<string, { lessonCount: number; durationMinutes: number }>();
     if (courseIds.length === 0) return map;
 
     const rows = await this.lessonRepo
@@ -84,6 +104,21 @@ export class CourseService {
       });
     }
     return map;
+  }
+
+  private mergeStats(
+    courseId: string,
+    lessonStats: Map<string, { lessonCount: number; durationMinutes: number }>,
+    ratingStats: Map<string, { averageRating: number | null; reviewCount: number }>,
+  ): CourseStats {
+    const lesson = lessonStats.get(courseId);
+    const rating = ratingStats.get(courseId);
+    return {
+      lessonCount: lesson?.lessonCount ?? 0,
+      durationMinutes: lesson?.durationMinutes ?? 0,
+      averageRating: rating?.averageRating ?? null,
+      reviewCount: rating?.reviewCount ?? 0,
+    };
   }
 
   async create(dto: CreateCourseDto): Promise<CourseRecord> {
@@ -114,7 +149,7 @@ export class CourseService {
     });
 
     const saved = await this.repo.save(course);
-    return this.toContract(saved, { lessonCount: 0, durationMinutes: 0 });
+    return this.toContract(saved, EMPTY_STATS);
   }
 
   async update(id: string, dto: UpdateCourseDto): Promise<CourseRecord> {
@@ -181,7 +216,7 @@ export class CourseService {
     };
   }
 
-  private toContract(course: Course, stats?: CourseStats): CourseRecord {
+  private toContract(course: Course, stats: CourseStats): CourseRecord {
     const discount = this.buildDiscount(course);
     const effectivePrice: Money | null =
       discount?.isActive ? discount.price : course.price;
@@ -195,8 +230,10 @@ export class CourseService {
       price: course.price,
       discount,
       effectivePrice,
-      durationMinutes: stats?.durationMinutes ?? 0,
-      lessonCount: stats?.lessonCount ?? 0,
+      durationMinutes: stats.durationMinutes,
+      lessonCount: stats.lessonCount,
+      averageRating: stats.averageRating,
+      reviewCount: stats.reviewCount,
       level: course.level,
       runStatus: course.runStatus,
       accessType: course.accessType,
