@@ -2,7 +2,24 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
-import type { ReviewRecord, CreateReviewRequest, PaginatedReviews } from "@roohbakhsh/shared";
+import type { ReviewRecord, CreateReviewRequest, PaginatedReviews, PaginatedReviewsWithTarget } from "@roohbakhsh/shared";
+
+export const allReviewsKeys = {
+  list: (params?: Record<string, unknown>) => ["reviews", "all", params] as const,
+};
+
+export function useReviews(params?: { page?: number; limit?: number; rating?: number }) {
+  const qs = new URLSearchParams();
+  if (params?.page) qs.set("page", String(params.page));
+  if (params?.limit) qs.set("limit", String(params.limit));
+  if (params?.rating) qs.set("rating", String(params.rating));
+  const query = qs.toString() ? `?${qs}` : "";
+
+  return useQuery<PaginatedReviewsWithTarget>({
+    queryKey: allReviewsKeys.list(params),
+    queryFn: () => api.get<PaginatedReviewsWithTarget>(`/reviews${query}`),
+  });
+}
 
 export const reviewKeys = {
   course: (courseSlug: string, params?: Record<string, unknown>) =>
