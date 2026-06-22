@@ -1,0 +1,50 @@
+@import "@heroui/styles";
+@import "tailwindcss";
+
+/* ── Brand palette (60-30-10) ─────────────────────────────── */
+:root {
+  --bg:     #F7F7F7;
+  --brand:  #0ca789;
+  --cta:    #ff9f1c;
+  --ink:    #2b2d42;
+  --radius: 14px;
+
+  --font-arabic: "Almarai", system-ui, sans-serif;
+  --font-urdu:   "Noto Nastaliq Urdu", "Amar Nastaleeq", serif;
+}
+
+/* ── Custom thin scrollbar ────────────────────────────────── */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+.scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
+.scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+@layer base {
+  * { box-sizing: border-box; }
+
+  html, body { overflow-x: hidden; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    scrollbar-width: none;
+  }
+  body::-webkit-scrollbar { display: none; }
+
+  /* per-locale font */
+  :lang(ar) { font-family: var(--font-arabic); }
+  :lang(ur) { font-family: var(--font-urdu); line-height: 2; }
+}
+
+/* Outside any @layer — overrides everything from Tailwind/HeroUI */
+.container {
+  max-width: 1300px !important;
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
