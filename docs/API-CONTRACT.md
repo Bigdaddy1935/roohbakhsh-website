@@ -58,6 +58,7 @@
 # بخش ۲ — احراز هویت (منبع: NestJS)
 
 ### `POST /api/auth/register`
+علاوه بر ساخت حساب، یک ایمیل تأیید (لینک با توکن یک‌بارمصرف، اعتبار ۲۴ ساعت) برای کاربر ارسال می‌شود. **ورود مسدود نمی‌شود اگر ایمیل تأیید نشود** — `User.isEmailVerified` فقط برای نمایش هشدار در فرانت است.
 - **بدنه:** `RegisterRequest`
 - **پاسخ:** `201 AuthResponse` — توکن‌ها هم در بدنه و هم در کوکی برمی‌گردند.
 - **خطاها:** `409 EMAIL_TAKEN` | `400 VALIDATION_ERROR`
@@ -83,7 +84,7 @@
 - **خطا:** `401 Unauthorized`
 
 ### `POST /api/auth/forgot-password`
-درخواست بازیابی رمز عبور. توکن یک‌بارمصرف با اعتبار ۱ ساعت ساخته می‌شود و لینک بازیابی فعلاً فقط **لاگ** می‌شود (هنوز سرویس ارسال ایمیل در پروژه راه‌اندازی نشده).
+درخواست بازیابی رمز عبور. توکن یک‌بارمصرف با اعتبار ۱ ساعت ساخته و لینک بازیابی به ایمیل کاربر ارسال می‌شود (از طریق `MailService` — به‌ربط `docs/API-CONTRACT.md#راه‌اندازی-ایمیل-smtp`).
 همیشه پاسخ یکسان برمی‌گرداند — حتی اگر ایمیل ثبت‌نام نشده باشد (جلوگیری از user enumeration).
 - **بدنه:** `ForgotPasswordRequest { email }`
 - **پاسخ:** `204 No Content`
@@ -94,6 +95,38 @@
 - **بدنه:** `ResetPasswordRequest { token, newPassword }`
 - **پاسخ:** `204 No Content`
 - **خطاها:** `401 INVALID_RESET_TOKEN` (توکن نامعتبر/منقضی/استفاده‌شده) | `400 VALIDATION_ERROR`
+
+### `POST /api/auth/verify-email`
+با توکن خامِ ارسال‌شده در لینک ایمیل تأیید (که هنگام `register` فرستاده می‌شود)، فیلد `isEmailVerified` کاربر را `true` می‌کند. توکن یک‌بارمصرف با اعتبار ۲۴ ساعت.
+**ورود مسدود نمی‌شود اگر ایمیل تأیید نشده باشد** — این فقط برای نمایش وضعیت در فرانت است.
+- **بدنه:** `VerifyEmailRequest { token }`
+- **پاسخ:** `204 No Content`
+- **خطاها:** `401 INVALID_VERIFICATION_TOKEN` | `400 VALIDATION_ERROR`
+
+### `POST /api/auth/resend-verification`
+اگر ایمیل وجود داشته باشد و هنوز تأیید نشده باشد، لینک تأیید جدید ارسال می‌شود. همیشه پاسخ یکسان برمی‌گرداند (جلوگیری از user enumeration).
+- **بدنه:** `ResendVerificationRequest { email }`
+- **پاسخ:** `204 No Content`
+- **خطا:** `400 VALIDATION_ERROR`
+
+---
+
+## راه‌اندازی ایمیل (SMTP)
+
+ارسال ایمیل (بازیابی رمز + تأیید ایمیل) از طریق `MailService` در `apps/api/src/modules/mail/mail.service.ts` با کتابخانه‌ی `nodemailer` انجام می‌شود.
+
+- اگر `SMTP_HOST` در فایل env خالی باشد (مقدار پیش‌فرض توسعه)، هیچ ایمیلی واقعاً ارسال نمی‌شود — متن HTML ایمیل فقط در **لاگ سرور** چاپ می‌شود. این یعنی روی لوکال بدون نیاز به SMTP واقعی می‌توانید لینک بازیابی/تأیید را از لاگ کپی کنید.
+- برای ارسال واقعی، این متغیرها را در `.env.developer` یا `.env.production` پر کنید:
+  ```
+  SMTP_HOST=smtp.example.com
+  SMTP_PORT=587
+  SMTP_SECURE=false
+  SMTP_USER=...
+  SMTP_PASSWORD=...
+  MAIL_FROM=no-reply@roohbakhsh.ac
+  FRONTEND_URL=https://roohbakhsh.com   # برای ساخت لینک‌های داخل ایمیل
+  ```
+- هر سرویس SMTP معتبری کار می‌کند (Mailtrap برای تست، یا یک حساب SMTP واقعی مثل Zoho/SendGrid/Mailgun/Gmail App Password برای production). فقط مقادیر بالا را با همان سرویس پر کنید — کد تغییری لازم ندارد.
 
 ---
 

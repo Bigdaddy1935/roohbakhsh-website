@@ -118,6 +118,7 @@ export class SeedService implements OnApplicationBootstrap {
       fullName: "مدیر سامانه",
       role: "admin",
       preferredLocale: "ar",
+      isEmailVerified: true,
     });
     const saved = await this.userRepo.save(user);
     this.logger.log(`✓ ادمین نمونه ساخته شد: ${email} / Test@1234`);
@@ -147,6 +148,7 @@ export class SeedService implements OnApplicationBootstrap {
           fullName: def.fullName,
           role: "user",
           preferredLocale: "ar",
+          isEmailVerified: true,
         }),
       );
       users.push(saved);

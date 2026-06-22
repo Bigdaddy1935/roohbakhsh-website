@@ -2,7 +2,6 @@ import {
   Injectable,
   ConflictException,
   UnauthorizedException,
-  Logger,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -15,28 +14,34 @@ import type { AuthResponse, User as UserContract } from "@roohbakhsh/shared";
 import { User } from "./entities/user.entity";
 import { RefreshToken } from "./entities/refresh-token.entity";
 import { PasswordResetToken } from "./entities/password-reset-token.entity";
+import { EmailVerificationToken } from "./entities/email-verification-token.entity";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { VerifyEmailDto } from "./dto/verify-email.dto";
+import { ResendVerificationDto } from "./dto/resend-verification.dto";
+import { MailService } from "../mail/mail.service";
 
 const REFRESH_TTL_DAYS = 30;
 const PASSWORD_RESET_TTL_HOURS = 1;
+const EMAIL_VERIFICATION_TTL_HOURS = 24;
 const COOKIE_ACCESS = "access_token";
 const COOKIE_REFRESH = "refresh_token";
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
-
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     @InjectRepository(RefreshToken)
     private readonly refreshRepo: Repository<RefreshToken>,
     @InjectRepository(PasswordResetToken)
     private readonly passwordResetRepo: Repository<PasswordResetToken>,
+    @InjectRepository(EmailVerificationToken)
+    private readonly emailVerificationRepo: Repository<EmailVerificationToken>,
     private readonly jwtService: JwtService,
     private readonly config: ConfigService,
+    private readonly mailService: MailService,
   ) {}
 
   async register(dto: RegisterDto, res: Response): Promise<AuthResponse> {
@@ -52,6 +57,7 @@ export class AuthService {
       passwordHash,
     });
     await this.userRepo.save(user);
+    await this.sendVerificationEmail(user);
     return this.buildAuthResponse(user, res);
   }
 
@@ -88,10 +94,7 @@ export class AuthService {
     this.clearCookies(res);
   }
 
-  /**
-   * همیشه بدون افشای وجود/عدم‌وجود ایمیل پاسخ می‌دهد (جلوگیری از user enumeration).
-   * هیچ سرویس ارسال ایمیل در پروژه هنوز راه‌اندازی نشده — لینک بازیابی فعلاً فقط لاگ می‌شود.
-   */
+  /** همیشه بدون افشای وجود/عدم‌وجود ایمیل پاسخ می‌دهد (جلوگیری از user enumeration). */
   async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
     const user = await this.userRepo.findOne({ where: { email: dto.email, isActive: true } });
     if (!user) return;
@@ -106,10 +109,13 @@ export class AuthService {
       this.passwordResetRepo.create({ tokenHash, user, expiresAt }),
     );
 
-    const frontendUrl = this.config.get<string>("FRONTEND_URL") ?? "http://localhost:3000";
-    this.logger.log(
-      `لینک بازیابی رمز عبور برای ${user.email}: ${frontendUrl}/reset-password?token=${rawToken}`,
-    );
+    const frontendUrl = this.config.get<string>("FRONTEND_URL");
+    await this.mailService.send({
+      to: user.email,
+      subject: "بازیابی رمز عبور — آکادمی روح‌بخش",
+      html: `<p>برای تعیین رمز عبور جدید روی لینک زیر بزنید (اعتبار ${PASSWORD_RESET_TTL_HOURS} ساعت):</p>
+        <p><a href="${frontendUrl}/reset-password?token=${rawToken}">${frontendUrl}/reset-password?token=${rawToken}</a></p>`,
+    });
   }
 
   async resetPassword(dto: ResetPasswordDto): Promise<void> {
@@ -131,7 +137,51 @@ export class AuthService {
     await this.refreshRepo.delete({ userId: stored.userId });
   }
 
+  async verifyEmail(dto: VerifyEmailDto): Promise<void> {
+    const hash = this.hashToken(dto.token);
+    const stored = await this.emailVerificationRepo.findOne({
+      where: { tokenHash: hash },
+      relations: { user: true },
+    });
+
+    if (!stored || stored.expiresAt < new Date()) {
+      throw new UnauthorizedException("INVALID_VERIFICATION_TOKEN");
+    }
+
+    stored.user.isEmailVerified = true;
+    await this.userRepo.save(stored.user);
+    await this.emailVerificationRepo.delete({ userId: stored.userId });
+  }
+
+  /** همیشه بدون افشای وجود/عدم‌وجود ایمیل پاسخ می‌دهد (جلوگیری از user enumeration). */
+  async resendVerification(dto: ResendVerificationDto): Promise<void> {
+    const user = await this.userRepo.findOne({ where: { email: dto.email, isActive: true } });
+    if (!user || user.isEmailVerified) return;
+
+    await this.sendVerificationEmail(user);
+  }
+
   // ── helpers ──────────────────────────────────────────────────────────────
+
+  private async sendVerificationEmail(user: User): Promise<void> {
+    const rawToken = randomBytes(32).toString("hex");
+    const tokenHash = this.hashToken(rawToken);
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + EMAIL_VERIFICATION_TTL_HOURS);
+
+    await this.emailVerificationRepo.delete({ userId: user.id });
+    await this.emailVerificationRepo.save(
+      this.emailVerificationRepo.create({ tokenHash, user, expiresAt }),
+    );
+
+    const frontendUrl = this.config.get<string>("FRONTEND_URL");
+    await this.mailService.send({
+      to: user.email,
+      subject: "تأیید ایمیل — آکادمی روح‌بخش",
+      html: `<p>برای تأیید ایمیل خود روی لینک زیر بزنید (اعتبار ${EMAIL_VERIFICATION_TTL_HOURS} ساعت):</p>
+        <p><a href="${frontendUrl}/verify-email?token=${rawToken}">${frontendUrl}/verify-email?token=${rawToken}</a></p>`,
+    });
+  }
 
   private async buildAuthResponse(user: User, res: Response): Promise<AuthResponse> {
     const accessToken = this.jwtService.sign({ sub: user.id, email: user.email });
@@ -195,6 +245,7 @@ export class AuthService {
       preferredLocale: user.preferredLocale,
       avatarUrl: user.avatarUrl,
       isActive: user.isActive,
+      isEmailVerified: user.isEmailVerified,
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
     };

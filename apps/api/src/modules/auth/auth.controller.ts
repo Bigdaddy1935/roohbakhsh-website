@@ -26,6 +26,8 @@ import { LoginDto } from "./dto/login.dto";
 import { RefreshDto } from "./dto/refresh.dto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { VerifyEmailDto } from "./dto/verify-email.dto";
+import { ResendVerificationDto } from "./dto/resend-verification.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { Public } from "./decorators/public.decorator";
 import { User } from "./entities/user.entity";
@@ -159,6 +161,43 @@ export class AuthController {
   @ApiResponse({ status: 400, description: "خطای اعتبارسنجی — کد: VALIDATION_ERROR", type: ApiErrorSchema })
   resetPassword(@Body() dto: ResetPasswordDto) {
     return this.authService.resetPassword(dto);
+  }
+
+  // ── Verify email ─────────────────────────────────────────────────────────
+
+  @Public()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post("verify-email")
+  @ApiOperation({
+    summary: "تأیید ایمیل با توکن",
+    description:
+      "با توکن خامِ ارسال‌شده در لینک ایمیل تأیید (که هنگام ثبت‌نام فرستاده می‌شود)، حساب را تأیید می‌کند. " +
+      "ورود مسدود نمی‌شود اگر ایمیل تأیید نشده باشد؛ این فقط فیلد `isEmailVerified` کاربر را true می‌کند.",
+  })
+  @ApiHeader(LANG_HEADER)
+  @ApiResponse({ status: 204, description: "ایمیل تأیید شد — بدنه‌ای برنمی‌گردد" })
+  @ApiResponse({ status: 401, description: "توکن نامعتبر یا منقضی — کد: INVALID_VERIFICATION_TOKEN", type: ApiErrorSchema })
+  @ApiResponse({ status: 400, description: "خطای اعتبارسنجی — کد: VALIDATION_ERROR", type: ApiErrorSchema })
+  verifyEmail(@Body() dto: VerifyEmailDto) {
+    return this.authService.verifyEmail(dto);
+  }
+
+  // ── Resend verification ──────────────────────────────────────────────────
+
+  @Public()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post("resend-verification")
+  @ApiOperation({
+    summary: "ارسال دوباره‌ی ایمیل تأیید",
+    description:
+      "اگر ایمیل وجود داشته باشد و هنوز تأیید نشده باشد، لینک تأیید جدید (اعتبار ۲۴ ساعت) ارسال می‌شود. " +
+      "برای جلوگیری از افشای وجود/عدم‌وجود ایمیل، همیشه پاسخ یکسان (204) برمی‌گردد.",
+  })
+  @ApiHeader(LANG_HEADER)
+  @ApiResponse({ status: 204, description: "درخواست ثبت شد — بدنه‌ای برنمی‌گردد" })
+  @ApiResponse({ status: 400, description: "خطای اعتبارسنجی — کد: VALIDATION_ERROR", type: ApiErrorSchema })
+  resendVerification(@Body() dto: ResendVerificationDto) {
+    return this.authService.resendVerification(dto);
   }
 
   // ── Me ───────────────────────────────────────────────────────────────────

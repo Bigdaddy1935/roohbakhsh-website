@@ -82,6 +82,7 @@ export class UsersService {
       preferredLocale: user.preferredLocale,
       avatarUrl: user.avatarUrl,
       isActive: user.isActive,
+      isEmailVerified: user.isEmailVerified,
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
     };

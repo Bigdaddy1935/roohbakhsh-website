@@ -22,6 +22,8 @@ export interface User {
   preferredLocale: Locale;
   avatarUrl: string | null;
   isActive: boolean;
+  /** آیا ایمیل تأیید شده؟ ورود مسدود نمی‌شود، اما فرانت می‌تواند برای حساب‌های تأیید‌نشده هشدار نشان دهد. */
+  isEmailVerified: boolean;
   createdAt: ISODate;
   updatedAt: ISODate;
 }
@@ -49,6 +51,15 @@ export interface ResetPasswordRequest {
   /** توکن خام ارسال‌شده در لینک ایمیل بازیابی. */
   token: string;
   newPassword: string;
+}
+
+export interface VerifyEmailRequest {
+  /** توکن خام ارسال‌شده در لینک ایمیل تأیید. */
+  token: string;
+}
+
+export interface ResendVerificationRequest {
+  email: string;
 }
 
 /** پاسخ مشترک ثبت‌نام و ورود. */
