@@ -122,7 +122,7 @@ export default function Testimonials() {
   };
 
   /* visible window */
-  const visible = Array.from({ length: VISIBLE }, (_, i) => TESTIMONIALS[(start + i) % total]);
+  const visible = Array.from({ length: VISIBLE }, (_, i) => TESTIMONIALS[(start + i) % total]).filter((item): item is Testimonial => item !== undefined);
 
   return (
     <section className="container relative py-10 sm:py-16 lg:py-20 overflow-hidden">

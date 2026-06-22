@@ -5,15 +5,12 @@ import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { RiTimeLine, RiUserLine, RiArrowLeftSLine, RiLoader4Line } from "react-icons/ri";
 import { useArticles } from "@/hooks/queries/use-articles";
-import { useCategories } from "@/hooks/queries/use-categories";
 
 export default function LatestArticlesRow() {
   const t = useTranslations("Articles");
   const locale = useLocale() as "ar" | "ur";
 
   const { data: articlesData, isLoading } = useArticles({ limit: 4 });
-  const { data: categories } = useCategories();
-
   const latest = [...(articlesData?.items ?? [])]
     .sort((a, b) => new Date(b.publishedAt ?? b.createdAt).getTime() - new Date(a.publishedAt ?? a.createdAt).getTime())
     .slice(0, 4);
@@ -38,7 +35,6 @@ export default function LatestArticlesRow() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {latest.map((article) => {
-            const catLabel = categories?.find((c) => c.id === article.categoryId)?.name[locale] ?? "";
             const thumb = article.thumbnailUrl?.[locale] ?? article.thumbnailUrl?.ar ?? "";
             return (
               <Link
@@ -61,12 +57,7 @@ export default function LatestArticlesRow() {
 
                 {/* Content */}
                 <div className="flex flex-col gap-y-2 py-4 pe-4 flex-1 min-w-0">
-                  {catLabel && (
-                    <span className="text-[10px] font-bold text-[var(--brand)] bg-[var(--brand)]/10 px-2 py-0.5 rounded-lg self-start">
-                      {catLabel}
-                    </span>
-                  )}
-                  <h3 className="font-bold text-[var(--ink)] text-[13px] leading-5 line-clamp-2 group-hover:text-[var(--brand)] transition-colors">
+<h3 className="font-bold text-[var(--ink)] text-[13px] leading-5 line-clamp-2 group-hover:text-[var(--brand)] transition-colors">
                     {article.title[locale]}
                   </h3>
                   <p className="text-[11px] text-gray-400 line-clamp-2 leading-4 flex-1">
