@@ -72,7 +72,7 @@ export default function Testimonials() {
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 transition-all duration-500">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 transition-all duration-500 items-stretch">
           {visibleItems.map((item, i) => {
             const colorClass = AVATAR_COLORS[(item.userId.charCodeAt(0) + i) % AVATAR_COLORS.length]!;
             const initials = item.user.fullName.slice(0, 2);
@@ -80,10 +80,10 @@ export default function Testimonials() {
             return (
               <div
                 key={`${start}-${i}`}
-                className="bg-white rounded-lg border border-gray-100 p-5 flex flex-col gap-y-4"
+                className="bg-white rounded-lg border border-gray-100 p-5 flex flex-col justify-between h-full"
               >
                 {/* Quote + text */}
-                <div>
+                <div className="flex-1">
                   <RiDoubleQuotesL size={28} className="text-[var(--brand)]/15 mb-2" />
                   <p className="text-[var(--ink)] text-sm leading-7 line-clamp-4">
                     {item.comment ?? ""}
@@ -91,7 +91,7 @@ export default function Testimonials() {
                 </div>
 
                 {/* Stars */}
-                <div className="flex items-center gap-x-0.5">
+                <div className="flex items-center gap-x-0.5 mt-4">
                   {[1, 2, 3, 4, 5].map((s) => (
                     <RiStarFill
                       key={s}
@@ -102,7 +102,7 @@ export default function Testimonials() {
                 </div>
 
                 {/* Author */}
-                <div className="flex items-center gap-x-3 pt-3 border-t border-gray-100">
+                <div className="flex items-center gap-x-3 pt-3 mt-1 border-t border-gray-100">
                   {item.user.avatarUrl ? (
                     <Image
                       src={item.user.avatarUrl}
