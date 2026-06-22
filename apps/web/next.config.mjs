@@ -7,11 +7,8 @@ const nextConfig = {
   transpilePackages: ["@roohbakhsh/shared"],
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "roohbakhshac.ir" },
-      { protocol: "https", hostname: "cdn.roohbakhsh.ac" },
-      { protocol: "https", hostname: "dl.poshtybanman.ir" },
-      { protocol: "https", hostname: "s3.eseminar.tv" },
-      { protocol: "https", hostname: "secure.gravatar.com" },
+      { protocol: "https", hostname: "**" },
+      { protocol: "http", hostname: "**" },
     ],
   },
 };
