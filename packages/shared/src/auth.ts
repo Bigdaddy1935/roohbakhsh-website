@@ -41,6 +41,16 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  /** توکن خام ارسال‌شده در لینک ایمیل بازیابی. */
+  token: string;
+  newPassword: string;
+}
+
 /** پاسخ مشترک ثبت‌نام و ورود. */
 export interface AuthResponse {
   user: User;

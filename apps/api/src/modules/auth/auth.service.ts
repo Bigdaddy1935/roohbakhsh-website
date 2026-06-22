@@ -2,6 +2,7 @@ import {
   Injectable,
   ConflictException,
   UnauthorizedException,
+  Logger,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -13,19 +14,27 @@ import type { Response } from "express";
 import type { AuthResponse, User as UserContract } from "@roohbakhsh/shared";
 import { User } from "./entities/user.entity";
 import { RefreshToken } from "./entities/refresh-token.entity";
+import { PasswordResetToken } from "./entities/password-reset-token.entity";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
+import { ForgotPasswordDto } from "./dto/forgot-password.dto";
+import { ResetPasswordDto } from "./dto/reset-password.dto";
 
 const REFRESH_TTL_DAYS = 30;
+const PASSWORD_RESET_TTL_HOURS = 1;
 const COOKIE_ACCESS = "access_token";
 const COOKIE_REFRESH = "refresh_token";
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     @InjectRepository(RefreshToken)
     private readonly refreshRepo: Repository<RefreshToken>,
+    @InjectRepository(PasswordResetToken)
+    private readonly passwordResetRepo: Repository<PasswordResetToken>,
     private readonly jwtService: JwtService,
     private readonly config: ConfigService,
   ) {}
@@ -77,6 +86,49 @@ export class AuthService {
     const hash = this.hashToken(rawToken);
     await this.refreshRepo.delete({ tokenHash: hash });
     this.clearCookies(res);
+  }
+
+  /**
+   * همیشه بدون افشای وجود/عدم‌وجود ایمیل پاسخ می‌دهد (جلوگیری از user enumeration).
+   * هیچ سرویس ارسال ایمیل در پروژه هنوز راه‌اندازی نشده — لینک بازیابی فعلاً فقط لاگ می‌شود.
+   */
+  async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
+    const user = await this.userRepo.findOne({ where: { email: dto.email, isActive: true } });
+    if (!user) return;
+
+    const rawToken = randomBytes(32).toString("hex");
+    const tokenHash = this.hashToken(rawToken);
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + PASSWORD_RESET_TTL_HOURS);
+
+    await this.passwordResetRepo.delete({ userId: user.id });
+    await this.passwordResetRepo.save(
+      this.passwordResetRepo.create({ tokenHash, user, expiresAt }),
+    );
+
+    const frontendUrl = this.config.get<string>("FRONTEND_URL") ?? "http://localhost:3000";
+    this.logger.log(
+      `لینک بازیابی رمز عبور برای ${user.email}: ${frontendUrl}/reset-password?token=${rawToken}`,
+    );
+  }
+
+  async resetPassword(dto: ResetPasswordDto): Promise<void> {
+    const hash = this.hashToken(dto.token);
+    const stored = await this.passwordResetRepo.findOne({
+      where: { tokenHash: hash },
+      relations: { user: true },
+    });
+
+    if (!stored || stored.expiresAt < new Date()) {
+      throw new UnauthorizedException("INVALID_RESET_TOKEN");
+    }
+
+    stored.user.passwordHash = await bcrypt.hash(dto.newPassword, 12);
+    await this.userRepo.save(stored.user);
+
+    await this.passwordResetRepo.delete({ userId: stored.userId });
+    // امنیتی: همه‌ی نشست‌های فعال این کاربر باطل می‌شوند چون رمز عوض شده.
+    await this.refreshRepo.delete({ userId: stored.userId });
   }
 
   // ── helpers ──────────────────────────────────────────────────────────────

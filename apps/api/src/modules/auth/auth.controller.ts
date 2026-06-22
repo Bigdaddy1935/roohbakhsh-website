@@ -24,6 +24,8 @@ import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
 import { RefreshDto } from "./dto/refresh.dto";
+import { ForgotPasswordDto } from "./dto/forgot-password.dto";
+import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { Public } from "./decorators/public.decorator";
 import { User } from "./entities/user.entity";
@@ -120,6 +122,43 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     return this.authService.logout(dto.refreshToken, res);
+  }
+
+  // ── Forgot password ─────────────────────────────────────────────────────
+
+  @Public()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post("forgot-password")
+  @ApiOperation({
+    summary: "درخواست بازیابی رمز عبور",
+    description:
+      "اگر ایمیل در سیستم وجود داشته باشد، لینک بازیابی (حاوی توکن یک‌بارمصرف با اعتبار ۱ ساعت) ارسال می‌شود. " +
+      "برای جلوگیری از افشای وجود/عدم‌وجود ایمیل، همیشه پاسخ یکسان (204) برمی‌گردد — حتی اگر ایمیل ثبت‌نام نشده باشد.",
+  })
+  @ApiHeader(LANG_HEADER)
+  @ApiResponse({ status: 204, description: "درخواست ثبت شد — بدنه‌ای برنمی‌گردد" })
+  @ApiResponse({ status: 400, description: "خطای اعتبارسنجی — کد: VALIDATION_ERROR", type: ApiErrorSchema })
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto);
+  }
+
+  // ── Reset password ───────────────────────────────────────────────────────
+
+  @Public()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post("reset-password")
+  @ApiOperation({
+    summary: "تنظیم رمز عبور جدید با توکن بازیابی",
+    description:
+      "با توکن خامِ ارسال‌شده در لینک ایمیل، رمز عبور جدید را ثبت می‌کند. " +
+      "پس از موفقیت، تمام نشست‌های فعال (refresh tokenها) این کاربر باطل می‌شوند.",
+  })
+  @ApiHeader(LANG_HEADER)
+  @ApiResponse({ status: 204, description: "رمز عبور تغییر یافت — بدنه‌ای برنمی‌گردد" })
+  @ApiResponse({ status: 401, description: "توکن نامعتبر یا منقضی — کد: INVALID_RESET_TOKEN", type: ApiErrorSchema })
+  @ApiResponse({ status: 400, description: "خطای اعتبارسنجی — کد: VALIDATION_ERROR", type: ApiErrorSchema })
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
   }
 
   // ── Me ───────────────────────────────────────────────────────────────────
