@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import type { RecentViewItem } from "@roohbakhsh/shared";
+import type { RecentViewItem, Paginated } from "@roohbakhsh/shared";
 import { RecentView } from "./entities/recent-view.entity";
 import { Course } from "../courses/entities/course.entity";
 import { Lesson } from "../courses/entities/lesson.entity";
 import { RecordViewDto } from "./dto/record-view.dto";
+import { toPaginated } from "../../common/utils/paginate";
 
 @Injectable()
 export class RecentlyViewedService {
@@ -38,13 +39,29 @@ export class RecentlyViewedService {
     await this.repo.save(this.repo.create({ userId, type: dto.type, targetId: dto.id }));
   }
 
-  /** آخرین N بازدید کاربر — برای داشبورد و صفحه‌ی «بازدیدهای اخیر». */
+  /** آخرین N بازدید کاربر — برای داشبورد (بدون صفحه‌بندی). */
   async findRecent(userId: string, limit: number): Promise<RecentViewItem[]> {
     const views = await this.repo.find({
       where: { userId },
       order: { viewedAt: "DESC" },
       take: limit,
     });
+    return this.toItems(views);
+  }
+
+  /** لیست صفحه‌بندی‌شده‌ی بازدیدها — برای صفحه‌ی کامل «بازدیدهای اخیر». */
+  async findRecentPaginated(userId: string, page: number, limit: number): Promise<Paginated<RecentViewItem>> {
+    const [views, total] = await this.repo.findAndCount({
+      where: { userId },
+      order: { viewedAt: "DESC" },
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+    const items = await this.toItems(views);
+    return toPaginated(items, total, page, limit);
+  }
+
+  private async toItems(views: RecentView[]): Promise<RecentViewItem[]> {
     if (views.length === 0) return [];
 
     const courseIds = views.filter((v) => v.type === "course").map((v) => v.targetId);

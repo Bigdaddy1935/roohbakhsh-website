@@ -750,7 +750,11 @@ interface RecordViewRequest {
 خطا: `404 COURSE_NOT_FOUND` / `404 LESSON_NOT_FOUND`
 
 ### `GET /recently-viewed?limit=10` 🔒
-خروجی: `RecentViewItem[]` — جدیدترین اول.
+خروجی: `RecentViewItem[]` — جدیدترین اول. بدون صفحه‌بندی، برای داشبورد.
+
+### `GET /recently-viewed/paginated?page=1&limit=12` 🔒
+همان لیست، اما صفحه‌بندی‌شده — برای صفحه‌ی کامل «بازدیدهای اخیر».
+خروجی: `Paginated<RecentViewItem>`
 
 ---
 

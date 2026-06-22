@@ -2,6 +2,7 @@ import { Controller, Post, Get, Body, Query, Request, HttpCode, HttpStatus } fro
 import { ApiTags, ApiOperation, ApiResponse, ApiHeader, ApiBearerAuth, ApiCookieAuth, ApiQuery } from "@nestjs/swagger";
 import { RecentlyViewedService } from "./recently-viewed.service";
 import { RecordViewDto } from "./dto/record-view.dto";
+import { PaginationDto } from "../../common/dto/pagination.dto";
 import { ApiErrorSchema } from "../../common/swagger/api-error.schema";
 import { LANG_HEADER } from "../../common/swagger/lang-header";
 
@@ -32,5 +33,16 @@ export class RecentlyViewedController {
   @ApiResponse({ status: 200, description: "RecentViewItem[]" })
   findRecent(@Query("limit") limit: string | undefined, @Request() req: { user: { id: string } }) {
     return this.svc.findRecent(req.user.id, limit ? Number(limit) : 10);
+  }
+
+  @Get("paginated")
+  @ApiHeader(LANG_HEADER)
+  @ApiOperation({
+    summary: "آخرین بازدیدها (صفحه‌بندی‌شده)",
+    description: "همان لیست بازدیدها، اما صفحه‌بندی‌شده — برای صفحه‌ی کامل «بازدیدهای اخیر».",
+  })
+  @ApiResponse({ status: 200, description: "Paginated<RecentViewItem>" })
+  findRecentPaginated(@Query() query: PaginationDto, @Request() req: { user: { id: string } }) {
+    return this.svc.findRecentPaginated(req.user.id, query.page ?? 1, query.limit ?? 12);
   }
 }
