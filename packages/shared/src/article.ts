@@ -12,6 +12,7 @@ export interface ArticleRecord {
   thumbnailUrl: Localized<string | null>;
   instructorId: string;
   instructor: InstructorSummary;
+  categoryId: string | null;
   status: ArticleStatus;
   publishedAt: ISODate | null;
   createdAt: ISODate;

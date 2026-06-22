@@ -72,7 +72,7 @@ export class SeedService implements OnApplicationBootstrap {
     const students = await this.seedStudents();
     await this.seedCoupons();
     const courseIds = await this.seedCourses(instructor.id, categories.map((c) => c.id));
-    await this.seedArticles(instructor.id);
+    await this.seedArticles(instructor.id, categories.map((c) => c.id));
     await this.seedReviews(courseIds, students.map((s) => s.id));
 
     this.logger.log("seed داده‌های نمونه تمام شد.");
@@ -523,11 +523,12 @@ export class SeedService implements OnApplicationBootstrap {
     ];
   }
 
-  private async seedArticles(instructorId: string): Promise<void> {
+  private async seedArticles(instructorId: string, categoryIds: string[]): Promise<void> {
     for (const def of this.articleDefs()) {
       const existing = await this.articleRepo.findOne({ where: { slug: def.slug } });
       if (existing) continue;
 
+      const randomCategoryId = categoryIds[Math.floor(Math.random() * categoryIds.length)]!;
       await this.articleRepo.save(
         this.articleRepo.create({
           title: def.title,
@@ -539,6 +540,7 @@ export class SeedService implements OnApplicationBootstrap {
             ? { ar: randomThumbnail(), ur: randomThumbnail() }
             : null,
           instructorId,
+          categoryId: randomCategoryId,
           status: def.status,
           publishedAt: def.status === "published" ? new Date() : null,
         }),

@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import type { Localized, ArticleStatus } from "@roohbakhsh/shared";
 import { Instructor } from "../../instructor/entities/instructor.entity";
+import { Category } from "../../category/entities/category.entity";
 
 @Entity("articles")
 export class Article {
@@ -39,6 +40,13 @@ export class Article {
 
   @Column({ name: "instructor_id", type: "varchar" })
   instructorId!: string;
+
+  @ManyToOne(() => Category, { onDelete: "SET NULL", eager: false, nullable: true })
+  @JoinColumn({ name: "category_id" })
+  category!: Category | null;
+
+  @Column({ name: "category_id", type: "varchar", nullable: true, default: null })
+  categoryId!: string | null;
 
   @Column({
     type: "enum",

@@ -587,6 +587,7 @@ interface ArticleRecord {
   thumbnailUrl: Localized<string | null>;
   instructorId: string;        // UUID استاد نویسنده — از همان جدول instructors که دوره‌ها استفاده می‌کنند
   instructor: InstructorSummary;
+  categoryId: string | null;   // UUID دسته‌بندی — اختیاری، از همان جدول categories که دوره‌ها استفاده می‌کنند
   status: "draft" | "published";
   publishedAt: ISODate | null;  // null اگر هنوز draft باشد
   createdAt: ISODate;
@@ -597,6 +598,7 @@ interface ArticleRecord {
 ### نکات
 
 - `instructorId` باید UUID یک استاد موجود در `/instructors` باشد؛ وگرنه `404 INSTRUCTOR_NOT_FOUND`
+- `categoryId` اختیاری است؛ اگر ارسال شود باید UUID یک دسته موجود در `/categories` باشد، وگرنه `404 CATEGORY_NOT_FOUND`
 - `GET /articles/:slug` فقط مقالات `published` را برمی‌گرداند؛ draft → 404
 - در `POST /articles` اگر `status: "published"` باشد، `publishedAt` همان لحظه ست می‌شود
 - `PATCH /articles/:id` می‌تواند slug را تغییر دهد؛ اگر slug تکراری باشد → 409 `SLUG_ALREADY_EXISTS`

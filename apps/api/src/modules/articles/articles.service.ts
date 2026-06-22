@@ -9,6 +9,7 @@ import type { ArticleRecord, Paginated } from "@roohbakhsh/shared";
 import { toPaginated } from "../../common/utils/paginate";
 import { Article } from "./entities/article.entity";
 import { Instructor } from "../instructor/entities/instructor.entity";
+import { Category } from "../category/entities/category.entity";
 import { CreateArticleDto } from "./dto/create-article.dto";
 import { UpdateArticleDto } from "./dto/update-article.dto";
 
@@ -19,6 +20,8 @@ export class ArticlesService {
     private readonly repo: Repository<Article>,
     @InjectRepository(Instructor)
     private readonly instructorRepo: Repository<Instructor>,
+    @InjectRepository(Category)
+    private readonly categoryRepo: Repository<Category>,
   ) {}
 
   async create(dto: CreateArticleDto): Promise<ArticleRecord> {
@@ -27,6 +30,11 @@ export class ArticlesService {
 
     const instructor = await this.instructorRepo.findOne({ where: { id: dto.instructorId } });
     if (!instructor) throw new NotFoundException("INSTRUCTOR_NOT_FOUND");
+
+    if (dto.categoryId) {
+      const cat = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
+      if (!cat) throw new NotFoundException("CATEGORY_NOT_FOUND");
+    }
 
     const article = this.repo.create({
       title: dto.title,
@@ -37,6 +45,7 @@ export class ArticlesService {
       thumbnailUrl: dto.thumbnailUrl ?? null,
       instructorId: dto.instructorId,
       instructor,
+      categoryId: dto.categoryId ?? null,
       status: dto.status ?? "draft",
       publishedAt: dto.status === "published" ? new Date() : null,
     });
@@ -98,6 +107,14 @@ export class ArticlesService {
       article.instructorId = dto.instructorId;
     }
 
+    if (dto.categoryId !== undefined) {
+      if (dto.categoryId) {
+        const cat = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
+        if (!cat) throw new NotFoundException("CATEGORY_NOT_FOUND");
+      }
+      article.categoryId = dto.categoryId ?? null;
+    }
+
     if (dto.title) article.title = dto.title;
     if (dto.summary) article.summary = dto.summary;
     if (dto.body) {
@@ -137,6 +154,7 @@ export class ArticlesService {
         name: a.instructor.name,
         avatarUrl: a.instructor.avatarUrl,
       },
+      categoryId: a.categoryId,
       status: a.status,
       publishedAt: a.publishedAt ? a.publishedAt.toISOString() : null,
       createdAt: a.createdAt.toISOString(),
