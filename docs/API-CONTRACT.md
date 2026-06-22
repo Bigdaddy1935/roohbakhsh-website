@@ -669,7 +669,7 @@ interface ArticleRecord {
 
 | Method | Path | Auth | توضیح |
 |--------|------|------|-------|
-| `GET` | `/courses/:courseSlug/reviews` | Public | لیست نظرات دوره (صفحه‌بندی) |
+| `GET` | `/courses/:courseSlug/reviews` | Public (auth اختیاری) | لیست نظرات تأییدشده‌ی دوره (صفحه‌بندی)؛ اگر کاربر لاگین باشد، نظرات تأییدنشده‌ی خودش هم در نتیجه می‌آید |
 | `POST` | `/courses/:courseSlug/reviews` | کاربر لاگین‌شده | ثبت نظر — هیچ محدودیتی در تعداد نیست، کاربر می‌تواند چندبار نظر بدهد |
 | `PATCH` | `/courses/:courseSlug/reviews/:reviewId` | صاحب نظر | ویرایش نظر خودم |
 | `DELETE` | `/courses/:courseSlug/reviews/:reviewId` | صاحب نظر یا admin | حذف نظر |
@@ -728,7 +728,7 @@ interface ReviewWithTarget extends ReviewRecord {
 - `CourseRecord` و `ArticleRecord` هر دو دو فیلد `averageRating: number | null` و `reviewCount: number` دارند که مستقیماً از جدول `reviews` محاسبه می‌شوند (denormalize نشده، مثل `lessonCount`/`durationMinutes`) — **فقط نظرات تأیید‌شده در این محاسبه و در لیست‌های عمومی در نظر گرفته می‌شوند.**
 - `averageRating` تا یک رقم اعشار رند می‌شود؛ اگر هیچ نظری نباشد `null` است
 - نظرات دوره و مقاله مستقل از هم هستند — یک رکورد `Review` یا `courseId` دارد یا `articleId`، هرگز هر دو
-- هر نظر تازه‌ثبت‌شده با `isApproved: false` ساخته می‌شود و در هیچ لیست عمومی (`GET /courses/:slug/reviews`, `GET /articles/:slug/reviews`, `GET /reviews`) نمایش داده نمی‌شود تا admin آن را با `POST /reviews/:id/approve` تأیید کند
+- هر نظر تازه‌ثبت‌شده با `isApproved: false` ساخته می‌شود و در هیچ لیست عمومی (`GET /courses/:slug/reviews`, `GET /articles/:slug/reviews`, `GET /reviews`) نمایش داده نمی‌شود تا admin آن را با `POST /reviews/:id/approve` تأیید کند — به‌جز اینکه در `GET /courses/:slug/reviews`، اگر کاربر صاحب آن نظر لاگین باشد، نظر تأییدنشده‌ی خودش را هم در همان لیست (با `isApproved: false`) می‌بیند
 
 ---
 
