@@ -606,7 +606,7 @@ interface ArticleRecord {
 
 ---
 
-## §12 — Reviews (نظر و امتیاز دوره)
+## §12 — Reviews (نظر و امتیاز دوره و مقاله)
 
 ### روت‌ها
 
@@ -616,13 +616,18 @@ interface ArticleRecord {
 | `POST` | `/courses/:courseSlug/reviews` | کاربر لاگین‌شده | ثبت نظر — هر کاربر فقط یک‌بار در هر دوره |
 | `PATCH` | `/courses/:courseSlug/reviews/:reviewId` | صاحب نظر | ویرایش نظر خودم |
 | `DELETE` | `/courses/:courseSlug/reviews/:reviewId` | صاحب نظر یا admin | حذف نظر |
+| `GET` | `/articles/:articleSlug/reviews` | Public | لیست نظرات مقاله (صفحه‌بندی) |
+| `POST` | `/articles/:articleSlug/reviews` | کاربر لاگین‌شده | ثبت نظر — هر کاربر فقط یک‌بار در هر مقاله |
+| `PATCH` | `/articles/:articleSlug/reviews/:reviewId` | صاحب نظر | ویرایش نظر خودم |
+| `DELETE` | `/articles/:articleSlug/reviews/:reviewId` | صاحب نظر یا admin | حذف نظر |
 
 ### شیء ReviewRecord
 
 ```ts
 interface ReviewRecord {
   id: string;
-  courseId: string;
+  courseId: string | null;   // دقیقاً یکی از courseId/articleId مقدار دارد
+  articleId: string | null;
   userId: string;
   user: { id: string; fullName: string; avatarUrl: string | null };
   rating: number;          // ۱ تا ۵
@@ -634,9 +639,10 @@ interface ReviewRecord {
 
 ### نکات
 
-- یک کاربر فقط یک نظر روی هر دوره می‌تواند ثبت کند؛ تلاش دوم → `409 REVIEW_ALREADY_EXISTS` (باید PATCH بزند)
-- `CourseRecord` حالا دو فیلد `averageRating: number | null` و `reviewCount: number` دارد که مستقیماً از جدول `reviews` محاسبه می‌شوند (denormalize نشده، مثل `lessonCount`/`durationMinutes`)
-- `averageRating` تا یک رقم اعشار رند می‌شود؛ اگر دوره هیچ نظری نداشته باشد `null` است
+- یک کاربر فقط یک نظر روی هر دوره/مقاله می‌تواند ثبت کند؛ تلاش دوم → `409 REVIEW_ALREADY_EXISTS` (باید PATCH بزند)
+- `CourseRecord` و `ArticleRecord` هر دو دو فیلد `averageRating: number | null` و `reviewCount: number` دارند که مستقیماً از جدول `reviews` محاسبه می‌شوند (denormalize نشده، مثل `lessonCount`/`durationMinutes`)
+- `averageRating` تا یک رقم اعشار رند می‌شود؛ اگر هیچ نظری نباشد `null` است
+- نظرات دوره و مقاله مستقل از هم هستند — یک رکورد `Review` یا `courseId` دارد یا `articleId`، هرگز هر دو
 
 ---
 

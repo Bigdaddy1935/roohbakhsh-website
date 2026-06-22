@@ -13,6 +13,10 @@ export interface ArticleRecord {
   instructorId: string;
   instructor: InstructorSummary;
   categoryId: string | null;
+  /** میانگین امتیاز نظرات (۱ تا ۵) — null یعنی هنوز نظری ثبت نشده. */
+  averageRating: number | null;
+  /** تعداد کل نظرات ثبت‌شده روی این مقاله. */
+  reviewCount: number;
   status: ArticleStatus;
   publishedAt: ISODate | null;
   createdAt: ISODate;

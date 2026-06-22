@@ -8,7 +8,9 @@ export interface ReviewUser {
 
 export interface ReviewRecord {
   id: ID;
-  courseId: ID;
+  /** دقیقاً یکی از courseId/articleId مقدار دارد. */
+  courseId: ID | null;
+  articleId: ID | null;
   userId: ID;
   user: ReviewUser;
   rating: number; // 1 تا 5

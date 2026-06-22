@@ -72,8 +72,9 @@ export class SeedService implements OnApplicationBootstrap {
     const students = await this.seedStudents();
     await this.seedCoupons();
     const courseIds = await this.seedCourses(instructor.id, categories.map((c) => c.id));
-    await this.seedArticles(instructor.id, categories.map((c) => c.id));
+    const articleIds = await this.seedArticles(instructor.id, categories.map((c) => c.id));
     await this.seedReviews(courseIds, students.map((s) => s.id));
+    await this.seedArticleReviews(articleIds, students.map((s) => s.id));
 
     this.logger.log("seed داده‌های نمونه تمام شد.");
   }
@@ -523,13 +524,18 @@ export class SeedService implements OnApplicationBootstrap {
     ];
   }
 
-  private async seedArticles(instructorId: string, categoryIds: string[]): Promise<void> {
+  private async seedArticles(instructorId: string, categoryIds: string[]): Promise<string[]> {
+    const articleIds: string[] = [];
+
     for (const def of this.articleDefs()) {
       const existing = await this.articleRepo.findOne({ where: { slug: def.slug } });
-      if (existing) continue;
+      if (existing) {
+        articleIds.push(existing.id);
+        continue;
+      }
 
       const randomCategoryId = categoryIds[Math.floor(Math.random() * categoryIds.length)]!;
-      await this.articleRepo.save(
+      const saved = await this.articleRepo.save(
         this.articleRepo.create({
           title: def.title,
           slug: def.slug,
@@ -545,8 +551,11 @@ export class SeedService implements OnApplicationBootstrap {
           publishedAt: def.status === "published" ? new Date() : null,
         }),
       );
+      articleIds.push(saved.id);
       this.logger.log(`✓ مقاله نمونه ساخته شد: ${def.slug} (${def.status})`);
     }
+
+    return articleIds;
   }
 
   private async seedReviews(courseIds: string[], studentIds: string[]): Promise<void> {
@@ -575,5 +584,33 @@ export class SeedService implements OnApplicationBootstrap {
       }
     }
     this.logger.log(`✓ نظرات نمونه ساخته شدند (${courseIds.length} دوره × ${studentIds.length} کاربر)`);
+  }
+
+  private async seedArticleReviews(articleIds: string[], studentIds: string[]): Promise<void> {
+    const sampleReviews = [
+      { rating: 5, comment: "مقالة رائعة ومفيدة جداً." },
+      { rating: 4, comment: "محتوى جيد لكن أتمنى تفاصيل أكثر." },
+      { rating: 5, comment: null },
+      { rating: 3, comment: "مقالة مفيدة لكن مختصرة قليلاً." },
+    ];
+
+    for (const articleId of articleIds) {
+      for (let i = 0; i < studentIds.length; i++) {
+        const studentId = studentIds[i]!;
+        const existing = await this.reviewRepo.findOne({ where: { articleId, userId: studentId } });
+        if (existing) continue;
+
+        const sample = sampleReviews[(articleIds.indexOf(articleId) + i) % sampleReviews.length]!;
+        await this.reviewRepo.save(
+          this.reviewRepo.create({
+            articleId,
+            userId: studentId,
+            rating: sample.rating,
+            comment: sample.comment,
+          }),
+        );
+      }
+    }
+    this.logger.log(`✓ نظرات نمونه مقالات ساخته شدند (${articleIds.length} مقاله × ${studentIds.length} کاربر)`);
   }
 }

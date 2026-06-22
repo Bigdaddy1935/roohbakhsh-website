@@ -5,13 +5,16 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import type { ArticleRecord, Paginated } from "@roohbakhsh/shared";
+import type { ArticleRecord, Paginated, CourseRatingSummary } from "@roohbakhsh/shared";
 import { toPaginated } from "../../common/utils/paginate";
 import { Article } from "./entities/article.entity";
 import { Instructor } from "../instructor/entities/instructor.entity";
 import { Category } from "../category/entities/category.entity";
+import { ReviewsService } from "../reviews/reviews.service";
 import { CreateArticleDto } from "./dto/create-article.dto";
 import { UpdateArticleDto } from "./dto/update-article.dto";
+
+const EMPTY_RATING: CourseRatingSummary = { averageRating: null, reviewCount: 0 };
 
 @Injectable()
 export class ArticlesService {
@@ -22,6 +25,7 @@ export class ArticlesService {
     private readonly instructorRepo: Repository<Instructor>,
     @InjectRepository(Category)
     private readonly categoryRepo: Repository<Category>,
+    private readonly reviewsService: ReviewsService,
   ) {}
 
   async create(dto: CreateArticleDto): Promise<ArticleRecord> {
@@ -51,7 +55,7 @@ export class ArticlesService {
     });
 
     const saved = await this.repo.save(article);
-    return this.toContract(saved);
+    return this.toContract(saved, EMPTY_RATING);
   }
 
   async findAll(page: number, limit: number): Promise<Paginated<ArticleRecord>> {
@@ -62,7 +66,13 @@ export class ArticlesService {
       take: limit,
       skip: (page - 1) * limit,
     });
-    return toPaginated(items.map((a) => this.toContract(a)), total, page, limit);
+    const ratings = await this.reviewsService.articleRatingSummaries(items.map((a) => a.id));
+    return toPaginated(
+      items.map((a) => this.toContract(a, ratings.get(a.id) ?? EMPTY_RATING)),
+      total,
+      page,
+      limit,
+    );
   }
 
   async findAllAdmin(page: number, limit: number): Promise<Paginated<ArticleRecord>> {
@@ -72,7 +82,13 @@ export class ArticlesService {
       take: limit,
       skip: (page - 1) * limit,
     });
-    return toPaginated(items.map((a) => this.toContract(a)), total, page, limit);
+    const ratings = await this.reviewsService.articleRatingSummaries(items.map((a) => a.id));
+    return toPaginated(
+      items.map((a) => this.toContract(a, ratings.get(a.id) ?? EMPTY_RATING)),
+      total,
+      page,
+      limit,
+    );
   }
 
   async findBySlug(slug: string): Promise<ArticleRecord> {
@@ -81,13 +97,15 @@ export class ArticlesService {
       relations: { instructor: true },
     });
     if (!article) throw new NotFoundException("ARTICLE_NOT_FOUND");
-    return this.toContract(article);
+    const rating = await this.reviewsService.articleRatingSummary(article.id);
+    return this.toContract(article, rating);
   }
 
   async findOne(id: string): Promise<ArticleRecord> {
     const article = await this.repo.findOne({ where: { id }, relations: { instructor: true } });
     if (!article) throw new NotFoundException("ARTICLE_NOT_FOUND");
-    return this.toContract(article);
+    const rating = await this.reviewsService.articleRatingSummary(article.id);
+    return this.toContract(article, rating);
   }
 
   async update(id: string, dto: UpdateArticleDto): Promise<ArticleRecord> {
@@ -130,7 +148,8 @@ export class ArticlesService {
     }
 
     const saved = await this.repo.save(article);
-    return this.toContract(saved);
+    const rating = await this.reviewsService.articleRatingSummary(saved.id);
+    return this.toContract(saved, rating);
   }
 
   async remove(id: string): Promise<void> {
@@ -139,7 +158,7 @@ export class ArticlesService {
     await this.repo.remove(article);
   }
 
-  private toContract(a: Article): ArticleRecord {
+  private toContract(a: Article, rating: CourseRatingSummary): ArticleRecord {
     return {
       id: a.id,
       title: a.title,
@@ -155,6 +174,8 @@ export class ArticlesService {
         avatarUrl: a.instructor.avatarUrl,
       },
       categoryId: a.categoryId,
+      averageRating: rating.averageRating,
+      reviewCount: rating.reviewCount,
       status: a.status,
       publishedAt: a.publishedAt ? a.publishedAt.toISOString() : null,
       createdAt: a.createdAt.toISOString(),
