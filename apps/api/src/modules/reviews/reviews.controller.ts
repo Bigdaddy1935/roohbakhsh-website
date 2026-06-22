@@ -29,6 +29,7 @@ import { CreateReviewDto } from "./dto/create-review.dto";
 import { UpdateReviewDto } from "./dto/update-review.dto";
 import { ReplyReviewDto } from "./dto/reply-review.dto";
 import { Public } from "../auth/decorators/public.decorator";
+import { OptionalJwtAuthGuard } from "../auth/guards/optional-jwt-auth.guard";
 import { RolesGuard, Roles } from "../../common/guards/roles.guard";
 import { ApiErrorSchema } from "../../common/swagger/api-error.schema";
 import { LANG_HEADER } from "../../common/swagger/lang-header";
@@ -41,10 +42,12 @@ export class ReviewsController {
   constructor(private readonly svc: ReviewsService) {}
 
   @Public()
+  @UseGuards(OptionalJwtAuthGuard)
   @Get()
   @ApiOperation({
     summary: "نظرات یک دوره",
-    description: "لیست صفحه‌بندی‌شده‌ی نظرات و امتیازهای ثبت‌شده روی دوره — نیازی به احراز هویت نیست.",
+    description:
+      "لیست صفحه‌بندی‌شده‌ی نظرات تأییدشده روی دوره — نیازی به احراز هویت نیست. اگر کاربر لاگین باشد، نظرات تأییدنشده‌ی خودش هم در نتیجه می‌آید.",
   })
   @ApiHeader(LANG_HEADER)
   @ApiParam({ name: "courseSlug", description: "slug دوره", example: "intro-to-fiqh-course" })
@@ -56,8 +59,9 @@ export class ReviewsController {
     @Param("courseSlug") courseSlug: string,
     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query("limit", new DefaultValuePipe(12), ParseIntPipe) limit: number,
+    @Request() req: { user: { id: string } | null },
   ) {
-    return this.svc.findByCourse(courseSlug, page, limit);
+    return this.svc.findByCourse(courseSlug, page, limit, req.user?.id);
   }
 
   @Post()

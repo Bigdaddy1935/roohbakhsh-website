@@ -36,9 +36,9 @@ export class ReviewsService {
     return this.toContract(await this.withUser(saved.id));
   }
 
-  async findByCourse(courseSlug: string, page: number, limit: number): Promise<Paginated<ReviewRecord>> {
+  async findByCourse(courseSlug: string, page: number, limit: number, currentUserId?: string): Promise<Paginated<ReviewRecord>> {
     const course = await this.courseBySlug(courseSlug);
-    return this.findPaginated({ courseId: course.id }, page, limit);
+    return this.findPaginated({ courseId: course.id }, page, limit, currentUserId);
   }
 
   async updateCourseReview(courseSlug: string, reviewId: string, userId: string, dto: UpdateReviewDto): Promise<ReviewRecord> {
@@ -83,9 +83,9 @@ export class ReviewsService {
     return this.toContract(await this.withUser(saved.id));
   }
 
-  async findByArticle(articleSlug: string, page: number, limit: number): Promise<Paginated<ReviewRecord>> {
+  async findByArticle(articleSlug: string, page: number, limit: number, currentUserId?: string): Promise<Paginated<ReviewRecord>> {
     const article = await this.articleBySlug(articleSlug);
-    return this.findPaginated({ articleId: article.id }, page, limit);
+    return this.findPaginated({ articleId: article.id }, page, limit, currentUserId);
   }
 
   async updateArticleReview(articleSlug: string, reviewId: string, userId: string, dto: UpdateReviewDto): Promise<ReviewRecord> {
@@ -145,18 +145,36 @@ export class ReviewsService {
 
   // ── منطق مشترک ────────────────────────────────────────────────────────────
 
+  /** نظرات تأییدشده‌ی یک دوره/مقاله — به‌همراه نظرات تأییدنشده‌ی خود کاربر فعلی (اگر لاگین باشد). */
   private async findPaginated(
     where: { courseId: string } | { articleId: string },
     page: number,
     limit: number,
+    currentUserId?: string,
   ): Promise<Paginated<ReviewRecord>> {
-    const [items, total] = await this.repo.findAndCount({
-      where: { ...where, isApproved: true },
-      relations: { user: true },
-      order: { createdAt: "DESC" },
-      take: limit,
-      skip: (page - 1) * limit,
-    });
+    const targetColumn = "courseId" in where ? "review.courseId" : "review.articleId";
+    const targetId = "courseId" in where ? where.courseId : where.articleId;
+
+    const qb = this.repo
+      .createQueryBuilder("review")
+      .leftJoinAndSelect("review.user", "user")
+      .where(`${targetColumn} = :targetId`, { targetId });
+
+    if (currentUserId) {
+      qb.andWhere("(review.isApproved = :isApproved OR review.userId = :currentUserId)", {
+        isApproved: true,
+        currentUserId,
+      });
+    } else {
+      qb.andWhere("review.isApproved = :isApproved", { isApproved: true });
+    }
+
+    const [items, total] = await qb
+      .orderBy("review.createdAt", "DESC")
+      .take(limit)
+      .skip((page - 1) * limit)
+      .getManyAndCount();
+
     return toPaginated(items.map((r) => this.toContract(r)), total, page, limit);
   }
 
