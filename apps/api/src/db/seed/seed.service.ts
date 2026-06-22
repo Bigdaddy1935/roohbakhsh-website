@@ -12,6 +12,8 @@ import { Section } from "../../modules/courses/entities/section.entity";
 import { Lesson } from "../../modules/courses/entities/lesson.entity";
 import { Article } from "../../modules/articles/entities/article.entity";
 import { Review } from "../../modules/reviews/entities/review.entity";
+import { Ticket } from "../../modules/tickets/entities/ticket.entity";
+import { TicketMessage } from "../../modules/tickets/entities/ticket-message.entity";
 
 const SAMPLE_THUMBNAILS = [
   "https://storage.sabzlearn.ir/legacy-statics/2025/07/21-1.webp",
@@ -61,6 +63,8 @@ export class SeedService implements OnApplicationBootstrap {
     @InjectRepository(Lesson) private readonly lessonRepo: Repository<Lesson>,
     @InjectRepository(Article) private readonly articleRepo: Repository<Article>,
     @InjectRepository(Review) private readonly reviewRepo: Repository<Review>,
+    @InjectRepository(Ticket) private readonly ticketRepo: Repository<Ticket>,
+    @InjectRepository(TicketMessage) private readonly ticketMessageRepo: Repository<TicketMessage>,
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
@@ -75,6 +79,7 @@ export class SeedService implements OnApplicationBootstrap {
     const articleIds = await this.seedArticles(instructor.id, categories.map((c) => c.id));
     await this.seedReviews(courseIds, students.map((s) => s.id));
     await this.seedArticleReviews(articleIds, students.map((s) => s.id));
+    await this.seedTickets(students.map((s) => s.id));
 
     this.logger.log("seed داده‌های نمونه تمام شد.");
   }
@@ -627,5 +632,58 @@ export class SeedService implements OnApplicationBootstrap {
       }
     }
     this.logger.log(`✓ نظرات نمونه مقالات ساخته شدند (${articleIds.length} مقاله × ${studentIds.length} کاربر)`);
+  }
+
+  private async seedTickets(studentIds: string[]): Promise<void> {
+    const defs: { subject: string; status: "open" | "answered" | "closed"; messages: { body: string; authorType: "user" | "support" }[] }[] = [
+      {
+        subject: "مشکل در پرداخت",
+        status: "closed",
+        messages: [
+          { body: "هنگام پرداخت با خطای ۵۰۰ مواجه شدم.", authorType: "user" },
+          { body: "بررسی شد و مشکل برطرف گردید. لطفاً دوباره تلاش کنید.", authorType: "support" },
+        ],
+      },
+      {
+        subject: "دورة تجويد",
+        status: "closed",
+        messages: [
+          { body: "هل يمكنني الوصول إلى الدورة بعد انتهاء الاشتراك؟", authorType: "user" },
+          { body: "نعم، الوصول يبقى متاحاً مدى الحياة بعد الشراء.", authorType: "support" },
+        ],
+      },
+      {
+        subject: "واجهة الموقع",
+        status: "answered",
+        messages: [
+          { body: "هناك تداخل في عرض الأزرار على الجوال.", authorType: "user" },
+          { body: "تم تحويل الملاحظة لفريق التطوير، شكراً لك.", authorType: "support" },
+        ],
+      },
+      {
+        subject: "سؤال حول الشهادة",
+        status: "open",
+        messages: [
+          { body: "هل تُصرف شهادة معتمدة بعد إكمال الدورة؟", authorType: "user" },
+        ],
+      },
+    ];
+
+    for (const studentId of studentIds) {
+      for (const def of defs) {
+        const existing = await this.ticketRepo.findOne({ where: { userId: studentId, subject: def.subject } });
+        if (existing) continue;
+
+        const ticket = await this.ticketRepo.save(
+          this.ticketRepo.create({ userId: studentId, subject: def.subject, status: def.status }),
+        );
+        await this.ticketMessageRepo.save(
+          def.messages.map((m) =>
+            this.ticketMessageRepo.create({ ticketId: ticket.id, body: m.body, authorType: m.authorType }),
+          ),
+        );
+      }
+    }
+    this.logger.log(`✓ تیکت‌های نمونه ساخته شدند (${defs.length} موضوع × ${studentIds.length} کاربر)`);
   }
 }

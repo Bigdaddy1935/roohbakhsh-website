@@ -668,6 +668,59 @@ interface ReviewWithTarget extends ReviewRecord {
 
 ---
 
+## §13 — Tickets (تیکتینگ)
+
+### روت‌ها
+
+| Method | Path | Auth | توضیح |
+|--------|------|------|-------|
+| `POST` | `/tickets` | کاربر یا مهمان | ثبت تیکت جدید — مهمان باید `guestEmail` بفرستد |
+| `GET` | `/tickets/mine` | کاربر لاگین‌شده | تیکت‌های من (صفحه‌بندی) |
+| `GET` | `/tickets` | Admin | همه‌ی تیکت‌ها (صفحه‌بندی) |
+| `GET` | `/tickets/:id` | صاحب تیکت یا admin | جزئیات یک تیکت با همه‌ی پیام‌ها |
+| `POST` | `/tickets/:id/reply` | صاحب تیکت یا admin | پاسخ — پاسخ admin وضعیت را `answered` می‌کند |
+| `POST` | `/tickets/:id/close` | صاحب تیکت یا admin | بستن تیکت |
+
+### شیء Ticket
+
+```ts
+interface Ticket {
+  id: string;
+  userId: string | null;       // null یعنی تیکت مهمان است
+  guestEmail: string | null;
+  subject: string;
+  status: "open" | "answered" | "closed";
+  createdAt: ISODate;
+  updatedAt: ISODate;
+  messages: { id: string; body: string; authorType: "user" | "support"; createdAt: ISODate }[];
+}
+```
+
+### نکات
+
+- `POST /tickets` روی توکن نامعتبر/منقضی خطا نمی‌دهد — اگر کاربر معتبر نباشد و `guestEmail` هم نباشد، `400 GUEST_EMAIL_REQUIRED`
+- روی تیکت `closed` نمی‌توان پاسخ داد → `400 TICKET_CLOSED`
+- دسترسی غیرمجاز به تیکت دیگران → `403 NOT_TICKET_OWNER`
+
+---
+
+## §14 — User Dashboard (داشبورد پروفایل)
+
+### `GET /users/me/dashboard` 🔒 کاربر لاگین‌شده
+
+```ts
+interface UserDashboard {
+  totalSpent: Money | null;     // مجموع سفارش‌های paid — null یعنی هیچ خریدی نبوده
+  myCoursesCount: number;       // تعداد دوره‌های متمایز خریداری‌شده
+  ticketsCount: number;
+  recentTickets: Ticket[];      // آخرین ۳ تیکت
+}
+```
+
+> فیلد «آخرین دوره‌های دیده‌شده» (در طرح داشبورد فرانت) فعلاً پشتیبانی نمی‌شود — هیچ مکانیزم ردیابی بازدید دوره در بک‌اند وجود ندارد. اگر لازم شد باید جدول جدیدی برای `course_views` طراحی و قرارداد جدید نوشته شود.
+
+---
+
 ## فرایند تغییر قرارداد (مهم)
 
 اگر وسط کار نیاز به تغییر یک API بود:

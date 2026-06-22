@@ -3,7 +3,8 @@
 // (Ù†Ù‡ CMS. Ø­Ø³Ø§Ø¨â€ŒÙ‡Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø±ÛŒ Ù†Ù‡Ø§ÛŒÛŒ Ù…Ø§Ù„ NestJS Ø§Ø³Øª.)
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-import type { ID, ISODate, Locale } from "./common";
+import type { ID, ISODate, Locale, Money } from "./common";
+import type { Ticket } from "./ticket";
 
 export type UserRole = "user" | "instructor" | "admin";
 
@@ -43,5 +44,17 @@ export interface AuthResponse {
   accessToken: string;
   /** Ø¨Ø±Ø§ÛŒ ØªÙ…Ø¯ÛŒØ¯ ØªÙˆÚ©Ù†. */
   refreshToken: string;
+}
+
+/** خروجی داشبورد پروفایل کاربر — GET /users/me/dashboard */
+export interface UserDashboard {
+  /** مجموع پرداختی کاربر روی سفارش‌های paid — null یعنی هیچ پرداختی ثبت نشده. */
+  totalSpent: Money | null;
+  /** تعداد دوره‌های متمایزی که کاربر خریده (از روی سفارش‌های paid). */
+  myCoursesCount: number;
+  /** تعداد کل تیکت‌های کاربر. */
+  ticketsCount: number;
+  /** آخرین تیکت‌ها — حداکثر ۳ مورد. */
+  recentTickets: Ticket[];
 }
 

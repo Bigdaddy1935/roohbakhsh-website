@@ -9,6 +9,8 @@ import { Section } from "../../modules/courses/entities/section.entity";
 import { Lesson } from "../../modules/courses/entities/lesson.entity";
 import { Article } from "../../modules/articles/entities/article.entity";
 import { Review } from "../../modules/reviews/entities/review.entity";
+import { Ticket } from "../../modules/tickets/entities/ticket.entity";
+import { TicketMessage } from "../../modules/tickets/entities/ticket-message.entity";
 import { SeedService } from "./seed.service";
 
 @Module({
@@ -23,6 +25,8 @@ import { SeedService } from "./seed.service";
       Lesson,
       Article,
       Review,
+      Ticket,
+      TicketMessage,
     ]),
   ],
   providers: [SeedService],

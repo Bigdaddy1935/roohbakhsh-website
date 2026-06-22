@@ -1,4 +1,4 @@
-﻿import { Controller, Get, Query, UseGuards } from "@nestjs/common";
+﻿import { Controller, Get, Query, Request, UseGuards } from "@nestjs/common";
 import {
   ApiTags, ApiOperation, ApiResponse,
   ApiHeader, ApiBearerAuth, ApiCookieAuth,
@@ -32,5 +32,19 @@ export class UsersController {
   @ApiResponse({ status: 403, description: "دسترسی ندارید — کد: FORBIDDEN", type: ApiErrorSchema })
   findAll(@Query() query: PaginationDto) {
     return this.usersService.findAll(query.page ?? 1, query.limit ?? 12);
+  }
+
+  @Get("me/dashboard")
+  @ApiOperation({
+    summary: "داشبورد پروفایل من",
+    description:
+      "آماری که در صفحه‌ی داشبورد کاربر نمایش داده می‌شود: مجموع پرداختی، تعداد دوره‌های خریداری‌شده، " +
+      "تعداد تیکت‌ها و آخرین ۳ تیکت.",
+  })
+  @ApiHeader(LANG_HEADER)
+  @ApiResponse({ status: 200, description: "UserDashboard" })
+  @ApiResponse({ status: 401, description: "احراز هویت نشده", type: ApiErrorSchema })
+  dashboard(@Request() req: { user: { id: string } }) {
+    return this.usersService.dashboard(req.user.id);
   }
 }
