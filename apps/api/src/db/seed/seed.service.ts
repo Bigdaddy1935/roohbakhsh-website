@@ -363,16 +363,29 @@ export class SeedService implements OnApplicationBootstrap {
     ];
   }
 
+  /** ایندکس‌های ۲ دوره‌ای که رایگان ساخته می‌شوند (انتخاب تصادفی از courseDefs). */
+  private pickFreeCourseIndexes(total: number, count: number): Set<number> {
+    const indexes = new Set<number>();
+    while (indexes.size < Math.min(count, total)) {
+      indexes.add(Math.floor(Math.random() * total));
+    }
+    return indexes;
+  }
+
   private async seedCourses(instructorId: string, categoryIds: string[]): Promise<string[]> {
     const courseIds: string[] = [];
+    const defs = this.courseDefs();
+    const freeIndexes = this.pickFreeCourseIndexes(defs.length, 2);
 
-    for (const def of this.courseDefs()) {
+    for (let i = 0; i < defs.length; i++) {
+      const def = defs[i]!;
       const existing = await this.courseRepo.findOne({ where: { slug: def.slug } });
       if (existing) {
         courseIds.push(existing.id);
         continue;
       }
 
+      const isFree = freeIndexes.has(i);
       const randomCategoryId = categoryIds[Math.floor(Math.random() * categoryIds.length)]!;
       const course = await this.courseRepo.save(
         this.courseRepo.create({
@@ -380,7 +393,7 @@ export class SeedService implements OnApplicationBootstrap {
           slug: def.slug,
           description: def.description,
           thumbnailUrl: { ar: randomThumbnail(), ur: randomThumbnail() },
-          price: { amountMinor: def.amountMinor, currency: "IRR" },
+          price: isFree ? null : { amountMinor: def.amountMinor, currency: "IRR" },
           level: def.level,
           runStatus: "ongoing",
           accessType: "online_only",
@@ -417,7 +430,9 @@ export class SeedService implements OnApplicationBootstrap {
       }
 
       courseIds.push(course.id);
-      this.logger.log(`✓ دوره نمونه ساخته شد: ${def.slug} (${def.sections.length} سرفصل)`);
+      this.logger.log(
+        `✓ دوره نمونه ساخته شد: ${def.slug} (${def.sections.length} سرفصل)${isFree ? " — رایگان" : ""}`,
+      );
     }
 
     return courseIds;

@@ -500,9 +500,16 @@ Accept-Language: ar
 
 ### POST /payments/initiate/:orderId — response
 ```json
-{ "paymentId": "uuid", "gatewayUrl": "https://www.zarinpal.com/pg/StartPay/AUTHORITY" }
+{ "paymentId": "uuid", "gatewayUrl": "https://www.zarinpal.com/pg/StartPay/AUTHORITY", "requiresPayment": true }
 ```
 → Frontend redirects user to `gatewayUrl`.
+
+**سفارش کاملاً رایگان** (مثلاً فقط دوره‌های رایگان در سبد — `price: null`، یعنی `order.total.amountMinor === 0`):
+بدون رفتن به درگاه ZarinPal، فوراً تکمیل می‌شود:
+```json
+{ "paymentId": "uuid", "gatewayUrl": null, "requiresPayment": false }
+```
+سفارش بلافاصله `status: "paid"` می‌شود و فاکتور با `paymentRefId: "FREE"` ساخته می‌شود. فرانت اگر `requiresPayment: false` دید، نباید ریدایرکت کند — فقط پیام موفقیت نشان دهد.
 
 ### GET /payments/verify?Authority=...&Status=OK — response
 ```json

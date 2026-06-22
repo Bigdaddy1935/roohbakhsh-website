@@ -46,6 +46,25 @@ export class PaymentsService {
       throw new BadRequestException("ORDER_NOT_PAYABLE");
     }
 
+    // سفارش کاملاً رایگان (مثلاً فقط دوره‌های رایگان) — بدون رفتن به درگاه ZarinPal تکمیل می‌شود
+    if (order.total.amountMinor === 0) {
+      const payment = await this.repo.save(
+        this.repo.create({
+          orderId,
+          userId,
+          amount: order.total,
+          status: "paid",
+          refId: "FREE",
+          description: "Free order — no payment gateway needed",
+        }),
+      );
+      await this.ordersService.updateStatus(orderId, "paid");
+      const freeOrder = await this.ordersService.findEntity(orderId);
+      await this.invoicesService.createFromOrder(freeOrder, "FREE");
+
+      return { paymentId: payment.id, gatewayUrl: null, requiresPayment: false };
+    }
+
     const merchantId = this.config.get("ZARINPAL_MERCHANT_ID", { infer: true })!;
     const isSandbox  = this.config.get("ZARINPAL_SANDBOX", { infer: true })!;
     const callbackBase = this.config.get("PAYMENT_CALLBACK_BASE_URL", { infer: true })!;
@@ -99,7 +118,7 @@ export class PaymentsService {
 
     await this.repo.update(payment.id, { authority, gatewayUrl });
 
-    return { paymentId: payment.id, gatewayUrl };
+    return { paymentId: payment.id, gatewayUrl, requiresPayment: true };
   }
 
   async verify(authority: string, status: string): Promise<{ message: string; refId?: string }> {
