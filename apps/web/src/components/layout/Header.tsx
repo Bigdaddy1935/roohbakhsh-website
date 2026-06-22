@@ -26,27 +26,17 @@ import {
 } from "react-icons/ri";
 import { useMe, useLogout } from "@/hooks/queries/use-auth";
 import { useCart, useRemoveFromCart } from "@/hooks/queries/use-cart";
+import { useCategories } from "@/hooks/queries/use-categories";
 import { formatMoney } from "@/lib/format";
 
-type CategoryId = "quran" | "fiqh" | "aqeedah" | "history" | "arabic" | "tazkiyah";
-type CategoryDef = { id: CategoryId; href: string; Icon: React.ComponentType<{ className?: string; size?: number }> };
-
-const CATEGORIES: CategoryDef[] = [
-  { id: "quran",    href: "/courses/quran",    Icon: RiBookOpenLine  },
-  { id: "fiqh",     href: "/courses/fiqh",     Icon: RiScales2Line   },
-  { id: "aqeedah",  href: "/courses/aqeedah",  Icon: RiMoonLine      },
-  { id: "history",  href: "/courses/history",  Icon: RiTimeLine      },
-  { id: "arabic",   href: "/courses/arabic",   Icon: RiPenNibLine    },
-  { id: "tazkiyah", href: "/courses/tazkiyah", Icon: RiHeartLine     },
-];
-
-const MOCK_COURSES: Record<CategoryId, { ar: string[]; ur: string[] }> = {
-  quran:    { ar: ["تجويد القرآن الكريم", "تفسير جزء عم", "علوم القرآن", "الإجازة بالقراءات"], ur: ["تجوید القرآن الکریم", "تفسیر جزء عم", "علوم القرآن", "اجازہ بالقراءات"] },
-  fiqh:     { ar: ["أصول الفقه الإسلامي", "فقه العبادات", "الفقه المقارن", "أحكام المعاملات"], ur: ["اصول فقہ اسلامی", "فقہ عبادات", "فقہ مقارن", "احکام معاملات"] },
-  aqeedah:  { ar: ["العقيدة الطحاوية", "شرح الأسماء الحسنى", "التوحيد وأقسامه", "علم الكلام"], ur: ["عقیدہ طحاویہ", "شرح اسماء الحسنیٰ", "توحید اور اس کی اقسام", "علم کلام"] },
-  history:  { ar: ["السيرة النبوية الشريفة", "تاريخ الخلفاء الراشدين", "تاريخ الدولة الأموية", "فتوحات صدر الإسلام"], ur: ["سیرت النبی ﷺ", "تاریخ خلفاء راشدین", "تاریخ دولت اموی", "فتوحات صدر اسلام"] },
-  arabic:   { ar: ["النحو الميسر للمبتدئين", "الصرف العملي", "البلاغة القرآنية", "تحليل النصوص العربية"], ur: ["عربی نحو برائے مبتدیین", "صرف عملی", "قرآنی بلاغت", "عربی متون کا تجزیہ"] },
-  tazkiyah: { ar: ["تزكية النفس ومراقي السعادة", "رياض الصالحين", "الأذكار والأوراد", "علم الأخلاق الإسلامي"], ur: ["تزکیہ نفس", "ریاض الصالحین", "اذکار و اوراد", "اسلامی اخلاق"] },
+type IconType = React.ComponentType<{ className?: string; size?: number }>;
+const SLUG_ICONS: Record<string, IconType> = {
+  quran:    RiBookOpenLine,
+  fiqh:     RiScales2Line,
+  aqeedah:  RiMoonLine,
+  history:  RiTimeLine,
+  arabic:   RiPenNibLine,
+  tazkiyah: RiHeartLine,
 };
 
 const UI = {
@@ -82,23 +72,21 @@ export default function Header() {
   const ui = UI[locale];
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<CategoryId>("quran");
+  const [activeSlug, setActiveSlug] = useState<string>("");
 
   const { data: user } = useMe();
   const { data: cart } = useCart();
   const { mutate: removeFromCart } = useRemoveFromCart();
   const { mutate: logout } = useLogout();
+  const { data: categories = [] } = useCategories();
 
   const isLoggedIn = !!user;
   const cartItems = cart?.items ?? [];
 
   const switchLocale = (next: string) => router.replace(pathname, { locale: next });
 
-  const catNames: Record<CategoryId, string> = {
-    quran: t("categories.quran"), fiqh: t("categories.fiqh"), aqeedah: t("categories.aqeedah"),
-    history: t("categories.history"), arabic: t("categories.arabic"), tazkiyah: t("categories.tazkiyah"),
-  };
-  const mockCourses = MOCK_COURSES[activeCategory][locale];
+  const activeCategory = categories.find((c) => c.slug === activeSlug) ?? categories[0];
+  const courseWord = locale === "ar" ? "دورة" : "کورس";
 
   const userMenuItems = [
     { href: "/dashboard",              icon: RiHomeLine,            label: ui.home },
@@ -145,29 +133,54 @@ export default function Header() {
               </Link>
               <div className="absolute top-full right-0 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-150 pt-4 z-50">
                 <div className="flex bg-white border border-gray-200 rounded-xl shadow-xl shadow-black/[0.08] overflow-hidden">
+                  {/* Left: category list */}
                   <div className="flex flex-col gap-y-1 p-4 w-72 shrink-0">
-                    {CATEGORIES.map(({ id, href, Icon }) => (
-                      <Link key={id} href={href} onMouseEnter={() => setActiveCategory(id)}
-                        className={`flex items-center justify-between rounded-lg px-4 py-3 transition-colors ${activeCategory === id ? "bg-gray-100" : "hover:bg-gray-50"}`}>
-                        <span className="flex items-center gap-x-3">
-                          <Icon size={22} className={`shrink-0 ${activeCategory === id ? "text-[var(--brand)]" : "text-gray-400"}`} />
-                          <span className="text-sm font-medium">{catNames[id]}</span>
-                        </span>
-                        <RiArrowLeftSLine size={18} className="text-gray-300 shrink-0" />
+                    {categories.map((cat) => {
+                      const Icon = SLUG_ICONS[cat.slug] ?? RiBookOpenLine;
+                      const isActive = (activeSlug || categories[0]?.slug) === cat.slug;
+                      return (
+                        <Link key={cat.id} href={`/courses?cat=${cat.slug}`}
+                          onMouseEnter={() => setActiveSlug(cat.slug)}
+                          className={`flex items-center justify-between rounded-lg px-4 py-3 transition-colors ${isActive ? "bg-gray-100" : "hover:bg-gray-50"}`}>
+                          <span className="flex items-center gap-x-3">
+                            <Icon size={22} className={`shrink-0 ${isActive ? "text-[var(--brand)]" : "text-gray-400"}`} />
+                            <span className="text-sm font-medium">{cat.name[locale]}</span>
+                          </span>
+                          <RiArrowLeftSLine size={18} className="text-gray-300 shrink-0" />
+                        </Link>
+                      );
+                    })}
+                  </div>
+                  {/* Right: active category detail */}
+                  {activeCategory && (
+                    <div className="flex flex-col justify-between bg-gray-50 w-64 p-5 border-s border-gray-100">
+                      <div className="flex flex-col gap-y-4">
+                        {(activeCategory.thumbnailUrl?.[locale] ?? activeCategory.thumbnailUrl?.ar) && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={activeCategory.thumbnailUrl?.[locale] ?? activeCategory.thumbnailUrl?.ar ?? ""}
+                            alt={activeCategory.name[locale]}
+                            className="w-full h-28 object-cover rounded-lg"
+                          />
+                        )}
+                        <div>
+                          <p className="text-sm font-bold text-[var(--ink)]">{activeCategory.name[locale]}</p>
+                          {activeCategory.description?.[locale] && (
+                            <p className="text-xs text-gray-400 mt-1 leading-5 line-clamp-3">
+                              {activeCategory.description[locale]}
+                            </p>
+                          )}
+                          <p className="text-xs text-[var(--brand)] font-semibold mt-2">
+                            {activeCategory.courseCount} {courseWord}
+                          </p>
+                        </div>
+                      </div>
+                      <Link href={`/courses?cat=${activeCategory.slug}`} className="flex items-center gap-x-1 text-[13px] font-semibold text-[var(--brand)] hover:underline mt-5">
+                        {t("viewAll")}
+                        <RiArrowLeftSLine size={15} />
                       </Link>
-                    ))}
-                  </div>
-                  <div className="flex flex-col justify-between bg-gray-50 w-64 p-5 border-s border-gray-100">
-                    <div className="flex flex-col gap-y-3.5">
-                      {mockCourses.map((course) => (
-                        <Link key={course} href={`/courses/${activeCategory}`} className="text-sm text-[var(--ink)] hover:text-[var(--brand)] transition-colors">{course}</Link>
-                      ))}
                     </div>
-                    <Link href={`/courses/${activeCategory}`} className="flex items-center gap-x-1 text-[13px] font-semibold text-[var(--brand)] hover:underline mt-5">
-                      {t("viewAll")}
-                      <RiArrowLeftSLine size={15} />
-                    </Link>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -386,15 +399,19 @@ export default function Header() {
           <div>
             <p className="text-xs font-bold text-[var(--brand)] mb-2.5">{t("categories_title")}</p>
             <div className="flex flex-col gap-y-0.5">
-              {CATEGORIES.map(({ id, href, Icon }) => (
-                <Link key={id} href={href} onClick={() => setDrawerOpen(false)} className="flex items-center justify-between px-2 py-2.5 rounded-xl hover:bg-white transition-colors">
-                  <span className="flex items-center gap-x-3 text-sm text-[var(--ink)]">
-                    <Icon size={18} className="text-[var(--brand)]" />
-                    {catNames[id]}
-                  </span>
-                  <RiArrowLeftSLine size={16} className="text-gray-300" />
-                </Link>
-              ))}
+              {categories.map((cat) => {
+                const Icon = SLUG_ICONS[cat.slug] ?? RiBookOpenLine;
+                return (
+                  <Link key={cat.id} href={`/courses?cat=${cat.slug}`} onClick={() => setDrawerOpen(false)}
+                    className="flex items-center justify-between px-2 py-2.5 rounded-xl hover:bg-white transition-colors">
+                    <span className="flex items-center gap-x-3 text-sm text-[var(--ink)]">
+                      <Icon size={18} className="text-[var(--brand)]" />
+                      {cat.name[locale]}
+                    </span>
+                    <RiArrowLeftSLine size={16} className="text-gray-300" />
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
