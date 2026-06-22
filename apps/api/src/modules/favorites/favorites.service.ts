@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import type { FavoriteItem, FavoriteStatus } from "@roohbakhsh/shared";
+import type { FavoriteItem, FavoriteStatus, Paginated } from "@roohbakhsh/shared";
 import { Favorite } from "./entities/favorite.entity";
 import { Course } from "../courses/entities/course.entity";
 import { Article } from "../articles/entities/article.entity";
 import { ToggleFavoriteDto } from "./dto/toggle-favorite.dto";
+import { toPaginated } from "../../common/utils/paginate";
 
 @Injectable()
 export class FavoritesService {
@@ -39,13 +40,29 @@ export class FavoritesService {
     return { isFavorite: true };
   }
 
-  /** لیست علاقه‌مندی‌های کاربر — برای داشبورد و صفحه‌ی «علاقه‌مندی‌های من». */
+  /** لیست علاقه‌مندی‌های کاربر — برای داشبورد (بدون صفحه‌بندی، فقط حداکثر N مورد). */
   async findMine(userId: string, limit?: number): Promise<FavoriteItem[]> {
     const favorites = await this.repo.find({
       where: { userId },
       order: { createdAt: "DESC" },
       take: limit,
     });
+    return this.toItems(favorites);
+  }
+
+  /** لیست صفحه‌بندی‌شده‌ی علاقه‌مندی‌ها — برای صفحه‌ی «علاقه‌مندی‌های من». */
+  async findMinePaginated(userId: string, page: number, limit: number): Promise<Paginated<FavoriteItem>> {
+    const [favorites, total] = await this.repo.findAndCount({
+      where: { userId },
+      order: { createdAt: "DESC" },
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+    const items = await this.toItems(favorites);
+    return toPaginated(items, total, page, limit);
+  }
+
+  private async toItems(favorites: Favorite[]): Promise<FavoriteItem[]> {
     if (favorites.length === 0) return [];
 
     const courseIds = favorites.filter((f) => f.type === "course").map((f) => f.targetId);

@@ -2,6 +2,7 @@ import { Controller, Post, Get, Body, Query, Request } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiResponse, ApiHeader, ApiBearerAuth, ApiCookieAuth, ApiQuery } from "@nestjs/swagger";
 import { FavoritesService } from "./favorites.service";
 import { ToggleFavoriteDto } from "./dto/toggle-favorite.dto";
+import { PaginationDto } from "../../common/dto/pagination.dto";
 import { ApiErrorSchema } from "../../common/swagger/api-error.schema";
 import { LANG_HEADER } from "../../common/swagger/lang-header";
 
@@ -31,5 +32,16 @@ export class FavoritesController {
   @ApiResponse({ status: 200, description: "FavoriteItem[]" })
   findMine(@Query("limit") limit: string | undefined, @Request() req: { user: { id: string } }) {
     return this.svc.findMine(req.user.id, limit ? Number(limit) : undefined);
+  }
+
+  @Get()
+  @ApiHeader(LANG_HEADER)
+  @ApiOperation({
+    summary: "علاقه‌مندی‌های من (صفحه‌بندی‌شده)",
+    description: "همان لیست علاقه‌مندی‌ها، اما صفحه‌بندی‌شده — برای صفحه‌ی کامل «علاقه‌مندی‌های من».",
+  })
+  @ApiResponse({ status: 200, description: "Paginated<FavoriteItem>" })
+  findMinePaginated(@Query() query: PaginationDto, @Request() req: { user: { id: string } }) {
+    return this.svc.findMinePaginated(req.user.id, query.page ?? 1, query.limit ?? 12);
   }
 }

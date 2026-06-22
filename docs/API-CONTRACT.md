@@ -785,7 +785,11 @@ interface FavoriteStatus {
 خطا: `404 COURSE_NOT_FOUND` / `404 ARTICLE_NOT_FOUND`
 
 ### `GET /favorites/mine?limit=20` 🔒
-خروجی: `FavoriteItem[]` — جدیدترین اول.
+خروجی: `FavoriteItem[]` — جدیدترین اول. بدون صفحه‌بندی، برای داشبورد.
+
+### `GET /favorites?page=1&limit=12` 🔒
+همان لیست، اما صفحه‌بندی‌شده — برای صفحه‌ی کامل «علاقه‌مندی‌های من».
+خروجی: `Paginated<FavoriteItem>`
 
 ---
 
