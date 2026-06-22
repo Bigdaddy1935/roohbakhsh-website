@@ -178,6 +178,7 @@
 > `level` یکی از: `"beginner" | "intermediate" | "advanced"`.
 > `runStatus` یکی از: `"ongoing"` (در حال برگزاری) | `"upcoming"` (به زودی) | `"completed"` (پایان‌یافته). پیش‌فرض: `upcoming`.
 > `accessType` یکی از: `"online_only"` (فقط آنلاین) | `"downloadable"` (قابل دانلود). پیش‌فرض: `online_only`.
+> `participantCount` تعداد کاربران یکتایی است که این دوره را با سفارش `paid` خریده‌اند — مستقیماً از `order_items`+`orders` محاسبه می‌شود (denormalize نشده، مثل `lessonCount`).
 
 ### `GET /api/courses`
 لیست صفحه‌بندی‌شده دوره‌ها با اطلاعات خلاصه استاد.

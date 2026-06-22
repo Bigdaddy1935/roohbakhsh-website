@@ -5,6 +5,7 @@ import { Section } from "./entities/section.entity";
 import { Lesson } from "./entities/lesson.entity";
 import { Instructor } from "../instructor/entities/instructor.entity";
 import { Category } from "../category/entities/category.entity";
+import { OrderItem } from "../orders/entities/order-item.entity";
 import { ReviewsModule } from "../reviews/reviews.module";
 import { CourseService } from "./course.service";
 import { SectionService } from "./section.service";
@@ -15,7 +16,7 @@ import { LessonController } from "./lesson.controller";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Course, Section, Lesson, Instructor, Category]),
+    TypeOrmModule.forFeature([Course, Section, Lesson, Instructor, Category, OrderItem]),
     ReviewsModule,
   ],
   controllers: [CourseController, SectionController, LessonController],

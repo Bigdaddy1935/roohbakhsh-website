@@ -143,6 +143,8 @@ export interface CourseRecord {
   averageRating: number | null;
   /** تعداد کل نظرات ثبت‌شده روی این دوره. */
   reviewCount: number;
+  /** تعداد کاربران یکتایی که این دوره را با سفارش paid خریده‌اند. */
+  participantCount: number;
   level: CourseLevel;
   /** وضعیت برگزاری: ongoing=در حال برگزاری، upcoming=به زودی، completed=پایان‌یافته */
   runStatus: CourseRunStatus;

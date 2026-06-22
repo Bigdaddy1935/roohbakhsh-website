@@ -11,6 +11,7 @@ import { Course } from "./entities/course.entity";
 import { Lesson } from "./entities/lesson.entity";
 import { Instructor } from "../instructor/entities/instructor.entity";
 import { Category } from "../category/entities/category.entity";
+import { OrderItem } from "../orders/entities/order-item.entity";
 import { ReviewsService } from "../reviews/reviews.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
@@ -20,6 +21,7 @@ interface CourseStats {
   durationMinutes: number;
   averageRating: number | null;
   reviewCount: number;
+  participantCount: number;
 }
 
 const EMPTY_STATS: CourseStats = {
@@ -27,6 +29,7 @@ const EMPTY_STATS: CourseStats = {
   durationMinutes: 0,
   averageRating: null,
   reviewCount: 0,
+  participantCount: 0,
 };
 
 @Injectable()
@@ -40,6 +43,8 @@ export class CourseService {
     private readonly instructorRepo: Repository<Instructor>,
     @InjectRepository(Category)
     private readonly categoryRepo: Repository<Category>,
+    @InjectRepository(OrderItem)
+    private readonly orderItemRepo: Repository<OrderItem>,
     private readonly reviewsService: ReviewsService,
   ) {}
 
@@ -51,12 +56,13 @@ export class CourseService {
       skip: (page - 1) * limit,
     });
     const courseIds = items.map((c) => c.id);
-    const [lessonStats, ratingStats] = await Promise.all([
+    const [lessonStats, ratingStats, participantStats] = await Promise.all([
       this.lessonStatsForCourses(courseIds),
       this.reviewsService.ratingSummaries(courseIds),
+      this.participantCountsForCourses(courseIds),
     ]);
     return toPaginated(
-      items.map((c) => this.toContract(c, this.mergeStats(c.id, lessonStats, ratingStats))),
+      items.map((c) => this.toContract(c, this.mergeStats(c.id, lessonStats, ratingStats, participantStats))),
       total,
       page,
       limit,
@@ -70,15 +76,17 @@ export class CourseService {
     return this.toContract(course, stats);
   }
 
-  /** lessonCount/durationMinutes از جدول lessons و averageRating/reviewCount از جدول reviews — هیچ‌کدام denormalize نشده. */
+  /** lessonCount/durationMinutes از lessons، averageRating/reviewCount از reviews، participantCount از سفارش‌های paid — هیچ‌کدام denormalize نشده. */
   private async statsForCourse(courseId: string): Promise<CourseStats> {
     const lessons = await this.lessonRepo.find({ where: { courseId } });
     const rating = await this.reviewsService.ratingSummary(courseId);
+    const participantCount = await this.participantCountForCourse(courseId);
     return {
       lessonCount: lessons.length,
       durationMinutes: lessons.reduce((sum, l) => sum + l.durationMinutes, 0),
       averageRating: rating.averageRating,
       reviewCount: rating.reviewCount,
+      participantCount,
     };
   }
 
@@ -106,10 +114,37 @@ export class CourseService {
     return map;
   }
 
+  /** تعداد کاربران یکتایی که این دوره را با سفارش paid خریده‌اند. */
+  private async participantCountForCourse(courseId: string): Promise<number> {
+    const map = await this.participantCountsForCourses([courseId]);
+    return map.get(courseId) ?? 0;
+  }
+
+  private async participantCountsForCourses(courseIds: string[]): Promise<Map<string, number>> {
+    const map = new Map<string, number>();
+    if (courseIds.length === 0) return map;
+
+    const rows = await this.orderItemRepo
+      .createQueryBuilder("item")
+      .innerJoin("item.order", "order")
+      .select("item.courseId", "courseId")
+      .addSelect("COUNT(DISTINCT order.userId)", "participantCount")
+      .where("item.courseId IN (:...courseIds)", { courseIds })
+      .andWhere("order.status = :status", { status: "paid" })
+      .groupBy("item.courseId")
+      .getRawMany<{ courseId: string; participantCount: string }>();
+
+    for (const row of rows) {
+      map.set(row.courseId, Number(row.participantCount));
+    }
+    return map;
+  }
+
   private mergeStats(
     courseId: string,
     lessonStats: Map<string, { lessonCount: number; durationMinutes: number }>,
     ratingStats: Map<string, { averageRating: number | null; reviewCount: number }>,
+    participantStats: Map<string, number>,
   ): CourseStats {
     const lesson = lessonStats.get(courseId);
     const rating = ratingStats.get(courseId);
@@ -118,6 +153,7 @@ export class CourseService {
       durationMinutes: lesson?.durationMinutes ?? 0,
       averageRating: rating?.averageRating ?? null,
       reviewCount: rating?.reviewCount ?? 0,
+      participantCount: participantStats.get(courseId) ?? 0,
     };
   }
 
@@ -234,6 +270,7 @@ export class CourseService {
       lessonCount: stats.lessonCount,
       averageRating: stats.averageRating,
       reviewCount: stats.reviewCount,
+      participantCount: stats.participantCount,
       level: course.level,
       runStatus: course.runStatus,
       accessType: course.accessType,
