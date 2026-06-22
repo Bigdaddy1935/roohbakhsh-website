@@ -8,6 +8,7 @@ import { Course } from "../../modules/courses/entities/course.entity";
 import { Section } from "../../modules/courses/entities/section.entity";
 import { Lesson } from "../../modules/courses/entities/lesson.entity";
 import { Article } from "../../modules/articles/entities/article.entity";
+import { Review } from "../../modules/reviews/entities/review.entity";
 import { SeedService } from "./seed.service";
 
 @Module({
@@ -21,6 +22,7 @@ import { SeedService } from "./seed.service";
       Section,
       Lesson,
       Article,
+      Review,
     ]),
   ],
   providers: [SeedService],

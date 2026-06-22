@@ -11,6 +11,7 @@ import { Course } from "../../modules/courses/entities/course.entity";
 import { Section } from "../../modules/courses/entities/section.entity";
 import { Lesson } from "../../modules/courses/entities/lesson.entity";
 import { Article } from "../../modules/articles/entities/article.entity";
+import { Review } from "../../modules/reviews/entities/review.entity";
 
 const SAMPLE_THUMBNAILS = [
   "https://storage.sabzlearn.ir/legacy-statics/2025/07/21-1.webp",
@@ -59,6 +60,7 @@ export class SeedService implements OnApplicationBootstrap {
     @InjectRepository(Section) private readonly sectionRepo: Repository<Section>,
     @InjectRepository(Lesson) private readonly lessonRepo: Repository<Lesson>,
     @InjectRepository(Article) private readonly articleRepo: Repository<Article>,
+    @InjectRepository(Review) private readonly reviewRepo: Repository<Review>,
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
@@ -67,9 +69,11 @@ export class SeedService implements OnApplicationBootstrap {
     await this.seedAdmin();
     const instructor = await this.seedInstructor();
     const category = await this.seedCategory();
+    const students = await this.seedStudents();
     await this.seedCoupons();
-    await this.seedCourses(instructor.id, category.id);
+    const courseIds = await this.seedCourses(instructor.id, category.id);
     await this.seedArticles(instructor.id);
+    await this.seedReviews(courseIds, students.map((s) => s.id));
 
     this.logger.log("seed داده‌های نمونه تمام شد.");
   }
@@ -90,6 +94,37 @@ export class SeedService implements OnApplicationBootstrap {
     const saved = await this.userRepo.save(user);
     this.logger.log(`✓ ادمین نمونه ساخته شد: ${email} / Test@1234`);
     return saved;
+  }
+
+  private async seedStudents(): Promise<User[]> {
+    const defs = [
+      { email: "student1@roohbakhsh.ac", fullName: "محمد الأحمدي" },
+      { email: "student2@roohbakhsh.ac", fullName: "علي حسن" },
+      { email: "student3@roohbakhsh.ac", fullName: "فاطمة الزهراء" },
+    ];
+
+    const users: User[] = [];
+    for (const def of defs) {
+      const existing = await this.userRepo.findOne({ where: { email: def.email } });
+      if (existing) {
+        users.push(existing);
+        continue;
+      }
+
+      const passwordHash = await bcrypt.hash("Test@1234", 12);
+      const saved = await this.userRepo.save(
+        this.userRepo.create({
+          email: def.email,
+          passwordHash,
+          fullName: def.fullName,
+          role: "user",
+          preferredLocale: "ar",
+        }),
+      );
+      users.push(saved);
+      this.logger.log(`✓ کاربر نمونه ساخته شد: ${def.email} / Test@1234`);
+    }
+    return users;
   }
 
   private async seedInstructor(): Promise<Instructor> {
@@ -236,10 +271,15 @@ export class SeedService implements OnApplicationBootstrap {
     ];
   }
 
-  private async seedCourses(instructorId: string, categoryId: string): Promise<void> {
+  private async seedCourses(instructorId: string, categoryId: string): Promise<string[]> {
+    const courseIds: string[] = [];
+
     for (const def of this.courseDefs()) {
       const existing = await this.courseRepo.findOne({ where: { slug: def.slug } });
-      if (existing) continue;
+      if (existing) {
+        courseIds.push(existing.id);
+        continue;
+      }
 
       const course = await this.courseRepo.save(
         this.courseRepo.create({
@@ -283,8 +323,11 @@ export class SeedService implements OnApplicationBootstrap {
         await this.lessonRepo.save(lessons);
       }
 
+      courseIds.push(course.id);
       this.logger.log(`✓ دوره نمونه ساخته شد: ${def.slug} (${def.sections.length} سرفصل)`);
     }
+
+    return courseIds;
   }
 
   private articleDefs(): SeedArticleDef[] {
@@ -410,5 +453,33 @@ export class SeedService implements OnApplicationBootstrap {
       );
       this.logger.log(`✓ مقاله نمونه ساخته شد: ${def.slug} (${def.status})`);
     }
+  }
+
+  private async seedReviews(courseIds: string[], studentIds: string[]): Promise<void> {
+    const sampleReviews = [
+      { rating: 5, comment: "دورة ممتازة ومحتوى مرتب، استفدت كثيراً." },
+      { rating: 4, comment: "شرح جيد جداً لكن أتمنى أمثلة أكثر." },
+      { rating: 5, comment: null },
+      { rating: 3, comment: "الدورة مفيدة لكن سرعة الشرح كانت سريعة قليلاً." },
+    ];
+
+    for (const courseId of courseIds) {
+      for (let i = 0; i < studentIds.length; i++) {
+        const studentId = studentIds[i]!;
+        const existing = await this.reviewRepo.findOne({ where: { courseId, userId: studentId } });
+        if (existing) continue;
+
+        const sample = sampleReviews[(courseIds.indexOf(courseId) + i) % sampleReviews.length]!;
+        await this.reviewRepo.save(
+          this.reviewRepo.create({
+            courseId,
+            userId: studentId,
+            rating: sample.rating,
+            comment: sample.comment,
+          }),
+        );
+      }
+    }
+    this.logger.log(`✓ نظرات نمونه ساخته شدند (${courseIds.length} دوره × ${studentIds.length} کاربر)`);
   }
 }
