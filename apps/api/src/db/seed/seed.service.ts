@@ -428,6 +428,7 @@ export class SeedService implements OnApplicationBootstrap {
           slug: def.slug,
           description: def.description,
           thumbnailUrl: { ar: randomThumbnail(), ur: randomThumbnail() },
+          introVideoUrl: { ar: randomVideoUrl(), ur: randomVideoUrl() },
           price: isFree ? null : { amountMinor: def.amountMinor, currency: "IRR" },
           level: def.level,
           runStatus: "ongoing",

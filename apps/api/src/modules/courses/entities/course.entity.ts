@@ -31,6 +31,9 @@ export class Course {
   @Column({ name: "thumbnail_url", type: "json", nullable: true, default: null })
   thumbnailUrl!: Localized<string | null> | null;
 
+  @Column({ name: "intro_video_url", type: "json", nullable: true, default: null })
+  introVideoUrl!: Localized<string | null> | null;
+
   @Column({ type: "json", nullable: true, default: null })
   price!: Money | null;
 

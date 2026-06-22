@@ -28,6 +28,18 @@ class LocalizedNullableDto {
   ur!: string | null;
 }
 
+class LocalizedVideoUrlDto {
+  @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/videos/ar/intro.mp4", nullable: true })
+  @IsOptional()
+  @IsUrl()
+  ar!: string | null;
+
+  @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/videos/ur/intro.mp4", nullable: true })
+  @IsOptional()
+  @IsUrl()
+  ur!: string | null;
+}
+
 class MoneyDto implements Money {
   @ApiPropertyOptional({ example: 5000 })
   @IsInt()
@@ -70,6 +82,18 @@ export class UpdateCourseDto implements UpdateCourseRequest {
   @Type(() => LocalizedNullableDto)
   @IsObject()
   thumbnailUrl?: Localized<string | null>;
+
+  @ApiPropertyOptional({
+    type: LocalizedVideoUrlDto,
+    nullable: true,
+    description: "ویدیوی معرفی دوره — می‌تواند per locale متفاوت باشد",
+    example: { ar: "https://cdn.roohbakhsh.com/videos/ar/intro.mp4", ur: null },
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => LocalizedVideoUrlDto)
+  @IsObject()
+  introVideoUrl?: Localized<string | null>;
 
   @ApiPropertyOptional({ type: MoneyDto, nullable: true })
   @IsOptional()

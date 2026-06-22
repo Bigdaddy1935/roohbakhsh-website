@@ -173,6 +173,7 @@ export class CourseService {
       slug: dto.slug,
       description: dto.description,
       thumbnailUrl: dto.thumbnailUrl ?? null,
+      introVideoUrl: dto.introVideoUrl ?? null,
       price: dto.price ?? null,
       level: dto.level ?? "beginner",
       runStatus: dto.runStatus ?? "upcoming",
@@ -215,6 +216,7 @@ export class CourseService {
     if (dto.slug !== undefined) course.slug = dto.slug;
     if (dto.description !== undefined) course.description = dto.description;
     if (dto.thumbnailUrl !== undefined) course.thumbnailUrl = dto.thumbnailUrl ?? null;
+    if (dto.introVideoUrl !== undefined) course.introVideoUrl = dto.introVideoUrl ?? null;
     if (dto.price !== undefined) course.price = dto.price ?? null;
     if (dto.level !== undefined) course.level = dto.level;
     if (dto.runStatus !== undefined) course.runStatus = dto.runStatus;
@@ -263,6 +265,7 @@ export class CourseService {
       slug: course.slug,
       description: course.description,
       thumbnailUrl: course.thumbnailUrl ?? { ar: null, ur: null },
+      introVideoUrl: course.introVideoUrl ?? { ar: null, ur: null },
       price: course.price,
       discount,
       effectivePrice,

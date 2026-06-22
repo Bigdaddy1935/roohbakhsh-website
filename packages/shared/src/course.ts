@@ -134,6 +134,8 @@ export interface CourseRecord {
   slug: string;
   description: Localized;
   thumbnailUrl: Localized<string | null>;
+  /** ویدیوی معرفی دوره — دو زبانه، مثل thumbnailUrl. */
+  introVideoUrl: Localized<string | null>;
   /** قیمت اصلی دوره — null یعنی رایگان. */
   price: Money | null;
   /** اطلاعات تخفیف — null یعنی بدون تخفیف. */
@@ -166,6 +168,7 @@ export interface CreateCourseRequest {
   slug: string;
   description: Localized;
   thumbnailUrl?: Localized<string | null>;
+  introVideoUrl?: Localized<string | null>;
   price?: Money | null;
   level?: CourseLevel;
   runStatus?: CourseRunStatus;
@@ -181,6 +184,7 @@ export interface UpdateCourseRequest {
   slug?: string;
   description?: Localized;
   thumbnailUrl?: Localized<string | null>;
+  introVideoUrl?: Localized<string | null>;
   price?: Money | null;
   level?: CourseLevel;
   runStatus?: CourseRunStatus;
