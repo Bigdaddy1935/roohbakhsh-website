@@ -60,13 +60,12 @@ export class ArticleReviewsController {
   @Post()
   @ApiOperation({
     summary: "ثبت نظر و امتیاز روی مقاله",
-    description: "هر کاربر فقط یک‌بار می‌تواند روی هر مقاله نظر بدهد. برای ویرایش از PATCH استفاده کنید.",
+    description: "هیچ محدودیتی در تعداد نظرات یک کاربر برای یک مقاله نیست. برای ویرایش نظر قبلی از PATCH استفاده کنید.",
   })
   @ApiHeader(LANG_HEADER)
   @ApiParam({ name: "articleSlug", description: "slug مقاله", example: "intro-to-fiqh" })
   @ApiResponse({ status: 201, description: "نظر ثبت شد" })
   @ApiResponse({ status: 404, description: "ARTICLE_NOT_FOUND", type: ApiErrorSchema })
-  @ApiResponse({ status: 409, description: "REVIEW_ALREADY_EXISTS — این کاربر قبلاً نظر داده", type: ApiErrorSchema })
   create(
     @Param("articleSlug") articleSlug: string,
     @Body() dto: CreateReviewDto,

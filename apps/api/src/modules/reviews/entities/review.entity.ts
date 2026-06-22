@@ -6,24 +6,19 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  Unique,
+  Index,
 } from "typeorm";
 import { Course } from "../../courses/entities/course.entity";
 import { Article } from "../../articles/entities/article.entity";
 import { User } from "../../auth/entities/user.entity";
 
-/**
- * یک نظر می‌تواند روی دوره یا مقاله باشد — دقیقاً یکی از courseId/articleId مقدار دارد.
- * MySQL مقادیر NULL را در ایندکس یکتا متمایز در نظر می‌گیرد، پس دو Unique جدا
- * (courseId,userId) و (articleId,userId) با هم تداخلی ندارند.
- */
+/** یک نظر می‌تواند روی دوره یا مقاله باشد — دقیقاً یکی از courseId/articleId مقدار دارد. هر کاربر می‌تواند چندبار نظر بدهد. */
 @Entity("reviews")
-@Unique(["courseId", "userId"])
-@Unique(["articleId", "userId"])
 export class Review {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
+  @Index("idx_reviews_course_id")
   @Column({ name: "course_id", type: "varchar", nullable: true, default: null })
   courseId!: string | null;
 
@@ -31,6 +26,7 @@ export class Review {
   @JoinColumn({ name: "course_id" })
   course!: Course | null;
 
+  @Index("idx_reviews_article_id")
   @Column({ name: "article_id", type: "varchar", nullable: true, default: null })
   articleId!: string | null;
 

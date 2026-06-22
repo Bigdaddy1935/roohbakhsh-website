@@ -670,12 +670,12 @@ interface ArticleRecord {
 | Method | Path | Auth | توضیح |
 |--------|------|------|-------|
 | `GET` | `/courses/:courseSlug/reviews` | Public | لیست نظرات دوره (صفحه‌بندی) |
-| `POST` | `/courses/:courseSlug/reviews` | کاربر لاگین‌شده | ثبت نظر — هر کاربر فقط یک‌بار در هر دوره |
+| `POST` | `/courses/:courseSlug/reviews` | کاربر لاگین‌شده | ثبت نظر — هیچ محدودیتی در تعداد نیست، کاربر می‌تواند چندبار نظر بدهد |
 | `PATCH` | `/courses/:courseSlug/reviews/:reviewId` | صاحب نظر | ویرایش نظر خودم |
 | `DELETE` | `/courses/:courseSlug/reviews/:reviewId` | صاحب نظر یا admin | حذف نظر |
 | `POST` | `/courses/:courseSlug/reviews/:reviewId/reply` | فقط admin | ثبت/ویرایش پاسخ روی یک نظر (بازنویسی می‌شود اگر قبلاً پاسخی بوده) |
 | `GET` | `/articles/:articleSlug/reviews` | Public | لیست نظرات مقاله (صفحه‌بندی) |
-| `POST` | `/articles/:articleSlug/reviews` | کاربر لاگین‌شده | ثبت نظر — هر کاربر فقط یک‌بار در هر مقاله |
+| `POST` | `/articles/:articleSlug/reviews` | کاربر لاگین‌شده | ثبت نظر — هیچ محدودیتی در تعداد نیست، کاربر می‌تواند چندبار نظر بدهد |
 | `PATCH` | `/articles/:articleSlug/reviews/:reviewId` | صاحب نظر | ویرایش نظر خودم |
 | `DELETE` | `/articles/:articleSlug/reviews/:reviewId` | صاحب نظر یا admin | حذف نظر |
 | `GET` | `/reviews` | Public | همه‌ی نظرات **تأیید‌شده** دوره و مقاله با هم (صفحه‌بندی)، شامل اطلاعات هدف هر نظر |
@@ -724,7 +724,7 @@ interface ReviewWithTarget extends ReviewRecord {
 
 ### نکات
 
-- یک کاربر فقط یک نظر روی هر دوره/مقاله می‌تواند ثبت کند؛ تلاش دوم → `409 REVIEW_ALREADY_EXISTS` (باید PATCH بزند)
+- هیچ محدودیتی روی تعداد نظرات یک کاربر برای یک دوره/مقاله نیست — می‌تواند چندبار نظر جدید ثبت کند (علاوه بر `PATCH` برای ویرایش نظرات قبلی خودش)
 - `CourseRecord` و `ArticleRecord` هر دو دو فیلد `averageRating: number | null` و `reviewCount: number` دارند که مستقیماً از جدول `reviews` محاسبه می‌شوند (denormalize نشده، مثل `lessonCount`/`durationMinutes`) — **فقط نظرات تأیید‌شده در این محاسبه و در لیست‌های عمومی در نظر گرفته می‌شوند.**
 - `averageRating` تا یک رقم اعشار رند می‌شود؛ اگر هیچ نظری نباشد `null` است
 - نظرات دوره و مقاله مستقل از هم هستند — یک رکورد `Review` یا `courseId` دارد یا `articleId`، هرگز هر دو

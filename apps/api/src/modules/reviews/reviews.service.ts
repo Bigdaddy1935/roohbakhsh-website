@@ -1,7 +1,6 @@
 import {
   Injectable,
   NotFoundException,
-  ConflictException,
   ForbiddenException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -30,8 +29,6 @@ export class ReviewsService {
 
   async createForCourse(courseSlug: string, userId: string, dto: CreateReviewDto): Promise<ReviewRecord> {
     const course = await this.courseBySlug(courseSlug);
-    const existing = await this.repo.findOne({ where: { courseId: course.id, userId } });
-    if (existing) throw new ConflictException("REVIEW_ALREADY_EXISTS");
 
     const saved = await this.repo.save(
       this.repo.create({ courseId: course.id, userId, rating: dto.rating, comment: dto.comment ?? null }),
@@ -79,8 +76,6 @@ export class ReviewsService {
 
   async createForArticle(articleSlug: string, userId: string, dto: CreateReviewDto): Promise<ReviewRecord> {
     const article = await this.articleBySlug(articleSlug);
-    const existing = await this.repo.findOne({ where: { articleId: article.id, userId } });
-    if (existing) throw new ConflictException("REVIEW_ALREADY_EXISTS");
 
     const saved = await this.repo.save(
       this.repo.create({ articleId: article.id, userId, rating: dto.rating, comment: dto.comment ?? null }),

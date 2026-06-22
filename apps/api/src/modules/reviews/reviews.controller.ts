@@ -8,6 +8,7 @@ import {
   Body,
   Query,
   Request,
+  UseGuards,
   ParseIntPipe,
   DefaultValuePipe,
   HttpCode,
@@ -26,7 +27,9 @@ import {
 import { ReviewsService } from "./reviews.service";
 import { CreateReviewDto } from "./dto/create-review.dto";
 import { UpdateReviewDto } from "./dto/update-review.dto";
+import { ReplyReviewDto } from "./dto/reply-review.dto";
 import { Public } from "../auth/decorators/public.decorator";
+import { RolesGuard, Roles } from "../../common/guards/roles.guard";
 import { ApiErrorSchema } from "../../common/swagger/api-error.schema";
 import { LANG_HEADER } from "../../common/swagger/lang-header";
 
@@ -60,13 +63,12 @@ export class ReviewsController {
   @Post()
   @ApiOperation({
     summary: "ثبت نظر و امتیاز روی دوره",
-    description: "هر کاربر فقط یک‌بار می‌تواند روی هر دوره نظر بدهد. برای ویرایش از PATCH استفاده کنید.",
+    description: "هیچ محدودیتی در تعداد نظرات یک کاربر برای یک دوره نیست. برای ویرایش نظر قبلی از PATCH استفاده کنید.",
   })
   @ApiHeader(LANG_HEADER)
   @ApiParam({ name: "courseSlug", description: "slug دوره", example: "intro-to-fiqh-course" })
   @ApiResponse({ status: 201, description: "نظر ثبت شد" })
   @ApiResponse({ status: 404, description: "COURSE_NOT_FOUND", type: ApiErrorSchema })
-  @ApiResponse({ status: 409, description: "REVIEW_ALREADY_EXISTS — این کاربر قبلاً نظر داده", type: ApiErrorSchema })
   create(
     @Param("courseSlug") courseSlug: string,
     @Body() dto: CreateReviewDto,
@@ -110,5 +112,26 @@ export class ReviewsController {
     @Request() req: { user: { id: string; role: string } },
   ) {
     return this.svc.removeCourseReview(courseSlug, reviewId, req.user.id, req.user.role === "admin");
+  }
+
+  @Post(":reviewId/reply")
+  @UseGuards(RolesGuard)
+  @Roles("admin")
+  @ApiOperation({
+    summary: "ثبت/ویرایش پاسخ مدیر روی یک نظر",
+    description: "فقط admin می‌تواند روی نظرات پاسخ بدهد. اگر قبلاً پاسخی ثبت شده باشد، بازنویسی می‌شود.",
+  })
+  @ApiHeader(LANG_HEADER)
+  @ApiParam({ name: "courseSlug", description: "slug دوره" })
+  @ApiParam({ name: "reviewId", description: "UUID نظر" })
+  @ApiResponse({ status: 200, description: "پاسخ ثبت شد" })
+  @ApiResponse({ status: 403, description: "دسترسی فقط برای admin", type: ApiErrorSchema })
+  @ApiResponse({ status: 404, description: "REVIEW_NOT_FOUND یا COURSE_NOT_FOUND", type: ApiErrorSchema })
+  reply(
+    @Param("courseSlug") courseSlug: string,
+    @Param("reviewId") reviewId: string,
+    @Body() dto: ReplyReviewDto,
+  ) {
+    return this.svc.replyToCourseReview(courseSlug, reviewId, dto);
   }
 }
