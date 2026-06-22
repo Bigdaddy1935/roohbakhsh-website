@@ -41,11 +41,11 @@ export default function LatestArticles() {
                 id: article.id,
                 title: article.title[locale],
                 excerpt: article.summary[locale],
-                author: article.authorId,
-                readTime: "",
+                author: article.instructor.name[locale],
+                averageRating: article.averageRating,
+                reviewCount: article.reviewCount,
                 image: thumb || "https://dl.poshtybanman.ir/upload/6%20(1)_68924fcebd53d.jpg",
                 href: `/articles/${article.slug}`,
-                category: "",
               }}
             />
           );

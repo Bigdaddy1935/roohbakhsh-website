@@ -19,7 +19,7 @@ export default function StatsBar() {
       <div className="container">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {KEYS.map((key, i) => {
-            const Icon = ICONS[i];
+            const Icon = ICONS[i]!;
             return (
               <div
                 key={key}

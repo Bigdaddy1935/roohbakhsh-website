@@ -19,14 +19,15 @@ function courseToCard(course: CourseRecord, locale: "ar" | "ur", currency: strin
     title: course.title[locale],
     description: course.description[locale],
     instructor: course.instructor.name[locale],
-    rating: 0,
-    students: 0,
-    duration: Math.floor((course.durationMinutes ?? 0) / 60),
+    averageRating: course.averageRating,
+    reviewCount: course.reviewCount,
+    participantCount: course.participantCount,
+    lessonCount: course.lessonCount,
+    durationMinutes: course.durationMinutes ?? 0,
     price: free ? (locale === "ar" ? "مجاني" : "مفت") : formatMoney(course.effectivePrice, locale),
     originalPrice: course.price ? formatMoney(course.price, locale) : undefined,
     discount: disc > 0 ? disc : undefined,
     isFree: free,
-    category: currency,
   };
 }
 
@@ -88,7 +89,6 @@ export default function CourseGrid() {
       {courses.map((course) => (
         <CourseCard
           key={course.id}
-          fluid
           course={courseToCard(course, locale, t("currency"))}
         />
       ))}

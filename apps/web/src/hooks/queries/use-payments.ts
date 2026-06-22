@@ -26,7 +26,7 @@ export function useInitiatePayment() {
     mutationFn: (orderId) =>
       api.post<InitiatePaymentResponse>(`/payments/initiate/${orderId}`),
     onSuccess: (data) => {
-      window.location.href = data.gatewayUrl;
+      if (data.gatewayUrl) window.location.href = data.gatewayUrl;
     },
   });
 }

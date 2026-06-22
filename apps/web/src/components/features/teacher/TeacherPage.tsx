@@ -117,7 +117,6 @@ export default function TeacherPage({ slug }: { slug: string }) {
                   return (
                     <CourseCard
                       key={course.id}
-                      fluid
                       course={{
                         id: course.id,
                         href: `/courses/${course.slug}`,
@@ -125,14 +124,15 @@ export default function TeacherPage({ slug }: { slug: string }) {
                         title: course.title[locale],
                         description: course.description[locale],
                         instructor: course.instructor.name[locale],
-                        rating: 0,
-                        students: 0,
-                        duration: Math.floor((course.durationMinutes ?? 0) / 60),
+                        averageRating: course.averageRating,
+                        reviewCount: course.reviewCount,
+                        participantCount: course.participantCount,
+                        lessonCount: course.lessonCount,
+                        durationMinutes: course.durationMinutes ?? 0,
                         price: free ? (locale === "ar" ? "مجاني" : "مفت") : formatMoney(course.effectivePrice, locale),
                         originalPrice: course.price ? formatMoney(course.price, locale) : undefined,
                         discount: discountPercent(course.price, course.effectivePrice) || undefined,
                         isFree: free,
-                        category: "",
                       }}
                     />
                   );

@@ -32,12 +32,13 @@ export default function FreeCourses() {
               title: course.title[locale],
               description: course.description[locale],
               instructor: course.instructor.name[locale],
-              rating: 0,
-              students: 0,
-              duration: Math.floor((course.durationMinutes ?? 0) / 60),
+              averageRating: course.averageRating,
+              reviewCount: course.reviewCount,
+              participantCount: course.participantCount,
+              lessonCount: course.lessonCount,
+              durationMinutes: course.durationMinutes ?? 0,
               price: locale === "ar" ? "مجاني" : "مفت",
               isFree: true,
-              category: "",
             }}
           />
         );

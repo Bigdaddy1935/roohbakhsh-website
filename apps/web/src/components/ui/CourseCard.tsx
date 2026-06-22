@@ -8,30 +8,38 @@ export type CourseCardData = {
   title: string;
   description: string;
   instructor: string;
-  rating: number;
-  students: number;
-  duration: number;
+  averageRating: number | null;
+  reviewCount: number;
+  participantCount: number;
+  lessonCount: number;
+  durationMinutes: number;
   price: string;
   originalPrice?: string;
   discount?: number;
   image: string;
   href: string;
   isFree?: boolean;
-  category: string;
+  level?: string;
 };
 
-export default function CourseCard({ course, fluid: _fluid }: { course: CourseCardData; fluid?: boolean }) {
+export default function CourseCard({ course }: { course: CourseCardData }) {
+  const rating = course.averageRating ?? 5;
+
   return (
     <div className="group/course flex flex-col bg-white rounded-lg min-h-[402px] h-full">
       {/* Thumbnail */}
-      <Link href={course.href} className="block cursor-pointer">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+      <Link href={course.href} className="block relative">
         <img
           src={course.image}
           alt={course.title}
           className="w-full aspect-video object-cover rounded-lg group-hover/course:brightness-110 transition-all"
           loading="lazy"
         />
+        {course.discount && (
+          <span className="absolute top-2 start-2 px-2 py-0.5 bg-[var(--cta)] text-white text-[11px] font-bold rounded-md">
+            {course.discount}%
+          </span>
+        )}
       </Link>
 
       {/* Body */}
@@ -51,52 +59,49 @@ export default function CourseCard({ course, fluid: _fluid }: { course: CourseCa
           </p>
         </div>
 
-        {/* Divider rows */}
         <div className="space-y-2 sm:space-y-3 divide-y divide-gray-100">
           {/* Row 1: instructor | rating */}
           <div className="pb-2 sm:pb-3 flex items-center justify-between">
-            <div className="flex items-center gap-x-2 cursor-pointer">
+            <div className="flex items-center gap-x-2">
               <span className="size-5 sm:size-6 rounded-full bg-[var(--brand)]/15 flex items-center justify-center shrink-0">
                 <RiUserLine size={12} className="text-[var(--brand)]" />
               </span>
-              <span className="text-[11px] sm:text-xs text-gray-700 truncate max-w-[120px]">{course.instructor}</span>
+              <span className="text-[11px] sm:text-xs text-gray-700 truncate max-w-[120px]">
+                {course.instructor}
+              </span>
             </div>
             <div className="flex items-center gap-x-1">
-              <span className="text-xs sm:text-sm text-gray-500">{course.rating > 0 ? course.rating.toFixed(1) : "5"}</span>
-              <RiStarFill size={16} className="text-yellow-400" />
+              <RiStarFill size={14} className="text-yellow-400" />
+              <span className="text-xs font-semibold text-gray-700">{rating.toFixed(1)}</span>
+              {course.reviewCount > 0 && (
+                <span className="text-[11px] text-gray-400">({course.reviewCount})</span>
+              )}
             </div>
           </div>
 
-          {/* Row 2: students | price */}
-          <div className="flex items-end justify-between pt-2">
-            {/* Students */}
-            <div className="flex items-center gap-x-1 text-gray-500">
-              <RiUserLine size={16} />
-              <span className="text-sm font-normal">{course.students > 0 ? course.students.toLocaleString() : "—"}</span>
+          {/* Row 2: participants | price */}
+          <div className="flex items-center justify-between pt-2 gap-x-2">
+            {/* Participants — سمت راست */}
+            <div className="flex items-center gap-x-1 text-[11px] text-gray-400">
+              {course.participantCount > 0 ? (
+                <>
+                  <RiUserLine size={12} />
+                  <span>{course.participantCount.toLocaleString()} دانشجو</span>
+                </>
+              ) : <span />}
             </div>
 
-            {/* Price */}
-            <div className="flex items-center gap-x-2 sm:gap-x-3.5">
+            {/* Price — سمت چپ */}
+            <div className="flex items-center gap-x-1.5 shrink-0">
               {course.isFree ? (
-                <span className="text-sm sm:text-base font-bold text-[var(--brand)]">{course.price}</span>
+                <span className="text-sm font-bold text-[var(--brand)]">{course.price}</span>
               ) : course.discount ? (
-                <>
-                  {/* Price column: original + new */}
-                  <div className="flex flex-col items-end -space-y-1">
-                    <div className="flex items-center gap-x-2">
-                      <span className="text-xs font-light line-through text-gray-400">{course.originalPrice}</span>
-                    </div>
-                    <span className="text-sm sm:text-base font-bold text-[var(--brand)]">{course.price}</span>
-                  </div>
-                  {/* Discount badge */}
-                  <div className="flex flex-col items-center gap-y-1 text-xs sm:text-sm">
-                    <span className="w-7 sm:w-10 font-bold bg-[var(--brand)] text-white text-center rounded-md py-0.5 text-[11px]">
-                      {course.discount}%
-                    </span>
-                  </div>
-                </>
+                <div className="flex flex-col items-end -space-y-0.5">
+                  <span className="text-[11px] font-light line-through text-gray-400">{course.originalPrice}</span>
+                  <span className="text-sm font-bold text-[var(--brand)]">{course.price}</span>
+                </div>
               ) : (
-                <span className="text-sm sm:text-base font-bold text-[var(--brand)]">{course.price}</span>
+                <span className="text-sm font-bold text-[var(--brand)]">{course.price}</span>
               )}
             </div>
           </div>

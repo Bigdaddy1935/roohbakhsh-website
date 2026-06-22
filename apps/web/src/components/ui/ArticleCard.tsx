@@ -1,17 +1,17 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
-import { RiTimeLine, RiUserLine, RiArrowLeftLine } from "react-icons/ri";
+import { RiStarFill, RiUserLine, RiArrowLeftLine } from "react-icons/ri";
 
 export type ArticleCardData = {
   id: string;
   title: string;
   excerpt: string;
   author: string;
-  readTime: string;
+  averageRating: number | null;
+  reviewCount: number;
   image: string;
   href: string;
-  category: string;
 };
 
 export default function ArticleCard({ article }: { article: ArticleCardData }) {
@@ -42,7 +42,7 @@ export default function ArticleCard({ article }: { article: ArticleCardData }) {
           </p>
         </div>
 
-        {/* Meta */}
+        {/* Meta: author | rating */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-x-1.5">
             <span className="size-5 sm:size-6 rounded-full bg-[var(--brand)]/15 flex items-center justify-center shrink-0">
@@ -52,12 +52,15 @@ export default function ArticleCard({ article }: { article: ArticleCardData }) {
               {article.author}
             </span>
           </div>
-          {article.readTime && (
-            <div className="flex items-center gap-x-1 rounded-md px-1.5 py-1 text-gray-400 bg-gray-100 text-[11px]">
-              <RiTimeLine size={13} />
-              <span>{article.readTime}</span>
-            </div>
-          )}
+          <div className="flex items-center gap-x-1">
+            <RiStarFill size={13} className="text-yellow-400" />
+            <span className="text-xs font-semibold text-gray-700">
+              {(article.averageRating ?? 5).toFixed(1)}
+            </span>
+            {article.reviewCount > 0 && (
+              <span className="text-[11px] text-gray-400">({article.reviewCount})</span>
+            )}
+          </div>
         </div>
 
         {/* Read button — absolute, overflows card bottom */}

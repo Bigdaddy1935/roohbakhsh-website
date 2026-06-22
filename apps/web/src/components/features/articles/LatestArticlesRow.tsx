@@ -66,7 +66,7 @@ export default function LatestArticlesRow() {
                   <div className="flex items-center gap-x-3 text-[10px] text-gray-400 mt-auto">
                     <span className="flex items-center gap-x-1">
                       <RiUserLine size={11} />
-                      {article.authorId}
+                      {article.instructor.name[locale]}
                     </span>
                     <span className="flex items-center gap-x-1">
                       <RiTimeLine size={11} />

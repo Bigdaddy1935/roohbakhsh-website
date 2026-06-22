@@ -2,29 +2,29 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
-import type { Notification, UnreadCountResponse, Paginated } from "@roohbakhsh/shared";
+import type { NotificationItem, NotificationsSummary, Paginated } from "@roohbakhsh/shared";
 
 export const notificationKeys = {
   list: (params?: Record<string, unknown>) => ["notifications", "list", params] as const,
   unreadCount: ["notifications", "unread-count"] as const,
 };
 
-export function useNotifications(params?: { page?: number; limit?: number }) {
+export function useNotificationItems(params?: { page?: number; limit?: number }) {
   const qs = new URLSearchParams();
   if (params?.page) qs.set("page", String(params.page));
   if (params?.limit) qs.set("limit", String(params.limit));
   const query = qs.toString() ? `?${qs}` : "";
 
-  return useQuery<Paginated<Notification>>({
+  return useQuery<Paginated<NotificationItem>>({
     queryKey: notificationKeys.list(params),
-    queryFn: () => api.get<Paginated<Notification>>(`/notifications${query}`),
+    queryFn: () => api.get<Paginated<NotificationItem>>(`/notifications${query}`),
   });
 }
 
 export function useUnreadCount() {
-  return useQuery<UnreadCountResponse>({
+  return useQuery<NotificationsSummary>({
     queryKey: notificationKeys.unreadCount,
-    queryFn: () => api.get<UnreadCountResponse>("/notifications/unread-count"),
+    queryFn: () => api.get<NotificationsSummary>("/notifications/unread-count"),
   });
 }
 

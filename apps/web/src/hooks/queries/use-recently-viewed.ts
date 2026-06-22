@@ -3,9 +3,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 import type {
-  RecentlyViewed,
-  PaginatedRecentlyViewed,
+  RecentViewItem,
   RecordViewRequest,
+  Paginated,
 } from "@roohbakhsh/shared";
 
 export const recentlyViewedKeys = {
@@ -18,9 +18,9 @@ export function useRecentlyViewed(params?: { limit?: number }) {
   if (params?.limit) qs.set("limit", String(params.limit));
   const query = qs.toString() ? `?${qs}` : "";
 
-  return useQuery<RecentlyViewed[]>({
+  return useQuery<RecentViewItem[]>({
     queryKey: recentlyViewedKeys.list(params),
-    queryFn: () => api.get<RecentlyViewed[]>(`/recently-viewed${query}`),
+    queryFn: () => api.get<RecentViewItem[]>(`/recently-viewed${query}`),
   });
 }
 
@@ -30,9 +30,9 @@ export function useRecentlyViewedPaginated(params?: { page?: number; limit?: num
   if (params?.limit) qs.set("limit", String(params.limit));
   const query = qs.toString() ? `?${qs}` : "";
 
-  return useQuery<PaginatedRecentlyViewed>({
+  return useQuery<Paginated<RecentViewItem>>({
     queryKey: recentlyViewedKeys.paginated(params),
-    queryFn: () => api.get<PaginatedRecentlyViewed>(`/recently-viewed/paginated${query}`),
+    queryFn: () => api.get<Paginated<RecentViewItem>>(`/recently-viewed/paginated${query}`),
   });
 }
 

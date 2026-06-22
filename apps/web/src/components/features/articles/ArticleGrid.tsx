@@ -90,7 +90,7 @@ export default function ArticleGrid() {
                   <span className="size-6 rounded-full bg-[var(--brand)]/10 flex items-center justify-center">
                     <RiUserLine size={12} className="text-[var(--brand)]" />
                   </span>
-                  <span className="truncate max-w-[110px]">{article.authorId}</span>
+                  <span className="truncate max-w-[110px]">{article.instructor.name[locale]}</span>
                 </span>
               </div>
 
