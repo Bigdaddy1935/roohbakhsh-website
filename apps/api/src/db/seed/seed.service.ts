@@ -12,6 +12,17 @@ import { Section } from "../../modules/courses/entities/section.entity";
 import { Lesson } from "../../modules/courses/entities/lesson.entity";
 import { Article } from "../../modules/articles/entities/article.entity";
 
+const SAMPLE_THUMBNAILS = [
+  "https://storage.sabzlearn.ir/legacy-statics/2025/07/21-1.webp",
+  "https://storage.sabzlearn.ir/legacy-statics/2025/11/AlpineJS8-1.webp",
+  "https://storage.sabzlearn.ir/legacy-statics/2025/11/SQL5.webp",
+  "https://storage.sabzlearn.ir/legacy-statics/2024/12/Bash-Script-1.webp",
+];
+
+function randomThumbnail(): string {
+  return SAMPLE_THUMBNAILS[Math.floor(Math.random() * SAMPLE_THUMBNAILS.length)]!;
+}
+
 interface SeedCourseDef {
   slug: string;
   title: Localized;
@@ -235,10 +246,7 @@ export class SeedService implements OnApplicationBootstrap {
           title: def.title,
           slug: def.slug,
           description: def.description,
-          thumbnailUrl: {
-            ar: `https://cdn.roohbakhsh.ac/courses/${def.slug}/thumb-ar.webp`,
-            ur: `https://cdn.roohbakhsh.ac/courses/${def.slug}/thumb-ur.webp`,
-          },
+          thumbnailUrl: { ar: randomThumbnail(), ur: randomThumbnail() },
           price: { amountMinor: def.amountMinor, currency: "IRR" },
           level: def.level,
           runStatus: "ongoing",
@@ -393,10 +401,7 @@ export class SeedService implements OnApplicationBootstrap {
           bodyAr: def.bodyAr,
           bodyUr: def.bodyUr,
           thumbnailUrl: def.hasThumbnail
-            ? {
-                ar: `https://cdn.roohbakhsh.ac/articles/${def.slug}/thumb-ar.webp`,
-                ur: `https://cdn.roohbakhsh.ac/articles/${def.slug}/thumb-ur.webp`,
-              }
+            ? { ar: randomThumbnail(), ur: randomThumbnail() }
             : null,
           authorId,
           status: def.status,
