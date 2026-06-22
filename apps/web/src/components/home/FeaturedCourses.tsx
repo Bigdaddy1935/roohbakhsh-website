@@ -15,17 +15,16 @@ export default function FeaturedCourses() {
   return (
     <CardSlider
       title={t("title")}
-      subtitle={t("subtitle")}
-      viewAllHref="/courses"
-      viewAllLabel={t("view_all")}
-      bgClass="bg-white"
+      title1={t("title_1")}
+      title2={t("title_2")}
+      scrollAmount={1232}
     >
       {courses.map((course) => {
         const free = isFree(course.effectivePrice);
         const thumb = course.thumbnailUrl?.[locale] ?? course.thumbnailUrl?.ar ?? "";
         return (
+          <div key={course.id} className="w-[298px] shrink-0" style={{ scrollSnapAlign: "start" }}>
           <CourseCard
-            key={course.id}
             course={{
               id: course.id,
               href: `/courses/${course.slug}`,
@@ -43,6 +42,7 @@ export default function FeaturedCourses() {
               category: "",
             }}
           />
+          </div>
         );
       })}
     </CardSlider>

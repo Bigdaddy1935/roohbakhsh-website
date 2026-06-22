@@ -125,13 +125,18 @@ export default function Testimonials() {
   const visible = Array.from({ length: VISIBLE }, (_, i) => TESTIMONIALS[(start + i) % total]);
 
   return (
-    <section className="py-16 bg-gradient-to-br from-[#f0faf7] to-[var(--bg)] overflow-hidden">
-      <div className="container">
+    <section className="container relative py-10 sm:py-16 lg:py-20 overflow-hidden">
 
         {/* Header */}
-        <div className="text-center mb-10">
-          <p className="text-[var(--brand)] text-sm font-semibold mb-1.5">{t("subtitle")}</p>
-          <h2 className="text-2xl lg:text-3xl font-extrabold text-[var(--ink)]">{t("title")}</h2>
+        <div className="mb-12">
+<div className="flex items-center gap-x-4 sm:gap-x-7">
+            <div className="hidden sm:block w-full h-px bg-gray-200" />
+            <h2 className="flex items-center gap-x-1 shrink-0 text-xl sm:text-2xl md:text-3xl font-bold cursor-default whitespace-nowrap">
+              <span className="text-[var(--ink)]">{t("title_1")}</span>
+              <span className="text-[var(--brand)]">{t("title_2")}</span>
+            </h2>
+            <div className="hidden sm:block w-full h-px bg-gray-200" />
+          </div>
         </div>
 
         {/* Slider row */}
@@ -144,7 +149,7 @@ export default function Testimonials() {
             {visible.map((item, i) => (
               <div
                 key={`${start}-${i}`}
-                className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 p-5 flex flex-col gap-y-4"
+                className="bg-white rounded-lg border border-gray-100 p-5 flex flex-col gap-y-4"
               >
                 {/* Quote + text */}
                 <div>
@@ -200,7 +205,6 @@ export default function Testimonials() {
           </button>
         </div>
 
-      </div>
     </section>
   );
 }

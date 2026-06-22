@@ -2,35 +2,25 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import {
-  RiBookOpenLine,
-  RiScales2Line,
-  RiMoonLine,
-  RiTimeLine,
-  RiPenNibLine,
-  RiHeartLine,
-  RiArrowRightSLine,
-  RiArrowLeftSLine,
-} from "react-icons/ri";
+import { RiArrowRightSLine, RiArrowLeftSLine } from "react-icons/ri";
 import { useRef } from "react";
+
+const STATIC_IMG = "https://storage.sabzlearn.ir/app/static/files/fd5c17d5-2826-4027-b964-d092959d2a71-js-logo.png";
 
 type Cat = {
   id: string;
   href: string;
-  Icon: React.ComponentType<{ size?: number; className?: string }>;
   name: { ar: string; ur: string };
   count: { ar: string; ur: string };
-  gradient: string;
-  iconColor: string;
 };
 
 const CATS: Cat[] = [
-  { id:"quran",    href:"/courses/quran",    Icon:RiBookOpenLine, name:{ar:"العلوم القرآنية",ur:"قرآنی علوم"},    count:{ar:"١٢ دورة",ur:"12 کورسز"}, gradient:"from-emerald-400 to-teal-600",   iconColor:"text-white" },
-  { id:"fiqh",     href:"/courses/fiqh",     Icon:RiScales2Line,  name:{ar:"الفقه والأصول",ur:"فقہ و اصول"},     count:{ar:"٨ دورات",ur:"8 کورسز"},  gradient:"from-blue-400 to-indigo-600",   iconColor:"text-white" },
-  { id:"aqeedah",  href:"/courses/aqeedah",  Icon:RiMoonLine,     name:{ar:"العقيدة والكلام",ur:"عقیدہ و کلام"}, count:{ar:"٦ دورات",ur:"6 کورسز"},  gradient:"from-violet-400 to-purple-600", iconColor:"text-white" },
-  { id:"history",  href:"/courses/history",  Icon:RiTimeLine,     name:{ar:"التاريخ الإسلامي",ur:"اسلامی تاریخ"}, count:{ar:"٩ دورات",ur:"9 کورسز"}, gradient:"from-amber-400 to-orange-500",  iconColor:"text-white" },
-  { id:"arabic",   href:"/courses/arabic",   Icon:RiPenNibLine,   name:{ar:"اللغة العربية",ur:"عربی زبان"},     count:{ar:"١٥ دورة",ur:"15 کورسز"}, gradient:"from-rose-400 to-pink-600",     iconColor:"text-white" },
-  { id:"tazkiyah", href:"/courses/tazkiyah", Icon:RiHeartLine,    name:{ar:"التزكية والسلوك",ur:"تزکیہ و سلوک"}, count:{ar:"٧ دورات",ur:"7 کورسز"}, gradient:"from-teal-400 to-cyan-600",    iconColor:"text-white" },
+  { id:"quran",    href:"/courses/quran",    name:{ar:"العلوم القرآنية",ur:"قرآنی علوم"},    count:{ar:"١٢ دورة",ur:"12 کورس"} },
+  { id:"fiqh",     href:"/courses/fiqh",     name:{ar:"الفقه والأصول",ur:"فقہ و اصول"},     count:{ar:"٨ دورات",ur:"8 کورس"}  },
+  { id:"aqeedah",  href:"/courses/aqeedah",  name:{ar:"العقيدة والكلام",ur:"عقیدہ و کلام"}, count:{ar:"٦ دورات",ur:"6 کورس"}  },
+  { id:"history",  href:"/courses/history",  name:{ar:"التاريخ الإسلامي",ur:"اسلامی تاریخ"}, count:{ar:"٩ دورات",ur:"9 کورس"} },
+  { id:"arabic",   href:"/courses/arabic",   name:{ar:"اللغة العربية",ur:"عربی زبان"},     count:{ar:"١٥ دورة",ur:"15 کورس"} },
+  { id:"tazkiyah", href:"/courses/tazkiyah", name:{ar:"التزكية والسلوك",ur:"تزکیہ و سلوک"}, count:{ar:"٧ دورات",ur:"7 کورس"}  },
 ];
 
 export default function CategoriesSection() {
@@ -43,16 +33,16 @@ export default function CategoriesSection() {
   };
 
   return (
-    <section className="py-14">
-      <div className="container">
+    <section className="container relative py-10 sm:py-16 lg:py-20">
 
         {/* Header */}
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <p className="text-[var(--brand)] text-sm font-semibold mb-1">{t("subtitle")}</p>
-            <h2 className="text-2xl lg:text-3xl font-extrabold text-[var(--ink)]">{t("title")}</h2>
-          </div>
-          <div className="flex items-center gap-x-2">
+        <div className="flex items-center gap-x-3 sm:gap-x-7 flex-wrap sm:flex-nowrap mb-12">
+          <h2 className="flex items-center gap-x-1 shrink-0 text-xl sm:text-2xl md:text-3xl font-bold cursor-default">
+            <span className="text-[var(--ink)]">{t("title_1")}</span>
+            <span className="text-[var(--brand)]">{t("title_2")}</span>
+          </h2>
+          <div className="hidden sm:block w-full h-px bg-gray-200" />
+          <div className="flex items-center gap-x-2 shrink-0 ms-auto">
             <button type="button" onClick={() => scroll("prev")} className="size-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-400 hover:border-[var(--brand)] hover:text-[var(--brand)] transition-colors cursor-pointer">
               <RiArrowRightSLine size={18} />
             </button>
@@ -68,24 +58,26 @@ export default function CategoriesSection() {
           className="flex gap-x-4 overflow-x-auto pb-2 scroll-smooth"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {CATS.map(({ id, href, Icon, name, count, gradient, iconColor }) => (
+          {CATS.map(({ id, href, name, count }) => (
             <Link
               key={id}
               href={href}
-              className="group flex flex-col items-center gap-y-3 p-6 rounded-xl border border-gray-100 bg-white hover:border-transparent hover:shadow-lg transition-all duration-200 text-center w-44 shrink-0"
+              className="bg-white flex flex-col items-center gap-3 sm:gap-4 px-2.5 py-4 sm:py-6 rounded-lg border-2 border-transparent hover:border-[var(--brand)] hover:bg-[var(--brand)]/10 transition-colors text-center flex-1 min-w-36"
             >
-              <div className={`size-16 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-200`}>
-                <Icon size={28} className={iconColor} />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-[var(--ink)] leading-5">{name[locale]}</p>
-                <p className="text-[11px] text-gray-400 mt-1">{count[locale]}</p>
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={STATIC_IMG}
+                alt={name[locale]}
+                className="size-14 sm:size-16 object-cover rounded-sm"
+                loading="lazy"
+              />
+              <h3 className="text-sm sm:text-base font-semibold text-[var(--ink)]">{name[locale]}</h3>
+              <span className="flex items-center gap-x-0.5 px-2.5 py-1 bg-[var(--brand)]/5 text-xs sm:text-sm rounded-sm text-[var(--ink)]">
+                {count[locale]}
+              </span>
             </Link>
           ))}
         </div>
-
-      </div>
     </section>
   );
 }
