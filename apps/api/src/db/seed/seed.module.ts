@@ -11,6 +11,9 @@ import { Article } from "../../modules/articles/entities/article.entity";
 import { Review } from "../../modules/reviews/entities/review.entity";
 import { Ticket } from "../../modules/tickets/entities/ticket.entity";
 import { TicketMessage } from "../../modules/tickets/entities/ticket-message.entity";
+import { RecentView } from "../../modules/recently-viewed/entities/recent-view.entity";
+import { Favorite } from "../../modules/favorites/entities/favorite.entity";
+import { LessonProgress } from "../../modules/progress/entities/lesson-progress.entity";
 import { SeedService } from "./seed.service";
 
 @Module({
@@ -27,6 +30,9 @@ import { SeedService } from "./seed.service";
       Review,
       Ticket,
       TicketMessage,
+      RecentView,
+      Favorite,
+      LessonProgress,
     ]),
   ],
   providers: [SeedService],

@@ -16,6 +16,9 @@ import { InvoicesModule } from "./modules/invoices/invoices.module";
 import { ArticlesModule } from "./modules/articles/articles.module";
 import { ReviewsModule } from "./modules/reviews/reviews.module";
 import { TicketsModule } from "./modules/tickets/tickets.module";
+import { RecentlyViewedModule } from "./modules/recently-viewed/recently-viewed.module";
+import { FavoritesModule } from "./modules/favorites/favorites.module";
+import { ProgressModule } from "./modules/progress/progress.module";
 import { SeedModule } from "./db/seed/seed.module";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { JwtAuthGuard } from "./modules/auth/guards/jwt-auth.guard";
@@ -45,6 +48,9 @@ import { RolesGuard } from "./common/guards/roles.guard";
     ArticlesModule,
     ReviewsModule,
     TicketsModule,
+    RecentlyViewedModule,
+    FavoritesModule,
+    ProgressModule,
     // فقط در توسعه: داده‌های نمونه را خودکار seed می‌کند (هیچ‌وقت در production)
     ...(process.env.NODE_ENV !== "production" ? [SeedModule] : []),
   ],

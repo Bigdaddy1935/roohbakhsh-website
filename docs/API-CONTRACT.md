@@ -713,11 +713,103 @@ interface UserDashboard {
   totalSpent: Money | null;     // مجموع سفارش‌های paid — null یعنی هیچ خریدی نبوده
   myCoursesCount: number;       // تعداد دوره‌های متمایز خریداری‌شده
   ticketsCount: number;
-  recentTickets: Ticket[];      // آخرین ۳ تیکت
+  recentTickets: Ticket[];          // آخرین ۳ تیکت
+  recentViews: RecentViewItem[];    // آخرین ۵ بازدید — دوره یا درس
+  favorites: FavoriteItem[];        // همه‌ی علاقه‌مندی‌ها — دوره یا مقاله
+  coursesProgress: CourseProgress[]; // پیشرفت برای دوره‌هایی که کاربر خریده
 }
 ```
 
-> فیلد «آخرین دوره‌های دیده‌شده» (در طرح داشبورد فرانت) فعلاً پشتیبانی نمی‌شود — هیچ مکانیزم ردیابی بازدید دوره در بک‌اند وجود ندارد. اگر لازم شد باید جدول جدیدی برای `course_views` طراحی و قرارداد جدید نوشته شود.
+---
+
+## §15 — Recently Viewed (آخرین بازدیدها)
+
+دوره یا درس — هر بار باز شدن صفحه‌ی دوره/درس در فرانت باید `POST /recently-viewed` صدا زده شود.
+
+```ts
+type RecentViewType = "course" | "lesson";
+
+interface RecentViewItem {
+  type: RecentViewType;
+  id: ID;
+  title: Localized;
+  thumbnailUrl: Localized<string | null>; // برای lesson همان thumbnail دوره‌ی والد است
+  courseId: ID;     // برای lesson دوره‌ی والد، برای course خودش
+  courseSlug: string;
+  viewedAt: ISODate;
+}
+
+interface RecordViewRequest {
+  type: RecentViewType;
+  id: ID; // UUID دوره یا درس
+}
+```
+
+### `POST /recently-viewed` 🔒
+بدنه: `RecordViewRequest`. idempotent — اگر قبلاً ثبت شده بود فقط `viewedAt` را جلو می‌برد.
+خطا: `404 COURSE_NOT_FOUND` / `404 LESSON_NOT_FOUND`
+
+### `GET /recently-viewed?limit=10` 🔒
+خروجی: `RecentViewItem[]` — جدیدترین اول.
+
+---
+
+## §16 — Favorites (علاقه‌مندی‌ها)
+
+دوره یا مقاله.
+
+```ts
+type FavoriteType = "course" | "article";
+
+interface FavoriteItem {
+  type: FavoriteType;
+  id: ID;
+  slug: string;
+  title: Localized;
+  thumbnailUrl: Localized<string | null>;
+  createdAt: ISODate;
+}
+
+interface ToggleFavoriteRequest {
+  type: FavoriteType;
+  id: ID;
+}
+
+interface FavoriteStatus {
+  isFavorite: boolean;
+}
+```
+
+### `POST /favorites/toggle` 🔒
+بدنه: `ToggleFavoriteRequest`. اگر قبلاً علاقه‌مندی بود حذف می‌کند و `{isFavorite: false}` برمی‌گرداند، در غیر این صورت اضافه می‌کند و `{isFavorite: true}`.
+خطا: `404 COURSE_NOT_FOUND` / `404 ARTICLE_NOT_FOUND`
+
+### `GET /favorites/mine?limit=20` 🔒
+خروجی: `FavoriteItem[]` — جدیدترین اول.
+
+---
+
+## §17 — Course Progress (درصد پیشرفت دوره)
+
+درصد پیشرفت بر اساس مدت‌زمان درس‌هایی که کاربر **آنلاین دیده** محاسبه می‌شود (هیچ ستون denormalize نشده — مشابه `lessonCount`/`durationMinutes` دوره، روی هر درخواست از روی جدول `lesson_progress` و `lessons` محاسبه می‌شود).
+
+```ts
+interface CourseProgress {
+  courseId: ID;
+  courseSlug: string;
+  watchedMinutes: number;  // مجموع مدت‌زمان درس‌های دیده‌شده
+  totalMinutes: number;    // مدت‌زمان کل دوره
+  progressPercent: number; // ۰ تا ۱۰۰ — totalMinutes صفر یعنی ۰
+}
+```
+
+### `POST /lessons/:lessonId/watch` 🔒
+درس را به‌عنوان دیده‌شده ثبت می‌کند — idempotent (هر درس فقط یک‌بار شمارش می‌شود).
+خطا: `404 LESSON_NOT_FOUND`
+
+### `GET /courses/:courseSlug/progress` 🔒
+خروجی: `CourseProgress` برای کاربر لاگین‌شده.
+خطا: `404 COURSE_NOT_FOUND`
 
 ---
 

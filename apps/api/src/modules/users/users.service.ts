@@ -5,6 +5,9 @@ import type { User as UserContract, UserDashboard, Paginated, Money } from "@roo
 import { User } from "../auth/entities/user.entity";
 import { Order } from "../orders/entities/order.entity";
 import { TicketsService } from "../tickets/tickets.service";
+import { RecentlyViewedService } from "../recently-viewed/recently-viewed.service";
+import { FavoritesService } from "../favorites/favorites.service";
+import { ProgressService } from "../progress/progress.service";
 import { toPaginated } from "../../common/utils/paginate";
 
 @Injectable()
@@ -15,6 +18,9 @@ export class UsersService {
     @InjectRepository(Order)
     private readonly orderRepo: Repository<Order>,
     private readonly ticketsService: TicketsService,
+    private readonly recentlyViewedService: RecentlyViewedService,
+    private readonly favoritesService: FavoritesService,
+    private readonly progressService: ProgressService,
   ) {}
 
   async findAll(page: number, limit: number): Promise<Paginated<UserContract>> {
@@ -38,18 +44,24 @@ export class UsersService {
             currency: paidOrders[0]!.total.currency,
           };
 
-    const courseIds = new Set(paidOrders.flatMap((o) => o.items.map((i) => i.courseId)));
+    const courseIds = [...new Set(paidOrders.flatMap((o) => o.items.map((i) => i.courseId)))];
 
-    const [ticketsCount, recentTickets] = await Promise.all([
+    const [ticketsCount, recentTickets, recentViews, favorites, progressMap] = await Promise.all([
       this.ticketsService.countMine(userId),
       this.ticketsService.recentForUser(userId, 3),
+      this.recentlyViewedService.findRecent(userId, 5),
+      this.favoritesService.findMine(userId),
+      this.progressService.progressForCourses(userId, courseIds),
     ]);
 
     return {
       totalSpent,
-      myCoursesCount: courseIds.size,
+      myCoursesCount: courseIds.length,
       ticketsCount,
       recentTickets,
+      recentViews,
+      favorites,
+      coursesProgress: [...progressMap.values()],
     };
   }
 

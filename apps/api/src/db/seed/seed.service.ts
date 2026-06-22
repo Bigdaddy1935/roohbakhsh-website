@@ -14,6 +14,9 @@ import { Article } from "../../modules/articles/entities/article.entity";
 import { Review } from "../../modules/reviews/entities/review.entity";
 import { Ticket } from "../../modules/tickets/entities/ticket.entity";
 import { TicketMessage } from "../../modules/tickets/entities/ticket-message.entity";
+import { RecentView } from "../../modules/recently-viewed/entities/recent-view.entity";
+import { Favorite } from "../../modules/favorites/entities/favorite.entity";
+import { LessonProgress } from "../../modules/progress/entities/lesson-progress.entity";
 
 const SAMPLE_THUMBNAILS = [
   "https://storage.sabzlearn.ir/legacy-statics/2025/07/21-1.webp",
@@ -65,6 +68,9 @@ export class SeedService implements OnApplicationBootstrap {
     @InjectRepository(Review) private readonly reviewRepo: Repository<Review>,
     @InjectRepository(Ticket) private readonly ticketRepo: Repository<Ticket>,
     @InjectRepository(TicketMessage) private readonly ticketMessageRepo: Repository<TicketMessage>,
+    @InjectRepository(RecentView) private readonly recentViewRepo: Repository<RecentView>,
+    @InjectRepository(Favorite) private readonly favoriteRepo: Repository<Favorite>,
+    @InjectRepository(LessonProgress) private readonly lessonProgressRepo: Repository<LessonProgress>,
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
@@ -80,6 +86,9 @@ export class SeedService implements OnApplicationBootstrap {
     await this.seedReviews(courseIds, students.map((s) => s.id));
     await this.seedArticleReviews(articleIds, students.map((s) => s.id));
     await this.seedTickets(students.map((s) => s.id));
+    await this.seedLessonProgress(courseIds, students.map((s) => s.id));
+    await this.seedRecentViews(courseIds, students.map((s) => s.id));
+    await this.seedFavorites(courseIds, articleIds, students.map((s) => s.id));
 
     this.logger.log("seed داده‌های نمونه تمام شد.");
   }
@@ -685,5 +694,88 @@ export class SeedService implements OnApplicationBootstrap {
       }
     }
     this.logger.log(`✓ تیکت‌های نمونه ساخته شدند (${defs.length} موضوع × ${studentIds.length} کاربر)`);
+  }
+
+  /** هر کاربر نیمی از درس‌های دوره‌ی اول را دیده — برای تست درصد پیشرفت. */
+  private async seedLessonProgress(courseIds: string[], studentIds: string[]): Promise<void> {
+    const firstCourseId = courseIds[0];
+    if (!firstCourseId) return;
+
+    const lessons = await this.lessonRepo.find({ where: { courseId: firstCourseId }, order: { order: "ASC" } });
+    const watchedLessons = lessons.slice(0, Math.ceil(lessons.length / 2));
+
+    for (const studentId of studentIds) {
+      for (const lesson of watchedLessons) {
+        const existing = await this.lessonProgressRepo.findOne({
+          where: { userId: studentId, lessonId: lesson.id },
+        });
+        if (existing) continue;
+        await this.lessonProgressRepo.save(
+          this.lessonProgressRepo.create({ userId: studentId, lessonId: lesson.id, courseId: firstCourseId }),
+        );
+      }
+    }
+    this.logger.log(`✓ پیشرفت نمونه ساخته شد (${watchedLessons.length} درس از دوره‌ی اول × ${studentIds.length} کاربر)`);
+  }
+
+  /** بازدید نمونه از دو دوره‌ی اول و یک درس — برای تست «آخرین بازدیدها». */
+  private async seedRecentViews(courseIds: string[], studentIds: string[]): Promise<void> {
+    const viewedCourseIds = courseIds.slice(0, 2);
+    if (viewedCourseIds.length === 0) return;
+
+    const firstLesson = await this.lessonRepo.findOne({ where: { courseId: viewedCourseIds[0] } });
+
+    for (const studentId of studentIds) {
+      for (const courseId of viewedCourseIds) {
+        const existing = await this.recentViewRepo.findOne({
+          where: { userId: studentId, type: "course", targetId: courseId },
+        });
+        if (existing) continue;
+        await this.recentViewRepo.save(
+          this.recentViewRepo.create({ userId: studentId, type: "course", targetId: courseId }),
+        );
+      }
+      if (firstLesson) {
+        const existing = await this.recentViewRepo.findOne({
+          where: { userId: studentId, type: "lesson", targetId: firstLesson.id },
+        });
+        if (!existing) {
+          await this.recentViewRepo.save(
+            this.recentViewRepo.create({ userId: studentId, type: "lesson", targetId: firstLesson.id }),
+          );
+        }
+      }
+    }
+    this.logger.log(`✓ بازدیدهای نمونه ساخته شدند (${studentIds.length} کاربر)`);
+  }
+
+  /** هر کاربر دوره‌ی اول و مقاله‌ی اول را علاقه‌مندی کرده — برای تست «علاقه‌مندی‌ها». */
+  private async seedFavorites(courseIds: string[], articleIds: string[], studentIds: string[]): Promise<void> {
+    const courseId = courseIds[0];
+    const articleId = articleIds[0];
+
+    for (const studentId of studentIds) {
+      if (courseId) {
+        const existing = await this.favoriteRepo.findOne({
+          where: { userId: studentId, type: "course", targetId: courseId },
+        });
+        if (!existing) {
+          await this.favoriteRepo.save(
+            this.favoriteRepo.create({ userId: studentId, type: "course", targetId: courseId }),
+          );
+        }
+      }
+      if (articleId) {
+        const existing = await this.favoriteRepo.findOne({
+          where: { userId: studentId, type: "article", targetId: articleId },
+        });
+        if (!existing) {
+          await this.favoriteRepo.save(
+            this.favoriteRepo.create({ userId: studentId, type: "article", targetId: articleId }),
+          );
+        }
+      }
+    }
+    this.logger.log(`✓ علاقه‌مندی‌های نمونه ساخته شدند (${studentIds.length} کاربر)`);
   }
 }
