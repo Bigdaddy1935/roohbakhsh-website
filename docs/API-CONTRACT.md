@@ -101,6 +101,8 @@
 > عملیات نوشتن (POST / PATCH / DELETE) فقط برای `role: admin` مجاز است.
 > خواندن (GET) برای همه (بدون توکن) آزاد است.
 > `name` و `description` از نوع `Localized` هستند: `{ ar: string, ur: string }`.
+> `thumbnailUrl` از نوع `Localized<string | null>` است — مثل دوره‌ها، می‌تواند تصویر متفاوتی برای ar/ur داشته باشد.
+> `courseCount` همیشه در پاسخ هست و مستقیماً از تعداد دوره‌هایی که `categoryId` آن‌ها به این دسته اشاره می‌کند محاسبه می‌شود (ستون مجزا در دیتابیس ندارد).
 
 ### `GET /api/categories`
 لیست مسطح همه دسته‌ها.

@@ -157,6 +157,7 @@ export class SeedService implements OnApplicationBootstrap {
         ar: "دوره‌های مرتبط با فقه اسلامی و تفسیر قرآن کریم.",
         ur: "اسلامی فقہ اور قرآن کریم کی تفسیر سے متعلق کورسز۔",
       },
+      thumbnailUrl: { ar: randomThumbnail(), ur: randomThumbnail() },
       order: 1,
     });
     const saved = await this.categoryRepo.save(category);
