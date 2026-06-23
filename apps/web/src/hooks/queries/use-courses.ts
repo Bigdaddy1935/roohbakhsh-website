@@ -12,15 +12,17 @@ export const courseKeys = {
     ["courses", "lesson", courseSlug, sectionId, lessonId] as const,
 };
 
-export function useCourses(params?: { page?: number; limit?: number }) {
+export function useCourses(params?: { page?: number; limit?: number; q?: string }) {
   const qs = new URLSearchParams();
   if (params?.page) qs.set("page", String(params.page));
   if (params?.limit) qs.set("limit", String(params.limit));
+  if (params?.q) qs.set("q", params.q);
   const query = qs.toString() ? `?${qs}` : "";
 
   return useQuery<Paginated<CourseRecord>>({
     queryKey: courseKeys.list(params),
     queryFn: () => api.get<Paginated<CourseRecord>>(`/courses${query}`),
+    enabled: !params?.q || params.q.trim().length >= 3,
   });
 }
 
