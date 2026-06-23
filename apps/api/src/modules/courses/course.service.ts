@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  BadRequestException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -48,13 +49,27 @@ export class CourseService {
     private readonly reviewsService: ReviewsService,
   ) {}
 
-  async findAll(page: number, limit: number): Promise<Paginated<CourseRecord>> {
-    const [items, total] = await this.repo.findAndCount({
-      relations: { instructor: true },
-      order: { createdAt: "DESC" },
-      take: limit,
-      skip: (page - 1) * limit,
-    });
+  async findAll(page: number, limit: number, q?: string): Promise<Paginated<CourseRecord>> {
+    const search = q?.trim();
+    if (search && search.length < 3) {
+      throw new BadRequestException("SEARCH_QUERY_TOO_SHORT");
+    }
+
+    const qb = this.repo
+      .createQueryBuilder("course")
+      .leftJoinAndSelect("course.instructor", "instructor")
+      .orderBy("course.createdAt", "DESC")
+      .take(limit)
+      .skip((page - 1) * limit);
+
+    if (search) {
+      qb.andWhere(
+        "(JSON_UNQUOTE(JSON_EXTRACT(course.title, '$.ar')) LIKE :q OR JSON_UNQUOTE(JSON_EXTRACT(course.title, '$.ur')) LIKE :q)",
+        { q: `%${search}%` },
+      );
+    }
+
+    const [items, total] = await qb.getManyAndCount();
     const courseIds = items.map((c) => c.id);
     const [lessonStats, ratingStats, participantStats] = await Promise.all([
       this.lessonStatsForCourses(courseIds),
