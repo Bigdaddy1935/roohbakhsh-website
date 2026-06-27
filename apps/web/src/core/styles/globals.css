@@ -41,6 +41,36 @@
   :lang(ur) { font-family: var(--font-urdu); line-height: 2; }
 }
 
+/* ── Rich-text article body (rendered from CMS richText as HTML) ── */
+.article-body h1, .article-body h2, .article-body h3, .article-body h4 {
+  color: var(--ink);
+  font-weight: 800;
+  line-height: 1.6;
+  margin-block: 1em 0.5em;
+}
+.article-body h1 { font-size: 1.5em; }
+.article-body h2 { font-size: 1.3em; }
+.article-body h3 { font-size: 1.15em; }
+.article-body p { margin-block: 0.75em; }
+.article-body ul, .article-body ol {
+  margin-block: 0.75em;
+  padding-inline-start: 1.5em;
+}
+.article-body ul { list-style: disc; }
+.article-body ol { list-style: decimal; }
+.article-body li { margin-block: 0.3em; }
+.article-body a { color: var(--brand); text-decoration: underline; }
+.article-body strong, .article-body b { color: var(--ink); font-weight: 700; }
+.article-body blockquote {
+  border-inline-start: 3px solid var(--brand);
+  padding-inline-start: 1em;
+  margin-block: 1em;
+  color: #6b7280;
+}
+.article-body img { max-width: 100%; border-radius: var(--radius); margin-block: 1em; }
+.article-body table { width: 100%; border-collapse: collapse; margin-block: 1em; }
+.article-body th, .article-body td { border: 1px solid #e5e7eb; padding: 0.5em 0.75em; }
+
 /* Outside any @layer — overrides everything from Tailwind/HeroUI */
 .container {
   max-width: 1300px !important;

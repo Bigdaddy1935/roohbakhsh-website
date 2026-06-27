@@ -1,25 +1,30 @@
 "use client";
 
-import Image from "next/image";
 import { useLocale } from "next-intl";
-import { Link, usePathname } from "@/i18n/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import {
   RiHomeLine,
   RiBookmarkLine,
+  RiHeartLine,
   RiExchangeDollarLine,
   RiCustomerService2Line,
   RiAccountCircleLine,
   RiLogoutBoxLine,
+  RiUserLine,
+  RiNotification3Line,
 } from "react-icons/ri";
-import { MOCK_USER_PROFILE } from "@/data/dashboard.mock";
+import { useMe, useLogout } from "@/hooks/queries/use-auth";
+import { useUnreadCount } from "@/hooks/queries/use-notifications";
 
 const UI = {
   ar: {
     quickAccess: "دسترسی سریع",
     home: "الرئيسية",
     myCourses: "دوراتي",
+    favorites: "المفضلة",
     transactions: "المعاملات",
     tickets: "التيكيت",
+    notifications: "الإشعارات",
     account: "تفاصيل الحساب",
     logout: "تسجيل الخروج",
   },
@@ -27,19 +32,23 @@ const UI = {
     quickAccess: "فوری رسائی",
     home: "ہوم",
     myCourses: "میرے کورسز",
+    favorites: "پسندیدہ",
     transactions: "لین دین",
     tickets: "ٹکٹس",
+    notifications: "اطلاعات",
     account: "اکاؤنٹ کی تفصیلات",
     logout: "لاگ آؤٹ",
   },
 };
 
 const NAV = [
-  { key: "home",         href: "/dashboard",              Icon: RiHomeLine },
-  { key: "myCourses",   href: "/dashboard/my-courses",   Icon: RiBookmarkLine },
-  { key: "transactions", href: "/dashboard/transactions", Icon: RiExchangeDollarLine },
-  { key: "tickets",     href: "/dashboard/tickets",      Icon: RiCustomerService2Line },
-  { key: "account",     href: "/dashboard/account",      Icon: RiAccountCircleLine },
+  { key: "home",          href: "/dashboard",              Icon: RiHomeLine },
+  { key: "myCourses",     href: "/dashboard/my-courses",   Icon: RiBookmarkLine },
+  { key: "favorites",     href: "/dashboard/favorites",    Icon: RiHeartLine },
+  { key: "transactions",  href: "/dashboard/transactions", Icon: RiExchangeDollarLine },
+  { key: "tickets",       href: "/dashboard/tickets",      Icon: RiCustomerService2Line },
+  { key: "notifications", href: "/dashboard/notifications", Icon: RiNotification3Line },
+  { key: "account",       href: "/dashboard/account",      Icon: RiAccountCircleLine },
 ] as const;
 
 type Props = { open: boolean; onClose: () => void };
@@ -48,7 +57,18 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
   const locale = useLocale() as "ar" | "ur";
   const pathname = usePathname();
   const ui = UI[locale];
-  const user = MOCK_USER_PROFILE;
+  const { data: user } = useMe();
+  const { data: unread } = useUnreadCount();
+  const hasUnread = (unread?.unreadCount ?? 0) > 0;
+  const router = useRouter();
+  const logout = useLogout();
+
+  function handleLogout() {
+    onClose();
+    logout.mutate(undefined, {
+      onSettled: () => router.replace("/signin"),
+    });
+  }
 
   const isActive = (href: string) =>
     href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
@@ -58,18 +78,14 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
       {/* User info */}
       <div className="flex items-center justify-between pb-5 mb-5 border-b border-gray-100">
         <div className="flex items-center gap-x-2">
-          <Image
-            src={user.avatar}
-            alt="avatar"
-            width={44}
-            height={44}
-            className="size-11 rounded-full object-cover shrink-0"
-          />
+          <div className="size-11 rounded-full bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
+            <RiUserLine size={22} className="text-[var(--brand)]" />
+          </div>
           <div className="flex flex-col text-sm">
             <span className="font-semibold max-w-28 truncate text-[var(--ink)]">
-              {user.name[locale]}
+              {user?.fullName ?? "—"}
             </span>
-            <span className="text-gray-400 text-xs mt-0.5">{user.phone}</span>
+            <span className="text-gray-400 text-xs mt-0.5">{user?.phone ?? user?.email ?? ""}</span>
           </div>
         </div>
       </div>
@@ -94,12 +110,17 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
                   active ? "bg-[var(--brand)]" : "bg-transparent"
                 }`}
               />
-              <Icon
-                size={20}
-                className={`transition-colors shrink-0 ${
-                  active ? "text-[var(--brand)]" : "text-gray-400 group-hover:text-[var(--brand)]"
-                }`}
-              />
+              <span className="relative shrink-0">
+                <Icon
+                  size={20}
+                  className={`transition-colors ${
+                    active ? "text-[var(--brand)]" : "text-gray-400 group-hover:text-[var(--brand)]"
+                  }`}
+                />
+                {key === "notifications" && hasUnread && (
+                  <span className="absolute -top-0.5 -end-0.5 size-1.5 rounded-full bg-[var(--cta)]" />
+                )}
+              </span>
               <span
                 className={`text-sm transition-colors ${
                   active
@@ -118,7 +139,9 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
       <div className="mt-6 pt-5 border-t border-gray-100">
         <button
           type="button"
-          className="flex items-center gap-x-2.5 py-2 w-full group"
+          onClick={handleLogout}
+          disabled={logout.isPending}
+          className="flex items-center gap-x-2.5 py-2 w-full group cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
         >
           <span className="block w-0.5 h-5 ml-1 rounded-full bg-transparent shrink-0" />
           <RiLogoutBoxLine
@@ -126,7 +149,7 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
             className="text-red-400 group-hover:text-red-500 transition-colors shrink-0"
           />
           <span className="text-sm text-red-400 group-hover:text-red-500 transition-colors">
-            {ui.logout}
+            {logout.isPending ? `${ui.logout}...` : ui.logout}
           </span>
         </button>
       </div>

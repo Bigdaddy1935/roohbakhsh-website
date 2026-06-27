@@ -33,3 +33,5 @@ export interface ReplyTicketRequest {
   ticketId: ID;
   body: string;
 }
+
+export type PaginatedTickets = import("./common").Paginated<Ticket>;

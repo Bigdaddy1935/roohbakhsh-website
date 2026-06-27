@@ -1,8 +1,6 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
-import StatsBar from "@/components/home/StatsBar";
-import FreeCourses from "@/components/home/FreeCourses";
 import CategoriesSection from "@/components/home/CategoriesSection";
 import FeaturedCourses from "@/components/home/FeaturedCourses";
 import ServicesSection from "@/components/home/ServicesSection";
@@ -16,12 +14,10 @@ export default function HomePage() {
       <Header />
       <main>
       <HeroSection />
-      <StatsBar />
-      <FreeCourses />
+      <NewestCourses />
       <CategoriesSection />
       <FeaturedCourses />
       <ServicesSection />
-      <NewestCourses />
       <LatestArticles />
       <Testimonials />
       <AboutMission />

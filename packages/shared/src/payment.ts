@@ -22,3 +22,23 @@ export interface InitiatePaymentResponse {
 }
 
 export type PaginatedPayments = Paginated<PaymentRecord>;
+
+export interface PaymentDestinationAccount {
+  bankName: string;
+  accountNumber: string;
+  cardNumber: string;
+  accountHolder: string;
+}
+
+export interface SubmitCardToCardPaymentRequest {
+  orderId: string;
+  trackingCode: string;
+  cardNumber: string;
+  transferredAt?: string;
+  receiptImageUrl?: string;
+}
+
+export interface UploadReceiptResponse {
+  paymentId: string;
+  url: string;
+}

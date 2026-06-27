@@ -4,7 +4,8 @@ import { Suspense } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { RiArrowLeftSLine, RiBookOpenLine, RiTimeLine, RiUserLine, RiCalendarLine } from "react-icons/ri";
-import { COURSE_CATEGORIES, COURSE_SORT_OPTIONS } from "@/data/courses.mock";
+import { useCategories } from "@/hooks/queries/use-categories";
+import { useCourseStats } from "@/hooks/queries/use-courses";
 import { useCourseFilters } from "@/hooks/useCourseFilters";
 import FilterSortBar from "@/components/ui/FilterSortBar";
 import CoursesSidebar from "./CoursesSidebar";
@@ -14,9 +15,17 @@ function CoursesContent() {
   const t = useTranslations("Courses");
   const locale = useLocale() as "ar" | "ur";
   const { cats, sort, toggleCategory, setSort } = useCourseFilters();
+  const { data: categories } = useCategories();
+  const { data: stats } = useCourseStats();
 
-  const categoryOptions = COURSE_CATEGORIES.map((c) => ({ value: c.value, label: c[locale] }));
-  const sortOptions = COURSE_SORT_OPTIONS.map((o) => ({ value: o.value, label: o[locale] }));
+  const fmt = (n: number) => `+${n.toLocaleString(locale === "ar" ? "ar-EG" : "ur")}`;
+
+  const categoryOptions = (categories ?? []).map((c) => ({ value: c.id, label: c.name[locale] }));
+  const sortOptions = [
+    { value: "newest",  label: t("sort_newest")  },
+    { value: "popular", label: t("sort_popular") },
+    { value: "advanced", label: t("sort_advanced") },
+  ];
 
   return (
     <div className="bg-[var(--bg)] min-h-screen">
@@ -36,9 +45,9 @@ function CoursesContent() {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto">
             {[
-              { Icon: RiUserLine,     value: "+١٣٠٩٢٢١", label: t("stat_students") },
-              { Icon: RiCalendarLine, value: "+٩٧",       label: t("stat_courses")  },
-              { Icon: RiTimeLine,     value: "+٢١٦٤",     label: t("stat_hours")    },
+              { Icon: RiUserLine,     value: fmt(stats?.studentsCount ?? 0), label: t("stat_students") },
+              { Icon: RiCalendarLine, value: fmt(stats?.coursesCount ?? 0),  label: t("stat_courses")  },
+              { Icon: RiTimeLine,     value: fmt(stats?.totalHours ?? 0),    label: t("stat_hours")    },
             ].map(({ Icon, value, label }) => (
               <div key={label} className="flex flex-col items-center gap-y-2 bg-white/10 rounded-xl p-4">
                 <div className="size-10 rounded-xl bg-white/10 flex items-center justify-center">

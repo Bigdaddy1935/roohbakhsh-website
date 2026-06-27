@@ -10,6 +10,8 @@ export interface Category {
   parentId: ID | null;
   /** ترتیب نمایش در میان هم‌رده‌ها */
   order: number;
+  thumbnailUrl: Localized<string | null> | null;
+  courseCount: number;
   createdAt: ISODate;
   updatedAt: ISODate;
 }

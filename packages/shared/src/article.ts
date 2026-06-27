@@ -1,4 +1,5 @@
 import type { ISODate, Localized, Paginated } from "./common";
+import type { InstructorSummary } from "./instructor";
 
 export type ArticleStatus = "draft" | "published";
 
@@ -10,6 +11,9 @@ export interface ArticleRecord {
   body: Localized;
   thumbnailUrl: Localized<string | null>;
   authorId: string;
+  instructor: InstructorSummary;
+  averageRating: number;
+  reviewCount: number;
   status: ArticleStatus;
   publishedAt: ISODate | null;
   createdAt: ISODate;
