@@ -25,6 +25,9 @@ export class Category {
   @Column({ type: "json", nullable: true, default: null })
   description!: Localized | null;
 
+  @Column({ name: "thumbnail_url", type: "json", nullable: true, default: null })
+  thumbnailUrl!: Localized<string | null> | null;
+
   @Column({ default: 0 })
   order!: number;
 

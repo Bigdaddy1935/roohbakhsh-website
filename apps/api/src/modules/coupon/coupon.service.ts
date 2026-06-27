@@ -60,7 +60,8 @@ export class CouponService {
       expiresAt: dto.expiresAt ? new Date(dto.expiresAt) : null,
       isActive: dto.isActive ?? true,
     });
-    return this.toContract(await this.repo.save(coupon));
+    const saved = await this.repo.save(coupon);
+    return this.toContract(saved);
   }
 
   async update(id: string, dto: UpdateCouponDto): Promise<CouponRecord> {

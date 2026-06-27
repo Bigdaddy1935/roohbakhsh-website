@@ -6,7 +6,6 @@ import {
   Query,
   Request,
   UseGuards,
-  Redirect,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -33,13 +32,12 @@ export class PaymentsController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: "Initiate payment for an order",
-    description: "Creates a payment record and returns the gateway URL. Redirect user to `gatewayUrl`. (Gateway not configured yet — returns 503.)",
+    description: "Creates a payment record and returns the ZarinPal gateway URL. Redirect user to `gatewayUrl`.",
   })
   @ApiParam({ name: "orderId", description: "Order UUID" })
   @ApiResponse({ status: 201, description: "Payment initiated — { paymentId, gatewayUrl }" })
   @ApiResponse({ status: 400, description: "ORDER_ALREADY_PAID | ORDER_NOT_PAYABLE" })
   @ApiResponse({ status: 404, description: "ORDER_NOT_FOUND" })
-  @ApiResponse({ status: 503, description: "PAYMENT_GATEWAY_NOT_CONFIGURED" })
   initiate(
     @Request() req: { user: { id: string } },
     @Param("orderId") orderId: string,
@@ -50,11 +48,11 @@ export class PaymentsController {
   @Get("verify")
   @Public()
   @ApiOperation({
-    summary: "Payment gateway callback — verify payment",
-    description: "The payment gateway redirects here after payment. Verifies and updates order status. (Gateway not configured yet — returns 503.)",
+    summary: "ZarinPal callback — verify payment",
+    description: "ZarinPal redirects here after payment. Verifies with ZarinPal API and updates order status.",
   })
-  @ApiQuery({ name: "Authority", required: true, description: "Gateway authority/reference code" })
-  @ApiQuery({ name: "Status", required: true, enum: ["OK", "NOK"], description: "Payment status from gateway" })
+  @ApiQuery({ name: "Authority", required: true, description: "ZarinPal authority code" })
+  @ApiQuery({ name: "Status", required: true, enum: ["OK", "NOK"], description: "Payment status from ZarinPal" })
   @ApiResponse({ status: 200, description: "Payment result — { message, refId? }" })
   @ApiResponse({ status: 404, description: "PAYMENT_NOT_FOUND" })
   verify(

@@ -1,8 +1,10 @@
 import { NextIntlClientProvider } from "next-intl";
+import QueryProvider from "@/providers/QueryProvider";
 import { getMessages } from "next-intl/server";
 import { Almarai, Noto_Nastaliq_Urdu } from "next/font/google";
 import type { Locale } from "@roohbakhsh/shared";
 import { dirForLocale } from "@/core/utils/dir";
+import { Toaster } from "sonner";
 import "@/core/styles/globals.css";
 
 const almarai = Almarai({
@@ -37,9 +39,16 @@ export default async function LocaleLayout({
       className={`${almarai.variable} ${nastaliq.variable}`}
     >
       <body>
-        <NextIntlClientProvider messages={messages}>
-          {children}
-        </NextIntlClientProvider>
+        <QueryProvider>
+          <NextIntlClientProvider messages={messages}>
+            {children}
+            <Toaster
+              position="top-center"
+              dir={dirForLocale(locale)}
+              toastOptions={{ style: { fontFamily: "inherit" } }}
+            />
+          </NextIntlClientProvider>
+        </QueryProvider>
       </body>
     </html>
   );

@@ -9,13 +9,12 @@ export default function AboutMission() {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <section className="py-14">
-      <div className="container">
-        <div className="rounded-xl border border-[var(--brand)]/15 bg-white overflow-hidden shadow-sm">
+    <section className="container relative py-10 sm:py-16 lg:py-20">
+        <div className="bg-white rounded-lg relative pb-8">
 
           {/* Top bar */}
-          <div className="flex items-center gap-x-4 px-8 py-6 border-b border-gray-50">
-            <div className="size-11 rounded-xl bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-x-4 px-8 py-6 border-b border-gray-100">
+            <div className="size-11 rounded-lg bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
               <RiLeafLine size={22} className="text-[var(--brand)]" />
             </div>
             <div>
@@ -25,8 +24,7 @@ export default function AboutMission() {
           </div>
 
           {/* Content */}
-          <div className="px-8 py-6">
-            {/* Always-visible intro — ~8 lines */}
+          <div className="px-8 pt-6 pb-4">
             <div className="text-[var(--ink)] text-[15px] leading-8 space-y-4">
               <p>{t("intro")}</p>
               <p>{t("body_1")}</p>
@@ -43,19 +41,17 @@ export default function AboutMission() {
                 <p>{t("body_3")}</p>
               </div>
             </div>
-
-            {/* Toggle button */}
-            <button
-              type="button"
-              onClick={() => setExpanded((v) => !v)}
-              className="mt-7 flex items-center gap-x-2 mx-auto px-7 py-2.5 rounded-xl border-2 border-[var(--brand)]/30 text-[var(--brand)] font-semibold text-sm hover:border-[var(--brand)] hover:bg-[var(--brand)]/5 transition-all cursor-pointer"
-            >
-              {expanded ? <RiSubtractLine size={18} /> : <RiAddLine size={18} />}
-              {expanded ? t("btn_less") : t("btn_more")}
-            </button>
           </div>
+
+          {/* Toggle button — absolute, centered at bottom */}
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            className="absolute -bottom-4 left-1/2 -translate-x-1/2 size-8 rounded-full bg-[var(--brand)] text-white flex items-center justify-center hover:opacity-90 transition-opacity cursor-pointer"
+          >
+            {expanded ? <RiSubtractLine size={18} /> : <RiAddLine size={18} />}
+          </button>
         </div>
-      </div>
     </section>
   );
 }

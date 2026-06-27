@@ -69,7 +69,7 @@ export class LessonController {
     summary: "افزودن درس به سرفصل 🔒 admin",
     description:
       "درس جدید به سرفصل اضافه می‌کند. " +
-      "پس از اضافه شدن، `lessonCount` و `durationMinutes` دوره به‌صورت خودکار آپدیت می‌شوند.",
+      "`lessonCount` و `durationMinutes` دوره مستقیماً از روی درس‌های موجود محاسبه می‌شوند (ستون مجزا ندارند).",
   })
   @ApiHeader(LANG_HEADER)
   @ApiParam({ name: "courseSlug", description: "slug دوره" })
@@ -113,7 +113,7 @@ export class LessonController {
   @Delete(":lessonId")
   @ApiOperation({
     summary: "حذف درس 🔒 admin",
-    description: "درس را حذف می‌کند. `lessonCount` و `durationMinutes` دوره خودکار آپدیت می‌شوند.",
+    description: "درس را حذف می‌کند. `lessonCount` و `durationMinutes` دوره بلافاصله از روی درس‌های باقی‌مانده محاسبه می‌شوند.",
   })
   @ApiHeader(LANG_HEADER)
   @ApiParam({ name: "courseSlug", description: "slug دوره" })

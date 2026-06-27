@@ -15,11 +15,11 @@ export default function StatsBar() {
   const t = useTranslations("Home.stats");
 
   return (
-    <section className="bg-white border-y border-gray-100 py-8">
+    <section className="border-y border-gray-100 py-8">
       <div className="container">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {KEYS.map((key, i) => {
-            const Icon = ICONS[i];
+            const Icon = ICONS[i]!;
             return (
               <div
                 key={key}

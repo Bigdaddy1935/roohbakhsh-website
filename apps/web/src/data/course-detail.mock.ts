@@ -227,13 +227,13 @@ export function getLessonContext(courseId: string, lessonId: string): LessonCont
   const pos = allLessons.findIndex((x) => x.lesson.id === lessonId);
   if (pos === -1) return null;
 
-  const { lesson, chapter, ci, li } = allLessons[pos];
+  const { lesson, chapter, ci, li } = allLessons[pos]!;
   return {
     lesson,
     chapter,
     chapterIndex: ci,
     lessonIndex: li,
-    prevLesson: pos > 0 ? { id: allLessons[pos - 1].lesson.id, courseId } : null,
-    nextLesson: pos < allLessons.length - 1 ? { id: allLessons[pos + 1].lesson.id, courseId } : null,
+    prevLesson: pos > 0 ? { id: allLessons[pos - 1]!.lesson.id, courseId } : null,
+    nextLesson: pos < allLessons.length - 1 ? { id: allLessons[pos + 1]!.lesson.id, courseId } : null,
   };
 }

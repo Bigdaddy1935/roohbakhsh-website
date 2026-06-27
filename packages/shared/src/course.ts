@@ -70,6 +70,7 @@ export interface CourseListQuery {
 export interface Lesson {
   id: ID;
   title: Localized;
+  videoUrl: Localized<string | null>;
   order: number;
   durationMinutes: number;
   isFreePreview: boolean;
@@ -81,6 +82,7 @@ export interface Lesson {
 
 export interface CreateLessonRequest {
   title: Localized;
+  videoUrl?: Localized<string | null>;
   order?: number;
   durationMinutes: number;
   isFreePreview?: boolean;
@@ -88,6 +90,7 @@ export interface CreateLessonRequest {
 
 export interface UpdateLessonRequest {
   title?: Localized;
+  videoUrl?: Localized<string | null>;
   order?: number;
   durationMinutes?: number;
   isFreePreview?: boolean;
@@ -131,6 +134,8 @@ export interface CourseRecord {
   slug: string;
   description: Localized;
   thumbnailUrl: Localized<string | null>;
+  /** ویدیوی معرفی دوره — دو زبانه، مثل thumbnailUrl. */
+  introVideoUrl: Localized<string | null>;
   /** قیمت اصلی دوره — null یعنی رایگان. */
   price: Money | null;
   /** اطلاعات تخفیف — null یعنی بدون تخفیف. */
@@ -139,6 +144,12 @@ export interface CourseRecord {
   effectivePrice: Money | null;
   durationMinutes: number;
   lessonCount: number;
+  /** میانگین امتیاز نظرات (۱ تا ۵) — null یعنی هنوز نظری ثبت نشده. */
+  averageRating: number | null;
+  /** تعداد کل نظرات ثبت‌شده روی این دوره. */
+  reviewCount: number;
+  /** تعداد کاربران یکتایی که این دوره را با سفارش paid خریده‌اند. */
+  participantCount: number;
   level: CourseLevel;
   /** وضعیت برگزاری: ongoing=در حال برگزاری، upcoming=به زودی، completed=پایان‌یافته */
   runStatus: CourseRunStatus;
@@ -152,11 +163,18 @@ export interface CourseRecord {
   updatedAt: ISODate;
 }
 
+export interface CourseStatsSummary {
+  studentsCount: number;
+  coursesCount: number;
+  totalHours: number;
+}
+
 export interface CreateCourseRequest {
   title: Localized;
   slug: string;
   description: Localized;
   thumbnailUrl?: Localized<string | null>;
+  introVideoUrl?: Localized<string | null>;
   price?: Money | null;
   level?: CourseLevel;
   runStatus?: CourseRunStatus;
@@ -172,6 +190,7 @@ export interface UpdateCourseRequest {
   slug?: string;
   description?: Localized;
   thumbnailUrl?: Localized<string | null>;
+  introVideoUrl?: Localized<string | null>;
   price?: Money | null;
   level?: CourseLevel;
   runStatus?: CourseRunStatus;

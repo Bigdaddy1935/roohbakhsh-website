@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { RiArrowLeftSLine, RiArticleLine } from "react-icons/ri";
 import { Suspense } from "react";
-import { ARTICLE_CATEGORIES } from "@/data/articles.mock";
+import { useCategories } from "@/hooks/queries/use-categories";
 import { useArticleFilters } from "@/hooks/useArticleFilters";
 import FilterSortBar from "@/components/ui/FilterSortBar";
 import LatestArticlesRow from "./LatestArticlesRow";
@@ -16,10 +16,11 @@ function ArticlesContent() {
   const t = useTranslations("Articles");
   const locale = useLocale() as "ar" | "ur";
   const { cats, sort, toggleCategory, setSort } = useArticleFilters();
+  const { data: categories } = useCategories();
 
-  const categoryOptions = ARTICLE_CATEGORIES.map((c) => ({
-    value: c.value,
-    label: c[locale],
+  const categoryOptions = (categories ?? []).map((c) => ({
+    value: c.id,
+    label: c.name[locale],
   }));
 
   const sortOptions = [

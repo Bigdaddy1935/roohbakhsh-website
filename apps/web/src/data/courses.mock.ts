@@ -47,7 +47,7 @@ export const COURSES: MockCourse[] = [
     image: "https://dl.poshtybanman.ir/upload/6%20(1)_68924fcebd53d.jpg",
     title:    { ar: "تجويد القرآن الكريم من الصفر", ur: "تجوید القرآن الکریم از صفر" },
     excerpt:  { ar: "دورة شاملة لتعلم أحكام التجويد وتحسين التلاوة", ur: "تجوید کے احکام سیکھنے کی جامع کورس" },
-    instructor: { name: { ar: "الشيخ أحمد الحسن", ur: "شیخ احمد حسن" }, avatar: AVATARS[0] },
+    instructor: { name: { ar: "الشيخ أحمد الحسن", ur: "شیخ احمد حسن" }, avatar: AVATARS[0]! },
     rating: 5, students: 1309221, originalPrice: 4000000, discountedPrice: 1200000, discountPct: 70, updatedAt: "2026-05-10",
   },
   {
@@ -55,7 +55,7 @@ export const COURSES: MockCourse[] = [
     image: "https://dl.poshtybanman.ir/upload/%D8%B5%D9%84%D8%AD_6880d1068d6f3.jpg",
     title:    { ar: "النحو الميسّر للمبتدئين", ur: "مبتدیوں کے لیے آسان نحو" },
     excerpt:  { ar: "تعلّم قواعد النحو العربي بأسلوب مبسّط وسلس", ur: "عربی نحو کے قواعد سادہ انداز میں" },
-    instructor: { name: { ar: "د. فاطمة التجار", ur: "ڈاکٹر فاطمہ تاجر" }, avatar: AVATARS[0] },
+    instructor: { name: { ar: "د. فاطمة التجار", ur: "ڈاکٹر فاطمہ تاجر" }, avatar: AVATARS[0]! },
     rating: 5, students: 735, originalPrice: 1955000, discountedPrice: 586500, discountPct: 70, updatedAt: "2026-04-20",
   },
   {
@@ -63,7 +63,7 @@ export const COURSES: MockCourse[] = [
     image: "https://dl.poshtybanman.ir/upload/7%20(1)_68924fcdf18ae.jpg",
     title:    { ar: "أصول الفقه الإسلامي", ur: "اسلامی فقہ کے اصول" },
     excerpt:  { ar: "دراسة معمّقة لأصول الفقه وطرق الاستنباط الشرعي", ur: "فقہ کے اصولوں اور استنباط کا گہرا مطالعہ" },
-    instructor: { name: { ar: "الشيخ يوسف الأنصاري", ur: "شیخ یوسف انصاری" }, avatar: AVATARS[0] },
+    instructor: { name: { ar: "الشيخ يوسف الأنصاري", ur: "شیخ یوسف انصاری" }, avatar: AVATARS[0]! },
     rating: 5, students: 45, originalPrice: 5130000, discountedPrice: 1536000, discountPct: 70, updatedAt: "2026-03-15",
   },
   {
@@ -71,7 +71,7 @@ export const COURSES: MockCourse[] = [
     image: "https://dl.poshtybanman.ir/upload/%D8%B9%DA%A9%D8%B3%20%D9%87%D8%AF%D8%B1_690c6ae90fcc2.jpg",
     title:    { ar: "العقيدة الطحاوية", ur: "عقیدہ طحاویہ" },
     excerpt:  { ar: "شرح مفصّل للعقيدة الطحاوية على منهج أهل السنة", ur: "اہل سنت کے منہج پر عقیدہ طحاویہ کی تفصیلی شرح" },
-    instructor: { name: { ar: "الشيخ أحمد الحسن", ur: "شیخ احمد حسن" }, avatar: AVATARS[0] },
+    instructor: { name: { ar: "الشيخ أحمد الحسن", ur: "شیخ احمد حسن" }, avatar: AVATARS[0]! },
     rating: 5, students: 2300, originalPrice: 3200000, discountedPrice: 960000, discountPct: 70, updatedAt: "2026-05-01",
   },
   {
@@ -79,7 +79,7 @@ export const COURSES: MockCourse[] = [
     image: "https://dl.poshtybanman.ir/upload/6%20(1)_68924fcebd53d.jpg",
     title:    { ar: "السيرة النبوية الشريفة", ur: "سیرت النبی ﷺ" },
     excerpt:  { ar: "رحلة شاملة في حياة النبي ﷺ من المولد إلى الوفاة", ur: "نبی کریم ﷺ کی حیات مبارکہ کا جامع سفر" },
-    instructor: { name: { ar: "د. محمد البستاني", ur: "ڈاکٹر محمد بستانی" }, avatar: AVATARS[0] },
+    instructor: { name: { ar: "د. محمد البستاني", ur: "ڈاکٹر محمد بستانی" }, avatar: AVATARS[0]! },
     rating: 5, students: 4100, originalPrice: 2800000, discountedPrice: 840000, discountPct: 70, updatedAt: "2026-02-28",
   },
   {
@@ -87,7 +87,7 @@ export const COURSES: MockCourse[] = [
     image: "https://dl.poshtybanman.ir/upload/%D8%B5%D9%84%D8%AD_6880d1068d6f3.jpg",
     title:    { ar: "تزكية النفس ومراقي السعادة", ur: "تزکیہ نفس اور سعادت کی منازل" },
     excerpt:  { ar: "طريقك إلى تزكية النفس والارتقاء بالأخلاق الإسلامية", ur: "نفس کی تطہیر اور اسلامی اخلاق کی بلندی" },
-    instructor: { name: { ar: "الشيخ أحمد الحسن", ur: "شیخ احمد حسن" }, avatar: AVATARS[0] },
+    instructor: { name: { ar: "الشيخ أحمد الحسن", ur: "شیخ احمد حسن" }, avatar: AVATARS[0]! },
     rating: 5, students: 1900, originalPrice: 2500000, discountedPrice: 750000, discountPct: 70, updatedAt: "2026-04-05",
   },
   {
@@ -95,7 +95,7 @@ export const COURSES: MockCourse[] = [
     image: "https://dl.poshtybanman.ir/upload/7%20(1)_68924fcdf18ae.jpg",
     title:    { ar: "التربية الإسلامية للأسرة", ur: "خاندان کی اسلامی تربیت" },
     excerpt:  { ar: "كيف تبني أسرة مسلمة متماسكة على أسس إسلامية", ur: "اسلامی بنیادوں پر مضبوط مسلمان خاندان کیسے بنائیں" },
-    instructor: { name: { ar: "د. فاطمة التجار", ur: "ڈاکٹر فاطمہ تاجر" }, avatar: AVATARS[0] },
+    instructor: { name: { ar: "د. فاطمة التجار", ur: "ڈاکٹر فاطمہ تاجر" }, avatar: AVATARS[0]! },
     rating: 5, students: 870, originalPrice: 1800000, discountedPrice: 540000, discountPct: 70, updatedAt: "2026-01-20",
   },
   {
@@ -103,7 +103,7 @@ export const COURSES: MockCourse[] = [
     image: "https://dl.poshtybanman.ir/upload/%D8%B9%DA%A9%D8%B3%20%D9%87%D8%AF%D8%B1_690c6ae90fcc2.jpg",
     title:    { ar: "فن الدعوة إلى الله", ur: "دعوت الی اللہ کا فن" },
     excerpt:  { ar: "أساليب الدعوة الفعّالة في العصر الحديث", ur: "جدید دور میں موثر دعوت کے اسالیب" },
-    instructor: { name: { ar: "الشيخ يوسف الأنصاري", ur: "شیخ یوسف انصاری" }, avatar: AVATARS[0] },
+    instructor: { name: { ar: "الشيخ يوسف الأنصاري", ur: "شیخ یوسف انصاری" }, avatar: AVATARS[0]! },
     rating: 5, students: 620, originalPrice: 2200000, discountedPrice: 660000, discountPct: 70, updatedAt: "2026-03-30",
   },
   {
@@ -111,7 +111,7 @@ export const COURSES: MockCourse[] = [
     image: "https://dl.poshtybanman.ir/upload/6%20(1)_68924fcebd53d.jpg",
     title:    { ar: "الإجازة القرآنية بالروايات", ur: "قرآنی اجازہ بالروایات" },
     excerpt:  { ar: "برنامج متخصص للحصول على إجازة التلاوة والتحفيظ", ur: "تلاوت اور حفظ کی اجازہ کا خصوصی پروگرام" },
-    instructor: { name: { ar: "الشيخ أحمد الحسن", ur: "شیخ احمد حسن" }, avatar: AVATARS[0] },
+    instructor: { name: { ar: "الشيخ أحمد الحسن", ur: "شیخ احمد حسن" }, avatar: AVATARS[0]! },
     rating: 5, students: 310, originalPrice: 6000000, discountedPrice: 1800000, discountPct: 70, updatedAt: "2026-05-15",
   },
 ];

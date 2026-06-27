@@ -48,6 +48,7 @@ export class LessonService {
 
     const lesson = this.lessonRepo.create({
       title: dto.title,
+      videoUrl: dto.videoUrl ?? null,
       order: dto.order ?? 0,
       durationMinutes: dto.durationMinutes,
       isFreePreview: dto.isFreePreview ?? false,
@@ -56,7 +57,6 @@ export class LessonService {
     });
 
     const saved = await this.lessonRepo.save(lesson);
-    await this.syncCourseStats(section.courseId);
 
     return this.toContract(saved);
   }
@@ -72,12 +72,12 @@ export class LessonService {
     if (!lesson) throw new NotFoundException("LESSON_NOT_FOUND");
 
     if (dto.title !== undefined) lesson.title = dto.title;
+    if (dto.videoUrl !== undefined) lesson.videoUrl = dto.videoUrl ?? null;
     if (dto.order !== undefined) lesson.order = dto.order;
     if (dto.durationMinutes !== undefined) lesson.durationMinutes = dto.durationMinutes;
     if (dto.isFreePreview !== undefined) lesson.isFreePreview = dto.isFreePreview;
 
     const saved = await this.lessonRepo.save(lesson);
-    await this.syncCourseStats(section.courseId);
 
     return this.toContract(saved);
   }
@@ -88,7 +88,6 @@ export class LessonService {
     if (!lesson) throw new NotFoundException("LESSON_NOT_FOUND");
 
     await this.lessonRepo.remove(lesson);
-    await this.syncCourseStats(section.courseId);
   }
 
   private async sectionByIdAndCourseSlug(courseSlug: string, sectionId: string): Promise<Section> {
@@ -101,17 +100,11 @@ export class LessonService {
     return section;
   }
 
-  private async syncCourseStats(courseId: string): Promise<void> {
-    const lessons = await this.lessonRepo.find({ where: { courseId } });
-    const lessonCount = lessons.length;
-    const durationMinutes = lessons.reduce((sum, l) => sum + l.durationMinutes, 0);
-    await this.courseRepo.update(courseId, { lessonCount, durationMinutes });
-  }
-
   private toContract(lesson: Lesson): LessonContract {
     return {
       id: lesson.id,
       title: lesson.title,
+      videoUrl: lesson.videoUrl ?? { ar: null, ur: null },
       order: lesson.order,
       durationMinutes: lesson.durationMinutes,
       isFreePreview: lesson.isFreePreview,
