@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Checkbox, RadioGroup, Radio } from "@heroui/react";
 import { RiSearchLine } from "react-icons/ri";
-import { ARTICLE_CATEGORIES } from "@/data/articles.mock";
+import { useCategories } from "@/hooks/queries/use-categories";
 import { useArticleFilters } from "@/hooks/useArticleFilters";
 
 export default function ArticlesSidebar() {
   const t = useTranslations("Articles");
   const locale = useLocale() as "ar" | "ur";
   const { cats, sort, q, toggleCategory, setSort, setSearch } = useArticleFilters();
+  const { data: categories } = useCategories();
 
   const [localSearch, setLocalSearch] = useState(q);
 
@@ -49,17 +50,17 @@ export default function ArticlesSidebar() {
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
         <p className="text-sm font-extrabold text-[var(--ink)] mb-4">{t("filter_label")}</p>
         <div className="flex flex-col gap-y-3 max-h-64 overflow-y-auto scrollbar-thin pe-1">
-          {ARTICLE_CATEGORIES.map((cat) => (
+          {(categories ?? []).map((cat) => (
             <Checkbox
-              key={cat.value}
-              isSelected={cats.includes(cat.value)}
-              onChange={() => toggleCategory(cat.value)}
+              key={cat.id}
+              isSelected={cats.includes(cat.id)}
+              onChange={() => toggleCategory(cat.id)}
             >
               <Checkbox.Content>
                 <Checkbox.Control>
                   <Checkbox.Indicator />
                 </Checkbox.Control>
-                <span className="text-[13px] text-[var(--ink)]">{cat[locale]}</span>
+                <span className="text-[13px] text-[var(--ink)]">{cat.name[locale]}</span>
               </Checkbox.Content>
             </Checkbox>
           ))}

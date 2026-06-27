@@ -16,3 +16,8 @@ export * from "./order";
 export * from "./payment";
 export * from "./invoice";
 export * from "./article";
+export * from "./review";
+export * from "./favorites";
+export * from "./notifications";
+export * from "./recently-viewed";
+export * from "./dashboard";

@@ -1,97 +1,117 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { RiMailLine, RiArrowRightSLine } from "react-icons/ri";
+import { RiMailLine, RiArrowRightSLine, RiCheckboxCircleLine } from "react-icons/ri";
 import AuthCard from "./AuthCard";
+import { useForgotPassword } from "@/hooks/queries/use-auth";
+import type { ApiError } from "@roohbakhsh/shared";
 
 const UI = {
   ar: {
     title: "استعادة كلمة المرور",
-    sub: "أدخل بريدك الإلكتروني وسنرسل لك رمز التحقق",
+    sub: "أدخل بريدك الإلكتروني وسنرسل لك رابط استعادة كلمة المرور",
     email: "البريد الإلكتروني",
-    submit: "إرسال رمز التحقق",
-    otpTitle: "أدخل رمز التحقق",
-    otpSub: "تم إرسال الرمز إلى بريدك الإلكتروني",
-    otpResend: "لم تستلم الرمز؟",
-    otpResendLink: "إعادة الإرسال",
-    otpSubmit: "تأكيد ومتابعة",
+    submit: "إرسال رابط الاستعادة",
     back: "رجوع",
+    emailRequired: "البريد الإلكتروني مطلوب",
+    emailInvalid: "صيغة البريد الإلكتروني غير صحيحة",
+    networkError: "تعذر الاتصال بالخادم. تحقق من اتصالك بالإنترنت وحاول مرة أخرى",
+    successTitle: "تحقق من بريدك الإلكتروني",
+    successSub: "إذا كان هذا البريد مسجلاً لدينا، فستصلك رسالة تحتوي على رابط لإعادة تعيين كلمة المرور.",
   },
   ur: {
     title: "پاسورڈ بازیابی",
-    sub: "اپنا ای میل درج کریں، ہم آپ کو تصدیقی کوڈ بھیجیں گے",
+    sub: "اپنا ای میل درج کریں، ہم آپ کو پاسورڈ ری سیٹ لنک بھیجیں گے",
     email: "ای میل",
-    submit: "کوڈ بھیجیں",
-    otpTitle: "تصدیقی کوڈ درج کریں",
-    otpSub: "کوڈ آپ کے ای میل پر بھیجا گیا ہے",
-    otpResend: "کوڈ نہیں ملا؟",
-    otpResendLink: "دوبارہ بھیجیں",
-    otpSubmit: "تصدیق اور جاری رہیں",
+    submit: "ری سیٹ لنک بھیجیں",
     back: "واپس",
+    emailRequired: "ای میل ضروری ہے",
+    emailInvalid: "ای میل کا فارمیٹ درست نہیں ہے",
+    networkError: "سرور سے رابطہ نہیں ہو سکا۔ اپنا انٹرنیٹ کنکشن چیک کریں اور دوبارہ کوشش کریں",
+    successTitle: "اپنا ای میل چیک کریں",
+    successSub: "اگر یہ ای میل ہمارے ہاں رجسٹرڈ ہے تو آپ کو پاسورڈ ری سیٹ لنک موصول ہوگا۔",
   },
 };
 
-const OTP_LENGTH = 5;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function ForgotPasswordForm() {
   const locale = useLocale() as "ar" | "ur";
   const ui = UI[locale];
-  const [step, setStep] = useState<"email" | "otp">("email");
+  const { mutate: forgotPassword, isPending, error } = useForgotPassword();
+
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
-  const [seconds, setSeconds] = useState(107);
-  const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [emailError, setEmailError] = useState<string | undefined>();
+  const [done, setDone] = useState(false);
 
-  const startTimer = () => {
-    setSeconds(107);
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setSeconds((s) => {
-        if (s <= 1) { clearInterval(timerRef.current!); return 0; }
-        return s - 1;
-      });
-    }, 1000);
-  };
+  const apiError = error as ApiError | null;
+  const formMessage = apiError?.code === "NETWORK_ERROR" ? ui.networkError : apiError?.message ?? null;
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  function validate(): boolean {
+    let next: string | undefined;
+    if (!email.trim()) next = ui.emailRequired;
+    else if (!EMAIL_RE.test(email.trim())) next = ui.emailInvalid;
+    setEmailError(next);
+    return !next;
+  }
+
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setStep("otp");
-    startTimer();
-    setTimeout(() => inputsRef.current[0]?.focus(), 50);
-  };
-
-  const handleOtpKey = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !otp[i] && i > 0) inputsRef.current[i - 1]?.focus();
-  };
-
-  const handleOtpChange = (i: number, val: string) => {
-    const digit = val.replace(/\D/g, "").slice(-1);
-    const next = [...otp];
-    next[i] = digit;
-    setOtp(next);
-    if (digit && i < OTP_LENGTH - 1) inputsRef.current[i + 1]?.focus();
-  };
-
-  const fmt = (s: number) => `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
+    if (!validate()) return;
+    forgotPassword({ email: email.trim() }, { onSuccess: () => setDone(true) });
+  }
 
   return (
     <AuthCard>
-      {step === "email" ? (
+      {done ? (
+        <div className="flex flex-col items-center text-center gap-y-4 py-4">
+          <div className="size-16 rounded-full bg-[var(--brand)]/10 flex items-center justify-center">
+            <RiCheckboxCircleLine size={36} className="text-[var(--brand)]" />
+          </div>
+          <h1 className="text-xl font-extrabold text-[var(--ink)]">{ui.successTitle}</h1>
+          <p className="text-sm text-gray-400">{ui.successSub}</p>
+          <Link href="/signin" className="flex items-center gap-x-1 text-sm text-[var(--brand)] font-semibold hover:underline mt-2">
+            <RiArrowRightSLine size={16} />
+            {ui.back}
+          </Link>
+        </div>
+      ) : (
         <>
           <h1 className="text-2xl font-extrabold text-[var(--ink)] mb-1 text-center">{ui.title}</h1>
           <p className="text-sm text-gray-400 mt-2 mb-7 text-center">{ui.sub}</p>
-          <form onSubmit={handleEmailSubmit} className="flex flex-col gap-y-4">
-            <div className="relative">
-              <RiMailLine size={17} className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-              <input type="email" placeholder={ui.email} value={email} onChange={(e) => setEmail(e.target.value)} required
-                className="w-full h-11 rounded-lg border border-gray-200 ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none focus:border-[var(--brand)] transition-colors bg-white" />
+
+          {formMessage && (
+            <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+              {formMessage}
             </div>
-            <button type="submit"
-              className="w-full h-11 rounded-lg bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity">
-              {ui.submit}
+          )}
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-y-4" noValidate>
+            <div>
+              <div className="relative">
+                <RiMailLine size={17} className="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <input
+                  type="email"
+                  placeholder={ui.email}
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (emailError) setEmailError(undefined);
+                  }}
+                  disabled={isPending}
+                  aria-invalid={!!emailError}
+                  className={`w-full h-11 rounded-lg border ps-4 pe-10 text-sm text-[var(--ink)] placeholder:text-gray-400 outline-none transition-colors bg-white disabled:opacity-60 ${
+                    emailError ? "border-red-300 focus:border-red-400" : "border-gray-200 focus:border-[var(--brand)]"
+                  }`}
+                />
+              </div>
+              {emailError && <p className="mt-1 text-xs text-red-500">{emailError}</p>}
+            </div>
+            <button type="submit" disabled={isPending}
+              className="w-full h-11 rounded-lg bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-60">
+              {isPending ? "..." : ui.submit}
             </button>
           </form>
           <div className="mt-4 flex justify-center">
@@ -100,46 +120,6 @@ export default function ForgotPasswordForm() {
               {ui.back}
             </Link>
           </div>
-        </>
-      ) : (
-        <>
-          <button onClick={() => setStep("email")} className="absolute top-6 end-6 flex items-center gap-x-1 text-sm text-gray-400 hover:text-[var(--ink)] transition-colors">
-            <RiArrowRightSLine size={16} />
-            {ui.back}
-          </button>
-          <h1 className="text-2xl font-extrabold text-[var(--ink)] mb-1 text-center">{ui.otpTitle}</h1>
-          <p className="text-sm text-gray-400 mb-1 text-center">{ui.otpSub}</p>
-          <p className="text-sm text-[var(--brand)] font-semibold mb-6 text-center">{fmt(seconds)}</p>
-
-          <div dir="ltr" className="flex items-center justify-center gap-x-2.5 mb-6">
-            {otp.map((digit, i) => (
-              <input
-                key={i}
-                ref={(el) => { inputsRef.current[i] = el; }}
-                type="text"
-                inputMode="numeric"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleOtpChange(i, e.target.value)}
-                onKeyDown={(e) => handleOtpKey(i, e)}
-                className="size-11 rounded-lg border border-gray-200 text-center text-lg font-bold text-[var(--ink)] outline-none focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/15 transition-all bg-white"
-              />
-            ))}
-          </div>
-
-          <button type="button" onClick={() => {}}
-            className="w-full h-11 rounded-lg bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity">
-            {ui.otpSubmit}
-          </button>
-
-          <p className="text-center text-xs text-gray-400 mt-4">
-            {ui.otpResend}{" "}
-            <button type="button" onClick={() => { startTimer(); setOtp(Array(OTP_LENGTH).fill("")); }}
-              className="text-[var(--brand)] font-semibold hover:underline disabled:opacity-40"
-              disabled={seconds > 0}>
-              {ui.otpResendLink}
-            </button>
-          </p>
         </>
       )}
     </AuthCard>

@@ -17,7 +17,6 @@ import {
   RiHeartLine,
   RiShoppingCartLine,
   RiUserLine,
-  RiLoginBoxLine,
   RiHomeLine,
   RiBookmarkLine,
   RiAccountCircleLine,
@@ -25,37 +24,20 @@ import {
   RiLogoutBoxLine,
   RiDeleteBinLine,
 } from "react-icons/ri";
+import { useMe, useLogout } from "@/hooks/queries/use-auth";
+import { useCart, useRemoveFromCart } from "@/hooks/queries/use-cart";
+import { useCategories } from "@/hooks/queries/use-categories";
+import { formatMoney } from "@/lib/format";
 
-type CategoryId = "quran" | "fiqh" | "aqeedah" | "history" | "arabic" | "tazkiyah";
-type CategoryDef = { id: CategoryId; href: string; Icon: React.ComponentType<{ className?: string; size?: number }> };
-
-const CATEGORIES: CategoryDef[] = [
-  { id: "quran",    href: "/courses/quran",    Icon: RiBookOpenLine  },
-  { id: "fiqh",     href: "/courses/fiqh",     Icon: RiScales2Line   },
-  { id: "aqeedah",  href: "/courses/aqeedah",  Icon: RiMoonLine      },
-  { id: "history",  href: "/courses/history",  Icon: RiTimeLine      },
-  { id: "arabic",   href: "/courses/arabic",   Icon: RiPenNibLine    },
-  { id: "tazkiyah", href: "/courses/tazkiyah", Icon: RiHeartLine     },
-];
-
-const MOCK_COURSES: Record<CategoryId, { ar: string[]; ur: string[] }> = {
-  quran:    { ar: ["تجويد القرآن الكريم", "تفسير جزء عم", "علوم القرآن", "الإجازة بالقراءات"], ur: ["تجوید القرآن الکریم", "تفسیر جزء عم", "علوم القرآن", "اجازہ بالقراءات"] },
-  fiqh:     { ar: ["أصول الفقه الإسلامي", "فقه العبادات", "الفقه المقارن", "أحكام المعاملات"], ur: ["اصول فقہ اسلامی", "فقہ عبادات", "فقہ مقارن", "احکام معاملات"] },
-  aqeedah:  { ar: ["العقيدة الطحاوية", "شرح الأسماء الحسنى", "التوحيد وأقسامه", "علم الكلام"], ur: ["عقیدہ طحاویہ", "شرح اسماء الحسنیٰ", "توحید اور اس کی اقسام", "علم کلام"] },
-  history:  { ar: ["السيرة النبوية الشريفة", "تاريخ الخلفاء الراشدين", "تاريخ الدولة الأموية", "فتوحات صدر الإسلام"], ur: ["سیرت النبی ﷺ", "تاریخ خلفاء راشدین", "تاریخ دولت اموی", "فتوحات صدر اسلام"] },
-  arabic:   { ar: ["النحو الميسر للمبتدئين", "الصرف العملي", "البلاغة القرآنية", "تحليل النصوص العربية"], ur: ["عربی نحو برائے مبتدیین", "صرف عملی", "قرآنی بلاغت", "عربی متون کا تجزیہ"] },
-  tazkiyah: { ar: ["تزكية النفس ومراقي السعادة", "رياض الصالحين", "الأذكار والأوراد", "علم الأخلاق الإسلامي"], ur: ["تزکیہ نفس", "ریاض الصالحین", "اذکار و اوراد", "اسلامی اخلاق"] },
+type IconType = React.ComponentType<{ className?: string; size?: number }>;
+const SLUG_ICONS: Record<string, IconType> = {
+  quran:    RiBookOpenLine,
+  fiqh:     RiScales2Line,
+  aqeedah:  RiMoonLine,
+  history:  RiTimeLine,
+  arabic:   RiPenNibLine,
+  tazkiyah: RiHeartLine,
 };
-
-/* Mock cart items */
-type CartItem = { id: string; title: { ar: string; ur: string }; price: number; thumb: string };
-const INITIAL_CART: CartItem[] = [
-  { id: "c1", title: { ar: "تجويد القرآن الكريم", ur: "تجوید القرآن الکریم" }, price: 120000, thumb: "https://s3.eseminar.tv/upload/teacher/1595422681_64.jpg" },
-  { id: "c2", title: { ar: "أصول الفقه الإسلامي", ur: "اصول فقہ اسلامی" }, price: 95000, thumb: "https://s3.eseminar.tv/upload/teacher/1595422681_64.jpg" },
-];
-
-/* Mock user */
-const MOCK_USER = { name: { ar: "أحمد محمد", ur: "احمد محمد" }, email: "ahmad@example.com", avatar: "https://secure.gravatar.com/avatar/4f10b9f676fbf54ff6dbe991b237849e?s=96&d=mp&r=g" };
 
 const UI = {
   ar: {
@@ -90,21 +72,21 @@ export default function Header() {
   const ui = UI[locale];
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<CategoryId>("quran");
-  const [cartItems, setCartItems] = useState<CartItem[]>(INITIAL_CART);
+  const [activeSlug, setActiveSlug] = useState<string>("");
 
-  /* Always show user icon (auth buttons hidden per request) */
-  const isLoggedIn = true;
+  const { data: user } = useMe();
+  const { data: cart } = useCart();
+  const { mutate: removeFromCart } = useRemoveFromCart();
+  const { mutate: logout } = useLogout();
+  const { data: categories = [] } = useCategories();
+
+  const isLoggedIn = !!user;
+  const cartItems = cart?.items ?? [];
 
   const switchLocale = (next: string) => router.replace(pathname, { locale: next });
-  const removeFromCart = (id: string) => setCartItems((prev) => prev.filter((i) => i.id !== id));
-  const cartTotal = cartItems.reduce((s, i) => s + i.price, 0);
 
-  const catNames: Record<CategoryId, string> = {
-    quran: t("categories.quran"), fiqh: t("categories.fiqh"), aqeedah: t("categories.aqeedah"),
-    history: t("categories.history"), arabic: t("categories.arabic"), tazkiyah: t("categories.tazkiyah"),
-  };
-  const mockCourses = MOCK_COURSES[activeCategory][locale];
+  const activeCategory = categories.find((c) => c.slug === activeSlug) ?? categories[0];
+  const courseWord = locale === "ar" ? "دورة" : "کورس";
 
   const userMenuItems = [
     { href: "/dashboard",              icon: RiHomeLine,            label: ui.home },
@@ -127,8 +109,13 @@ export default function Header() {
             <Link href="/">
               <Image src="https://roohbakhshac.ir/logo.png" alt="روح‌بخش" width={150} height={48} className="object-contain h-12 w-auto" priority />
             </Link>
-            <Link href="/cart" aria-label={t("cart")}>
+            <Link href="/cart" aria-label={t("cart")} className="relative">
               <RiShoppingCartLine size={24} className="text-[var(--ink)] hover:text-[var(--brand)] transition-colors" />
+              {cartItems.length > 0 && (
+                <span className="absolute -top-1.5 -end-1.5 size-4 flex items-center justify-center rounded-full bg-[var(--cta)] text-white text-[10px] font-bold">
+                  {cartItems.length}
+                </span>
+              )}
             </Link>
           </div>
 
@@ -146,29 +133,54 @@ export default function Header() {
               </Link>
               <div className="absolute top-full right-0 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-150 pt-4 z-50">
                 <div className="flex bg-white border border-gray-200 rounded-xl shadow-xl shadow-black/[0.08] overflow-hidden">
+                  {/* Left: category list */}
                   <div className="flex flex-col gap-y-1 p-4 w-72 shrink-0">
-                    {CATEGORIES.map(({ id, href, Icon }) => (
-                      <Link key={id} href={href} onMouseEnter={() => setActiveCategory(id)}
-                        className={`flex items-center justify-between rounded-lg px-4 py-3 transition-colors ${activeCategory === id ? "bg-gray-100" : "hover:bg-gray-50"}`}>
-                        <span className="flex items-center gap-x-3">
-                          <Icon size={22} className={`shrink-0 ${activeCategory === id ? "text-[var(--brand)]" : "text-gray-400"}`} />
-                          <span className="text-sm font-medium">{catNames[id]}</span>
-                        </span>
-                        <RiArrowLeftSLine size={18} className="text-gray-300 shrink-0" />
+                    {categories.map((cat) => {
+                      const Icon = SLUG_ICONS[cat.slug] ?? RiBookOpenLine;
+                      const isActive = (activeSlug || categories[0]?.slug) === cat.slug;
+                      return (
+                        <Link key={cat.id} href={`/courses?cat=${cat.slug}`}
+                          onMouseEnter={() => setActiveSlug(cat.slug)}
+                          className={`flex items-center justify-between rounded-lg px-4 py-3 transition-colors ${isActive ? "bg-gray-100" : "hover:bg-gray-50"}`}>
+                          <span className="flex items-center gap-x-3">
+                            <Icon size={22} className={`shrink-0 ${isActive ? "text-[var(--brand)]" : "text-gray-400"}`} />
+                            <span className="text-sm font-medium">{cat.name[locale]}</span>
+                          </span>
+                          <RiArrowLeftSLine size={18} className="text-gray-300 shrink-0" />
+                        </Link>
+                      );
+                    })}
+                  </div>
+                  {/* Right: active category detail */}
+                  {activeCategory && (
+                    <div className="flex flex-col justify-between bg-gray-50 w-64 p-5 border-s border-gray-100">
+                      <div className="flex flex-col gap-y-4">
+                        {(activeCategory.thumbnailUrl?.[locale] ?? activeCategory.thumbnailUrl?.ar) && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={activeCategory.thumbnailUrl?.[locale] ?? activeCategory.thumbnailUrl?.ar ?? ""}
+                            alt={activeCategory.name[locale]}
+                            className="w-full h-28 object-cover rounded-lg"
+                          />
+                        )}
+                        <div>
+                          <p className="text-sm font-bold text-[var(--ink)]">{activeCategory.name[locale]}</p>
+                          {activeCategory.description?.[locale] && (
+                            <p className="text-xs text-gray-400 mt-1 leading-5 line-clamp-3">
+                              {activeCategory.description[locale]}
+                            </p>
+                          )}
+                          <p className="text-xs text-[var(--brand)] font-semibold mt-2">
+                            {activeCategory.courseCount} {courseWord}
+                          </p>
+                        </div>
+                      </div>
+                      <Link href={`/courses?cat=${activeCategory.slug}`} className="flex items-center gap-x-1 text-[13px] font-semibold text-[var(--brand)] hover:underline mt-5">
+                        {t("viewAll")}
+                        <RiArrowLeftSLine size={15} />
                       </Link>
-                    ))}
-                  </div>
-                  <div className="flex flex-col justify-between bg-gray-50 w-64 p-5 border-s border-gray-100">
-                    <div className="flex flex-col gap-y-3.5">
-                      {mockCourses.map((course) => (
-                        <Link key={course} href={`/courses/${activeCategory}`} className="text-sm text-[var(--ink)] hover:text-[var(--brand)] transition-colors">{course}</Link>
-                      ))}
                     </div>
-                    <Link href={`/courses/${activeCategory}`} className="flex items-center gap-x-1 text-[13px] font-semibold text-[var(--brand)] hover:underline mt-5">
-                      {t("viewAll")}
-                      <RiArrowLeftSLine size={15} />
-                    </Link>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -212,23 +224,32 @@ export default function Header() {
                   ) : (
                     <>
                       <div className="flex flex-col divide-y divide-gray-100 max-h-72 overflow-y-auto">
-                        {cartItems.map((item) => (
-                          <div key={item.id} className="flex items-center gap-x-3 px-4 py-3">
-                            <Image src={item.thumb} alt={item.title[locale]} width={48} height={48} className="size-12 rounded-lg object-cover shrink-0" />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-semibold text-[var(--ink)] truncate">{item.title[locale]}</p>
-                              <p className="text-xs text-[var(--brand)] mt-0.5">{item.price.toLocaleString()} ت</p>
+                        {cartItems.map((item) => {
+                          const thumb = item.thumbnailUrl?.[locale] ?? item.thumbnailUrl?.ar ?? "";
+                          return (
+                            <div key={item.courseId} className="flex items-center gap-x-3 px-4 py-3">
+                              {thumb ? (
+                                <Image src={thumb} alt={item.title[locale]} width={48} height={48} className="size-12 rounded-lg object-cover shrink-0" />
+                              ) : (
+                                <div className="size-12 rounded-lg bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
+                                  <RiBookOpenLine size={20} className="text-[var(--brand)]" />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-semibold text-[var(--ink)] truncate">{item.title[locale]}</p>
+                                <p className="text-xs text-[var(--brand)] mt-0.5">{formatMoney(item.effectivePrice, locale)}</p>
+                              </div>
+                              <button type="button" onClick={() => removeFromCart(item.courseId)}
+                                className="shrink-0 size-7 flex items-center justify-center rounded-lg text-red-400 hover:bg-red-50 transition-colors">
+                                <RiDeleteBinLine size={15} />
+                              </button>
                             </div>
-                            <button type="button" onClick={() => removeFromCart(item.id)}
-                              className="shrink-0 size-7 flex items-center justify-center rounded-lg text-red-400 hover:bg-red-50 transition-colors">
-                              <RiDeleteBinLine size={15} />
-                            </button>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                       <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between">
                         <span className="text-xs text-gray-500">{ui.cartTotal}:</span>
-                        <span className="text-sm font-bold text-[var(--ink)]">{cartTotal.toLocaleString()} ت</span>
+                        <span className="text-sm font-bold text-[var(--ink)]">{formatMoney(cart?.total, locale)}</span>
                       </div>
                       <div className="px-4 pb-4">
                         <Link href="/cart"
@@ -246,8 +267,8 @@ export default function Header() {
             <div className="group relative">
               <button type="button"
                 className="size-9 flex items-center justify-center rounded-xl border border-gray-200 hover:border-[var(--brand)] hover:text-[var(--brand)] text-[var(--ink)] transition-colors overflow-hidden">
-                {isLoggedIn ? (
-                  <Image src={MOCK_USER.avatar} alt="user" width={36} height={36} className="size-full object-cover" />
+                {user?.avatarUrl ? (
+                  <Image src={user.avatarUrl} alt="user" width={36} height={36} className="size-full object-cover" />
                 ) : (
                   <RiUserLine size={20} />
                 )}
@@ -257,29 +278,46 @@ export default function Header() {
                 <div className="bg-white border border-gray-200 rounded-xl shadow-xl shadow-black/[0.08] overflow-hidden">
                   {isLoggedIn && (
                     <div className="flex items-center gap-x-3 px-4 py-3 border-b border-gray-100">
-                      <Image src={MOCK_USER.avatar} alt="user" width={44} height={44} className="size-11 rounded-full object-cover shrink-0" />
+                      {user.avatarUrl ? (
+                        <Image src={user.avatarUrl} alt="user" width={44} height={44} className="size-11 rounded-full object-cover shrink-0" />
+                      ) : (
+                        <div className="size-11 rounded-full bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
+                          <RiUserLine size={20} className="text-[var(--brand)]" />
+                        </div>
+                      )}
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-[var(--ink)] truncate">{MOCK_USER.name[locale]}</p>
-                        <p className="text-xs text-gray-400 truncate">{MOCK_USER.email}</p>
+                        <p className="text-sm font-semibold text-[var(--ink)] truncate">{user.fullName}</p>
+                        <p className="text-xs text-gray-400 truncate">{user.email}</p>
                       </div>
                     </div>
                   )}
                   <div className="p-2">
-                    {userMenuItems.map(({ href, icon: Icon, label }) => (
+                    {isLoggedIn ? userMenuItems.map(({ href, icon: Icon, label }) => (
                       <Link key={href} href={href}
                         className="flex items-center gap-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-colors">
                         <Icon size={20} className="text-[var(--brand)] shrink-0" />
                         <span className="text-sm text-[var(--ink)]">{label}</span>
                       </Link>
-                    ))}
+                    )) : (
+                      <div className="flex flex-col gap-y-2 p-2">
+                        <Link href="/signin" className="block w-full h-9 rounded-lg border border-[var(--brand)] text-[var(--brand)] text-sm font-semibold text-center leading-9 hover:bg-[var(--brand)]/5 transition-colors">
+                          {t("signin")}
+                        </Link>
+                        <Link href="/signup" className="block w-full h-9 rounded-lg bg-[var(--cta)] text-white text-sm font-bold text-center leading-9 hover:opacity-90 transition-opacity">
+                          {t("signup")}
+                        </Link>
+                      </div>
+                    )}
                   </div>
-                  <div className="px-2 pb-2 pt-1 border-t border-gray-100">
-                    <button type="button"
-                      className="flex items-center gap-x-3 w-full px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors">
-                      <RiLogoutBoxLine size={20} className="shrink-0" />
-                      <span className="text-sm font-semibold">{ui.logout}</span>
-                    </button>
-                  </div>
+                  {isLoggedIn && (
+                    <div className="px-2 pb-2 pt-1 border-t border-gray-100">
+                      <button type="button" onClick={() => logout()}
+                        className="flex items-center gap-x-3 w-full px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors">
+                        <RiLogoutBoxLine size={20} className="shrink-0" />
+                        <span className="text-sm font-semibold">{ui.logout}</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -301,13 +339,18 @@ export default function Header() {
         </div>
 
         <div className="px-4 py-5 flex flex-col gap-y-5">
-          {/* Auth / User info in drawer */}
           {isLoggedIn ? (
             <div className="flex items-center gap-x-3 px-3 py-3 bg-white rounded-xl border border-gray-100">
-              <Image src={MOCK_USER.avatar} alt="user" width={40} height={40} className="size-10 rounded-full object-cover shrink-0" />
+              {user.avatarUrl ? (
+                <Image src={user.avatarUrl} alt="user" width={40} height={40} className="size-10 rounded-full object-cover shrink-0" />
+              ) : (
+                <div className="size-10 rounded-full bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
+                  <RiUserLine size={18} className="text-[var(--brand)]" />
+                </div>
+              )}
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-[var(--ink)] truncate">{MOCK_USER.name[locale]}</p>
-                <p className="text-xs text-gray-400 truncate">{MOCK_USER.email}</p>
+                <p className="text-sm font-semibold text-[var(--ink)] truncate">{user.fullName}</p>
+                <p className="text-xs text-gray-400 truncate">{user.email}</p>
               </div>
             </div>
           ) : (
@@ -335,7 +378,6 @@ export default function Header() {
             ))}
           </div>
 
-          {/* User menu items in drawer */}
           {isLoggedIn && (
             <div className="flex flex-col gap-y-0.5">
               {userMenuItems.map(({ href, icon: Icon, label }) => (
@@ -345,7 +387,7 @@ export default function Header() {
                   <span className="text-sm text-[var(--ink)]">{label}</span>
                 </Link>
               ))}
-              <button type="button" onClick={() => setDrawerOpen(false)}
+              <button type="button" onClick={() => { logout(); setDrawerOpen(false); }}
                 className="flex items-center gap-x-3 px-2 py-2.5 rounded-xl text-red-500 hover:bg-white transition-colors w-full">
                 <RiLogoutBoxLine size={18} />
                 <span className="text-sm">{ui.logout}</span>
@@ -357,15 +399,19 @@ export default function Header() {
           <div>
             <p className="text-xs font-bold text-[var(--brand)] mb-2.5">{t("categories_title")}</p>
             <div className="flex flex-col gap-y-0.5">
-              {CATEGORIES.map(({ id, href, Icon }) => (
-                <Link key={id} href={href} onClick={() => setDrawerOpen(false)} className="flex items-center justify-between px-2 py-2.5 rounded-xl hover:bg-white transition-colors">
-                  <span className="flex items-center gap-x-3 text-sm text-[var(--ink)]">
-                    <Icon size={18} className="text-[var(--brand)]" />
-                    {catNames[id]}
-                  </span>
-                  <RiArrowLeftSLine size={16} className="text-gray-300" />
-                </Link>
-              ))}
+              {categories.map((cat) => {
+                const Icon = SLUG_ICONS[cat.slug] ?? RiBookOpenLine;
+                return (
+                  <Link key={cat.id} href={`/courses?cat=${cat.slug}`} onClick={() => setDrawerOpen(false)}
+                    className="flex items-center justify-between px-2 py-2.5 rounded-xl hover:bg-white transition-colors">
+                    <span className="flex items-center gap-x-3 text-sm text-[var(--ink)]">
+                      <Icon size={18} className="text-[var(--brand)]" />
+                      {cat.name[locale]}
+                    </span>
+                    <RiArrowLeftSLine size={16} className="text-gray-300" />
+                  </Link>
+                );
+              })}
             </div>
           </div>
 

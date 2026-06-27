@@ -17,6 +17,7 @@ export interface User {
   preferredLocale: Locale;
   avatarUrl: string | null;
   isActive: boolean;
+  isEmailVerified: boolean;
   createdAt: ISODate;
   updatedAt: ISODate;
 }
@@ -45,3 +46,12 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}

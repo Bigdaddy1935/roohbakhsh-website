@@ -1,29 +1,46 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { MOCK_TRANSACTIONS } from "@/data/dashboard.mock";
+import { RiLoader4Line, RiFileTextLine } from "react-icons/ri";
+import { useMyInvoices } from "@/hooks/queries/use-invoices";
+import { formatMoney } from "@/lib/format";
 
 const UI = {
   ar: {
     title: "المعاملات",
-    cols: ["المعرف", "وصف المعاملة", "التاريخ", "المبلغ", "الحالة"],
-    unit: "ريال",
+    cols: ["رقم الفاتورة", "الدورات", "التاريخ", "المبلغ"],
+    empty: "لا توجد معاملات بعد",
   },
   ur: {
     title: "لین دین",
-    cols: ["شناخت", "تفصیل", "تاریخ", "رقم", "حیثیت"],
-    unit: "روپے",
+    cols: ["انوائس نمبر", "کورسز", "تاریخ", "رقم"],
+    empty: "ابھی کوئی لین دین نہیں",
   },
-};
-
-const STATUS: Record<string, { ar: string; ur: string; cls: string }> = {
-  paid:      { ar: "مدفوع",  ur: "ادا شدہ", cls: "bg-green-50 text-green-600" },
-  cancelled: { ar: "ملغي",   ur: "منسوخ",   cls: "bg-red-50 text-red-500" },
 };
 
 export default function Transactions() {
   const locale = useLocale() as "ar" | "ur";
   const ui = UI[locale];
+
+  const { data, isLoading } = useMyInvoices({ limit: 50 });
+  const invoices = data?.items ?? [];
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[40vh]">
+        <RiLoader4Line size={32} className="text-[var(--brand)] animate-spin" />
+      </div>
+    );
+  }
+
+  if (invoices.length === 0) {
+    return (
+      <div className="bg-white p-4 sm:p-5 lg:rounded-md lg:p-7 min-h-full flex flex-col items-center justify-center gap-y-3 py-20 text-gray-400">
+        <RiFileTextLine size={48} className="opacity-30" />
+        <p>{ui.empty}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-4 sm:p-5 lg:rounded-md lg:p-7 min-h-full">
@@ -40,18 +57,15 @@ export default function Transactions() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {MOCK_TRANSACTIONS.map((tx) => (
-              <tr key={tx.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-5 py-3.5 text-xs text-gray-400 font-mono">{tx.id}</td>
-                <td className="px-5 py-3.5 font-medium text-[var(--ink)]">{tx.desc[locale]}</td>
-                <td className="px-5 py-3.5 text-gray-500">{tx.date[locale]}</td>
-                <td className="px-5 py-3.5 font-bold text-[var(--ink)]">
-                  {tx.amount.toLocaleString()} {ui.unit}
+            {invoices.map((inv) => (
+              <tr key={inv.id} className="hover:bg-gray-50 transition-colors">
+                <td className="px-5 py-3.5 text-xs text-gray-400 font-mono">{inv.invoiceNumber}</td>
+                <td className="px-5 py-3.5 font-medium text-[var(--ink)]">
+                  {inv.items.map((it) => it.titleSnapshot[locale]).join("، ")}
                 </td>
-                <td className="px-5 py-3.5">
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-md ${STATUS[tx.status].cls}`}>
-                    {STATUS[tx.status][locale]}
-                  </span>
+                <td className="px-5 py-3.5 text-gray-500">{inv.issuedAt.slice(0, 10)}</td>
+                <td className="px-5 py-3.5 font-bold text-[var(--brand)]">
+                  {formatMoney(inv.total, locale)}
                 </td>
               </tr>
             ))}
@@ -61,19 +75,18 @@ export default function Transactions() {
 
       {/* Mobile cards */}
       <div className="flex flex-col gap-y-3 md:hidden">
-        {MOCK_TRANSACTIONS.map((tx) => (
-          <div key={tx.id} className="bg-white rounded-md border border-gray-100 p-4 flex flex-col gap-y-2">
+        {invoices.map((inv) => (
+          <div key={inv.id} className="bg-white rounded-md border border-gray-100 p-4 flex flex-col gap-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-[var(--ink)]">{tx.desc[locale]}</span>
-              <span className={`text-xs font-semibold px-2.5 py-1 rounded-md ${STATUS[tx.status].cls}`}>
-                {STATUS[tx.status][locale]}
+              <span className="text-sm font-bold text-[var(--ink)] line-clamp-1">
+                {inv.items.map((it) => it.titleSnapshot[locale]).join("، ")}
               </span>
+              <span className="font-extrabold text-[var(--brand)] text-sm">{formatMoney(inv.total, locale)}</span>
             </div>
             <div className="flex items-center justify-between text-xs text-gray-400">
-              <span className="font-mono">{tx.id}</span>
-              <span>{tx.date[locale]}</span>
+              <span className="font-mono">{inv.invoiceNumber}</span>
+              <span>{inv.issuedAt.slice(0, 10)}</span>
             </div>
-            <p className="text-sm font-extrabold text-[var(--ink)]">{tx.amount.toLocaleString()} {ui.unit}</p>
           </div>
         ))}
       </div>
