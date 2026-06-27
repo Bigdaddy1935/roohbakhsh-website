@@ -1,13 +1,18 @@
-﻿// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Ø§Ø­Ø±Ø§Ø² Ù‡ÙˆÛŒØª Ùˆ Ú©Ø§Ø±Ø¨Ø± â€” Ù…Ù†Ø¨Ø¹ Ø¯Ø§Ø¯Ù‡: Ø¨Ú©â€ŒØ§Ù†Ø¯ NestJS
-// (Ù†Ù‡ CMS. Ø­Ø³Ø§Ø¨â€ŒÙ‡Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø±ÛŒ Ù†Ù‡Ø§ÛŒÛŒ Ù…Ø§Ù„ NestJS Ø§Ø³Øª.)
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ──────────────────────────────────────────────────────
+// احراز هویت و کاربر — منبع داده: بک‌اند NestJS
+// (نه CMS. حساب‌های کاربری نهایی مال NestJS است.)
+// ──────────────────────────────────────────────────────
 
-import type { ID, ISODate, Locale } from "./common";
+import type { ID, ISODate, Locale, Money } from "./common";
+import type { Ticket } from "./ticket";
+import type { RecentViewItem } from "./recently-viewed";
+import type { FavoriteItem } from "./favorite";
+import type { CourseProgress } from "./progress";
+import type { NotificationItem } from "./notification";
 
 export type UserRole = "user" | "instructor" | "admin";
 
-/** Ú©Ø§Ø±Ø¨Ø± â€” Ù‡Ù…Ø§Ù† Ú†ÛŒØ²ÛŒ Ú©Ù‡ Ø¯Ø± Ø¯Ø§Ø´Ø¨ÙˆØ±Ø¯ Ú©Ø§Ø±Ø¨Ø±ÛŒ Ù†Ù…Ø§ÛŒØ´ Ø¯Ø§Ø¯Ù‡ Ù…ÛŒâ€ŒØ´ÙˆØ¯. */
+/** کاربر — همان چیزی که در داشبورد کاربری نمایش داده می‌شود. */
 export interface User {
   id: ID;
   email: string;
@@ -17,12 +22,13 @@ export interface User {
   preferredLocale: Locale;
   avatarUrl: string | null;
   isActive: boolean;
+  /** آیا ایمیل تأیید شده؟ ورود مسدود نمی‌شود، اما فرانت می‌تواند برای حساب‌های تأیید‌نشده هشدار نشان دهد. */
   isEmailVerified: boolean;
   createdAt: ISODate;
   updatedAt: ISODate;
 }
 
-// â”€â”€ ÙˆØ±ÙˆØ¯ÛŒ/Ø®Ø±ÙˆØ¬ÛŒ APIÙ‡Ø§ â”€â”€
+// ── ورودی/خروجی APIها ──
 
 export interface RegisterRequest {
   fullName: string;
@@ -37,21 +43,52 @@ export interface LoginRequest {
   password: string;
 }
 
-/** Ù¾Ø§Ø³Ø® Ù…Ø´ØªØ±Ú© Ø«Ø¨Øªâ€ŒÙ†Ø§Ù… Ùˆ ÙˆØ±ÙˆØ¯. */
-export interface AuthResponse {
-  user: User;
-  /** ØªÙˆÚ©Ù† JWT â€” ÙØ±Ø§Ù†Øª Ø¢Ù† Ø±Ø§ Ø°Ø®ÛŒØ±Ù‡ Ùˆ Ø¯Ø± Ù‡Ø¯Ø± Ù‡Ø± Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ù…ÛŒâ€ŒÙØ±Ø³ØªØ¯. */
-  accessToken: string;
-  /** Ø¨Ø±Ø§ÛŒ ØªÙ…Ø¯ÛŒØ¯ ØªÙˆÚ©Ù†. */
-  refreshToken: string;
-}
-
-
 export interface ForgotPasswordRequest {
   email: string;
 }
 
 export interface ResetPasswordRequest {
+  /** توکن خام ارسال‌شده در لینک ایمیل بازیابی. */
   token: string;
   newPassword: string;
+}
+
+export interface VerifyEmailRequest {
+  /** توکن خام ارسال‌شده در لینک ایمیل تأیید. */
+  token: string;
+}
+
+export interface ResendVerificationRequest {
+  email: string;
+}
+
+/** پاسخ مشترک ثبت‌نام و ورود. */
+export interface AuthResponse {
+  user: User;
+  /** توکن JWT — فرانت آن را ذخیره و در هدر هر درخواست می‌فرستد. */
+  accessToken: string;
+  /** برای تمدید توکن. */
+  refreshToken: string;
+}
+
+/** خروجی داشبورد پروفایل کاربر — GET /users/me/dashboard */
+export interface UserDashboard {
+  /** مجموع پرداختی کاربر روی سفارش‌های paid — null یعنی هیچ پرداختی ثبت نشده. */
+  totalSpent: Money | null;
+  /** تعداد دوره‌های متمایزی که کاربر خریده (از روی سفارش‌های paid). */
+  myCoursesCount: number;
+  /** تعداد کل تیکت‌های کاربر. */
+  ticketsCount: number;
+  /** آخرین تیکت‌ها — حداکثر ۳ مورد. */
+  recentTickets: Ticket[];
+  /** آخرین بازدیدها — دوره یا درس، حداکثر ۵ مورد. */
+  recentViews: RecentViewItem[];
+  /** علاقه‌مندی‌ها — دوره یا مقاله. */
+  favorites: FavoriteItem[];
+  /** درصد پیشرفت برای دوره‌هایی که کاربر خریده. */
+  coursesProgress: CourseProgress[];
+  /** تعداد اعلانات خوانده‌نشده. */
+  unreadNotificationsCount: number;
+  /** آخرین اعلانات — خبر/دوره/کد تخفیف جدید، حداکثر ۵ مورد. */
+  recentNotifications: NotificationItem[];
 }

@@ -31,14 +31,11 @@ export class Course {
   @Column({ name: "thumbnail_url", type: "json", nullable: true, default: null })
   thumbnailUrl!: Localized<string | null> | null;
 
+  @Column({ name: "intro_video_url", type: "json", nullable: true, default: null })
+  introVideoUrl!: Localized<string | null> | null;
+
   @Column({ type: "json", nullable: true, default: null })
   price!: Money | null;
-
-  @Column({ name: "duration_minutes", type: "int", unsigned: true, default: 0 })
-  durationMinutes!: number;
-
-  @Column({ name: "lesson_count", type: "int", unsigned: true, default: 0 })
-  lessonCount!: number;
 
   @Column({
     type: "enum",

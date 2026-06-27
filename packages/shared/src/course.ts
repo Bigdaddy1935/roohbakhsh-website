@@ -70,10 +70,10 @@ export interface CourseListQuery {
 export interface Lesson {
   id: ID;
   title: Localized;
+  videoUrl: Localized<string | null>;
   order: number;
   durationMinutes: number;
   isFreePreview: boolean;
-  videoUrl: Localized<string | null>;
   sectionId: ID;
   courseId: ID;
   createdAt: ISODate;
@@ -82,6 +82,7 @@ export interface Lesson {
 
 export interface CreateLessonRequest {
   title: Localized;
+  videoUrl?: Localized<string | null>;
   order?: number;
   durationMinutes: number;
   isFreePreview?: boolean;
@@ -89,6 +90,7 @@ export interface CreateLessonRequest {
 
 export interface UpdateLessonRequest {
   title?: Localized;
+  videoUrl?: Localized<string | null>;
   order?: number;
   durationMinutes?: number;
   isFreePreview?: boolean;
@@ -132,6 +134,8 @@ export interface CourseRecord {
   slug: string;
   description: Localized;
   thumbnailUrl: Localized<string | null>;
+  /** ویدیوی معرفی دوره — دو زبانه، مثل thumbnailUrl. */
+  introVideoUrl: Localized<string | null>;
   /** قیمت اصلی دوره — null یعنی رایگان. */
   price: Money | null;
   /** اطلاعات تخفیف — null یعنی بدون تخفیف. */
@@ -140,16 +144,18 @@ export interface CourseRecord {
   effectivePrice: Money | null;
   durationMinutes: number;
   lessonCount: number;
+  /** میانگین امتیاز نظرات (۱ تا ۵) — null یعنی هنوز نظری ثبت نشده. */
+  averageRating: number | null;
+  /** تعداد کل نظرات ثبت‌شده روی این دوره. */
+  reviewCount: number;
+  /** تعداد کاربران یکتایی که این دوره را با سفارش paid خریده‌اند. */
+  participantCount: number;
   level: CourseLevel;
   /** وضعیت برگزاری: ongoing=در حال برگزاری، upcoming=به زودی، completed=پایان‌یافته */
   runStatus: CourseRunStatus;
   /** نحوه دسترسی: online_only=فقط آنلاین، downloadable=قابل دانلود */
   accessType: AccessType;
   isPublished: boolean;
-  introVideoUrl: Localized<string | null> | null;
-  participantCount: number;
-  averageRating: number;
-  reviewCount: number;
   instructorId: ID;
   instructor: InstructorSummary;
   categoryId: ID | null;
@@ -157,18 +163,22 @@ export interface CourseRecord {
   updatedAt: ISODate;
 }
 
+export interface CourseStatsSummary {
+  studentsCount: number;
+  coursesCount: number;
+  totalHours: number;
+}
+
 export interface CreateCourseRequest {
   title: Localized;
   slug: string;
   description: Localized;
   thumbnailUrl?: Localized<string | null>;
+  introVideoUrl?: Localized<string | null>;
   price?: Money | null;
   level?: CourseLevel;
   runStatus?: CourseRunStatus;
   accessType?: AccessType;
-  participantCount: number;
-  averageRating: number;
-  reviewCount: number;
   instructorId: ID;
   categoryId?: ID | null;
   discountPrice?: Money | null;
@@ -180,6 +190,7 @@ export interface UpdateCourseRequest {
   slug?: string;
   description?: Localized;
   thumbnailUrl?: Localized<string | null>;
+  introVideoUrl?: Localized<string | null>;
   price?: Money | null;
   level?: CourseLevel;
   runStatus?: CourseRunStatus;
@@ -191,17 +202,4 @@ export interface UpdateCourseRequest {
   discountPrice?: Money | null;
   /** تاریخ انقضای تخفیف (ISO 8601) — null یعنی تخفیف دائمی. */
   discountExpiresAt?: ISODate | null;
-}
-
-export interface CourseStatsSummary {
-  studentsCount: number;
-  coursesCount: number;
-  totalHours: number;
-}
-
-export interface CourseProgress {
-  courseId: string;
-  progressPercent: number;
-  watchedLessonIds: string[];
-  lastLessonId: string | null;
 }

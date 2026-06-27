@@ -1,18 +1,25 @@
+// ──────────────────────────────────────────────────────────────
+// بازدیدهای اخیر کاربر — دوره یا درس
+// ──────────────────────────────────────────────────────────────
+
 import type { ID, ISODate, Localized } from "./common";
 
-export type RecentViewTargetType = "course" | "article" | "lesson";
+export type RecentViewType = "course" | "lesson";
 
+/** یک آیتم در لیست «آخرین بازدیدها». */
 export interface RecentViewItem {
+  type: RecentViewType;
   id: ID;
-  type: RecentViewTargetType;
   title: Localized;
-  slug: string;
-  courseId: ID | undefined;
-  thumbnailUrl: string | null;
+  thumbnailUrl: Localized<string | null>;
+  /** دوره‌ی مرتبط — برای lesson همان دوره‌ی والد، برای course خودش. */
+  courseId: ID;
+  courseSlug: string;
   viewedAt: ISODate;
 }
 
+/** بدنه‌ی درخواست ثبت بازدید — وقتی کاربر صفحه‌ی دوره یا درس را باز می‌کند. */
 export interface RecordViewRequest {
-  type: RecentViewTargetType;
+  type: RecentViewType;
   id: ID;
 }

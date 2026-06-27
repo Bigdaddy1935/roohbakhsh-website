@@ -8,41 +8,60 @@ export interface ReviewUser {
   avatarUrl: string | null;
 }
 
-export interface ReviewTarget {
-  id: ID;
-  type: ReviewTargetType;
-  title: Localized;
-  slug: string;
-}
-
 export interface ReviewRecord {
   id: ID;
+  /** دقیقاً یکی از courseId/articleId مقدار دارد. */
+  courseId: ID | null;
+  articleId: ID | null;
+  targetType?: ReviewTargetType;
+  targetId?: ID;
   userId: ID;
   user: ReviewUser;
-  targetType: ReviewTargetType;
-  targetId: ID;
-  rating: number;
+  rating: number; // 1 تا 5
   comment: string | null;
-  isApproved: boolean;
-  isStudent: boolean;
+  isStudent?: boolean;
+  /** پاسخ مدیر/مدرس به این نظر — null یعنی هنوز پاسخی ثبت نشده. */
   instructorReply: string | null;
+  /** تاریخ ثبت پاسخ — null یعنی هنوز پاسخی ثبت نشده. */
   repliedAt: ISODate | null;
+  /** تأیید مدیر — تا true نشود در لیست‌های عمومی (GET) نمایش داده نمی‌شود. هنگام ساخت همیشه false است. */
+  isApproved: boolean;
   createdAt: ISODate;
   updatedAt: ISODate;
+}
+
+export interface CreateReviewRequest {
+  rating?: number; // 1 تا 5
+  comment?: string | null;
+}
+
+export interface UpdateReviewRequest {
+  rating?: number;
+  comment?: string | null;
+}
+
+/** ثبت/ویرایش پاسخ مدیر روی یک نظر — فقط admin. */
+export interface ReplyToReviewRequest {
+  reply: string;
+}
+
+export interface CourseRatingSummary {
+  averageRating: number | null; // null یعنی هنوز نظری ثبت نشده
+  reviewCount: number;
+}
+
+export type PaginatedReviews = Paginated<ReviewRecord>;
+
+/** دوره یا مقاله‌ای که این نظر متعلق به آن است — برای روت سراسری GET /reviews. */
+export interface ReviewTarget {
+  type: ReviewTargetType;
+  id: ID;
+  slug: string;
+  title: Localized;
 }
 
 export interface ReviewWithTarget extends ReviewRecord {
   target: ReviewTarget;
 }
 
-export interface CreateReviewRequest {
-  rating?: number;
-  comment?: string | null;
-}
-
-export interface ReplyToReviewRequest {
-  reply: string;
-}
-
-export type PaginatedReviews = Paginated<ReviewRecord>;
 export type PaginatedReviewsWithTarget = Paginated<ReviewWithTarget>;

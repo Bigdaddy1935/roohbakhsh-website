@@ -4,6 +4,7 @@ import {
   IsInt,
   IsString,
   IsBoolean,
+  IsOptional,
   Min,
   validateSync,
 } from "class-validator";
@@ -46,8 +47,45 @@ class EnvConfig {
   @IsString()
   JWT_EXPIRES_IN: string = "7d";
 
-  // درگاه پرداخت ارزی (Stripe/PayPal/...) بعداً اینجا اضافه می‌شود.
-  // متغیرهای ZarinPal حذف شدند.
+  @IsString()
+  ZARINPAL_MERCHANT_ID!: string;
+
+  @IsBoolean()
+  ZARINPAL_SANDBOX: boolean = true;
+
+  @IsString()
+  PAYMENT_CALLBACK_BASE_URL!: string;
+
+  // ── Mail (SMTP) ──────────────────────────────────────────
+  // اختیاری — اگر تنظیم نشود، ایمیل‌ها فقط لاگ می‌شوند (حالت توسعه).
+
+  @IsOptional()
+  @IsString()
+  SMTP_HOST?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  SMTP_PORT?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  SMTP_SECURE?: boolean;
+
+  @IsOptional()
+  @IsString()
+  SMTP_USER?: string;
+
+  @IsOptional()
+  @IsString()
+  SMTP_PASSWORD?: string;
+
+  @IsOptional()
+  @IsString()
+  MAIL_FROM?: string;
+
+  @IsString()
+  FRONTEND_URL: string = "http://localhost:3000";
 }
 
 function validate(config: Record<string, unknown>): EnvConfig {

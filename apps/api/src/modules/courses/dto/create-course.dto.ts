@@ -1,6 +1,6 @@
 import {
   IsString, IsOptional, ValidateNested, IsObject,
-  IsUrl, IsInt, Min, IsUUID, IsIn, IsISO8601, IsBoolean,
+  IsUrl, IsInt, Min, IsUUID, IsIn, IsISO8601,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
@@ -23,6 +23,18 @@ class LocalizedNullableDto {
   ar!: string | null;
 
   @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/ur/c01.webp", nullable: true })
+  @IsOptional()
+  @IsUrl()
+  ur!: string | null;
+}
+
+class LocalizedVideoUrlDto {
+  @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/videos/ar/intro.mp4", nullable: true })
+  @IsOptional()
+  @IsUrl()
+  ar!: string | null;
+
+  @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/videos/ur/intro.mp4", nullable: true })
   @IsOptional()
   @IsUrl()
   ur!: string | null;
@@ -66,6 +78,17 @@ export class CreateCourseDto implements CreateCourseRequest {
   @Type(() => LocalizedNullableDto)
   @IsObject()
   thumbnailUrl?: Localized<string | null>;
+
+  @ApiPropertyOptional({
+    type: LocalizedVideoUrlDto,
+    description: "ویدیوی معرفی دوره — می‌تواند per locale متفاوت باشد",
+    example: { ar: "https://cdn.roohbakhsh.com/videos/ar/intro.mp4", ur: "https://cdn.roohbakhsh.com/videos/ur/intro.mp4" },
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => LocalizedVideoUrlDto)
+  @IsObject()
+  introVideoUrl?: Localized<string | null>;
 
   @ApiPropertyOptional({ type: MoneyDto, nullable: true, description: "قیمت دوره — null یعنی رایگان" })
   @IsOptional()

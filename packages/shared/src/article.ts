@@ -10,9 +10,12 @@ export interface ArticleRecord {
   summary: Localized;
   body: Localized;
   thumbnailUrl: Localized<string | null>;
-  authorId: string;
+  instructorId: string;
   instructor: InstructorSummary;
-  averageRating: number;
+  categoryId: string | null;
+  /** میانگین امتیاز نظرات (۱ تا ۵) — null یعنی هنوز نظری ثبت نشده. */
+  averageRating: number | null;
+  /** تعداد کل نظرات ثبت‌شده روی این مقاله. */
   reviewCount: number;
   status: ArticleStatus;
   publishedAt: ISODate | null;

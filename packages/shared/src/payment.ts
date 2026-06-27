@@ -18,7 +18,10 @@ export interface PaymentRecord {
 
 export interface InitiatePaymentResponse {
   paymentId: string;
-  gatewayUrl: string;
+  /** اگر سفارش کاملاً رایگان باشد null است — کاربر نیازی به رفتن به درگاه ندارد. */
+  gatewayUrl: string | null;
+  /** false یعنی سفارش رایگان بود و بلافاصله paid شد (بدون رفتن به درگاه). */
+  requiresPayment: boolean;
 }
 
 export type PaginatedPayments = Paginated<PaymentRecord>;
@@ -31,7 +34,7 @@ export interface PaymentDestinationAccount {
 }
 
 export interface SubmitCardToCardPaymentRequest {
-  orderId: string;
+  orderId?: string;
   trackingCode: string;
   cardNumber: string;
   transferredAt?: string;

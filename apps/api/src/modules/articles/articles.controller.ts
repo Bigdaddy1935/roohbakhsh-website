@@ -11,7 +11,6 @@ import {
   DefaultValuePipe,
   HttpCode,
   HttpStatus,
-  Request,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -83,9 +82,10 @@ export class ArticlesController {
   @ApiOperation({ summary: "[Admin] ایجاد مقاله جدید" })
   @ApiResponse({ status: 201, description: "مقاله ایجاد شد" })
   @ApiResponse({ status: 409, description: "SLUG_ALREADY_EXISTS — اسلاگ تکراری است" })
+  @ApiResponse({ status: 404, description: "INSTRUCTOR_NOT_FOUND" })
   @ApiResponse({ status: 403, description: "فقط admin" })
-  create(@Body() dto: CreateArticleDto, @Request() req: any) {
-    return this.svc.create(dto, req.user.id);
+  create(@Body() dto: CreateArticleDto) {
+    return this.svc.create(dto);
   }
 
   @Roles("admin")

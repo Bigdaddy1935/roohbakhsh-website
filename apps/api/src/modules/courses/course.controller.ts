@@ -4,7 +4,7 @@ import {
 } from "@nestjs/common";
 import {
   ApiTags, ApiOperation, ApiResponse,
-  ApiParam, ApiHeader, ApiBearerAuth, ApiCookieAuth,
+  ApiParam, ApiQuery, ApiHeader, ApiBearerAuth, ApiCookieAuth,
 } from "@nestjs/swagger";
 import { CourseService } from "./course.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
@@ -26,15 +26,18 @@ export class CourseController {
   @Public()
   @Get()
   @ApiOperation({
-    summary: "لیست صفحه‌بندی‌شده دوره‌ها",
+    summary: "لیست صفحه‌بندی‌شده دوره‌ها / سرچ بر اساس عنوان",
     description:
       "دوره‌ها را صفحه‌بندی‌شده برمی‌گرداند. " +
-      "هر دوره شامل اطلاعات خلاصه استاد است. نیازی به احراز هویت نیست.",
+      "هر دوره شامل اطلاعات خلاصه استاد است. نیازی به احراز هویت نیست. " +
+      "با پارامتر `q` می‌توان بر اساس عنوان دوره (عربی یا اردو) سرچ کرد — حداقل ۳ کاراکتر لازم است.",
   })
   @ApiHeader(LANG_HEADER)
+  @ApiQuery({ name: "q", required: false, type: String, description: "متن سرچ روی عنوان دوره — حداقل ۳ کاراکتر", example: "تفسیر" })
   @ApiResponse({ status: 200, description: "لیست صفحه‌بندی‌شده دوره‌ها — Paginated<CourseRecord>" })
-  findAll(@Query() query: PaginationDto) {
-    return this.courseService.findAll(query.page ?? 1, query.limit ?? 12);
+  @ApiResponse({ status: 400, description: "طول q کمتر از ۳ کاراکتر — کد: SEARCH_QUERY_TOO_SHORT", type: ApiErrorSchema })
+  findAll(@Query() query: PaginationDto, @Query("q") q?: string) {
+    return this.courseService.findAll(query.page ?? 1, query.limit ?? 12, q);
   }
 
   @Public()

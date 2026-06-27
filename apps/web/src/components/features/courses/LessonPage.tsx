@@ -629,7 +629,7 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
   const videoUrl = lesson.videoUrl[locale] ?? lesson.videoUrl.ar ?? lesson.videoUrl.ur;
 
   const isLessonFavorite = !!favorites?.some((f) => f.type === "lesson" && f.id === lesson.id);
-  const isLessonWatched = !!progress?.watchedLessonIds.includes(lesson.id);
+  const isLessonWatched = !!progress?.watchedLessonIds?.includes(lesson.id);
 
   function handleMarkDone() {
     if (!isAuthed) {
