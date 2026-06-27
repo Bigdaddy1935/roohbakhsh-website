@@ -4,13 +4,15 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { RiArrowLeftLine } from "react-icons/ri";
 import ArticleCard from "@/components/ui/ArticleCard";
+import { ArticleCardSkeleton } from "@/components/ui/Skeleton";
 import { useArticles } from "@/hooks/queries/use-articles";
 
 export default function LatestArticles() {
   const t = useTranslations("Home.articles");
   const locale = useLocale() as "ar" | "ur";
-  const { data } = useArticles({ limit: 4 });
+  const { data, isLoading, isError } = useArticles({ limit: 4 });
   const articles = data?.items ?? [];
+  const showSkeleton = isLoading || (isError && !data);
 
   return (
     <section className="container relative py-10 sm:py-16 lg:py-20">
@@ -32,7 +34,9 @@ export default function LatestArticles() {
 
       {/* Grid — 4 cards, space for absolute read button overflow */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-7 gap-y-12 pb-6">
-        {articles.map((article) => {
+        {showSkeleton
+          ? Array.from({ length: 4 }).map((_, i) => <ArticleCardSkeleton key={i} />)
+          : articles.map((article) => {
           const thumb = article.thumbnailUrl?.[locale] ?? article.thumbnailUrl?.ar ?? "";
           return (
             <ArticleCard

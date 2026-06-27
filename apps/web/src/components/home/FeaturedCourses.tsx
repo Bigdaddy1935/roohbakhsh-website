@@ -3,14 +3,16 @@
 import { useLocale, useTranslations } from "next-intl";
 import CardSlider from "@/components/ui/CardSlider";
 import CourseCard from "@/components/ui/CourseCard";
+import { CourseCardSkeleton } from "@/components/ui/Skeleton";
 import { useCourses } from "@/hooks/queries/use-courses";
 import { formatMoney, isFree, discountPercent } from "@/lib/format";
 
 export default function FeaturedCourses() {
   const t = useTranslations("Home.featured");
   const locale = useLocale() as "ar" | "ur";
-  const { data } = useCourses({ limit: 8 });
+  const { data, isLoading, isError } = useCourses({ limit: 8 });
   const courses = data?.items ?? [];
+  const showSkeleton = isLoading || (isError && !data);
 
   return (
     <CardSlider
@@ -19,18 +21,24 @@ export default function FeaturedCourses() {
       title2={t("title_2")}
       scrollAmount={1232}
     >
-      {courses.map((course) => {
+      {showSkeleton
+        ? Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="shrink-0 w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-3*1.25rem)/4)]">
+              <CourseCardSkeleton />
+            </div>
+          ))
+        : courses.map((course) => {
         const free = isFree(course.effectivePrice);
         const thumb = course.thumbnailUrl?.[locale] ?? course.thumbnailUrl?.ar ?? "";
         return (
-          <div key={course.id} className="w-[298px] shrink-0" style={{ scrollSnapAlign: "start" }}>
+          <div key={course.id} className="shrink-0 w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-3*1.25rem)/4)]" style={{ scrollSnapAlign: "start" }}>
           <CourseCard
             course={{
               id: course.id,
               href: `/courses/${course.slug}`,
               image: thumb || "https://dl.poshtybanman.ir/upload/1%20(4)_63dd121c7b132.png",
               title: course.title[locale],
-              description: course.description[locale],
+              description: course.description?.[locale] ?? "",
               instructor: course.instructor.name[locale],
               averageRating: course.averageRating,
               reviewCount: course.reviewCount,

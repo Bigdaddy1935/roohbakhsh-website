@@ -4,14 +4,16 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { RiArrowLeftLine } from "react-icons/ri";
 import CourseCard from "@/components/ui/CourseCard";
+import { CourseCardSkeleton } from "@/components/ui/Skeleton";
 import { useCourses } from "@/hooks/queries/use-courses";
 import { formatMoney, isFree, discountPercent } from "@/lib/format";
 
 export default function NewestCourses() {
   const t = useTranslations("Home.newest");
   const locale = useLocale() as "ar" | "ur";
-  const { data } = useCourses({ limit: 8 });
+  const { data, isLoading, isError } = useCourses({ limit: 8 });
   const courses = data?.items ?? [];
+  const showSkeleton = isLoading || (isError && !data);
 
   return (
     <section className="container relative py-10 sm:py-16 lg:py-20">
@@ -31,7 +33,9 @@ export default function NewestCourses() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
-          {courses.map((course) => {
+          {showSkeleton
+            ? Array.from({ length: 8 }).map((_, i) => <CourseCardSkeleton key={i} />)
+            : courses.map((course) => {
             const free = isFree(course.effectivePrice);
             const thumb = course.thumbnailUrl?.[locale] ?? course.thumbnailUrl?.ar ?? "";
             return (
@@ -42,7 +46,7 @@ export default function NewestCourses() {
                   href: `/courses/${course.slug}`,
                   image: thumb || "https://dl.poshtybanman.ir/upload/1%20(4)_63dd121c7b132.png",
                   title: course.title[locale],
-                  description: course.description[locale],
+                  description: course.description?.[locale] ?? "",
                   instructor: course.instructor.name[locale],
                   averageRating: course.averageRating,
                   reviewCount: course.reviewCount,
@@ -59,6 +63,7 @@ export default function NewestCourses() {
             );
           })}
         </div>
+
     </section>
   );
 }

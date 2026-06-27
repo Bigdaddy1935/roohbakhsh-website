@@ -5,13 +5,15 @@ import { Link } from "@/i18n/navigation";
 import { RiArrowRightSLine, RiArrowLeftSLine, RiGridLine } from "react-icons/ri";
 import { useRef } from "react";
 import { useCategories } from "@/hooks/queries/use-categories";
+import { CategoryCardSkeleton } from "@/components/ui/Skeleton";
 
 export default function CategoriesSection() {
   const t = useTranslations("Home.categories");
   const locale = useLocale() as "ar" | "ur";
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { data: cats = [] } = useCategories();
+  const { data: cats = [], isLoading, isError } = useCategories();
+  const showSkeleton = isLoading || (isError && !cats.length);
 
   const courseWord = locale === "ar" ? "دورة" : "کورس";
 
@@ -73,7 +75,9 @@ export default function CategoriesSection() {
         onPointerUp={onPointerUp}
         onPointerLeave={onPointerUp}
       >
-        {cats.map((cat) => {
+        {showSkeleton
+          ? Array.from({ length: 6 }).map((_, i) => <CategoryCardSkeleton key={i} />)
+          : cats.map((cat) => {
           const thumb = cat.thumbnailUrl?.[locale] ?? cat.thumbnailUrl?.ar ?? null;
           return (
             <Link

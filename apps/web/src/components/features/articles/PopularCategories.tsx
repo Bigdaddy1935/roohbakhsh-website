@@ -11,9 +11,12 @@ export default function PopularCategories() {
   const { data: categories } = useCategories();
 
   return (
-    <section className="py-8 bg-white border-y border-gray-100">
+    <section className="py-8 border-y border-gray-100">
       <div className="container">
-        <h2 className="text-base font-extrabold text-[var(--ink)] mb-5">{t("popular_cats")}</h2>
+        <h2 className="flex items-center justify-center gap-x-2 text-xl font-extrabold mb-5">
+          <span className="text-[var(--ink)]">{t("popular_cats_1")}</span>
+          <span className="text-[var(--brand)]">{t("popular_cats_2")}</span>
+        </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {(categories ?? []).map((cat) => {
             const isActive = cats.includes(cat.id);

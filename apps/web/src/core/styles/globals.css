@@ -1,5 +1,6 @@
 @import "@heroui/styles";
 @import "tailwindcss";
+@import "./scroll.css";
 
 /* ── Brand palette (60-30-10) ─────────────────────────────── */
 :root {
@@ -13,15 +14,6 @@
   --font-urdu:   "Noto Nastaliq Urdu", "Amar Nastaleeq", serif;
 }
 
-/* ── Custom thin scrollbar ────────────────────────────────── */
-.scrollbar-thin {
-  scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
-}
-.scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
-.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
-.scrollbar-thin::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
-.scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
 
 @layer base {
   * { box-sizing: border-box; }
@@ -34,7 +26,6 @@
     color: var(--ink);
     scrollbar-width: none;
   }
-  body::-webkit-scrollbar { display: none; }
 
   /* per-locale font */
   :lang(ar) { font-family: var(--font-arabic); }
@@ -71,10 +62,26 @@
 .article-body table { width: 100%; border-collapse: collapse; margin-block: 1em; }
 .article-body th, .article-body td { border: 1px solid #e5e7eb; padding: 0.5em 0.75em; }
 
-/* Outside any @layer — overrides everything from Tailwind/HeroUI */
-.container {
-  max-width: 1300px !important;
-  width: 100%;
-  margin-inline: auto;
-  padding-inline: 24px;
+/* ── Container — responsive breakpoints (excluding dashboard) ── */
+@layer utilities {
+  .container {
+    @apply w-full mx-auto;
+    padding-inline: 24px;
+  }
+}
+
+@media (min-width: 28rem) {
+  .container { max-width: 428px; }
+}
+@media (min-width: 40rem) {
+  .container { max-width: 620px; }
+}
+@media (min-width: 48rem) {
+  .container { max-width: 748px; }
+}
+@media (min-width: 64rem) {
+  .container { max-width: 1004px; }
+}
+@media (min-width: 80rem) {
+  .container { max-width: 1260px; }
 }
