@@ -29,7 +29,7 @@ export default function ArticlesSidebar() {
     <aside className="hidden lg:flex flex-col gap-y-6 sticky top-24 self-start">
 
       {/* Search */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+      <div className="bg-white rounded-lg border border-gray-100 p-4">
         <p className="text-sm font-extrabold text-[var(--ink)] mb-3">{t("search_label")}</p>
         <div className="relative">
           <RiSearchLine
@@ -41,13 +41,13 @@ export default function ArticlesSidebar() {
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
             placeholder={t("search_placeholder")}
-            className="w-full h-10 rounded-xl border border-gray-200 ps-9 pe-3 text-sm text-[var(--ink)] placeholder-gray-400 focus:outline-none focus:border-[var(--brand)] transition-colors"
+            className="w-full h-10 rounded-md border border-gray-200 ps-9 pe-3 text-sm text-[var(--ink)] placeholder-gray-400 focus:outline-none focus:border-[var(--brand)] transition-colors"
           />
         </div>
       </div>
 
       {/* Categories */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+      <div className="bg-white rounded-lg border border-gray-100 p-4">
         <p className="text-sm font-extrabold text-[var(--ink)] mb-4">{t("filter_label")}</p>
         <div className="flex flex-col gap-y-3 max-h-64 overflow-y-auto scrollbar-thin pe-1">
           {(categories ?? []).map((cat) => (
@@ -68,7 +68,7 @@ export default function ArticlesSidebar() {
       </div>
 
       {/* Sort */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+      <div className="bg-white rounded-lg border border-gray-100 p-4">
         <p className="text-sm font-extrabold text-[var(--ink)] mb-4">{t("sort_label")}</p>
         <RadioGroup value={sort} onChange={setSort} className="flex flex-col gap-y-2">
           <Radio value="newest">

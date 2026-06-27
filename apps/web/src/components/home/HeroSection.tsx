@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
+
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/navigation";
 import {
@@ -11,6 +12,7 @@ import {
   RiLoader4Line,
 } from "react-icons/ri";
 import { useCourses } from "@/hooks/queries/use-courses";
+
 
 const MIN_SEARCH_CHARS = 3;
 
