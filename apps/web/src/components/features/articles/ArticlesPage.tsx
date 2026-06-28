@@ -31,7 +31,7 @@ function ArticlesContent() {
   return (
     <div className="bg-[var(--bg)] min-h-screen">
       {/* Breadcrumb */}
-      <div className="py-5 border-b border-gray-100">
+      <div className="py-8 border-b border-gray-100">
         <div className="container">
           <div className="flex items-center gap-x-2 text-sm text-gray-400">
             <Link href="/" className="hover:text-[var(--brand)] transition-colors">

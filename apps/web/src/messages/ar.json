@@ -121,7 +121,8 @@
     "apply_btn": "تطبيق",
     "read_btn": "قراءة المقال",
     "no_results": "لا توجد مقالات",
-    "no_results_hint": "جرّب تغيير معايير البحث أو التصفية"
+    "no_results_hint": "جرّب تغيير معايير البحث أو التصفية",
+    "clear_filters": "مسح الفلاتر"
   },
   "Courses": {
     "breadcrumb_home": "الرئيسية",
@@ -141,6 +142,7 @@
     "search_placeholder": "ابحث عن دورة...",
     "no_results": "لا توجد دورات",
     "no_results_hint": "جرّب تغيير معايير البحث أو التصفية",
+    "clear_filters": "مسح الفلاتر",
     "discount": "خصم",
     "currency": "ر.س",
     "enroll_btn": "اشترك الآن"
@@ -364,6 +366,7 @@
     "signin": "تسجيل الدخول",
     "signup": "إنشاء حساب",
     "viewAll": "عرض الكل",
+    "noCourses": "لا توجد دورات في هذا التصنيف",
     "categories_title": "التصنيفات",
     "categories": {
       "quran": "العلوم القرآنية",

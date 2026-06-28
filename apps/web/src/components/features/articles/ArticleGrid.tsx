@@ -7,18 +7,25 @@ import { useArticles } from "@/hooks/queries/use-articles";
 import { useArticleFilters } from "@/hooks/useArticleFilters";
 import ArticleCard from "@/components/ui/ArticleCard";
 
-function EmptyState({ t }: { t: (k: string) => string }) {
+function EmptyState({ t, onClear }: { t: (k: string) => string; onClear: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-center gap-y-5">
-      <div className="relative size-24 flex items-center justify-center">
+    <div className="flex flex-col items-center justify-center py-20 text-center gap-y-6">
+      <div className="relative flex items-center justify-center size-28">
         <div className="absolute inset-0 rounded-full bg-[var(--brand)]/8" />
-        <div className="absolute inset-3 rounded-full bg-[var(--brand)]/12" />
-        <RiSearchLine size={36} className="relative text-[var(--brand)]/50" />
+        <div className="absolute inset-4 rounded-full bg-[var(--brand)]/12" />
+        <RiSearchLine size={44} className="relative text-[var(--brand)]/50" />
       </div>
-      <div className="flex flex-col gap-y-2">
+      <div className="flex flex-col gap-y-2 max-w-xs">
         <p className="text-lg font-extrabold text-[var(--ink)]">{t("no_results")}</p>
-        <p className="text-sm text-gray-400 max-w-xs">{t("no_results_hint")}</p>
+        <p className="text-sm text-gray-400 leading-6">{t("no_results_hint")}</p>
       </div>
+      <button
+        type="button"
+        onClick={onClear}
+        className="h-10 px-6 rounded-lg bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+      >
+        {t("clear_filters")}
+      </button>
     </div>
   );
 }
@@ -26,7 +33,7 @@ function EmptyState({ t }: { t: (k: string) => string }) {
 export default function ArticleGrid() {
   const t = useTranslations("Articles");
   const locale = useLocale() as "ar" | "ur";
-  const { cats, sort, q } = useArticleFilters();
+  const { cats, sort, q, clearAll } = useArticleFilters();
   const { data, isLoading, isError } = useArticles({ limit: 50 });
   const [ready, setReady] = useState(false);
 
@@ -53,7 +60,7 @@ export default function ArticleGrid() {
     );
   }
 
-  if (isError) return <EmptyState t={t} />;
+  if (isError) return <EmptyState t={t} onClear={clearAll} />;
 
   let articles = data?.items ?? [];
 
@@ -71,7 +78,7 @@ export default function ArticleGrid() {
       : new Date(b.publishedAt ?? b.createdAt).getTime() - new Date(a.publishedAt ?? a.createdAt).getTime(),
   );
 
-  if (articles.length === 0) return <EmptyState t={t} />;
+  if (articles.length === 0) return <EmptyState t={t} onClear={clearAll} />;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-7 gap-y-12 pb-6 content-start self-start">
