@@ -6,7 +6,9 @@ import Image from "next/image";
 import { RiStarFill, RiArrowRightSLine, RiArrowLeftSLine, RiDoubleQuotesL } from "react-icons/ri";
 import { useReviews } from "@/hooks/queries/use-reviews";
 
-const VISIBLE = 3;
+const VISIBLE_LG = 3;
+const VISIBLE_SM = 2;
+const VISIBLE_XS = 1;
 
 const AVATAR_COLORS = [
   "bg-emerald-500", "bg-blue-500", "bg-amber-500",
@@ -17,14 +19,28 @@ export default function Testimonials() {
   const t = useTranslations("Home.testimonials");
   const locale = useLocale() as "ar" | "ur";
   const [start, setStart] = useState(0);
+  const [visible, setVisible] = useState(VISIBLE_LG);
+
+  useEffect(() => {
+    const update = () => {
+      if (window.innerWidth < 640) setVisible(VISIBLE_XS);
+      else if (window.innerWidth < 1024) setVisible(VISIBLE_SM);
+      else setVisible(VISIBLE_LG);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   const { data } = useReviews({ limit: 12, rating: 5 });
   const reviews = data?.items ?? [];
   const total = reviews.length;
-  const maxStart = Math.max(0, total - VISIBLE);
+  const maxStart = Math.max(0, total - visible);
 
   const next = useCallback(() => setStart((s) => (s >= maxStart ? 0 : s + 1)), [maxStart]);
   const prev = useCallback(() => setStart((s) => (s <= 0 ? maxStart : s - 1)), [maxStart]);
+
+  useEffect(() => { setStart(0); }, [visible]);
 
   useEffect(() => {
     if (total < 2) return;
@@ -48,7 +64,7 @@ export default function Testimonials() {
   };
 
   const visibleItems = total > 0
-    ? Array.from({ length: Math.min(VISIBLE, total) }, (_, i) => reviews[(start + i) % total]!)
+    ? Array.from({ length: Math.min(visible, total) }, (_, i) => reviews[(start + i) % total]!)
     : [];
 
   return (
@@ -72,7 +88,7 @@ export default function Testimonials() {
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 transition-all duration-500 items-stretch">
+        <div className="flex gap-5 transition-all duration-500 items-stretch">
           {visibleItems.map((item, i) => {
             const colorClass = AVATAR_COLORS[(item.userId.charCodeAt(0) + i) % AVATAR_COLORS.length]!;
             const initials = item.user.fullName.slice(0, 2);
@@ -80,7 +96,7 @@ export default function Testimonials() {
             return (
               <div
                 key={`${start}-${i}`}
-                className="bg-white rounded-lg border border-gray-100 p-5 flex flex-col justify-between h-full"
+                className="bg-white rounded-lg border border-gray-100 p-5 flex flex-col justify-between h-full shrink-0 w-full sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)]"
               >
                 {/* Quote + text */}
                 <div className="flex-1">
@@ -132,7 +148,7 @@ export default function Testimonials() {
       </div>
 
       {/* Nav */}
-      {total > VISIBLE && (
+      {total > visible && (
         <div className="flex items-center justify-center gap-x-4 mt-8">
           <button
             type="button"

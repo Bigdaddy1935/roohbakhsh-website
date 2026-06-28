@@ -68,8 +68,8 @@ export default function CategoriesSection() {
       {/* Slider */}
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto pb-2 select-none cursor-grab"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        className="flex gap-4 overflow-x-auto pb-2 select-none cursor-grab scroll-smooth"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollSnapType: "x mandatory" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -84,9 +84,10 @@ export default function CategoriesSection() {
               key={cat.id}
               href={`/courses?cat=${cat.slug}`}
               draggable={false}
+              style={{ scrollSnapAlign: "start" }}
               className="bg-white flex flex-col items-center gap-3 sm:gap-4 px-2.5 py-4 sm:py-6 rounded-lg border-2 border-transparent hover:border-[var(--brand)] hover:bg-[var(--brand)]/10 transition-colors text-center shrink-0
-                w-[calc((100%-5*1rem)/3)]
-                sm:w-[calc((100%-5*1rem)/4)]
+                w-[calc((100%-1rem)/2)]
+                sm:w-[calc((100%-3*1rem)/4)]
                 lg:w-[calc((100%-5*1rem)/6)]"
             >
               {thumb ? (
