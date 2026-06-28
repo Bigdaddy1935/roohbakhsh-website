@@ -1,25 +1,49 @@
 ﻿"use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { RiArrowLeftSLine, RiLoader4Line } from "react-icons/ri";
+import { RiArrowLeftSLine } from "react-icons/ri";
 import { useArticles } from "@/hooks/queries/use-articles";
 
 export default function LatestArticlesRow() {
   const t = useTranslations("Articles");
   const locale = useLocale() as "ar" | "ur";
+  const [ready, setReady] = useState(false);
 
   const { data: articlesData, isLoading } = useArticles({ limit: 4 });
   const latest = [...(articlesData?.items ?? [])]
     .sort((a, b) => new Date(b.publishedAt ?? b.createdAt).getTime() - new Date(a.publishedAt ?? a.createdAt).getTime())
     .slice(0, 4);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!isLoading) setReady(true);
+  }, [isLoading]);
+
+  if (!ready) {
     return (
       <section className="py-10">
-        <div className="container flex justify-center">
-          <RiLoader4Line size={28} className="text-[var(--brand)] animate-spin" />
+        <div className="container">
+          {/* title skeleton */}
+          <div className="mb-8 flex justify-center">
+            <div className="h-7 w-48 rounded-lg bg-gray-200 animate-pulse" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex gap-x-5">
+                <div className="hidden sm:block w-40 h-28 lg:w-52 lg:h-32 shrink-0 rounded-xl bg-gray-200 animate-pulse" />
+                <div className="flex flex-col justify-between flex-1 min-w-0 py-1 gap-y-3">
+                  <div className="flex flex-col gap-y-2">
+                    <div className="h-4 w-full rounded bg-gray-200 animate-pulse" />
+                    <div className="h-4 w-3/4 rounded bg-gray-200 animate-pulse" />
+                    <div className="hidden lg:block h-3 w-full rounded bg-gray-100 animate-pulse" />
+                  </div>
+                  <div className="h-3 w-16 rounded bg-gray-200 animate-pulse ms-auto" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     );

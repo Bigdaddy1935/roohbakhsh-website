@@ -68,7 +68,7 @@ function ArticlesContent() {
       </div>
 
       {/* Desktop: sidebar (right) + grid (left) */}
-      <div className="container py-10">
+      <div className="container py-10 pb-20 lg:pb-28">
         {/* grid-cols-[300px_1fr] → first col (sidebar) on RIGHT in RTL */}
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 items-start">
           <ArticlesSidebar />
@@ -81,8 +81,10 @@ function ArticlesContent() {
 
 export default function ArticlesPage() {
   return (
-    <Suspense>
-      <ArticlesContent />
-    </Suspense>
+    <div className="min-h-[100vh]">
+      <Suspense>
+        <ArticlesContent />
+      </Suspense>
+    </div>
   );
 }

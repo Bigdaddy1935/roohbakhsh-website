@@ -191,25 +191,19 @@ export default function Header() {
           <div className="hidden md:block flex-1" />
 
           {/* Desktop actions */}
-          <div className="hidden md:flex items-center gap-x-3">
+          <div className="hidden md:flex items-center gap-x-5">
 
-            {/* Language switcher */}
-            <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden text-[12px] font-semibold">
-              <button type="button" onClick={() => switchLocale("ar")}
-                className={`w-8 text-center py-1.5 transition-colors cursor-pointer ${locale === "ar" ? "bg-[var(--brand)] text-white" : "text-gray-500 hover:bg-gray-100"}`}>
-                ع
-              </button>
-              <button type="button" onClick={() => switchLocale("ur")}
-                className={`w-[52px] text-center py-1.5 transition-colors cursor-pointer ${locale === "ur" ? "bg-[var(--brand)] text-white" : "text-gray-500 hover:bg-gray-100"}`}>
-                اردو
-              </button>
-            </div>
+            {/* Language switcher — toggle */}
+            <button type="button" onClick={() => switchLocale(locale === "ar" ? "ur" : "ar")}
+              className="border border-gray-200 rounded-md text-[12px] font-semibold cursor-pointer w-[55px] h-[35px] text-gray-500 hover:bg-gray-100 transition-colors">
+              {locale === "ar" ? "اردو" : "ع"}
+            </button>
 
             {/* Cart with hover popup */}
             <div className="group relative">
               <button type="button" aria-label={t("cart")}
-                className="size-9 flex items-center justify-center rounded-xl border border-gray-200 hover:border-[var(--brand)] hover:text-[var(--brand)] text-[var(--ink)] transition-colors relative">
-                <RiShoppingCartLine size={20} />
+                className="size-9 flex items-center justify-center rounded-xl hover:text-[var(--brand)] text-[var(--ink)] transition-colors relative">
+                <svg xmlns="http://www.w3.org/2000/svg" className="size-6 md:size-7" viewBox="0 0 24 24" fill="none"><g fill="none"><path d="M2 2H3.74001C4.82001 2 5.67 2.93 5.58 4L4.75 13.96C4.61 15.59 5.89999 16.99 7.53999 16.99H18.19C19.63 16.99 20.89 15.81 21 14.38L21.54 6.88C21.66 5.22 20.4 3.87 18.73 3.87H5.82001" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/><path d="M16.25 22C16.9404 22 17.5 21.4404 17.5 20.75C17.5 20.0596 16.9404 19.5 16.25 19.5C15.5596 19.5 15 20.0596 15 20.75C15 21.4404 15.5596 22 16.25 22Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/><path d="M8.25 22C8.94036 22 9.5 21.4404 9.5 20.75C9.5 20.0596 8.94036 19.5 8.25 19.5C7.55964 19.5 7 20.0596 7 20.75C7 21.4404 7.55964 22 8.25 22Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/><path d="M9 8H21" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/></g></svg>
                 {cartItems.length > 0 && (
                   <span className="absolute -top-1.5 -end-1.5 size-4 flex items-center justify-center rounded-full bg-[var(--cta)] text-white text-[10px] font-bold">
                     {cartItems.length}
@@ -266,11 +260,11 @@ export default function Header() {
             {/* User icon with hover popup */}
             <div className="group relative">
               <button type="button"
-                className="size-9 flex items-center justify-center rounded-xl border border-gray-200 hover:border-[var(--brand)] hover:text-[var(--brand)] text-[var(--ink)] transition-colors overflow-hidden">
+                className="size-9 flex items-center justify-center rounded-xl hover:text-[var(--brand)] text-[var(--ink)] transition-colors overflow-hidden">
                 {user?.avatarUrl ? (
                   <Image src={user.avatarUrl} alt="user" width={36} height={36} className="size-full object-cover" />
                 ) : (
-                  <RiUserLine size={20} />
+                  <svg xmlns="http://www.w3.org/2000/svg" className="size-6 md:size-7" viewBox="0 0 24 24" fill="none"><g fill="none"><path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M20.59 22C20.59 18.13 16.74 15 12 15C7.26003 15 3.41003 18.13 3.41003 22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></g></svg>
                 )}
               </button>
               {/* User menu popup */}

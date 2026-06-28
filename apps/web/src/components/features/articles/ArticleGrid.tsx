@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { RiLoader4Line, RiSearchLine } from "react-icons/ri";
+import { RiSearchLine } from "react-icons/ri";
 import { useArticles } from "@/hooks/queries/use-articles";
 import { useArticleFilters } from "@/hooks/useArticleFilters";
 import ArticleCard from "@/components/ui/ArticleCard";
@@ -27,11 +28,27 @@ export default function ArticleGrid() {
   const locale = useLocale() as "ar" | "ur";
   const { cats, sort, q } = useArticleFilters();
   const { data, isLoading, isError } = useArticles({ limit: 50 });
+  const [ready, setReady] = useState(false);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!isLoading) setReady(true);
+  }, [isLoading]);
+
+  if (!ready) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <RiLoader4Line size={36} className="text-[var(--brand)] animate-spin" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-7 gap-y-12 pb-6 content-start self-start">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="flex flex-col gap-y-3">
+            <div className="w-full aspect-[16/9] rounded-xl bg-gray-200 animate-pulse" />
+            <div className="h-4 w-3/4 rounded bg-gray-200 animate-pulse" />
+            <div className="h-3 w-full rounded bg-gray-100 animate-pulse" />
+            <div className="h-3 w-2/3 rounded bg-gray-100 animate-pulse" />
+            <div className="flex items-center justify-between mt-1">
+              <div className="h-3 w-20 rounded bg-gray-200 animate-pulse" />
+              <div className="h-3 w-12 rounded bg-gray-200 animate-pulse" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }

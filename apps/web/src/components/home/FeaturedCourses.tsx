@@ -23,7 +23,7 @@ export default function FeaturedCourses() {
     >
       {showSkeleton
         ? Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="shrink-0 w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-3*1.25rem)/4)]">
+            <div key={i} className="shrink-0 w-full sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-3*1.25rem)/4)]">
               <CourseCardSkeleton />
             </div>
           ))
@@ -31,7 +31,7 @@ export default function FeaturedCourses() {
         const free = isFree(course.effectivePrice);
         const thumb = course.thumbnailUrl?.[locale] ?? course.thumbnailUrl?.ar ?? "";
         return (
-          <div key={course.id} className="shrink-0 w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-3*1.25rem)/4)]" style={{ scrollSnapAlign: "start" }}>
+          <div key={course.id} className="shrink-0 w-full sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-3*1.25rem)/4)]" style={{ scrollSnapAlign: "start" }}>
           <CourseCard
             course={{
               id: course.id,
