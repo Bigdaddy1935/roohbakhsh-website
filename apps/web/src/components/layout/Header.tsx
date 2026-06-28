@@ -15,14 +15,17 @@ import {
   RiTimeLine,
   RiPenNibLine,
   RiHeartLine,
-  RiUserLine,
-  RiHomeLine,
-  RiBookmarkLine,
-  RiAccountCircleLine,
-  RiExchangeDollarLine,
-  RiLogoutBoxLine,
   RiDeleteBinLine,
+  RiUserLine,
 } from "react-icons/ri";
+import {
+  LuLayoutDashboard,
+  LuBookOpen,
+  LuUserCog,
+  LuReceiptText,
+  LuLogOut,
+  LuCircleUser,
+} from "react-icons/lu";
 import { useMe, useLogout } from "@/hooks/queries/use-auth";
 import { useCart, useRemoveFromCart } from "@/hooks/queries/use-cart";
 import { useCategories } from "@/hooks/queries/use-categories";
@@ -90,10 +93,10 @@ export default function Header() {
   const courseWord = locale === "ar" ? "دورة" : "کورس";
 
   const userMenuItems = [
-    { href: "/dashboard",              icon: RiHomeLine,            label: ui.home },
-    { href: "/dashboard/my-courses",   icon: RiBookmarkLine,        label: ui.myCourses },
-    { href: "/dashboard/account",      icon: RiAccountCircleLine,   label: ui.account },
-    { href: "/dashboard/transactions", icon: RiExchangeDollarLine,  label: ui.transactions },
+    { href: "/dashboard",              icon: LuLayoutDashboard, label: ui.home },
+    { href: "/dashboard/my-courses",   icon: LuBookOpen,        label: ui.myCourses },
+    { href: "/dashboard/account",      icon: LuUserCog,         label: ui.account },
+    { href: "/dashboard/transactions", icon: LuReceiptText,     label: ui.transactions },
   ];
 
   return (
@@ -278,47 +281,47 @@ export default function Header() {
               </button>
               {/* User menu popup */}
               <div className="absolute top-full end-0 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-150 pt-3 z-50 w-64">
-                <div className="bg-white border border-gray-200 rounded-xl shadow-xl shadow-black/[0.08] overflow-hidden">
-                  {isLoggedIn && (
-                    <div className="flex items-center gap-x-3 px-4 py-3 border-b border-gray-100">
-                      {user.avatarUrl ? (
-                        <Image src={user.avatarUrl} alt="user" width={44} height={44} className="size-11 rounded-full object-cover shrink-0" />
-                      ) : (
-                        <div className="size-11 rounded-full bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
-                          <RiUserLine size={20} className="text-[var(--brand)]" />
+                <div className="bg-white border border-gray-200 rounded-xl shadow-xl shadow-black/[0.08] p-5">
+                  {isLoggedIn ? (
+                    <>
+                      <div className="flex items-center gap-x-3 pb-3 mb-1 border-b border-gray-100">
+                        {user.avatarUrl ? (
+                          <Image src={user.avatarUrl} alt="user" width={44} height={44} className="size-11 rounded-full object-cover shrink-0" />
+                        ) : (
+                          <div className="size-11 rounded-full bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
+                            <LuCircleUser size={22} className="text-[var(--brand)]" />
+                          </div>
+                        )}
+                        <div className="flex flex-col min-w-0 cursor-default">
+                          <span className="text-sm font-semibold text-[var(--ink)] truncate">{user.fullName}</span>
+                          <span className="text-xs text-gray-400 mt-1">{user.phone ?? user.email}</span>
                         </div>
-                      )}
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-[var(--ink)] truncate">{user.fullName}</p>
-                        <p className="text-xs text-gray-400 truncate">{user.email}</p>
                       </div>
-                    </div>
-                  )}
-                  <div className="p-2">
-                    {isLoggedIn ? userMenuItems.map(({ href, icon: Icon, label }) => (
-                      <Link key={href} href={href}
-                        className="flex items-center gap-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-colors">
-                        <Icon size={20} className="text-[var(--brand)] shrink-0" />
-                        <span className="text-sm text-[var(--ink)]">{label}</span>
+                      <div className="flex flex-col">
+                        {userMenuItems.map(({ href, icon: Icon, label }) => (
+                          <Link key={href} href={href}
+                            className="flex items-center gap-x-3 py-2.5 px-3 hover:bg-gray-50 transition-colors rounded-lg">
+                            <Icon size={22} className="text-gray-500 shrink-0" />
+                            <span className="text-sm font-semibold text-[var(--ink)]">{label}</span>
+                          </Link>
+                        ))}
+                      </div>
+                      <div className="pt-3 mt-2 border-t border-gray-100">
+                        <button type="button" onClick={() => logout()}
+                          className="flex items-center justify-center w-full gap-x-3 py-2.5 px-3 text-red-500 bg-red-500/10 rounded-lg cursor-pointer transition-colors hover:bg-red-500/15">
+                          <LuLogOut size={18} className="shrink-0" />
+                          <span className="text-sm font-semibold">{ui.logout}</span>
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex flex-col gap-y-2">
+                      <Link href="/signin" className="block w-full h-9 rounded-lg border border-[var(--brand)] text-[var(--brand)] text-sm font-semibold text-center leading-9 hover:bg-[var(--brand)]/5 transition-colors">
+                        {t("signin")}
                       </Link>
-                    )) : (
-                      <div className="flex flex-col gap-y-2 p-2">
-                        <Link href="/signin" className="block w-full h-9 rounded-lg border border-[var(--brand)] text-[var(--brand)] text-sm font-semibold text-center leading-9 hover:bg-[var(--brand)]/5 transition-colors">
-                          {t("signin")}
-                        </Link>
-                        <Link href="/signup" className="block w-full h-9 rounded-lg bg-[var(--cta)] text-white text-sm font-bold text-center leading-9 hover:opacity-90 transition-opacity">
-                          {t("signup")}
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                  {isLoggedIn && (
-                    <div className="px-2 pb-2 pt-1 border-t border-gray-100">
-                      <button type="button" onClick={() => logout()}
-                        className="flex items-center gap-x-3 w-full px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors">
-                        <RiLogoutBoxLine size={20} className="shrink-0" />
-                        <span className="text-sm font-semibold">{ui.logout}</span>
-                      </button>
+                      <Link href="/signup" className="block w-full h-9 rounded-lg bg-[var(--cta)] text-white text-sm font-bold text-center leading-9 hover:opacity-90 transition-opacity">
+                        {t("signup")}
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -353,7 +356,7 @@ export default function Header() {
               )}
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-[var(--ink)] truncate">{user.fullName}</p>
-                <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                <p className="text-xs text-gray-400 truncate">{user.phone ?? user.email}</p>
               </div>
             </div>
           ) : (
@@ -392,7 +395,7 @@ export default function Header() {
               ))}
               <button type="button" onClick={() => { logout(); setDrawerOpen(false); }}
                 className="flex items-center gap-x-3 px-2 py-2.5 rounded-xl text-red-500 hover:bg-white transition-colors w-full">
-                <RiLogoutBoxLine size={18} />
+                <LuLogOut size={18} />
                 <span className="text-sm">{ui.logout}</span>
               </button>
             </div>
