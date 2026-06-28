@@ -125,8 +125,8 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="mt-12">
-        <div className="bg-[#3A3A3A] rounded-md px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-y-4 sm:gap-y-2 text-xs text-center sm:text-start">
-          <span className="text-white">© {new Date().getFullYear()} — {t("copyright")}</span>
+        <div className="bg-[#3A3A3A] rounded-md px-4 sm:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-y-3 sm:gap-y-2 text-xs text-center sm:text-start">
+          <span className="text-white leading-6">© {new Date().getFullYear()} — {t("copyright")}</span>
           <span className="text-white">{t("built_by")}</span>
         </div>
       </div>

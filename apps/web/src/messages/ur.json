@@ -121,7 +121,8 @@
     "apply_btn": "لاگو کریں",
     "read_btn": "مضمون پڑھیں",
     "no_results": "کوئی مضمون نہیں ملا",
-    "no_results_hint": "تلاش یا فلٹر کی شرائط تبدیل کرکے دوبارہ کوشش کریں"
+    "no_results_hint": "تلاش یا فلٹر کی شرائط تبدیل کرکے دوبارہ کوشش کریں",
+    "clear_filters": "فلٹر صاف کریں"
   },
   "Courses": {
     "breadcrumb_home": "ہوم",
@@ -141,6 +142,7 @@
     "search_placeholder": "کورس تلاش کریں...",
     "no_results": "کوئی کورس نہیں ملا",
     "no_results_hint": "تلاش یا فلٹر کی شرائط تبدیل کرکے دوبارہ کوشش کریں",
+    "clear_filters": "فلٹر صاف کریں",
     "discount": "چھوٹ",
     "currency": "ر.س",
     "enroll_btn": "ابھی داخلہ لیں"
@@ -364,6 +366,7 @@
     "signin": "سائن ان",
     "signup": "اکاؤنٹ بنائیں",
     "viewAll": "سب دیکھیں",
+    "noCourses": "اس زمرے میں کوئی کورس نہیں ہے",
     "categories_title": "زمرے",
     "categories": {
       "quran": "قرآنی علوم",

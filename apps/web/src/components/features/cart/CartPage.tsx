@@ -60,7 +60,7 @@ function CartContent() {
   }
 
   return (
-    <div className="bg-[var(--bg)] min-h-screen">
+    <div className="bg-[var(--bg)] min-h-[800px]">
       <div className="container py-8">
 
         <div className="flex items-center gap-x-2 text-sm text-gray-400 mb-6">
