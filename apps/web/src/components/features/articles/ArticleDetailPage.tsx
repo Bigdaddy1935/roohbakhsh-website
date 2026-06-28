@@ -9,7 +9,7 @@ import {
   RiArrowDownSLine,
   RiUserLine, RiCalendarLine, RiStarFill,
   RiBookOpenLine, RiShareLine,
-  RiAddLine, RiSubtractLine,
+  RiTelegramLine, RiInstagramLine, RiTwitterXLine,
   RiLoader4Line, RiChat3Line, RiCloseLine,
   RiHeartFill, RiHeartLine, RiLockLine,
   RiCheckLine, RiReplyLine, RiSendPlaneLine,
@@ -46,10 +46,11 @@ function ArticleFavoriteButton({ articleId, t }: { articleId: string; t: (k: str
         );
       }}
       disabled={toggleFavorite.isPending}
-      className="size-12 shrink-0 rounded-xl border border-gray-200 flex items-center justify-center text-gray-400 hover:border-rose-300 hover:text-rose-500 transition-colors disabled:opacity-60 cursor-pointer"
+      className={`w-full h-11 rounded-md border flex items-center justify-center gap-x-2 text-sm font-semibold transition-colors disabled:opacity-60 cursor-pointer ${isFavorite ? "border-rose-300 bg-rose-50 text-rose-500" : "border-gray-200 text-gray-500 hover:border-rose-300 hover:text-rose-500"}`}
       title={t("toggle_favorite")}
     >
-      {isFavorite ? <RiHeartFill size={20} className="text-rose-500" /> : <RiHeartLine size={20} />}
+      {isFavorite ? <RiHeartFill size={18} /> : <RiHeartLine size={18} />}
+      {isFavorite ? t("remove_favorite") : t("add_favorite")}
     </button>
   );
 }
@@ -339,61 +340,71 @@ function ReviewsSection({ articleId, articleSlug, t }: { articleId: string; arti
 function ArticleDetailSkeleton() {
   return (
     <div className="bg-[var(--bg)] min-h-screen">
-      <div className="container pt-8 sm:pt-10">
-        <section className="lg:grid grid-cols-2 gap-x-8 xl:gap-x-14 mb-8 sm:mb-12 lg:mb-16">
-          <div className="flex flex-col order-2 lg:order-1">
-            <div className="flex items-center gap-x-2 mb-5 sm:mb-7">
-              <Sk className="h-4 w-16" />
-              <Sk className="h-4 w-16" />
-              <Sk className="h-4 w-28" />
-            </div>
-            <Sk className="block lg:hidden w-full md:w-2/3 mx-auto aspect-video mb-5 sm:mb-6 rounded-xl" />
-            <div className="flex flex-col gap-y-3">
-              <Sk className="h-8 sm:h-9 w-4/5 mx-auto lg:mx-0" />
-              <Sk className="h-4 w-full" />
-              <Sk className="h-4 w-2/3 mx-auto lg:mx-0" />
-            </div>
-          </div>
-          <div className="hidden lg:block order-1 lg:order-2">
-            <Sk className="w-full aspect-video rounded-xl" />
-          </div>
-        </section>
-      </div>
+      <div className="container pt-8 sm:pt-10 pb-16">
+        {/* Breadcrumb skeleton */}
+        <div className="flex items-center gap-x-2 mb-7">
+          <Sk className="h-4 w-16" />
+          <Sk className="h-4 w-4" />
+          <Sk className="h-4 w-16" />
+          <Sk className="h-4 w-4" />
+          <Sk className="h-4 w-32" />
+        </div>
 
-      <div className="container">
         <div className="flex flex-col lg:flex-row gap-7">
-          <div className="flex flex-col gap-y-6 md:gap-y-8 lg:grow min-w-0">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="flex flex-col md:flex-row items-center gap-x-3 gap-y-1.5 bg-white py-3.5 md:px-4 rounded-xl border border-gray-50">
-                  <Sk className="size-7 rounded-full shrink-0" />
-                  <div className="flex flex-col items-center md:items-start gap-y-1.5 w-full">
-                    <Sk className="h-4 w-12" />
+          {/* Left sidebar skeleton */}
+          <div className="hidden lg:flex flex-col gap-y-4 w-[300px] shrink-0 order-last">
+            <div className="bg-white rounded-lg border border-gray-100 p-4 flex flex-col gap-y-3">
+              <Sk className="h-11 w-full rounded-md" />
+              <Sk className="h-11 w-full rounded-md" />
+            </div>
+            <div className="bg-white rounded-lg border border-gray-100 p-4">
+              <Sk className="h-4 w-20 mb-3" />
+              <div className="flex gap-x-2">
+                <Sk className="flex-1 h-9 rounded-md" />
+                <Sk className="flex-1 h-9 rounded-md" />
+                <Sk className="flex-1 h-9 rounded-md" />
+              </div>
+            </div>
+          </div>
+
+          {/* Main content skeleton */}
+          <div className="flex flex-col gap-y-6 lg:grow min-w-0">
+            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+              <div className="p-5 sm:p-7">
+                <Sk className="h-7 w-3/4 mb-4" />
+                <div className="flex items-center gap-x-5 pb-5 mb-5 border-b border-gray-100">
+                  <div className="flex items-center gap-x-2 flex-1">
+                    <Sk className="size-8 rounded-full shrink-0" />
+                    <div className="flex flex-col gap-y-1.5">
+                      <Sk className="h-3 w-16" />
+                      <Sk className="h-3.5 w-28" />
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center gap-y-1.5 shrink-0">
+                    <Sk className="h-3 w-20" />
+                    <Sk className="h-3 w-8" />
+                  </div>
+                  <div className="flex flex-col items-end gap-y-1.5 shrink-0">
                     <Sk className="h-3 w-16" />
+                    <Sk className="h-3.5 w-20" />
                   </div>
                 </div>
-              ))}
-            </div>
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
-              <Sk className="h-5 w-40 mb-6" />
-              <div className="flex flex-col gap-y-3">
+              </div>
+              <div className="px-5 sm:px-7 pb-5">
+                <Sk className="w-full aspect-video rounded-xl" />
+              </div>
+              <div className="p-5 sm:p-7 flex flex-col gap-y-3">
                 <Sk className="h-3.5 w-full" />
                 <Sk className="h-3.5 w-full" />
                 <Sk className="h-3.5 w-5/6" />
                 <Sk className="h-3.5 w-2/3" />
+                <Sk className="h-3.5 w-full" />
+                <Sk className="h-3.5 w-4/5" />
               </div>
             </div>
           </div>
-          <aside className="lg:w-[340px] xl:w-[360px] flex flex-col gap-y-5 shrink-0">
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
-              <Sk className="size-20 rounded-full mx-auto" />
-              <Sk className="h-4 w-2/3 mx-auto mt-4" />
-              <Sk className="h-10 w-full mt-6 rounded-xl" />
-            </div>
-          </aside>
         </div>
       </div>
-      <div className="h-16" />
     </div>
   );
 }
@@ -425,151 +436,137 @@ function ArticleDetailContent({ articleSlug }: { articleSlug: string }) {
   return (
     <div className="bg-[var(--bg)] min-h-screen">
 
-      <div className="container pt-8 sm:pt-10">
-        <section className="lg:grid grid-cols-2 gap-x-8 xl:gap-x-14 mb-8 sm:mb-12 lg:mb-16">
+      <div className="container pt-8 sm:pt-10 pb-16">
 
-          <div className="flex flex-col cursor-default order-2 lg:order-1">
-            <nav className="flex items-center gap-x-2 text-sm text-gray-400 mb-5 sm:mb-7 overflow-x-auto">
-              <Link href="/" className="text-nowrap hover:text-[var(--brand)] transition-colors">{t("breadcrumb_home")}</Link>
-              <RiArrowDownSLine size={14} className="-rotate-90 text-gray-300 shrink-0" />
-              <Link href="/articles" className="text-nowrap hover:text-[var(--brand)] transition-colors">{t("breadcrumb_articles")}</Link>
-              <RiArrowDownSLine size={14} className="-rotate-90 text-gray-300 shrink-0" />
-              <span className="text-nowrap text-[var(--ink)] font-semibold truncate max-w-[160px]">{article.title[locale]}</span>
-            </nav>
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-x-2 text-sm text-gray-400 mb-7 overflow-x-auto">
+          <Link href="/" className="text-nowrap hover:text-[var(--brand)] transition-colors">{t("breadcrumb_home")}</Link>
+          <RiArrowDownSLine size={14} className="-rotate-90 text-gray-300 shrink-0" />
+          <Link href="/articles" className="text-nowrap hover:text-[var(--brand)] transition-colors">{t("breadcrumb_articles")}</Link>
+          <RiArrowDownSLine size={14} className="-rotate-90 text-gray-300 shrink-0" />
+          <span className="text-nowrap text-[var(--ink)] font-semibold truncate max-w-[160px]">{article.title[locale]}</span>
+        </nav>
 
-            {thumb && (
-              <div className="relative block lg:hidden w-full md:w-2/3 mx-auto rounded-xl overflow-hidden aspect-video mb-5 sm:mb-6 bg-gray-900">
-                <Image src={thumb} alt={article.title[locale]} fill className="object-cover" sizes="100vw" />
-              </div>
-            )}
-
-            <div className="flex flex-col gap-y-3 md:text-center lg:text-start">
-              <h1 className="text-2xl md:text-3xl xl:text-4xl font-extrabold text-[var(--ink)]">{article.title[locale]}</h1>
-              <p className="text-sm md:text-base text-gray-500 leading-7 line-clamp-3">
-                {article.summary[locale]}
-              </p>
-            </div>
-
-            <div className="mt-6 sm:mt-8 lg:mt-auto">
-              <div className="flex items-center gap-x-2.5">
-                <Link
-                  href={`/teacher/${article.instructor.slug}`}
-                  className="flex items-center justify-center gap-x-2 h-12 px-6 rounded-xl bg-[var(--brand)] text-white font-bold text-sm md:text-base hover:opacity-90 active:scale-[0.98] transition-all shrink-0"
-                >
-                  <RiUserLine size={18} />
-                  {article.instructor.name[locale]}
-                </Link>
-                <ArticleFavoriteButton articleId={article.id} t={t} />
-              </div>
-            </div>
-          </div>
-
-          <div className="hidden lg:block order-1 lg:order-2">
-            <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-gray-900">
-              {thumb ? (
-                <Image src={thumb} alt={article.title[locale]} fill className="object-cover opacity-90" sizes="50vw" priority />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <RiBookOpenLine size={48} className="text-white/40" />
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <div className="container">
         <div className="flex flex-col lg:flex-row gap-7">
 
-          <div className="flex flex-col gap-y-6 md:gap-y-8 lg:grow min-w-0">
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
-              {stats.map(({ icon, val, label }, i) => (
-                <div key={i} className="flex flex-col md:flex-row items-center gap-x-3 gap-y-1.5 bg-white py-3.5 md:px-4 rounded-xl cursor-default border border-gray-50">
-                  <span className="shrink-0">{icon}</span>
-                  <div className="flex flex-col items-center md:items-start text-center md:text-start gap-y-0.5">
-                    <span className="font-bold text-sm text-[var(--ink)] leading-tight truncate max-w-[120px]">{val}</span>
-                    {label && <span className="text-gray-400 text-xs">{label}</span>}
-                  </div>
-                </div>
-              ))}
+          {/* Left sidebar */}
+          <aside className="hidden lg:flex flex-col gap-y-4 w-[300px] shrink-0 sticky top-24 self-start order-last">
+            {/* Actions card */}
+            <div className="bg-white rounded-lg border border-gray-100 p-4 flex flex-col gap-y-3">
+              <Link href={`/teacher/${article.instructor.slug}`}
+                className="flex items-center justify-center gap-x-2 h-11 w-full rounded-md bg-[var(--brand)] text-white font-bold text-sm hover:opacity-90 active:scale-[0.98] transition-all">
+                <RiUserLine size={17} />
+                {t("view_profile")}
+              </Link>
+              <ArticleFavoriteButton articleId={article.id} t={t} />
             </div>
 
-            <div className="relative bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
-              <SectionHead icon={<RiBookOpenLine size={28} />} title={t("section_body")} />
-              <div
-                className={`article-body text-sm md:text-base text-gray-600 leading-8 overflow-hidden transition-all ${!descExpanded ? "max-h-56" : ""}`}
-                dangerouslySetInnerHTML={{ __html: article.body[locale] }}
-              />
-              {!descExpanded && (
-                <div className="absolute bottom-0 start-0 end-0 h-32 bg-gradient-to-t from-white from-20% to-white/0 rounded-b-xl flex items-end justify-center pb-2">
-                  <button onClick={() => setDescExpanded(true)} className="size-10 flex items-center justify-center shadow-md bg-white border border-gray-100 rounded-xl hover:border-[var(--brand)] transition-colors">
-                    <RiAddLine size={16} />
-                  </button>
+            {/* Share card */}
+            <div className="bg-white rounded-lg border border-gray-100 p-4">
+              <div className="flex items-center gap-x-2 mb-3">
+                <RiShareLine size={16} className="text-[var(--ink)]" />
+                <span className="text-sm font-semibold text-[var(--ink)]">{t("share")}</span>
+              </div>
+              <div className="flex gap-x-2">
+                <button className="flex-1 h-9 flex items-center justify-center bg-gray-100 hover:bg-[#2AABEE] hover:text-white rounded-md transition-colors text-gray-500">
+                  <RiTelegramLine size={18} />
+                </button>
+                <button className="flex-1 h-9 flex items-center justify-center bg-gray-100 hover:bg-[#E1306C] hover:text-white rounded-md transition-colors text-gray-500">
+                  <RiInstagramLine size={18} />
+                </button>
+                <button className="flex-1 h-9 flex items-center justify-center bg-gray-100 hover:bg-[var(--ink)] hover:text-white rounded-md transition-colors text-gray-500">
+                  <RiTwitterXLine size={18} />
+                </button>
+              </div>
+            </div>
+          </aside>
+
+          {/* Main content */}
+          <div className="flex flex-col gap-y-6 md:gap-y-8 lg:grow min-w-0">
+
+            {/* Single box: title + meta + image + body */}
+            <div className="relative bg-white rounded-xl border border-gray-100 overflow-hidden">
+              <div className="p-5 sm:p-7">
+                {/* Title */}
+                <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--ink)] leading-snug mb-4">{article.title[locale]}</h1>
+
+                {/* Author + rating + date */}
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pb-5 mb-5 border-b border-gray-100">
+                  {/* Author */}
+                  <div className="flex items-center gap-x-2.5 min-w-0">
+                    {article.instructor.avatarUrl ? (
+                      <Image src={article.instructor.avatarUrl} alt={article.instructor.name[locale]} width={36} height={36} style={{ width: 36, height: 36 }} className="rounded-full object-cover shrink-0" />
+                    ) : (
+                      <div className="size-9 rounded-full bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
+                        <RiUserLine size={16} className="text-[var(--brand)]" />
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-[11px] text-gray-400 mb-0.5">{t("author")}</p>
+                      <p className="text-sm font-semibold text-[var(--ink)] truncate">{article.instructor.name[locale]}</p>
+                    </div>
+                  </div>
+                  {/* Divider */}
+                  <div className="hidden sm:block w-px h-8 bg-gray-100 shrink-0" />
+                  {/* Rating */}
+                  <div className="flex flex-col shrink-0">
+                    <p className="text-[11px] text-gray-400 mb-1">{t("rating")}</p>
+                    <div className="flex items-center gap-x-1.5">
+                      <Stars rating={article.averageRating} size={13} />
+                      <span className="text-sm font-semibold text-[var(--ink)]">{article.averageRating ? article.averageRating.toFixed(1) : "—"}</span>
+                    </div>
+                  </div>
+                  {/* Divider */}
+                  <div className="hidden sm:block w-px h-8 bg-gray-100 shrink-0" />
+                  {/* Date */}
+                  <div className="flex flex-col shrink-0">
+                    <p className="text-[11px] text-gray-400 mb-0.5">{t("published_at")}</p>
+                    <div className="flex items-center gap-x-1.5">
+                      <RiCalendarLine size={14} className="text-[var(--brand)] shrink-0" />
+                      <p className="text-sm font-semibold text-[var(--ink)]">{publishedDate}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Thumbnail */}
+              {thumb ? (
+                <div className="px-5 sm:px-7 pb-5">
+                  <div className="relative w-full aspect-video bg-gray-900 rounded-xl overflow-hidden">
+                    <Image src={thumb} alt={article.title[locale]} fill className="object-cover opacity-90" sizes="(max-width:1024px) 100vw, 800px" priority />
+                  </div>
+                </div>
+              ) : (
+                <div className="mx-5 sm:mx-7 mb-5 aspect-video bg-gray-100 rounded-xl flex items-center justify-center">
+                  <RiBookOpenLine size={40} className="text-gray-300" />
                 </div>
               )}
-              {descExpanded && (
-                <div className="flex justify-center mt-4">
-                  <button onClick={() => setDescExpanded(false)} className="size-10 flex items-center justify-center shadow-md bg-white border border-gray-100 rounded-xl hover:border-[var(--brand)] transition-colors">
-                    <RiSubtractLine size={16} />
-                  </button>
+
+              {/* Body */}
+              <div className="p-5 sm:p-7">
+                <div
+                  className="article-body text-sm md:text-base text-gray-600 leading-8"
+                  dangerouslySetInnerHTML={{ __html: article.body[locale] }}
+                />
+
+                {/* Mobile actions */}
+                <div className="flex lg:hidden items-center gap-x-2.5 mt-6">
+                  <Link href={`/teacher/${article.instructor.slug}`}
+                    className="flex items-center justify-center gap-x-2 h-11 flex-1 rounded-lg bg-[var(--brand)] text-white font-bold text-sm hover:opacity-90 transition-all">
+                    <RiUserLine size={17} />
+                    {t("view_profile")}
+                  </Link>
+                  <ArticleFavoriteButton articleId={article.id} t={t} />
                 </div>
-              )}
+              </div>
             </div>
 
             <ReviewsSection articleId={article.id} articleSlug={articleSlug} t={t} />
 
           </div>
 
-          <aside className="lg:w-[340px] xl:w-[360px] flex flex-col gap-y-5 shrink-0 lg:sticky lg:top-24 lg:self-start">
-
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
-              {article.instructor.avatarUrl ? (
-                <Image
-                  src={article.instructor.avatarUrl}
-                  alt={article.instructor.name[locale]}
-                  width={80} height={80}
-                  style={{ width: 80, height: 80 }}
-                  className="rounded-full object-cover border-2 border-[var(--brand)]/20 mx-auto"
-                />
-              ) : (
-                <div className="size-20 rounded-full bg-[var(--brand)]/10 flex items-center justify-center mx-auto border-2 border-[var(--brand)]/20">
-                  <RiUserLine size={32} className="text-[var(--brand)]" />
-                </div>
-              )}
-              <div className="text-center space-y-1 mt-4">
-                <h2 className="font-bold text-base sm:text-lg text-[var(--ink)]">{article.instructor.name[locale]}</h2>
-              </div>
-              <Link
-                href={`/teacher/${article.instructor.slug}`}
-                className="flex items-center justify-center gap-x-2 w-full mt-6 h-10 rounded-xl border border-[var(--brand)]/30 text-[var(--brand)] text-sm font-semibold hover:bg-[var(--brand)]/5 transition-colors"
-              >
-                <RiArrowLeftSLine size={16} />
-                {t("view_profile")}
-              </Link>
-            </div>
-
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-x-2.5">
-                  <RiShareLine size={20} className="text-[var(--ink)]" />
-                  <span className="text-sm md:text-base font-semibold text-[var(--ink)]">{t("share")}</span>
-                </div>
-                <div className="flex gap-x-2">
-                  {["TG", "IG", "X"].map((s) => (
-                    <button key={s} className="size-9 flex items-center justify-center bg-gray-400 hover:bg-[var(--brand)] rounded-lg transition-colors text-white text-xs font-bold">
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-          </aside>
         </div>
       </div>
-
-      <div className="h-16" />
     </div>
   );
 }
