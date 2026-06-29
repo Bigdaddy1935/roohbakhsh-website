@@ -229,9 +229,11 @@ function ReviewsSection({ articleId, articleSlug, t }: { articleId: string; arti
       </div>
 
       {!isAuthed && (
-        <div className="flex items-center gap-x-2.5 mb-6 px-4 py-3 rounded-lg bg-rose-50 border border-rose-200">
-          <RiLockLine size={18} className="text-rose-500 shrink-0" />
-          <span className="text-sm font-semibold text-rose-500">{t("login_required_toast")}</span>
+        <div className="flex items-center justify-between gap-x-2.5 mb-6 px-4 py-3 rounded-lg bg-rose-50 border border-rose-200">
+          <div className="flex items-center gap-x-2">
+            <RiLockLine size={18} className="text-rose-500 shrink-0" />
+            <span className="text-sm font-semibold text-rose-500">{t("login_required_toast")}</span>
+          </div>
           <Link href="/signup" className="text-sm font-bold text-[var(--brand)] hover:underline shrink-0">
             {t("register_link_text")}
           </Link>
@@ -301,7 +303,7 @@ function ReviewsSection({ articleId, articleSlug, t }: { articleId: string; arti
       ) : (
         <div className="flex flex-col">
           {reviews.map((r, idx) => (
-            <div key={r.id} className={`px-4 py-5 bg-white min-h-[150px] ${idx < reviews.length - 1 ? "border-b border-gray-200" : ""}`}>
+            <div key={r.id} className={`px-4 py-5 bg-white min-h-[150px] ${idx < reviews.length - 1 ? "border-b border-gray-100" : ""}`}>
               {/* Header row */}
               <div className="flex items-center gap-x-3">
                 {r.user.avatarUrl ? (
@@ -324,11 +326,11 @@ function ReviewsSection({ articleId, articleSlug, t }: { articleId: string; arti
                   </span>
                 </div>
                 <div className="flex items-center gap-x-2 ms-auto shrink-0 self-start">
+                  <Stars rating={r.rating} size={14} />
                   <span className="text-sm font-medium text-gray-500">{r.createdAt.slice(0, 10)}</span>
                   {!r.isApproved && (isAdmin || (me && r.userId === me.id)) && (
                     <span className="text-xs text-gray-400">· {t("review_pending_notice")}</span>
                   )}
-                  <Stars rating={r.rating} size={14} />
                 </div>
               </div>
               {/* Comment */}
