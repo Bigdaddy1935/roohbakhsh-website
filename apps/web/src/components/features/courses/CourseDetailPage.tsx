@@ -290,29 +290,44 @@ function ReviewsSection({ courseId, courseSlug, t }: { courseId: string; courseS
       )}
 
       {formOpen && (
-        <div className="flex flex-col gap-y-3 mb-6 p-4 rounded-lg bg-gray-50 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <StarsInput value={rating} onChange={setRating} />
-            <button type="button" onClick={() => setFormOpen(false)} className="text-gray-400 hover:text-gray-600 cursor-pointer">
-              <RiCloseLine size={20} />
+        <div className="mb-6 bg-white rounded-md border border-gray-100 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <span className="text-sm font-bold text-[var(--ink)]">{t("write_review").replace(/^\+\s*/, "")}</span>
+            <button type="button" onClick={() => setFormOpen(false)} className="size-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
+              <RiCloseLine size={18} />
             </button>
           </div>
-          <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            rows={3}
-            placeholder={t("review_placeholder")}
-            className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-y"
-          />
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={createReview.isPending}
-            className="self-end flex items-center gap-x-2 h-10 px-5 rounded-lg bg-[var(--brand)] text-white font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-60 cursor-pointer"
-          >
-            {createReview.isPending && <RiLoader4Line size={16} className="animate-spin" />}
-            {t("submit_review")}
-          </button>
+          <div className="flex items-center justify-between px-5 pt-5">
+            <span className="text-sm font-semibold text-[var(--ink)]">{t("rating")}</span>
+            <StarsInput value={rating} onChange={setRating} />
+          </div>
+          <div className="flex flex-col gap-y-1 px-5 pt-4">
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              rows={4}
+              placeholder={t("review_placeholder")}
+              className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-none"
+            />
+          </div>
+          <div className="flex items-center justify-end gap-x-2.5 px-5 py-4">
+            <button
+              type="button"
+              onClick={() => setFormOpen(false)}
+              className="h-10 px-5 rounded-md border border-gray-200 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              {t("cancel")}
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={createReview.isPending}
+              className="flex items-center gap-x-2 h-10 px-6 rounded-md bg-[var(--brand)] text-white font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-60 cursor-pointer"
+            >
+              {createReview.isPending && <RiLoader4Line size={15} className="animate-spin" />}
+              {t("submit_review")}
+            </button>
+          </div>
         </div>
       )}
 
@@ -331,50 +346,52 @@ function ReviewsSection({ courseId, courseSlug, t }: { courseId: string; courseS
       ) : reviews.length === 0 ? (
         <p className="text-sm text-gray-400 text-center py-6">{t("no_reviews_yet")}</p>
       ) : (
-        <div className="flex flex-col gap-y-4">
-          {reviews.map((r) => (
-            <div key={r.id} className="rounded-lg border border-gray-100 p-4">
-              <div className="flex items-start gap-x-3">
+        <div className="flex flex-col">
+          {reviews.map((r, idx) => (
+            <div key={r.id} className={`px-4 py-5 bg-white min-h-[150px] ${idx < reviews.length - 1 ? "border-b border-gray-200" : ""}`}>
+              {/* Header row */}
+              <div className="flex items-center gap-x-3">
                 {r.user.avatarUrl ? (
                   <Image
                     src={r.user.avatarUrl}
                     alt={r.user.fullName}
-                    width={40} height={40}
-                    style={{ width: 40, height: 40 }}
+                    width={38} height={38}
+                    style={{ width: 38, height: 38 }}
                     className="rounded-full object-cover shrink-0"
                   />
                 ) : (
-                  <div className="size-10 rounded-full bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
-                    <RiUserLine size={18} className="text-[var(--brand)]" />
+                  <div className={`size-[38px] rounded-full flex items-center justify-center shrink-0 ${r.isStudent ? "bg-[var(--brand)]/10" : "bg-gray-100"}`}>
+                    <RiUserLine size={20} className={r.isStudent ? "text-[var(--brand)]" : "text-gray-400"} />
                   </div>
                 )}
-                <div className="flex flex-col gap-y-1 min-w-0">
-                  <div className="flex items-center gap-x-2.5">
-                    <span className="text-sm font-semibold text-[var(--ink)]">{r.user.fullName}</span>
-                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${r.isStudent ? "bg-[var(--brand)]/10 text-[var(--brand)]" : "bg-gray-100 text-gray-400"}`}>
-                      {r.isStudent ? t("student_label") : t("user_label")}
-                    </span>
-                    <Stars rating={r.rating} size={12} />
-                  </div>
-                  {r.comment && <p className="text-sm text-gray-500 leading-7">{r.comment}</p>}
-                  <div className="flex items-center gap-x-2">
-                    <span className="text-[11px] text-gray-300">{r.createdAt.slice(0, 10)}</span>
-                    {!r.isApproved && (isAdmin || (me && r.userId === me.id)) && (
-                      <span className="text-[11px] text-gray-400">· {t("review_pending_notice")}</span>
-                    )}
-                  </div>
+                <div className="flex flex-col gap-y-2 min-w-0">
+                  <span className="text-sm font-semibold text-[var(--ink)] truncate">{r.user.fullName}</span>
+                  <span className={`self-start text-xs font-bold px-2 py-0.5 rounded-full ${r.isStudent ? "bg-[var(--brand)]/10 text-[var(--brand)]" : "bg-gray-100 text-gray-500"}`}>
+                    {r.isStudent ? t("student_label") : t("user_label")}
+                  </span>
+                </div>
+                <div className="flex items-center gap-x-2 ms-auto shrink-0 self-start">
+                  <span className="text-sm font-medium text-gray-500">{r.createdAt.slice(0, 10)}</span>
+                  {!r.isApproved && (isAdmin || (me && r.userId === me.id)) && (
+                    <span className="text-xs text-gray-400">· {t("review_pending_notice")}</span>
+                  )}
+                  <Stars rating={r.rating} size={14} />
                 </div>
               </div>
+              {/* Comment */}
+              {r.comment && <p className="text-sm font-medium text-gray-600 leading-7 mt-4 ps-[50px]">{r.comment}</p>}
 
               {r.instructorReply && (
-                <div className="flex items-start gap-x-3 mt-4 ms-6 sm:ms-10 ps-3.5 border-s-2 border-[var(--brand)]/30">
-                  <div className="size-8 rounded-full bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
-                    <RiCheckboxCircleLine size={16} className="text-[var(--brand)]" />
+                <div className="flex items-start gap-x-3 mt-6 ms-6 sm:ms-10 ps-3.5 border-s-2 border-sky-300">
+                  <div className="size-8 rounded-full bg-sky-50 flex items-center justify-center shrink-0">
+                    <RiCheckboxCircleLine size={16} className="text-sky-500" />
                   </div>
-                  <div className="flex flex-col gap-y-1 min-w-0">
-                    <span className="text-xs font-semibold text-[var(--brand)]">{t("reply_label")}</span>
+                  <div className="flex flex-col gap-y-2 min-w-0">
+                    <div className="flex items-center gap-x-2">
+                      <span className="text-xs font-semibold text-[var(--ink)]">{t("reply_label")}</span>
+                      {r.repliedAt && <span className="text-xs text-gray-400">{r.repliedAt.slice(0, 10)}</span>}
+                    </div>
                     <p className="text-sm text-gray-500 leading-7">{r.instructorReply}</p>
-                    {r.repliedAt && <span className="text-[11px] text-gray-300">{r.repliedAt.slice(0, 10)}</span>}
                   </div>
                 </div>
               )}
