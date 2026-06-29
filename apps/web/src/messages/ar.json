@@ -423,7 +423,8 @@
     "login_required_toast": "يجب تسجيل الدخول أولاً",
     "register_link_text": "إنشاء حساب",
     "student_label": "طالب",
-    "user_label": "مستخدم"
+    "user_label": "مستخدم",
+    "cancel": "إلغاء"
   },
   "Footer": {
     "about_title": "عن الأكاديمية",
