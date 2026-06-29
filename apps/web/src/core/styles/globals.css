@@ -18,7 +18,7 @@
 @layer base {
   * { box-sizing: border-box; }
 
-  html, body { overflow-x: hidden; }
+  html, body { overflow-x: clip; }
 
   body {
     margin: 0;

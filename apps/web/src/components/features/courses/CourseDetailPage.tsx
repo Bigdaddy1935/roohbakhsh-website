@@ -39,10 +39,11 @@ function DiscountCountdown({ expiresAt }: { expiresAt: string }) {
   const calc = () => {
     const diff = new Date(expiresAt).getTime() - Date.now();
     if (diff <= 0) return null;
-    const h = Math.floor(diff / 3600000);
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
-    return { h, m, s };
+    return { d, h, m, s };
   };
   const [time, setTime] = useState(calc);
   useEffect(() => {
@@ -51,14 +52,17 @@ function DiscountCountdown({ expiresAt }: { expiresAt: string }) {
   }, [expiresAt]);
   if (!time) return null;
   const pad = (n: number) => String(n).padStart(2, "0");
+  if (time.d > 0) {
+    return (
+      <span className="text-base font-bold text-rose-600">
+        {time.d} يوم
+      </span>
+    );
+  }
   return (
-    <div className="flex items-center gap-x-1 font-mono text-sm font-bold text-rose-600 tabular-nums">
-      <span className="bg-rose-100 px-1.5 py-0.5 rounded">{pad(time.h)}</span>
-      <span>:</span>
-      <span className="bg-rose-100 px-1.5 py-0.5 rounded">{pad(time.m)}</span>
-      <span>:</span>
-      <span className="bg-rose-100 px-1.5 py-0.5 rounded">{pad(time.s)}</span>
-    </div>
+    <span dir="ltr" className="font-mono text-base font-bold text-rose-600 tabular-nums">
+      {pad(time.h)}:{pad(time.m)}:{pad(time.s)}
+    </span>
   );
 }
 
@@ -713,10 +717,10 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
             <div className="mt-6 sm:mt-8 lg:mt-auto">
               {/* discount banner + countdown */}
               {discPct > 0 && course.discount?.isActive && (
-                <div className="mb-4 flex items-center justify-between gap-x-3">
+                <div className="mb-4 flex items-center justify-between gap-x-3 bg-white rounded-lg px-4 py-3">
                   <div className="flex items-center gap-x-2">
-                    <RiGiftLine size={18} className="text-rose-500 shrink-0" />
-                    <span className="text-sm font-bold text-rose-600">{discPct}٪ {t("discount_badge")}</span>
+                    <RiGiftLine size={22} className="text-rose-500 shrink-0" />
+                    <span className="text-base font-bold text-rose-600">{discPct}٪ {t("discount_badge")}</span>
                   </div>
                   {course.discount.expiresAt && (
                     <DiscountCountdown expiresAt={course.discount.expiresAt} />
@@ -772,7 +776,7 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
       </div>
 
       <div className="container">
-        <div className="flex flex-col lg:flex-row gap-7">
+        <div className="flex flex-col lg:flex-row lg:items-start gap-7">
 
           <div className="flex flex-col gap-y-6 md:gap-y-8 lg:grow min-w-0">
 
@@ -788,9 +792,9 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
               ))}
             </div>
 
-            <div className="relative bg-white p-5 sm:p-7 rounded-lg border border-gray-50 min-h-[684px]">
+            <div className="relative bg-white p-5 sm:p-7 rounded-lg border border-gray-50">
               <SectionHead icon={<RiBookOpenLine size={28} />} title={t("section_description")} />
-              <div className={`text-sm md:text-base text-gray-600 leading-8 whitespace-pre-line overflow-hidden transition-all ${!descExpanded ? "max-h-56" : ""}`}>
+              <div className={`text-sm md:text-base text-gray-600 leading-8 whitespace-pre-line overflow-hidden transition-all ${!descExpanded ? "max-h-14" : ""}`}>
                 {course.description[locale]}
               </div>
               {!descExpanded && (
