@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
   RiArrowLeftSLine,
-  RiLockLine,
+  RiPlayCircleLine, RiLockLine,
   RiArrowDownSLine, RiArrowUpSLine,
   RiArrowRightSLine,
   RiUserLine, RiTimeLine, RiBookOpenLine,
