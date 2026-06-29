@@ -121,12 +121,11 @@ export default function Testimonials() {
             return (
               <div
                 key={`${start}-${i}`}
-                className="bg-white rounded-lg border border-gray-100 p-5 flex flex-col justify-between h-full shrink-0 w-full sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)]"
+                className="bg-white rounded-lg border border-gray-100 p-5 flex flex-col shrink-0 h-[206px] w-full sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)]"
               >
                 {/* Quote + text */}
-                <div className="flex-1 flex flex-col">
-                  <RiDoubleQuotesL size={28} className="text-[var(--brand)]/15 mb-2" />
-                  <p className="text-[var(--ink)] text-sm leading-7 line-clamp-4 flex-1">
+                <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+                  <p className="text-[var(--ink)] text-sm leading-7 overflow-hidden flex-1">
                     {item.comment ?? ""}
                   </p>
                 </div>

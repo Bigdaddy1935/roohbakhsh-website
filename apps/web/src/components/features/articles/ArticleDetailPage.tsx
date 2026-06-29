@@ -342,16 +342,16 @@ function ArticleDetailSkeleton() {
     <div className="bg-[var(--bg)] min-h-screen">
       <div className="container pt-8 sm:pt-10 pb-16">
         {/* Breadcrumb skeleton */}
-        <div className="flex items-center gap-x-2 mb-7">
-          <Sk className="h-4 w-16" />
+        <div className="flex items-center gap-x-2 mb-12">
+          <Sk className="h-4 w-12" />
           <Sk className="h-4 w-4" />
-          <Sk className="h-4 w-16" />
+          <Sk className="h-4 w-12" />
           <Sk className="h-4 w-4" />
-          <Sk className="h-4 w-32" />
+          <Sk className="h-4 w-28" />
         </div>
 
         <div className="flex flex-col lg:flex-row gap-7">
-          {/* Left sidebar skeleton */}
+          {/* Left sidebar skeleton — desktop only */}
           <div className="hidden lg:flex flex-col gap-y-4 w-[300px] shrink-0 order-last">
             <div className="bg-white rounded-lg border border-gray-100 p-4 flex flex-col gap-y-3">
               <Sk className="h-11 w-full rounded-md" />
@@ -371,28 +371,23 @@ function ArticleDetailSkeleton() {
           <div className="flex flex-col gap-y-6 lg:grow min-w-0">
             <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
               <div className="p-5 sm:p-7">
-                <Sk className="h-7 w-3/4 mb-4" />
-                <div className="flex items-center gap-x-5 pb-5 mb-5 border-b border-gray-100">
-                  <div className="flex items-center gap-x-2 flex-1">
-                    <Sk className="size-8 rounded-full shrink-0" />
-                    <div className="flex flex-col gap-y-1.5">
-                      <Sk className="h-3 w-16" />
-                      <Sk className="h-3.5 w-28" />
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-center gap-y-1.5 shrink-0">
-                    <Sk className="h-3 w-20" />
-                    <Sk className="h-3 w-8" />
-                  </div>
-                  <div className="flex flex-col items-end gap-y-1.5 shrink-0">
-                    <Sk className="h-3 w-16" />
-                    <Sk className="h-3.5 w-20" />
-                  </div>
+                {/* Title */}
+                <Sk className="h-7 w-3/4 mb-2" />
+                <Sk className="h-7 w-1/2 mb-5" />
+                {/* Meta row */}
+                <div className="flex items-center gap-x-3 pt-4 mt-1 border-t border-gray-100">
+                  <Sk className="size-7 rounded-full shrink-0" />
+                  <Sk className="h-3.5 w-28" />
+                  <div className="w-px h-4 bg-gray-100 shrink-0" />
+                  <Sk className="h-3.5 w-8" />
+                  <Sk className="ms-auto h-3.5 w-20" />
                 </div>
               </div>
+              {/* Thumbnail */}
               <div className="px-5 sm:px-7 pb-5">
                 <Sk className="w-full aspect-video rounded-xl" />
               </div>
+              {/* Body lines */}
               <div className="p-5 sm:p-7 flex flex-col gap-y-3">
                 <Sk className="h-3.5 w-full" />
                 <Sk className="h-3.5 w-full" />
@@ -400,6 +395,19 @@ function ArticleDetailSkeleton() {
                 <Sk className="h-3.5 w-2/3" />
                 <Sk className="h-3.5 w-full" />
                 <Sk className="h-3.5 w-4/5" />
+              </div>
+              {/* Mobile action buttons skeleton */}
+              <div className="flex lg:hidden flex-col gap-y-2.5 p-5 sm:p-7 pt-0">
+                <Sk className="h-11 w-full rounded-md" />
+                <Sk className="h-11 w-full rounded-md" />
+                <div className="bg-gray-50 rounded-lg border border-gray-100 p-3 mt-1">
+                  <Sk className="h-3.5 w-16 mb-2.5" />
+                  <div className="flex gap-x-2">
+                    <Sk className="flex-1 h-9 rounded-md" />
+                    <Sk className="flex-1 h-9 rounded-md" />
+                    <Sk className="flex-1 h-9 rounded-md" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -439,7 +447,7 @@ function ArticleDetailContent({ articleSlug }: { articleSlug: string }) {
       <div className="container pt-8 sm:pt-10 pb-16">
 
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-x-2 text-sm text-gray-400 mb-7 overflow-x-auto">
+        <nav className="flex items-center gap-x-2 text-sm text-gray-400 mb-12 overflow-x-auto">
           <Link href="/" className="text-nowrap hover:text-[var(--brand)] transition-colors">{t("breadcrumb_home")}</Link>
           <RiArrowDownSLine size={14} className="-rotate-90 text-gray-300 shrink-0" />
           <Link href="/articles" className="text-nowrap hover:text-[var(--brand)] transition-colors">{t("breadcrumb_articles")}</Link>
@@ -468,15 +476,27 @@ function ArticleDetailContent({ articleSlug }: { articleSlug: string }) {
                 <span className="text-sm font-semibold text-[var(--ink)]">{t("share")}</span>
               </div>
               <div className="flex gap-x-2">
-                <button className="flex-1 h-9 flex items-center justify-center bg-gray-100 hover:bg-[#2AABEE] hover:text-white rounded-md transition-colors text-gray-500">
+                <a
+                  href={`https://t.me/share/url?url=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex-1 h-9 flex items-center justify-center bg-gray-100 hover:bg-[#2AABEE] hover:text-white rounded-md transition-colors text-gray-500"
+                >
                   <RiTelegramLine size={18} />
-                </button>
-                <button className="flex-1 h-9 flex items-center justify-center bg-gray-100 hover:bg-[#E1306C] hover:text-white rounded-md transition-colors text-gray-500">
+                </a>
+                <button
+                  type="button"
+                  onClick={() => { navigator.clipboard.writeText(typeof window !== "undefined" ? window.location.href : ""); toast.success(t("link_copied")); }}
+                  className="flex-1 h-9 flex items-center justify-center bg-gray-100 hover:bg-[#E1306C] hover:text-white rounded-md transition-colors text-gray-500 cursor-pointer"
+                >
                   <RiInstagramLine size={18} />
                 </button>
-                <button className="flex-1 h-9 flex items-center justify-center bg-gray-100 hover:bg-[var(--ink)] hover:text-white rounded-md transition-colors text-gray-500">
+                <a
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex-1 h-9 flex items-center justify-center bg-gray-100 hover:bg-[var(--ink)] hover:text-white rounded-md transition-colors text-gray-500"
+                >
                   <RiTwitterXLine size={18} />
-                </button>
+                </a>
               </div>
             </div>
           </aside>
@@ -490,41 +510,30 @@ function ArticleDetailContent({ articleSlug }: { articleSlug: string }) {
                 {/* Title */}
                 <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--ink)] leading-snug mb-4">{article.title[locale]}</h1>
 
-                {/* Author + rating + date */}
-                <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pb-5 mb-5 border-b border-gray-100">
+                {/* Author + rating + date — single row */}
+                <div className="flex items-center gap-x-3 sm:gap-x-4 flex-nowrap pt-4 mt-1 border-t border-gray-100 overflow-hidden">
                   {/* Author */}
-                  <div className="flex items-center gap-x-2.5 min-w-0">
+                  <div className="flex items-center gap-x-2 min-w-0">
                     {article.instructor.avatarUrl ? (
-                      <Image src={article.instructor.avatarUrl} alt={article.instructor.name[locale]} width={36} height={36} style={{ width: 36, height: 36 }} className="rounded-full object-cover shrink-0" />
+                      <Image src={article.instructor.avatarUrl} alt={article.instructor.name[locale]} width={28} height={28} style={{ width: 28, height: 28 }} className="rounded-full object-cover shrink-0 opacity-60" />
                     ) : (
-                      <div className="size-9 rounded-full bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
-                        <RiUserLine size={16} className="text-[var(--brand)]" />
+                      <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                        <RiUserLine size={14} className="text-gray-400" />
                       </div>
                     )}
-                    <div className="min-w-0">
-                      <p className="text-[11px] text-gray-400 mb-0.5">{t("author")}</p>
-                      <p className="text-sm font-semibold text-[var(--ink)] truncate">{article.instructor.name[locale]}</p>
-                    </div>
+                    <span className="text-sm text-gray-500 truncate max-w-[120px] sm:max-w-none">{article.instructor.name[locale]}</span>
                   </div>
                   {/* Divider */}
-                  <div className="hidden sm:block w-px h-8 bg-gray-100 shrink-0" />
+                  <div className="w-px h-4 bg-gray-200 shrink-0" />
                   {/* Rating */}
-                  <div className="flex flex-col shrink-0">
-                    <p className="text-[11px] text-gray-400 mb-1">{t("rating")}</p>
-                    <div className="flex items-center gap-x-1.5">
-                      <Stars rating={article.averageRating} size={13} />
-                      <span className="text-sm font-semibold text-[var(--ink)]">{article.averageRating ? article.averageRating.toFixed(1) : "—"}</span>
-                    </div>
+                  <div className="flex items-center gap-x-1.5 shrink-0">
+                    <RiStarFill size={13} className="text-gray-400 shrink-0" />
+                    <span className="text-sm text-gray-500">{article.averageRating ? article.averageRating.toFixed(1) : "—"}</span>
                   </div>
-                  {/* Divider */}
-                  <div className="hidden sm:block w-px h-8 bg-gray-100 shrink-0" />
-                  {/* Date */}
-                  <div className="flex flex-col shrink-0">
-                    <p className="text-[11px] text-gray-400 mb-0.5">{t("published_at")}</p>
-                    <div className="flex items-center gap-x-1.5">
-                      <RiCalendarLine size={14} className="text-[var(--brand)] shrink-0" />
-                      <p className="text-sm font-semibold text-[var(--ink)]">{publishedDate}</p>
-                    </div>
+                  {/* Date pushed to end */}
+                  <div className="flex items-center gap-x-1.5 shrink-0 ms-auto">
+                    <RiCalendarLine size={13} className="text-gray-400 shrink-0" />
+                    <span className="text-sm text-gray-500">{publishedDate}</span>
                   </div>
                 </div>
               </div>
@@ -550,13 +559,44 @@ function ArticleDetailContent({ articleSlug }: { articleSlug: string }) {
                 />
 
                 {/* Mobile actions */}
-                <div className="flex lg:hidden items-center gap-x-2.5 mt-6">
-                  <Link href={`/teacher/${article.instructor.slug}`}
-                    className="flex items-center justify-center gap-x-2 h-11 flex-1 rounded-lg bg-[var(--brand)] text-white font-bold text-sm hover:opacity-90 transition-all">
-                    <RiUserLine size={17} />
-                    {t("view_profile")}
-                  </Link>
-                  <ArticleFavoriteButton articleId={article.id} t={t} />
+                <div className="flex lg:hidden flex-col gap-y-3 mt-6">
+                  <div className="flex flex-col sm:flex-row items-stretch gap-2.5">
+                    <Link href={`/teacher/${article.instructor.slug}`}
+                      className="flex items-center justify-center gap-x-2 h-11 w-full rounded-md bg-[var(--brand)] text-white font-bold text-sm hover:opacity-90 transition-all">
+                      <RiUserLine size={17} />
+                      {t("view_profile")}
+                    </Link>
+                    <ArticleFavoriteButton articleId={article.id} t={t} />
+                  </div>
+                  <div className="bg-white rounded-lg border border-gray-100 p-3">
+                    <div className="flex items-center gap-x-2 mb-2.5">
+                      <RiShareLine size={15} className="text-[var(--ink)]" />
+                      <span className="text-sm font-semibold text-[var(--ink)]">{t("share")}</span>
+                    </div>
+                    <div className="flex gap-x-2">
+                      <a
+                        href={`https://t.me/share/url?url=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`}
+                        target="_blank" rel="noopener noreferrer"
+                        className="flex-1 h-9 flex items-center justify-center bg-gray-100 hover:bg-[#2AABEE] hover:text-white rounded-md transition-colors text-gray-500"
+                      >
+                        <RiTelegramLine size={18} />
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => { navigator.clipboard.writeText(typeof window !== "undefined" ? window.location.href : ""); toast.success(t("link_copied")); }}
+                        className="flex-1 h-9 flex items-center justify-center bg-gray-100 hover:bg-[#E1306C] hover:text-white rounded-md transition-colors text-gray-500 cursor-pointer"
+                      >
+                        <RiInstagramLine size={18} />
+                      </button>
+                      <a
+                        href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`}
+                        target="_blank" rel="noopener noreferrer"
+                        className="flex-1 h-9 flex items-center justify-center bg-gray-100 hover:bg-[var(--ink)] hover:text-white rounded-md transition-colors text-gray-500"
+                      >
+                        <RiTwitterXLine size={18} />
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
