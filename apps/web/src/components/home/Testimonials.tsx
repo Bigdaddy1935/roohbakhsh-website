@@ -32,7 +32,7 @@ export default function Testimonials() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  const { data } = useReviews({ limit: 12, rating: 5 });
+  const { data, isLoading } = useReviews({ limit: 12, rating: 5 });
   const reviews = data?.items ?? [];
   const total = reviews.length;
   const maxStart = Math.max(0, total - visible);
@@ -82,7 +82,32 @@ export default function Testimonials() {
         </div>
       </div>
 
+      {/* Skeleton */}
+      {isLoading && (
+        <div className="flex gap-5">
+          {Array.from({ length: visible }).map((_, i) => (
+            <div key={i} className="bg-white rounded-lg border border-gray-100 p-5 flex flex-col gap-y-3 shrink-0 w-full sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)]">
+              <div className="animate-pulse bg-gray-100 rounded h-4 w-4/5" />
+              <div className="animate-pulse bg-gray-100 rounded h-3.5 w-full" />
+              <div className="animate-pulse bg-gray-100 rounded h-3.5 w-2/3" />
+              <div className="animate-pulse bg-gray-100 rounded h-3.5 w-5/6" />
+              <div className="flex gap-x-1 mt-2">
+                {[1,2,3,4,5].map((s) => <div key={s} className="animate-pulse bg-gray-100 rounded size-3" />)}
+              </div>
+              <div className="flex items-center gap-x-3 pt-3 border-t border-gray-100">
+                <div className="animate-pulse bg-gray-100 rounded-lg size-10 shrink-0" />
+                <div className="flex flex-col gap-y-1.5 flex-1">
+                  <div className="animate-pulse bg-gray-100 rounded h-3.5 w-24" />
+                  <div className="animate-pulse bg-gray-100 rounded h-3 w-32" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Slider row */}
+      {!isLoading && (
       <div
         className="cursor-grab active:cursor-grabbing select-none"
         onPointerDown={onPointerDown}
@@ -99,22 +124,11 @@ export default function Testimonials() {
                 className="bg-white rounded-lg border border-gray-100 p-5 flex flex-col justify-between h-full shrink-0 w-full sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)]"
               >
                 {/* Quote + text */}
-                <div className="flex-1">
+                <div className="flex-1 flex flex-col">
                   <RiDoubleQuotesL size={28} className="text-[var(--brand)]/15 mb-2" />
-                  <p className="text-[var(--ink)] text-sm leading-7 line-clamp-4">
+                  <p className="text-[var(--ink)] text-sm leading-7 line-clamp-4 flex-1">
                     {item.comment ?? ""}
                   </p>
-                </div>
-
-                {/* Stars */}
-                <div className="flex items-center gap-x-0.5 mt-4">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <RiStarFill
-                      key={s}
-                      size={13}
-                      className={s <= (item.rating ?? 0) ? "text-[var(--cta)]" : "text-gray-200"}
-                    />
-                  ))}
                 </div>
 
                 {/* Author */}
@@ -146,6 +160,7 @@ export default function Testimonials() {
           })}
         </div>
       </div>
+      )}
 
       {/* Nav */}
       {total > visible && (
