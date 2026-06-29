@@ -241,31 +241,21 @@ function ReviewsSection({ articleId, articleSlug, t }: { articleId: string; arti
       )}
 
       {formOpen && (
-        <div className="mb-6 bg-white rounded-md border border-gray-100 overflow-hidden">
-          {/* Form header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-            <span className="text-sm font-bold text-[var(--ink)]">{t("write_review").replace(/^\+\s*/, "")}</span>
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <StarsInput value={rating} onChange={setRating} />
             <button type="button" onClick={() => setFormOpen(false)} className="size-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
               <RiCloseLine size={18} />
             </button>
           </div>
-          {/* Stars */}
-          <div className="flex items-center justify-between px-5 pt-5">
-            <span className="text-sm font-semibold text-[var(--ink)]">{t("rating")}</span>
-            <StarsInput value={rating} onChange={setRating} />
-          </div>
-          {/* Textarea */}
-          <div className="flex flex-col gap-y-1 px-5 pt-4">
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              rows={4}
-              placeholder={t("review_placeholder")}
-              className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-none"
-            />
-          </div>
-          {/* Actions */}
-          <div className="flex items-center justify-end gap-x-2.5 px-5 py-4">
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            rows={4}
+            placeholder={t("review_placeholder")}
+            className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-none mb-3"
+          />
+          <div className="flex items-center justify-end gap-x-2.5">
             <button
               type="button"
               onClick={() => setFormOpen(false)}

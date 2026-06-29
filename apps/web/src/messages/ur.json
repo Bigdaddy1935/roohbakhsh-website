@@ -423,7 +423,8 @@
     "login_required_toast": "پہلے لاگ ان کرنا ضروری ہے",
     "register_link_text": "اکاؤنٹ بنائیں",
     "student_label": "طالب علم",
-    "user_label": "صارف"
+    "user_label": "صارف",
+    "cancel": "منسوخ کریں"
   },
   "Footer": {
     "about_title": "اکیڈمی کے بارے میں",

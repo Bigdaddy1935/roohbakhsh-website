@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -34,6 +34,33 @@ import { tokenStore } from "@/lib/api-client";
 import { formatMoney, isFree, discountPercent } from "@/lib/format";
 import VideoPlayer from "@/components/ui/VideoPlayer";
 import type { SectionRecord, ReviewRecord } from "@roohbakhsh/shared";
+
+function DiscountCountdown({ expiresAt }: { expiresAt: string }) {
+  const calc = () => {
+    const diff = new Date(expiresAt).getTime() - Date.now();
+    if (diff <= 0) return null;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    return { h, m, s };
+  };
+  const [time, setTime] = useState(calc);
+  useEffect(() => {
+    const id = setInterval(() => setTime(calc()), 1000);
+    return () => clearInterval(id);
+  }, [expiresAt]);
+  if (!time) return null;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return (
+    <div className="flex items-center gap-x-1 font-mono text-sm font-bold text-rose-600 tabular-nums">
+      <span className="bg-rose-100 px-1.5 py-0.5 rounded">{pad(time.h)}</span>
+      <span>:</span>
+      <span className="bg-rose-100 px-1.5 py-0.5 rounded">{pad(time.m)}</span>
+      <span>:</span>
+      <span className="bg-rose-100 px-1.5 py-0.5 rounded">{pad(time.s)}</span>
+    </div>
+  );
+}
 
 function CourseFavoriteButton({ courseId, t }: { courseId: string; t: (k: string) => string }) {
   const tc = useTranslations("Common");
@@ -294,27 +321,21 @@ function ReviewsSection({ courseId, courseSlug, t }: { courseId: string; courseS
       )}
 
       {formOpen && (
-        <div className="mb-6 bg-white rounded-md border border-gray-100 overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-            <span className="text-sm font-bold text-[var(--ink)]">{t("write_review").replace(/^\+\s*/, "")}</span>
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <StarsInput value={rating} onChange={setRating} />
             <button type="button" onClick={() => setFormOpen(false)} className="size-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
               <RiCloseLine size={18} />
             </button>
           </div>
-          <div className="flex items-center justify-between px-5 pt-5">
-            <span className="text-sm font-semibold text-[var(--ink)]">{t("rating")}</span>
-            <StarsInput value={rating} onChange={setRating} />
-          </div>
-          <div className="flex flex-col gap-y-1 px-5 pt-4">
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              rows={4}
-              placeholder={t("review_placeholder")}
-              className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-none"
-            />
-          </div>
-          <div className="flex items-center justify-end gap-x-2.5 px-5 py-4">
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            rows={4}
+            placeholder={t("review_placeholder")}
+            className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-none mb-3"
+          />
+          <div className="flex items-center justify-end gap-x-2.5">
             <button
               type="button"
               onClick={() => setFormOpen(false)}
@@ -690,42 +711,48 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
             </div>
 
             <div className="mt-6 sm:mt-8 lg:mt-auto">
-              {discPct > 0 && (
-                <div className="flex items-center justify-center gap-x-1.5 py-2 mb-2 text-sm md:text-base font-bold text-rose-500">
-                  <RiGiftLine size={16} />
-                  {discPct}٪ {t("discount_badge")}
+              {/* discount banner + countdown */}
+              {discPct > 0 && course.discount?.isActive && (
+                <div className="mb-4 flex items-center justify-between gap-x-3">
+                  <div className="flex items-center gap-x-2">
+                    <RiGiftLine size={18} className="text-rose-500 shrink-0" />
+                    <span className="text-sm font-bold text-rose-600">{discPct}٪ {t("discount_badge")}</span>
+                  </div>
+                  {course.discount.expiresAt && (
+                    <DiscountCountdown expiresAt={course.discount.expiresAt} />
+                  )}
                 </div>
               )}
 
-
-              <div className="flex items-end justify-between gap-x-4">
-                <div className="flex items-center gap-x-2.5">
-                  <button
-                    onClick={() => addToCart(course.id)}
-                    disabled={addingToCart}
-                    className="flex items-center justify-center gap-x-2 h-12 px-6 rounded-lg bg-[var(--brand)] text-white font-bold text-sm md:text-base hover:opacity-90 active:scale-[0.98] transition-all shrink-0 disabled:opacity-60"
-                  >
-                    {addingToCart ? <RiLoader4Line size={18} className="animate-spin" /> : <RiShoppingCartLine size={18} />}
-                    {t("add_to_cart")}
-                  </button>
-                  <CourseFavoriteButton courseId={course.id} t={t} />
-                </div>
+              {/* price + actions */}
+              <div className="flex items-center justify-between gap-x-4">
+                {/* price */}
                 {free ? (
                   <span className="text-2xl font-extrabold text-[var(--brand)]">
                     {locale === "ar" ? "مجاني" : "مفت"}
                   </span>
                 ) : (
-                  <div className="flex items-end flex-col sm:flex-row gap-x-2.5 gap-y-0.5">
-                    {course.price && (
-                      <span className="text-base md:text-2xl text-gray-300 line-through">
-                        {formatMoney(course.price, locale)}
-                      </span>
+                  <div className="flex flex-col gap-y-0.5">
+                    {course.price && discPct > 0 && (
+                      <span className="text-sm text-gray-400 line-through">{formatMoney(course.price, locale)}</span>
                     )}
-                    <span className="text-lg md:text-2xl font-extrabold text-[var(--ink)]">
+                    <span className="text-2xl font-extrabold text-[var(--ink)]">
                       {formatMoney(course.effectivePrice, locale)}
                     </span>
                   </div>
                 )}
+                {/* buttons */}
+                <div className="flex items-center gap-x-2">
+                  <CourseFavoriteButton courseId={course.id} t={t} />
+                  <button
+                    onClick={() => addToCart(course.id)}
+                    disabled={addingToCart}
+                    className="flex items-center justify-center gap-x-2 h-11 px-5 rounded-lg bg-[var(--brand)] text-white font-bold text-sm hover:opacity-90 active:scale-[0.98] transition-all shrink-0 disabled:opacity-60"
+                  >
+                    {addingToCart ? <RiLoader4Line size={18} className="animate-spin" /> : <RiShoppingCartLine size={18} />}
+                    {t("add_to_cart")}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
