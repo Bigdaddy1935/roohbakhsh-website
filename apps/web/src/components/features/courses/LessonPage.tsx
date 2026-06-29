@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
   RiArrowRightSLine,
+  RiArrowLeftSLine,
   RiPlayCircleLine,
   RiLockLine,
   RiSkipBackLine,
@@ -233,7 +234,7 @@ function QASection({ lessonId, t }: { lessonId: string; t: (k: string) => string
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 md:p-6">
+    <div className="bg-white rounded-lg border border-gray-100 p-5 md:p-6">
       <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-100">
         <div className="flex items-center gap-x-2.5">
           <RiQuestionLine size={20} className="text-[var(--brand)] shrink-0" />
@@ -261,28 +262,40 @@ function QASection({ lessonId, t }: { lessonId: string; t: (k: string) => string
       )}
 
       {formOpen && (
-        <div className="flex flex-col gap-y-3 mb-6 p-4 rounded-lg bg-gray-50 border border-gray-100">
-          <div className="flex items-center justify-end">
-            <button type="button" onClick={() => setFormOpen(false)} className="text-gray-400 hover:text-gray-600 cursor-pointer">
-              <RiCloseLine size={20} />
+        <div className="mb-6 bg-white rounded-md border border-gray-100 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <span className="text-sm font-bold text-[var(--ink)]">{t("write_review").replace(/^\+\s*/, "")}</span>
+            <button type="button" onClick={() => setFormOpen(false)} className="size-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
+              <RiCloseLine size={18} />
             </button>
           </div>
-          <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            rows={3}
-            placeholder={t("review_placeholder")}
-            className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-y"
-          />
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={createReview.isPending}
-            className="self-end flex items-center gap-x-2 h-10 px-5 rounded-lg bg-[var(--brand)] text-white font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-60 cursor-pointer"
-          >
-            {createReview.isPending && <RiLoader4Line size={16} className="animate-spin" />}
-            {t("submit_review")}
-          </button>
+          <div className="flex flex-col gap-y-1 px-5 pt-4">
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              rows={4}
+              placeholder={t("review_placeholder")}
+              className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-none"
+            />
+          </div>
+          <div className="flex items-center justify-end gap-x-2.5 px-5 py-4">
+            <button
+              type="button"
+              onClick={() => setFormOpen(false)}
+              className="h-10 px-5 rounded-md border border-gray-200 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              {t("cancel")}
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={createReview.isPending}
+              className="flex items-center gap-x-2 h-10 px-6 rounded-md bg-[var(--brand)] text-white font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-60 cursor-pointer"
+            >
+              {createReview.isPending && <RiLoader4Line size={15} className="animate-spin" />}
+              {t("submit_review")}
+            </button>
+          </div>
         </div>
       )}
 
@@ -300,7 +313,7 @@ function QASection({ lessonId, t }: { lessonId: string; t: (k: string) => string
         </div>
       ) : reviews.length === 0 ? (
         <div className="flex flex-col items-center gap-y-3 py-8 text-center">
-          <div className="size-16 rounded-xl bg-gray-100 flex items-center justify-center">
+          <div className="size-16 rounded-lg bg-gray-100 flex items-center justify-center">
             <RiQuestionLine size={32} className="text-gray-300" />
           </div>
           <p className="font-semibold text-[var(--ink)]">{t("no_reviews_yet")}</p>
@@ -422,14 +435,14 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
   if (!lesson.isFreePreview) {
     return (
       <div className="container py-32 flex flex-col items-center text-center gap-y-4">
-        <div className="size-16 rounded-xl bg-gray-100 flex items-center justify-center">
+        <div className="size-16 rounded-lg bg-gray-100 flex items-center justify-center">
           <RiLockLine size={32} className="text-gray-300" />
         </div>
         <p className="font-bold text-[var(--ink)]">{t("locked_title")}</p>
         <p className="text-sm text-gray-400 max-w-sm">{t("locked_desc")}</p>
         <Link
           href={`/courses/${courseId}`}
-          className="flex items-center gap-x-1.5 h-10 px-5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+          className="flex items-center gap-x-1.5 h-10 px-5 rounded-lg bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
         >
           {t("back_to_course")}
         </Link>
@@ -481,7 +494,7 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
           <span className="text-[var(--ink)] font-semibold truncate max-w-[160px]">{lesson.title[locale]}</span>
         </nav>
 
-        <div className="bg-black shadow-2xl rounded-xl overflow-hidden">
+        <div className="bg-black rounded-lg overflow-hidden">
           {videoUrl ? (
             <VideoPlayer url={videoUrl} onPlay={() => isAuthed && watchLesson.mutate({ lessonId: lesson.id, courseSlug: courseId })} />
           ) : (
@@ -497,9 +510,9 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
 
           <main className="flex-1 flex flex-col gap-y-4 min-w-0">
 
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 md:p-6">
+            <div className="bg-white rounded-lg border border-gray-100 p-5 md:p-6">
               <div className="flex items-start gap-x-3 mb-4">
-                <span className="shrink-0 size-9 rounded-xl bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center font-bold text-sm">
+                <span className="shrink-0 size-9 rounded-lg bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center font-bold text-sm">
                   {lessonIndex + 1}
                 </span>
                 <h1 className="text-lg md:text-xl font-bold text-[var(--ink)] leading-snug mt-1">
@@ -518,7 +531,7 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
                 {prevLesson ? (
                   <Link
                     href={`/courses/${prevLesson.courseSlug}/lessons/${prevLesson.id}`}
-                    className="flex items-center gap-x-1.5 h-9 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-[var(--ink)] text-sm font-semibold transition-colors"
+                    className="flex items-center gap-x-1.5 h-9 px-4 rounded-lg bg-gray-100 hover:bg-gray-200 text-[var(--ink)] text-sm font-semibold transition-colors"
                   >
                     <RiSkipBackLine size={16} />
                     {t("prev")}
@@ -530,7 +543,7 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
                     type="button"
                     onClick={handleMarkDone}
                     disabled={watchLesson.isPending}
-                    className={`size-9 rounded-xl border flex items-center justify-center transition-colors disabled:opacity-60 cursor-pointer ${
+                    className={`size-9 rounded-lg border flex items-center justify-center transition-colors disabled:opacity-60 cursor-pointer ${
                       isLessonWatched
                         ? "border-[var(--brand)] bg-[var(--brand)] text-white"
                         : "border-gray-200 text-gray-500 hover:border-[var(--brand)] hover:text-[var(--brand)]"
@@ -543,12 +556,12 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
                     type="button"
                     onClick={handleToggleFavorite}
                     disabled={toggleFavorite.isPending}
-                    className="size-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:border-rose-300 hover:text-rose-500 transition-colors disabled:opacity-60 cursor-pointer"
+                    className="size-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:border-rose-300 hover:text-rose-500 transition-colors disabled:opacity-60 cursor-pointer"
                     title={t("bookmark")}
                   >
                     {isLessonFavorite ? <RiHeartFill size={17} className="text-rose-500" /> : <RiHeartLine size={17} />}
                   </button>
-                  <button className="size-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:border-[var(--brand)] hover:text-[var(--brand)] transition-colors" title={t("question")}>
+                  <button className="size-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:border-[var(--brand)] hover:text-[var(--brand)] transition-colors" title={t("question")}>
                     <RiQuestionLine size={17} />
                   </button>
                 </div>
@@ -556,7 +569,7 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
                 {nextLesson ? (
                   <Link
                     href={`/courses/${nextLesson.courseSlug}/lessons/${nextLesson.id}`}
-                    className="flex items-center gap-x-1.5 h-9 px-4 rounded-xl bg-[var(--brand)] hover:bg-[var(--brand)]/90 text-white text-sm font-semibold transition-colors"
+                    className="flex items-center gap-x-1.5 h-9 px-4 rounded-lg bg-[var(--brand)] hover:bg-[var(--brand)]/90 text-white text-sm font-semibold transition-colors"
                   >
                     {t("next")}
                     <RiSkipForwardLine size={16} />
@@ -570,7 +583,7 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
 
           <aside className="lg:w-[300px] xl:w-[320px] shrink-0 flex flex-col gap-y-4">
 
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-lg border border-gray-100 overflow-hidden">
               <div className="flex items-center gap-x-2.5 px-4 py-4 border-b border-gray-100">
                 <RiListCheck2 size={20} className="text-[var(--brand)] shrink-0" />
                 <h2 className="font-bold text-[var(--ink)]">{t("lesson_list")}</h2>
@@ -589,7 +602,7 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
+            <div className="bg-white rounded-lg border border-gray-100">
               <div className="grid grid-cols-3 divide-x divide-x-reverse divide-gray-100">
                 {[
                   { icon: <RiPlayCircleLine size={22} className="text-[var(--brand)]" />, val: totalLessons.toString(), label: t("total_lessons") },
@@ -605,31 +618,29 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-              <p className="text-xs text-gray-400 text-center mb-3">{t("instructor_label")}</p>
-              <div className="flex items-center gap-x-3 mb-3">
-                {course.instructor.avatarUrl ? (
-                  <Image
-                    src={course.instructor.avatarUrl}
-                    alt={course.instructor.name[locale]}
-                    width={48} height={48}
-                    style={{ width: 48, height: 48 }}
-                    className="rounded-full object-cover border border-gray-100 shrink-0"
-                  />
-                ) : (
-                  <div className="size-12 rounded-full bg-[var(--brand)]/10 flex items-center justify-center border border-gray-100 shrink-0">
-                    <RiUserLine size={20} className="text-[var(--brand)]" />
-                  </div>
-                )}
-                <div className="min-w-0">
-                  <p className="font-bold text-[var(--ink)] text-sm truncate">{course.instructor.name[locale]}</p>
+            <div className="bg-white rounded-lg border border-gray-100 p-5">
+              {course.instructor.avatarUrl ? (
+                <Image
+                  src={course.instructor.avatarUrl}
+                  alt={course.instructor.name[locale]}
+                  width={80} height={80}
+                  style={{ width: 80, height: 80 }}
+                  className="rounded-full object-cover border-2 border-[var(--brand)]/20 mx-auto"
+                />
+              ) : (
+                <div className="size-20 rounded-full bg-[var(--brand)]/10 flex items-center justify-center mx-auto border-2 border-[var(--brand)]/20">
+                  <RiUserLine size={32} className="text-[var(--brand)]" />
                 </div>
+              )}
+              <div className="text-center mt-4">
+                <h2 className="font-bold text-base text-[var(--ink)]">{course.instructor.name[locale]}</h2>
               </div>
               <Link
-                href={`/courses/${courseId}`}
-                className="flex items-center justify-center gap-x-1.5 w-full h-9 rounded-xl border border-[var(--brand)]/30 text-[var(--brand)] text-sm font-semibold hover:bg-[var(--brand)]/5 transition-colors"
+                href={`/teacher/${course.instructor.slug}`}
+                className="flex items-center justify-center gap-x-2 w-full mt-6 h-10 rounded-lg border border-[var(--brand)]/30 text-[var(--brand)] text-sm font-semibold hover:bg-[var(--brand)]/5 transition-colors"
               >
                 {t("all_lessons")}
+                <RiArrowLeftSLine size={16} />
               </Link>
             </div>
           </aside>
