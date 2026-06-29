@@ -128,7 +128,6 @@ export default function VideoPlayer({ url, poster, onPlay }: { url: string; post
         onWaiting={() => setLoading(true)}
         onCanPlay={() => setLoading(false)}
         onEnded={() => { setPlaying(false); setShowControls(true); }}
-        preload="none"
       />
 
       {/* Poster overlay — visible before first play */}
