@@ -52,16 +52,9 @@ function DiscountCountdown({ expiresAt }: { expiresAt: string }) {
   }, [expiresAt]);
   if (!time) return null;
   const pad = (n: number) => String(n).padStart(2, "0");
-  if (time.d > 0) {
-    return (
-      <span className="text-base font-bold text-rose-600">
-        {time.d} يوم
-      </span>
-    );
-  }
   return (
     <span dir="ltr" className="font-mono text-base font-bold text-rose-600 tabular-nums">
-      {pad(time.h)}:{pad(time.m)}:{pad(time.s)}
+      {pad(time.d)}:{pad(time.h)}:{pad(time.m)}:{pad(time.s)}
     </span>
   );
 }

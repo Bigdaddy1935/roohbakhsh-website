@@ -37,8 +37,8 @@ export default function CourseCard({ course }: { course: CourseCardData }) {
           loading="lazy"
         />
         {course.discount && (
-          <span className="absolute top-2 start-2 px-2 py-0.5 bg-[var(--cta)] text-white text-[11px] font-bold rounded-md">
-            {course.discount}%
+          <span className="absolute top-2.5 end-2.5 flex items-center gap-x-0.5 px-2.5 py-1 bg-[var(--cta)] text-white text-xs font-extrabold rounded-full shadow-md shadow-black/25 tracking-wide">
+            <span className="text-sm">{course.discount}</span><span className="text-xs">٪</span>
           </span>
         )}
       </Link>
