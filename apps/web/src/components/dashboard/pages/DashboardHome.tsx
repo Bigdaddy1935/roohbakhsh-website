@@ -3,65 +3,91 @@
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
-  RiBookOpenLine, RiHeartLine, RiCustomerService2Line,
-  RiWalletLine, RiArrowLeftSLine, RiLoader4Line,
+  RiPlayCircleLine, RiHeart3Line, RiMessage2Line,
+  RiBankCardLine, RiArrowLeftSLine, RiBookReadLine,
+  RiTimeLine, RiInformationLine, RiCheckboxCircleLine, RiErrorWarningLine,
 } from "react-icons/ri";
+import { HomePageSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { useDashboard } from "@/hooks/queries/use-dashboard";
 import { formatMoney } from "@/lib/format";
 import type { TicketStatus } from "@roohbakhsh/shared";
 
-const STATUS_CLASS: Record<TicketStatus, string> = {
+const STATUS_BADGE: Record<TicketStatus, string> = {
   open: "bg-blue-50 text-blue-600",
-  answered: "bg-green-50 text-[var(--brand)]",
+  answered: "bg-emerald-50 text-emerald-600",
   closed: "bg-gray-100 text-gray-500",
+};
+
+const STATUS_DOT: Record<TicketStatus, string> = {
+  open: "bg-blue-400",
+  answered: "bg-[var(--brand)]",
+  closed: "bg-gray-300",
+};
+
+const STATUS_ICON: Record<TicketStatus, React.ElementType> = {
+  open: RiInformationLine,
+  answered: RiCheckboxCircleLine,
+  closed: RiErrorWarningLine,
 };
 
 const UI = {
   ar: {
-    statLabels: ["دوراتي", "علاقاتي", "التيكيت", "إجمالي الإنفاق"],
-    statLinks: ["/dashboard/my-courses", "#", "/dashboard/tickets", "/dashboard/transactions"],
-    statColors: [
-      "bg-blue-50 text-blue-500",
-      "bg-purple-50 text-purple-500",
-      "bg-orange-50 text-orange-500",
-      "bg-green-50 text-green-600",
-    ],
+    statLabels: ["دوراتي", "المفضلة", "التيكيتات", "إجمالي الإنفاق"],
+    statLinks: ["/dashboard/my-courses", "/dashboard/favorites", "/dashboard/tickets", "/dashboard/transactions"] as string[],
     recentCourses: "آخر ما شاهدته",
     viewAll: "عرض الكل",
-    recentTickets: "التيكيت الأخيرة",
-    ticketStatus: { open: "مفتوح", answered: "تمت الإجابة", closed: "مغلق" },
-    viewDetails: "عرض التفاصيل",
-    watched: "مشاهدة",
-    noCourses: "لا توجد دورات بعد",
-    noTickets: "لا توجد تيكيت بعد",
+    recentTickets: "آخر التيكيتات",
+    ticketStatus: { open: "مفتوح", answered: "تمت الإجابة", closed: "مغلق" } as Record<TicketStatus, string>,
+    noCourses: "لم تشاهد أي دورة بعد",
+    noTickets: "لا توجد تيكيتات بعد",
   },
   ur: {
     statLabels: ["میرے کورسز", "پسندیدہ", "ٹکٹس", "کل خرچ"],
-    statLinks: ["/dashboard/my-courses", "#", "/dashboard/tickets", "/dashboard/transactions"],
-    statColors: [
-      "bg-blue-50 text-blue-500",
-      "bg-purple-50 text-purple-500",
-      "bg-orange-50 text-orange-500",
-      "bg-green-50 text-green-600",
-    ],
+    statLinks: ["/dashboard/my-courses", "/dashboard/favorites", "/dashboard/tickets", "/dashboard/transactions"] as string[],
     recentCourses: "حال ہی میں دیکھے گئے",
     viewAll: "سب دیکھیں",
     recentTickets: "حالیہ ٹکٹس",
-    ticketStatus: { open: "کھلا", answered: "جواب دیا", closed: "بند" },
-    viewDetails: "تفصیلات دیکھیں",
-    watched: "دیکھا",
+    ticketStatus: { open: "کھلا", answered: "جواب دیا", closed: "بند" } as Record<TicketStatus, string>,
     noCourses: "ابھی کوئی کورس نہیں",
     noTickets: "ابھی کوئی ٹکٹ نہیں",
   },
 };
 
-const STAT_ICONS = [RiBookOpenLine, RiHeartLine, RiCustomerService2Line, RiWalletLine];
+const STAT_CONFIG = [
+  { Icon: RiPlayCircleLine, iconBg: "bg-blue-100",    iconColor: "text-blue-500"    },
+  { Icon: RiHeart3Line,     iconBg: "bg-rose-100",    iconColor: "text-rose-500"    },
+  { Icon: RiMessage2Line,   iconBg: "bg-amber-100",   iconColor: "text-amber-500"   },
+  { Icon: RiBankCardLine, iconBg: "bg-emerald-100", iconColor: "text-emerald-600" },
+];
+
+function SectionHeader({ title, href, label }: { title: string; href: string; label: string }) {
+  return (
+    <div className="flex items-center justify-between mb-5">
+      <h2 className="text-[15px] font-bold text-[var(--ink)]">{title}</h2>
+      <Link
+        href={href}
+        className="flex items-center gap-x-1 text-xs font-semibold text-[var(--brand)] hover:opacity-75 transition-opacity"
+      >
+        {label}
+        <RiArrowLeftSLine size={15} className="mt-px" />
+      </Link>
+    </div>
+  );
+}
 
 export default function DashboardHome() {
   const locale = useLocale() as "ar" | "ur";
   const ui = UI[locale];
 
   const { data, isLoading } = useDashboard();
+
+  if (isLoading) {
+    return (
+      <div className="p-4 sm:p-5 lg:p-0">
+        <HomePageSkeleton />
+      </div>
+    );
+  }
 
   const progressByCourseId = new Map(
     (data?.coursesProgress ?? []).map((p) => [p.courseId, p.progressPercent]),
@@ -77,57 +103,68 @@ export default function DashboardHome() {
   return (
     <div className="flex flex-col gap-y-5 p-4 sm:p-5 lg:p-0">
 
-      {/* Stats */}
-      {isLoading ? (
-        <div className="flex justify-center py-6">
-          <RiLoader4Line size={28} className="text-[var(--brand)] animate-spin" />
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {STAT_ICONS.map((Icon, i) => (
-            <Link key={i} href={(ui.statLinks[i] ?? "#") as string}
-              className="bg-white rounded-md p-4 flex items-center justify-between border border-gray-100 hover:border-gray-200 transition-colors">
-              <div>
-                <p className="text-2xl font-extrabold text-[var(--ink)]">{statValues[i]}</p>
-                <p className="text-xs text-gray-400 mt-0.5">{ui.statLabels[i]}</p>
-              </div>
-              <div className={`size-12 rounded-md flex items-center justify-center ${ui.statColors[i]}`}>
-                <Icon size={24} />
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {STAT_CONFIG.map(({ Icon, iconBg, iconColor }, i) => (
+          <Link
+            key={i}
+            href={ui.statLinks[i] ?? "#"}
+            className="bg-white rounded-lg p-4 sm:p-5 flex items-center gap-x-4 hover:shadow-md transition-all duration-200 group"
+          >
+            <div
+              className={`size-12 sm:size-14 rounded-md ${iconBg} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}
+            >
+              <Icon size={24} className={iconColor} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-extrabold text-[var(--ink)] leading-tight truncate">
+                {statValues[i]}
+              </p>
+              <p className="text-xs text-gray-400 mt-0.5 truncate">{ui.statLabels[i]}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
 
       {/* Recent views */}
-      <div className="bg-white rounded-md border border-gray-100 p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-bold text-[var(--ink)]">{ui.recentCourses}</h2>
-          <Link href="/dashboard/my-courses" className="flex items-center gap-x-1 text-xs text-[var(--brand)] hover:underline">
-            {ui.viewAll} <RiArrowLeftSLine size={14} />
-          </Link>
-        </div>
+      <div className="bg-white rounded-lg p-5 sm:p-6">
+        <SectionHeader title={ui.recentCourses} href="/dashboard/my-courses" label={ui.viewAll} />
         {!data || data.recentViews.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-6">{ui.noCourses}</p>
+          <div className="flex flex-col items-center justify-center py-12 gap-y-2 text-gray-300">
+            <RiBookReadLine size={40} />
+            <p className="text-sm">{ui.noCourses}</p>
+          </div>
         ) : (
-          <div className="grid grid-cols-12 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {data.recentViews.slice(0, 4).map((v) => {
               const progress = progressByCourseId.get(v.courseId) ?? 0;
               return (
-                <div key={`${v.type}-${v.id}`} className="col-span-6 sm:col-span-6 lg:col-span-4 xl:col-span-3 bg-white rounded-md overflow-hidden border border-gray-100">
-                  <div className="aspect-video bg-[var(--brand)]/10 flex items-center justify-center">
-                    <RiBookOpenLine size={28} className="text-[var(--brand)] opacity-40" />
+                <Link
+                  key={`${v.type}-${v.id}`}
+                  href={`/courses/${v.courseId}`}
+                  className="group flex flex-col rounded-md overflow-hidden hover:shadow-md transition-all duration-200"
+                >
+                  <div className="aspect-video bg-gradient-to-br from-[var(--brand)]/20 to-[var(--brand)]/5 flex items-center justify-center">
+                    <RiPlayCircleLine
+                      size={32}
+                      className="text-[var(--brand)]/40 group-hover:text-[var(--brand)]/70 transition-colors"
+                    />
                   </div>
-                  <div className="p-3 border-b border-gray-100">
-                    <p className="text-xs font-semibold text-[var(--ink)] line-clamp-2 h-8">{v.title[locale]}</p>
-                  </div>
-                  <div className="flex items-center gap-x-1 px-3 py-2 text-[var(--brand)]">
-                    <span className="text-[11px] shrink-0 select-none">{progress}% {ui.watched}</span>
-                    <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-[var(--brand)] rounded-full" style={{ width: `${progress}%` }} />
+                  <div className="p-3 bg-gray-50 flex-1">
+                    <p className="text-xs font-semibold text-[var(--ink)] line-clamp-2 mb-2 leading-relaxed">
+                      {v.title[locale]}
+                    </p>
+                    <div className="flex items-center gap-x-2">
+                      <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-[var(--brand)] rounded-full transition-all"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                      <span className="text-[10px] text-gray-400 shrink-0">{progress}%</span>
                     </div>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
@@ -135,33 +172,40 @@ export default function DashboardHome() {
       </div>
 
       {/* Recent tickets */}
-      <div className="bg-white rounded-md border border-gray-100 p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-bold text-[var(--ink)]">{ui.recentTickets}</h2>
-          <Link href="/dashboard/tickets" className="flex items-center gap-x-1 text-xs text-[var(--brand)] hover:underline">
-            {ui.viewAll} <RiArrowLeftSLine size={14} />
-          </Link>
-        </div>
+      <div className="bg-white rounded-lg p-5 sm:p-6">
+        <SectionHeader title={ui.recentTickets} href="/dashboard/tickets" label={ui.viewAll} />
         {!data || data.recentTickets.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-6">{ui.noTickets}</p>
+          <div className="flex flex-col items-center justify-center py-12 gap-y-2 text-gray-300">
+            <RiMessage2Line size={40} />
+            <p className="text-sm">{ui.noTickets}</p>
+          </div>
         ) : (
-          <div className="flex flex-col gap-y-3">
-            {data.recentTickets.map((tk) => (
-              <div key={tk.id} className="flex items-center justify-between rounded-md border border-gray-100 px-4 py-3 hover:border-gray-200 transition-colors">
-                <div className="flex items-center gap-x-3">
-                  <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-md ${STATUS_CLASS[tk.status]}`}>
+          <div className="flex flex-col divide-y divide-gray-50">
+            {data.recentTickets.map((tk) => {
+              const StatusIcon = STATUS_ICON[tk.status];
+              return (
+                <Link
+                  key={tk.id}
+                  href={`/dashboard/tickets/${tk.id}`}
+                  className="flex items-center gap-x-3 py-3.5 hover:bg-gray-50 -mx-2 px-2 rounded-md transition-colors"
+                >
+                  <span className={`size-2 shrink-0 rounded-full ${STATUS_DOT[tk.status]}`} />
+                  <span className="flex-1 text-sm text-[var(--ink)] font-medium line-clamp-1">
+                    {tk.subject}
+                  </span>
+                  <span
+                    className={`hidden sm:flex items-center gap-x-1 text-[11px] font-semibold px-2.5 py-1 rounded-lg shrink-0 ${STATUS_BADGE[tk.status]}`}
+                  >
+                    <StatusIcon size={12} />
                     {ui.ticketStatus[tk.status]}
                   </span>
-                  <span className="text-sm text-[var(--ink)] font-medium">{tk.subject}</span>
-                </div>
-                <div className="flex items-center gap-x-3">
-                  <span className="text-xs text-gray-400 hidden sm:block">{tk.createdAt.slice(0, 10)}</span>
-                  <Link href="/dashboard/tickets" className="text-xs text-[var(--brand)] flex items-center gap-x-0.5 hover:underline">
-                    {ui.viewDetails} <RiArrowLeftSLine size={13} />
-                  </Link>
-                </div>
-              </div>
-            ))}
+                  <div className="hidden md:flex items-center gap-x-1 text-[11px] text-gray-400 shrink-0">
+                    <RiTimeLine size={12} />
+                    <span>{tk.createdAt.slice(0, 10)}</span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>

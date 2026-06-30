@@ -36,6 +36,9 @@ export function useCourseFilters() {
 
   const setSort = useCallback((s: string) => push({ sort: s }), [push]);
   const setSearch = useCallback((v: string) => push({ q: v || null }), [push]);
+  const clearAll = useCallback(() => {
+    router.replace(pathname as never, { scroll: false });
+  }, [router, pathname]);
 
-  return { cats, sort, q, toggleCategory, setSort, setSearch };
+  return { cats, sort, q, toggleCategory, setSort, setSearch, clearAll };
 }

@@ -3,52 +3,52 @@
 import { useLocale } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import {
-  RiHomeLine,
-  RiBookmarkLine,
-  RiHeartLine,
-  RiExchangeDollarLine,
-  RiCustomerService2Line,
-  RiAccountCircleLine,
-  RiLogoutBoxLine,
+  RiHome3Line,
+  RiPlayCircleLine,
+  RiHeart3Line,
+  RiBankCardLine,
+  RiMessage2Line,
+  RiBellLine,
+  RiUser3Line,
+  RiShutDownLine,
   RiUserLine,
-  RiNotification3Line,
 } from "react-icons/ri";
 import { useMe, useLogout } from "@/hooks/queries/use-auth";
 import { useUnreadCount } from "@/hooks/queries/use-notifications";
 
 const UI = {
   ar: {
-    quickAccess: "دسترسی سریع",
+    quickAccess: "القائمة",
     home: "الرئيسية",
     myCourses: "دوراتي",
     favorites: "المفضلة",
     transactions: "المعاملات",
-    tickets: "التيكيت",
+    tickets: "الدعم الفني",
     notifications: "الإشعارات",
-    account: "تفاصيل الحساب",
+    account: "الحساب",
     logout: "تسجيل الخروج",
   },
   ur: {
-    quickAccess: "فوری رسائی",
+    quickAccess: "مینو",
     home: "ہوم",
     myCourses: "میرے کورسز",
     favorites: "پسندیدہ",
     transactions: "لین دین",
-    tickets: "ٹکٹس",
+    tickets: "سپورٹ",
     notifications: "اطلاعات",
-    account: "اکاؤنٹ کی تفصیلات",
+    account: "اکاؤنٹ",
     logout: "لاگ آؤٹ",
   },
 };
 
 const NAV = [
-  { key: "home",          href: "/dashboard",              Icon: RiHomeLine },
-  { key: "myCourses",     href: "/dashboard/my-courses",   Icon: RiBookmarkLine },
-  { key: "favorites",     href: "/dashboard/favorites",    Icon: RiHeartLine },
-  { key: "transactions",  href: "/dashboard/transactions", Icon: RiExchangeDollarLine },
-  { key: "tickets",       href: "/dashboard/tickets",      Icon: RiCustomerService2Line },
-  { key: "notifications", href: "/dashboard/notifications", Icon: RiNotification3Line },
-  { key: "account",       href: "/dashboard/account",      Icon: RiAccountCircleLine },
+  { key: "home",          href: "/dashboard",               Icon: RiHome3Line },
+  { key: "myCourses",     href: "/dashboard/my-courses",    Icon: RiPlayCircleLine },
+  { key: "favorites",     href: "/dashboard/favorites",     Icon: RiHeart3Line },
+  { key: "transactions",  href: "/dashboard/transactions",  Icon: RiBankCardLine },
+  { key: "tickets",       href: "/dashboard/tickets",       Icon: RiMessage2Line },
+  { key: "notifications", href: "/dashboard/notifications", Icon: RiBellLine },
+  { key: "account",       href: "/dashboard/account",       Icon: RiUser3Line },
 ] as const;
 
 type Props = { open: boolean; onClose: () => void };
@@ -65,9 +65,7 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
 
   function handleLogout() {
     onClose();
-    logout.mutate(undefined, {
-      onSettled: () => router.replace("/signin"),
-    });
+    logout.mutate(undefined, { onSettled: () => router.replace("/signin") });
   }
 
   const isActive = (href: string) =>
@@ -75,26 +73,26 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      {/* User info */}
-      <div className="flex items-center justify-between pb-5 mb-5 border-b border-gray-100">
-        <div className="flex items-center gap-x-2">
-          <div className="size-11 rounded-full bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
-            <RiUserLine size={22} className="text-[var(--brand)]" />
-          </div>
-          <div className="flex flex-col text-sm">
-            <span className="font-semibold max-w-28 truncate text-[var(--ink)]">
-              {user?.fullName ?? "—"}
-            </span>
-            <span className="text-gray-400 text-xs mt-0.5">{user?.phone ?? user?.email ?? ""}</span>
-          </div>
+      {/* User card */}
+      <div className="flex items-center gap-x-3 p-3 mb-5 rounded-lg bg-gradient-to-l from-[var(--brand)]/8 to-[var(--brand)]/4">
+        <div className="size-10 rounded-md bg-[var(--brand)] flex items-center justify-center shrink-0 shadow-md shadow-[var(--brand)]/30">
+          <RiUserLine size={20} className="text-white" />
+        </div>
+        <div className="flex flex-col min-w-0">
+          <span className="text-sm font-bold text-[var(--ink)] truncate">
+            {user?.fullName ?? "—"}
+          </span>
+          <span className="text-xs text-gray-400 truncate mt-0.5">{user?.phone ?? user?.email ?? ""}</span>
         </div>
       </div>
 
-      {/* Quick access label */}
-      <span className="text-xs text-gray-400 select-none mb-3 block">{ui.quickAccess}</span>
+      {/* Label */}
+      <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2 px-2">
+        {ui.quickAccess}
+      </p>
 
-      {/* Nav items */}
-      <div className="flex flex-col gap-y-1">
+      {/* Nav */}
+      <nav className="flex flex-col gap-y-0.5">
         {NAV.map(({ key, href, Icon }) => {
           const active = isActive(href);
           return (
@@ -102,53 +100,39 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
               key={key}
               href={href}
               onClick={onClose}
-              className="flex items-center gap-x-2.5 py-2.5 group"
+              className={`flex items-center gap-x-3 px-3 py-2.5 rounded-md transition-all duration-200 ${
+                active
+                  ? "bg-[var(--brand)]/10 text-[var(--brand)]"
+                  : "text-gray-500 hover:bg-gray-50 hover:text-[var(--ink)]"
+              }`}
             >
-              {/* Active badge — first in DOM = rightmost in RTL flex */}
-              <span
-                className={`block w-0.5 h-5 ml-1 rounded-full transition-colors shrink-0 ${
-                  active ? "bg-[var(--brand)]" : "bg-transparent"
-                }`}
-              />
               <span className="relative shrink-0">
-                <Icon
-                  size={20}
-                  className={`transition-colors ${
-                    active ? "text-[var(--brand)]" : "text-gray-400 group-hover:text-[var(--brand)]"
-                  }`}
-                />
+                <Icon size={20} />
                 {key === "notifications" && hasUnread && (
-                  <span className="absolute -top-0.5 -end-0.5 size-1.5 rounded-full bg-[var(--cta)]" />
+                  <span className="absolute -top-0.5 -end-0.5 size-2 rounded-full bg-[var(--cta)]" />
                 )}
               </span>
-              <span
-                className={`text-sm transition-colors ${
-                  active
-                    ? "text-[var(--ink)] font-semibold"
-                    : "text-gray-600 group-hover:text-[var(--brand)]"
-                }`}
-              >
+              <span className={`text-sm ${active ? "font-bold" : "font-medium"}`}>
                 {ui[key]}
               </span>
+              {active && (
+                <span className="ms-auto size-1.5 rounded-full bg-[var(--brand)] shrink-0" />
+              )}
             </Link>
           );
         })}
-      </div>
+      </nav>
 
-      {/* Logout — below nav */}
-      <div className="mt-6 pt-5 border-t border-gray-100">
+      {/* Logout */}
+      <div className="mt-5 pt-4 border-t border-gray-100">
         <button
           type="button"
           onClick={handleLogout}
           disabled={logout.isPending}
-          className="flex items-center gap-x-2.5 py-2 w-full group cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex items-center gap-x-3 px-3 py-2.5 w-full rounded-md text-red-400 hover:bg-red-50 hover:text-red-500 transition-all duration-200 disabled:opacity-60 cursor-pointer"
         >
-          <span className="block w-0.5 h-5 ml-1 rounded-full bg-transparent shrink-0" />
-          <RiLogoutBoxLine
-            size={20}
-            className="text-red-400 group-hover:text-red-500 transition-colors shrink-0"
-          />
-          <span className="text-sm text-red-400 group-hover:text-red-500 transition-colors">
+          <RiShutDownLine size={20} />
+          <span className="text-sm font-medium">
             {logout.isPending ? `${ui.logout}...` : ui.logout}
           </span>
         </button>
@@ -157,21 +141,19 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
   );
 }
 
-const BASE = "w-64 shrink-0 bg-white border-s border-gray-100 px-7 py-5 overflow-y-auto";
+const BASE = "w-64 shrink-0 bg-white px-4 py-5 overflow-y-auto";
 
 export default function DashboardSidebar({ open, onClose }: Props) {
   return (
     <>
-      {/* Mobile: fixed drawer */}
       <aside
-        className={`md:hidden fixed top-0 bottom-0 right-0 z-50 ${BASE} transition-all duration-300 ${
+        className={`md:hidden fixed top-0 bottom-0 right-0 z-50 ${BASE} shadow-2xl transition-all duration-300 ${
           open ? "opacity-100 visible" : "opacity-0 invisible translate-x-full"
         }`}
       >
         <SidebarContent onClose={onClose} />
       </aside>
 
-      {/* Desktop: static in flex flow, sticky */}
       <aside className={`hidden md:block lg:sticky lg:top-5 lg:h-max lg:rounded-lg ${BASE}`}>
         <SidebarContent onClose={onClose} />
       </aside>

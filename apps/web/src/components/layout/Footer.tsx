@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
   RiTelegramLine,
@@ -9,114 +8,131 @@ import {
   RiLinkedinBoxLine,
   RiTwitterXLine,
   RiMailLine,
-  RiArrowLeftSLine,
 } from "react-icons/ri";
+import { useCourses } from "@/hooks/queries/use-courses";
 
 const USEFUL_LINKS = [
   { key: "link_terms",   href: "/terms"   },
-  { key: "link_support", href: "/support" },
   { key: "link_about",   href: "/about"   },
-  { key: "link_contact", href: "/contact" },
-] as const;
-
-const COURSES = [
-  { key: "course_1", href: "/courses/quran"   },
-  { key: "course_2", href: "/courses/fiqh"    },
-  { key: "course_3", href: "/courses/history" },
-  { key: "course_4", href: "/courses/arabic"  },
 ] as const;
 
 const SOCIALS = [
-  { Icon: RiTelegramLine,    href: "https://t.me/roohbakhsh",                    label: "Telegram"  },
-  { Icon: RiInstagramLine,   href: "https://instagram.com/roohbakhsh",            label: "Instagram" },
-  { Icon: RiLinkedinBoxLine, href: "https://linkedin.com/company/roohbakhsh",     label: "LinkedIn"  },
-  { Icon: RiTwitterXLine,    href: "https://x.com/roohbakhsh",                   label: "X"         },
+  { Icon: RiTelegramLine,    href: "https://t.me/roohbakhsh",                label: "Telegram",  color: "hover:bg-[#29a7e1]" },
+  { Icon: RiInstagramLine,   href: "https://instagram.com/roohbakhsh",        label: "Instagram", color: "hover:bg-[#e1306c]" },
+  { Icon: RiLinkedinBoxLine, href: "https://linkedin.com/company/roohbakhsh", label: "LinkedIn",  color: "hover:bg-[#0077b5]" },
+  { Icon: RiTwitterXLine,    href: "https://x.com/roohbakhsh",               label: "X",         color: "hover:bg-[#1da1f2]" },
 ] as const;
 
 export default function Footer() {
   const t = useTranslations("Footer");
+  const locale = useLocale() as "ar" | "ur";
+  const { data: coursesData } = useCourses({ limit: 4 });
+  const courses = coursesData?.items ?? [];
 
   return (
-    <footer className="bg-[#1a1f36] text-gray-300 mt-8">
+    <footer className="py-6 sm:pt-8 lg:pt-12 sm:pb-8">
+      <div className="container">
+      <div className="rounded-lg bg-[#242424] overflow-hidden px-10 py-8">
 
-        {/* Main grid */}
-        <div className="container py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+      {/* Main grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 
-          {/* About */}
-          <div className="flex flex-col gap-y-5">
-            <Link href="/" className="inline-block">
-              <Image src="https://roohbakhshac.ir/logo.png" alt="روح‌بخش" width={130} height={44} className="object-contain h-11 w-auto brightness-0 invert" />
-            </Link>
-            <p className="text-sm leading-7 text-gray-400">{t("about_desc")}</p>
-            <div className="flex items-center gap-x-2.5 mt-1">
-              {SOCIALS.map(({ Icon, href, label }) => (
-                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
-                  className="flex items-center justify-center size-9 rounded-lg bg-white/5 hover:bg-[var(--brand)] text-gray-400 hover:text-white transition-all duration-200">
-                  <Icon size={17} />
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Useful links */}
-          <div className="flex flex-col gap-y-4">
-            <h3 className="text-white font-bold text-sm uppercase tracking-wide opacity-60 mb-1">{t("useful_links_title")}</h3>
-            <ul className="flex flex-col gap-y-2.5">
-              {USEFUL_LINKS.map(({ key, href }) => (
-                <li key={key}>
-                  <Link href={href} className="flex items-center gap-x-1.5 text-sm text-gray-400 hover:text-[var(--brand)] transition-colors group">
-                    <RiArrowLeftSLine size={15} className="text-[var(--brand)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                    {t(key)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Courses */}
-          <div className="flex flex-col gap-y-4">
-            <h3 className="text-white font-bold text-sm uppercase tracking-wide opacity-60 mb-1">{t("courses_title")}</h3>
-            <ul className="flex flex-col gap-y-2.5">
-              {COURSES.map(({ key, href }) => (
-                <li key={key}>
-                  <Link href={href} className="flex items-center gap-x-1.5 text-sm text-gray-400 hover:text-[var(--brand)] transition-colors group">
-                    <RiArrowLeftSLine size={15} className="text-[var(--brand)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                    {t(key)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div className="flex flex-col gap-y-4">
-            <h3 className="text-white font-bold text-sm uppercase tracking-wide opacity-60 mb-1">{t("contact_title")}</h3>
-            <ul className="flex flex-col gap-y-2.5">
-              <li>
-                <a href="https://t.me/roohbakhsh_support" target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-x-2.5 text-sm text-gray-400 hover:text-[var(--brand)] transition-colors">
-                  <RiTelegramLine size={15} className="text-[var(--brand)] shrink-0" />
-                  {t("contact_telegram")}
-                </a>
-              </li>
-              <li>
-                <a href="mailto:info@roohbakhshac.ir" className="flex items-center gap-x-2.5 text-sm text-gray-400 hover:text-[var(--brand)] transition-colors">
-                  <RiMailLine size={15} className="text-[var(--brand)] shrink-0" />
-                  {t("contact_email")}
-                </a>
-              </li>
-            </ul>
+        {/* About */}
+        <div className="flex flex-col gap-y-5 lg:col-span-1">
+          <h3 className="font-extrabold text-white text-lg">{t("about_title")}</h3>
+          <p className="text-sm leading-9 text-[#d6d6d6]">{t("about_desc")}</p>
+          {/* Socials */}
+          <div className="flex items-center gap-x-2 mt-1">
+            {SOCIALS.map(({ Icon, href, label, color }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className={`flex items-center justify-center size-9 rounded-full bg-white/10 text-[#d6d6d6] hover:text-white transition-all duration-200 ${color}`}
+              >
+                <Icon size={16} />
+              </a>
+            ))}
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="border-t border-white/[0.06]">
-          <div className="container py-5 flex flex-col sm:flex-row items-center justify-between gap-y-2 text-xs text-gray-600">
-            <span>© {new Date().getFullYear()} — {t("copyright")}</span>
-            <span>{t("built_by")}</span>
-          </div>
+        {/* Suggested Courses */}
+        <div className="flex flex-col gap-y-8">
+          <h3 className="font-extrabold text-white text-lg">{t("courses_title")}</h3>
+          <ul className="flex flex-col gap-y-5">
+            {courses.map((course) => (
+              <li key={course.id}>
+                <Link
+                  href={`/courses/${course.slug}`}
+                  className="flex items-center gap-x-2 text-sm text-[#d6d6d6] hover:text-[var(--brand)] transition-colors"
+                >
+                  <span className="text-[var(--brand)] font-bold leading-none">-</span>
+                  {course.title[locale]}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
 
+        {/* Useful Links */}
+        <div className="flex flex-col gap-y-8">
+          <h3 className="font-extrabold text-white text-lg">{t("useful_links_title")}</h3>
+          <ul className="flex flex-col gap-y-5">
+            {USEFUL_LINKS.map(({ key, href }) => (
+              <li key={key}>
+                <Link
+                  href={href}
+                  className="flex items-center gap-x-2 text-sm text-[#d6d6d6] hover:text-[var(--brand)] transition-colors"
+                >
+                  <span className="text-[var(--brand)] font-bold leading-none">-</span>
+                  {t(key)}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Contact */}
+        <div className="flex flex-col gap-y-8">
+          <h3 className="font-extrabold text-white text-lg">{t("contact_title")}</h3>
+          <ul className="flex flex-col gap-y-5">
+            <li>
+              <a
+                href="https://t.me/roohbakhsh_support"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-x-2 text-sm text-[#d6d6d6] hover:text-[var(--brand)] transition-colors"
+              >
+                <RiTelegramLine size={15} className="text-[var(--brand)] shrink-0" />
+                {t("contact_telegram")}
+              </a>
+            </li>
+            <li>
+              <a
+                href="mailto:info@roohbakhshac.ir"
+                className="flex items-center gap-x-2 text-sm text-[#d6d6d6] hover:text-[var(--brand)] transition-colors"
+              >
+                <RiMailLine size={15} className="text-[var(--brand)] shrink-0" />
+                {t("contact_email")}
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      {/* Bottom bar */}
+      <div className="mt-12">
+        <div className="bg-[#3A3A3A] rounded-md px-4 sm:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-y-3 sm:gap-y-2 text-xs text-center sm:text-start">
+          <span className="text-white leading-6">© {new Date().getFullYear()} — {t("copyright")}</span>
+          <span className="text-white">{t("built_by")}</span>
+        </div>
+      </div>
+
+      </div>
+      </div>
     </footer>
   );
 }

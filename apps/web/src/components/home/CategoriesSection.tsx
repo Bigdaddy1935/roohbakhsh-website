@@ -5,13 +5,15 @@ import { Link } from "@/i18n/navigation";
 import { RiArrowRightSLine, RiArrowLeftSLine, RiGridLine } from "react-icons/ri";
 import { useRef } from "react";
 import { useCategories } from "@/hooks/queries/use-categories";
+import { CategoryCardSkeleton } from "@/components/ui/Skeleton";
 
 export default function CategoriesSection() {
   const t = useTranslations("Home.categories");
   const locale = useLocale() as "ar" | "ur";
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { data: cats = [] } = useCategories();
+  const { data: cats = [], isLoading, isError } = useCategories();
+  const showSkeleton = isLoading || (isError && !cats.length);
 
   const courseWord = locale === "ar" ? "دورة" : "کورس";
 
@@ -24,22 +26,26 @@ export default function CategoriesSection() {
   };
 
   /* ── drag-to-scroll ── */
-  const drag = useRef({ active: false, startX: 0, scrollLeft: 0 });
+  const drag = useRef({ active: false, startX: 0, scrollLeft: 0, captured: false });
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    drag.current = { active: true, startX: e.clientX, scrollLeft: scrollRef.current?.scrollLeft ?? 0 };
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    drag.current = { active: true, startX: e.clientX, scrollLeft: scrollRef.current?.scrollLeft ?? 0, captured: false };
     e.currentTarget.style.cursor = "grabbing";
   };
 
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!drag.current.active || !scrollRef.current) return;
     const dx = e.clientX - drag.current.startX;
+    if (Math.abs(dx) > 5 && !drag.current.captured) {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      drag.current.captured = true;
+    }
     scrollRef.current.scrollLeft = drag.current.scrollLeft - dx;
   };
 
   const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     drag.current.active = false;
+    drag.current.captured = false;
     e.currentTarget.style.cursor = "grab";
   };
 
@@ -66,23 +72,26 @@ export default function CategoriesSection() {
       {/* Slider */}
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto pb-2 select-none cursor-grab"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        className="flex gap-4 overflow-x-auto pb-2 select-none cursor-grab scroll-smooth"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollSnapType: "x mandatory" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerLeave={onPointerUp}
       >
-        {cats.map((cat) => {
+        {showSkeleton
+          ? Array.from({ length: 6 }).map((_, i) => <CategoryCardSkeleton key={i} />)
+          : cats.map((cat) => {
           const thumb = cat.thumbnailUrl?.[locale] ?? cat.thumbnailUrl?.ar ?? null;
           return (
             <Link
               key={cat.id}
-              href={`/courses?cat=${cat.slug}`}
+              href={`/courses?cats=${cat.id}`}
               draggable={false}
+              style={{ scrollSnapAlign: "start" }}
               className="bg-white flex flex-col items-center gap-3 sm:gap-4 px-2.5 py-4 sm:py-6 rounded-lg border-2 border-transparent hover:border-[var(--brand)] hover:bg-[var(--brand)]/10 transition-colors text-center shrink-0
-                w-[calc((100%-5*1rem)/3)]
-                sm:w-[calc((100%-5*1rem)/4)]
+                w-[calc((100%-1rem)/2)]
+                sm:w-[calc((100%-3*1rem)/4)]
                 lg:w-[calc((100%-5*1rem)/6)]"
             >
               {thumb ? (

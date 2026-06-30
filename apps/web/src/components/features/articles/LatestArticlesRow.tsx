@@ -1,25 +1,49 @@
 ﻿"use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { RiTimeLine, RiUserLine, RiArrowLeftSLine, RiLoader4Line } from "react-icons/ri";
+import { RiArrowLeftSLine } from "react-icons/ri";
 import { useArticles } from "@/hooks/queries/use-articles";
 
 export default function LatestArticlesRow() {
   const t = useTranslations("Articles");
   const locale = useLocale() as "ar" | "ur";
+  const [ready, setReady] = useState(false);
 
   const { data: articlesData, isLoading } = useArticles({ limit: 4 });
   const latest = [...(articlesData?.items ?? [])]
     .sort((a, b) => new Date(b.publishedAt ?? b.createdAt).getTime() - new Date(a.publishedAt ?? a.createdAt).getTime())
     .slice(0, 4);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!isLoading) setReady(true);
+  }, [isLoading]);
+
+  if (!ready) {
     return (
       <section className="py-10">
-        <div className="container flex justify-center">
-          <RiLoader4Line size={28} className="text-[var(--brand)] animate-spin" />
+        <div className="container">
+          {/* title skeleton */}
+          <div className="mb-8 flex justify-center">
+            <div className="h-7 w-48 rounded-lg bg-gray-200 animate-pulse" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex gap-x-5">
+                <div className="hidden sm:block w-40 h-28 lg:w-52 lg:h-32 shrink-0 rounded-xl bg-gray-200 animate-pulse" />
+                <div className="flex flex-col justify-between flex-1 min-w-0 py-1 gap-y-3">
+                  <div className="flex flex-col gap-y-2">
+                    <div className="h-4 w-full rounded bg-gray-200 animate-pulse" />
+                    <div className="h-4 w-3/4 rounded bg-gray-200 animate-pulse" />
+                    <div className="hidden lg:block h-3 w-full rounded bg-gray-100 animate-pulse" />
+                  </div>
+                  <div className="h-3 w-16 rounded bg-gray-200 animate-pulse ms-auto" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     );
@@ -28,53 +52,54 @@ export default function LatestArticlesRow() {
   return (
     <section className="py-10">
       <div className="container">
-        <div className="mb-8">
-          <p className="text-[var(--brand)] text-sm font-semibold mb-1">{t("latest_subtitle")}</p>
-          <h2 className="text-2xl font-extrabold text-[var(--ink)]">{t("latest_title")}</h2>
+        <div className="mb-8 text-center">
+          <h2 className="flex items-center justify-center gap-x-2 text-2xl font-extrabold">
+            <span className="text-[var(--ink)]">{t("latest_title_1")}</span>
+            <span className="text-[var(--brand)]">{t("latest_title_2")}</span>
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {latest.map((article) => {
             const thumb = article.thumbnailUrl?.[locale] ?? article.thumbnailUrl?.ar ?? "";
             return (
-              <Link
-                key={article.id}
-                href={`/articles/${article.slug}`}
-                className="group flex gap-x-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[var(--brand)]/20 transition-all overflow-hidden"
-              >
+              <div key={article.id} className="flex gap-x-5">
                 {/* Thumbnail */}
-                <div className="relative w-32 shrink-0 bg-gray-100">
-                  {thumb && (
-                    <Image
-                      src={thumb}
-                      alt={article.title[locale]}
-                      fill
-                      className="object-cover"
-                      sizes="128px"
-                    />
-                  )}
-                </div>
+                <Link
+                  href={`/articles/${article.slug}`}
+                  className="relative hidden sm:block w-40 h-28 lg:w-52 lg:h-32 shrink-0"
+                >
+                  <Image
+                    src={thumb || "/placeholder.jpg"}
+                    alt={article.title[locale]}
+                    fill
+                    className="object-cover rounded-xl"
+                    sizes="(max-width:1024px) 160px, 208px"
+                  />
+                </Link>
 
                 {/* Content */}
-                <div className="flex flex-col gap-y-2 py-4 pe-4 flex-1 min-w-0">
-<h3 className="font-bold text-[var(--ink)] text-[13px] leading-5 line-clamp-2 group-hover:text-[var(--brand)] transition-colors">
-                    {article.title[locale]}
-                  </h3>
-                  <p className="text-[11px] text-gray-400 line-clamp-2 leading-4 flex-1">
-                    {article.summary[locale]}
-                  </p>
-                  <div className="flex items-center gap-x-3 text-[10px] text-gray-400 mt-auto">
-                    <span className="flex items-center gap-x-1">
-                      <RiUserLine size={11} />
-                      {article.instructor.name[locale]}
-                    </span>
-                    <span className="flex items-center gap-x-1">
-                      <RiTimeLine size={11} />
-                      {article.publishedAt?.slice(0, 10) ?? article.createdAt.slice(0, 10)}
-                    </span>
+                <div className="flex flex-col justify-between flex-1 min-w-0 py-1">
+                  <div className="flex flex-col gap-y-2">
+                    <Link
+                      href={`/articles/${article.slug}`}
+                      className="font-bold text-[var(--ink)] text-sm leading-6 line-clamp-2 hover:text-[var(--brand)] transition-colors"
+                    >
+                      {article.title[locale]}
+                    </Link>
+                    <p className="text-xs text-gray-400 line-clamp-2 leading-5 hidden lg:block">
+                      {article.summary[locale]}
+                    </p>
                   </div>
+                  <Link
+                    href={`/articles/${article.slug}`}
+                    className="flex items-center gap-x-1.5 text-sm text-gray-400 hover:text-[var(--brand)] transition-colors w-fit mt-2 ms-auto"
+                  >
+                    <span className="text-xs">{t("read_btn")}</span>
+                    <RiArrowLeftSLine size={14} />
+                  </Link>
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>

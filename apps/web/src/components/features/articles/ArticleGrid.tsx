@@ -1,34 +1,66 @@
 "use client";
 
-import Image from "next/image";
-import { Link } from "@/i18n/navigation";
+import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { RiUserLine, RiArrowLeftSLine, RiInboxLine, RiLoader4Line } from "react-icons/ri";
+import { RiSearchLine } from "react-icons/ri";
 import { useArticles } from "@/hooks/queries/use-articles";
 import { useArticleFilters } from "@/hooks/useArticleFilters";
+import ArticleCard from "@/components/ui/ArticleCard";
+
+function EmptyState({ t, onClear }: { t: (k: string) => string; onClear: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-20 text-center gap-y-6">
+      <div className="relative flex items-center justify-center size-28">
+        <div className="absolute inset-0 rounded-full bg-[var(--brand)]/8" />
+        <div className="absolute inset-4 rounded-full bg-[var(--brand)]/12" />
+        <RiSearchLine size={44} className="relative text-[var(--brand)]/50" />
+      </div>
+      <div className="flex flex-col gap-y-2 max-w-xs">
+        <p className="text-lg font-extrabold text-[var(--ink)]">{t("no_results")}</p>
+        <p className="text-sm text-gray-400 leading-6">{t("no_results_hint")}</p>
+      </div>
+      <button
+        type="button"
+        onClick={onClear}
+        className="h-10 px-6 rounded-lg bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+      >
+        {t("clear_filters")}
+      </button>
+    </div>
+  );
+}
 
 export default function ArticleGrid() {
   const t = useTranslations("Articles");
   const locale = useLocale() as "ar" | "ur";
-  const { cats, sort, q } = useArticleFilters();
+  const { cats, sort, q, clearAll } = useArticleFilters();
   const { data, isLoading, isError } = useArticles({ limit: 50 });
+  const [ready, setReady] = useState(false);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!isLoading) setReady(true);
+  }, [isLoading]);
+
+  if (!ready) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <RiLoader4Line size={36} className="text-[var(--brand)] animate-spin" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-7 gap-y-12 pb-6 content-start self-start">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="flex flex-col gap-y-3">
+            <div className="w-full aspect-[16/9] rounded-xl bg-gray-200 animate-pulse" />
+            <div className="h-4 w-3/4 rounded bg-gray-200 animate-pulse" />
+            <div className="h-3 w-full rounded bg-gray-100 animate-pulse" />
+            <div className="h-3 w-2/3 rounded bg-gray-100 animate-pulse" />
+            <div className="flex items-center justify-between mt-1">
+              <div className="h-3 w-20 rounded bg-gray-200 animate-pulse" />
+              <div className="h-3 w-12 rounded bg-gray-200 animate-pulse" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
 
-  if (isError) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 text-center gap-y-3">
-        <RiInboxLine size={52} className="text-gray-300" />
-        <p className="font-bold text-[var(--ink)]">{t("no_results")}</p>
-      </div>
-    );
-  }
+  if (isError) return <EmptyState t={t} onClear={clearAll} />;
 
   let articles = data?.items ?? [];
 
@@ -46,63 +78,26 @@ export default function ArticleGrid() {
       : new Date(b.publishedAt ?? b.createdAt).getTime() - new Date(a.publishedAt ?? a.createdAt).getTime(),
   );
 
-  if (articles.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 text-center gap-y-3">
-        <RiInboxLine size={52} className="text-gray-300" />
-        <p className="font-bold text-[var(--ink)]">{t("no_results")}</p>
-        <p className="text-sm text-gray-400">{t("no_results_hint")}</p>
-      </div>
-    );
-  }
+  if (articles.length === 0) return <EmptyState t={t} onClear={clearAll} />;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 content-start self-start">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-7 gap-y-12 pb-6 content-start self-start">
       {articles.map((article) => {
         const thumb = article.thumbnailUrl?.[locale] ?? article.thumbnailUrl?.ar ?? "";
         return (
-          <div
+          <ArticleCard
             key={article.id}
-            className="group flex flex-col bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-[var(--brand)]/20 transition-all duration-300 overflow-hidden"
-          >
-            <div className="relative h-44 overflow-hidden bg-gray-100">
-              {thumb && (
-                <Image
-                  src={thumb}
-                  alt={article.title[locale]}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  sizes="(max-width:640px) 100vw, 50vw"
-                />
-              )}
-            </div>
-
-            <div className="flex flex-col flex-1 p-4 gap-y-2.5">
-              <h3 className="font-bold text-[var(--ink)] text-[14px] leading-6 line-clamp-2 group-hover:text-[var(--brand)] transition-colors">
-                {article.title[locale]}
-              </h3>
-              <p className="text-[12px] text-gray-400 line-clamp-2 leading-5 flex-1">
-                {article.summary[locale]}
-              </p>
-
-              <div className="flex items-center justify-between text-[11px] text-gray-400 pt-2 border-t border-gray-50">
-                <span className="flex items-center gap-x-1.5">
-                  <span className="size-6 rounded-full bg-[var(--brand)]/10 flex items-center justify-center">
-                    <RiUserLine size={12} className="text-[var(--brand)]" />
-                  </span>
-                  <span className="truncate max-w-[110px]">{article.instructor.name[locale]}</span>
-                </span>
-              </div>
-
-              <Link
-                href={`/articles/${article.slug}`}
-                className="flex items-center justify-center gap-x-1.5 h-9 rounded-xl bg-[var(--brand)] text-white text-[12px] font-bold hover:opacity-90 transition-opacity"
-              >
-                <RiArrowLeftSLine size={15} />
-                {t("read_btn")}
-              </Link>
-            </div>
-          </div>
+            article={{
+              id: article.id,
+              title: article.title[locale],
+              excerpt: article.summary[locale],
+              author: article.instructor.name[locale],
+              averageRating: article.averageRating,
+              reviewCount: article.reviewCount,
+              image: thumb || "https://dl.poshtybanman.ir/upload/6%20(1)_68924fcebd53d.jpg",
+              href: `/articles/${article.slug}`,
+            }}
+          />
         );
       })}
     </div>

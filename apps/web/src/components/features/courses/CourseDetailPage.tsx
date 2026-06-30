@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -12,7 +12,8 @@ import {
   RiUserLine, RiTimeLine, RiBookOpenLine,
   RiCalendarLine, RiStarFill,
   RiCheckboxCircleLine, RiWifiLine,
-  RiShareLine, RiShoppingCartLine,
+  RiShareLine, RiTelegramLine, RiInstagramLine, RiTwitterXLine,
+  RiShoppingCartLine,
   RiGiftLine, RiMessageLine,
   RiAddLine, RiSubtractLine,
   RiLoader4Line, RiChat3Line, RiCloseLine,
@@ -31,7 +32,32 @@ import { useMe } from "@/hooks/queries/use-auth";
 import { useMyFavorites, useToggleFavorite } from "@/hooks/queries/use-favorites";
 import { tokenStore } from "@/lib/api-client";
 import { formatMoney, isFree, discountPercent } from "@/lib/format";
+import VideoPlayer from "@/components/ui/VideoPlayer";
 import type { SectionRecord, ReviewRecord } from "@roohbakhsh/shared";
+
+function DiscountCountdown({ expiresAt }: { expiresAt: string }) {
+  const calc = () => {
+    const diff = new Date(expiresAt).getTime() - Date.now();
+    if (diff <= 0) return null;
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    return { d, h, m, s };
+  };
+  const [time, setTime] = useState(calc);
+  useEffect(() => {
+    const id = setInterval(() => setTime(calc()), 1000);
+    return () => clearInterval(id);
+  }, [expiresAt]);
+  if (!time) return null;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return (
+    <span dir="ltr" className="font-mono text-base font-bold text-rose-600 tabular-nums">
+      {pad(time.d)}:{pad(time.h)}:{pad(time.m)}:{pad(time.s)}
+    </span>
+  );
+}
 
 function CourseFavoriteButton({ courseId, t }: { courseId: string; t: (k: string) => string }) {
   const tc = useTranslations("Common");
@@ -54,7 +80,7 @@ function CourseFavoriteButton({ courseId, t }: { courseId: string; t: (k: string
         );
       }}
       disabled={toggleFavorite.isPending}
-      className="size-12 shrink-0 rounded-xl border border-gray-200 flex items-center justify-center text-gray-400 hover:border-rose-300 hover:text-rose-500 transition-colors disabled:opacity-60 cursor-pointer"
+      className="size-12 shrink-0 rounded-lg border border-gray-200 flex items-center justify-center text-gray-400 hover:border-rose-300 hover:text-rose-500 transition-colors disabled:opacity-60 cursor-pointer"
       title={t("toggle_favorite")}
     >
       {isFavorite ? <RiHeartFill size={20} className="text-rose-500" /> : <RiHeartLine size={20} />}
@@ -262,7 +288,7 @@ function ReviewsSection({ courseId, courseSlug, t }: { courseId: string; courseS
   }
 
   return (
-    <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
+    <div className="bg-white p-5 sm:p-7 rounded-lg border border-gray-50">
       <div className="flex items-center justify-between mb-5 md:mb-7">
         <div className="flex items-center gap-x-2.5">
           <span className="text-[var(--brand)] shrink-0"><RiChat3Line size={28} /></span>
@@ -280,9 +306,11 @@ function ReviewsSection({ courseId, courseSlug, t }: { courseId: string; courseS
       </div>
 
       {!isAuthed && (
-        <div className="flex items-center gap-x-2.5 mb-6 px-4 py-3 rounded-lg bg-rose-50 border border-rose-200">
-          <RiLockLine size={18} className="text-rose-500 shrink-0" />
-          <span className="text-sm font-semibold text-rose-500">{t("login_required_toast")}</span>
+        <div className="flex items-center justify-between gap-x-2.5 mb-6 px-4 py-3 rounded-lg bg-rose-50 border border-rose-200">
+          <div className="flex items-center gap-x-2">
+            <RiLockLine size={18} className="text-rose-500 shrink-0" />
+            <span className="text-sm font-semibold text-rose-500">{t("login_required_toast")}</span>
+          </div>
           <Link href="/signup" className="text-sm font-bold text-[var(--brand)] hover:underline shrink-0">
             {t("register_link_text")}
           </Link>
@@ -290,29 +318,38 @@ function ReviewsSection({ courseId, courseSlug, t }: { courseId: string; courseS
       )}
 
       {formOpen && (
-        <div className="flex flex-col gap-y-3 mb-6 p-4 rounded-lg bg-gray-50 border border-gray-100">
-          <div className="flex items-center justify-between">
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
             <StarsInput value={rating} onChange={setRating} />
-            <button type="button" onClick={() => setFormOpen(false)} className="text-gray-400 hover:text-gray-600 cursor-pointer">
-              <RiCloseLine size={20} />
+            <button type="button" onClick={() => setFormOpen(false)} className="size-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
+              <RiCloseLine size={18} />
             </button>
           </div>
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            rows={3}
+            rows={4}
             placeholder={t("review_placeholder")}
-            className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-y"
+            className="w-full rounded-md border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-none mb-3"
           />
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={createReview.isPending}
-            className="self-end flex items-center gap-x-2 h-10 px-5 rounded-lg bg-[var(--brand)] text-white font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-60 cursor-pointer"
-          >
-            {createReview.isPending && <RiLoader4Line size={16} className="animate-spin" />}
-            {t("submit_review")}
-          </button>
+          <div className="flex items-center justify-end gap-x-2.5">
+            <button
+              type="button"
+              onClick={() => setFormOpen(false)}
+              className="h-10 px-5 rounded-md border border-gray-200 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              {t("cancel")}
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={createReview.isPending}
+              className="flex items-center gap-x-2 h-10 px-6 rounded-md bg-[var(--brand)] text-white font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-60 cursor-pointer"
+            >
+              {createReview.isPending && <RiLoader4Line size={15} className="animate-spin" />}
+              {t("submit_review")}
+            </button>
+          </div>
         </div>
       )}
 
@@ -331,50 +368,52 @@ function ReviewsSection({ courseId, courseSlug, t }: { courseId: string; courseS
       ) : reviews.length === 0 ? (
         <p className="text-sm text-gray-400 text-center py-6">{t("no_reviews_yet")}</p>
       ) : (
-        <div className="flex flex-col gap-y-4">
-          {reviews.map((r) => (
-            <div key={r.id} className="rounded-lg border border-gray-100 p-4">
-              <div className="flex items-start gap-x-3">
+        <div className="flex flex-col">
+          {reviews.map((r, idx) => (
+            <div key={r.id} className={`px-4 py-5 bg-white min-h-[150px] ${idx < reviews.length - 1 ? "border-b border-gray-100" : ""}`}>
+              {/* Header row */}
+              <div className="flex items-center gap-x-3">
                 {r.user.avatarUrl ? (
                   <Image
                     src={r.user.avatarUrl}
                     alt={r.user.fullName}
-                    width={40} height={40}
-                    style={{ width: 40, height: 40 }}
+                    width={38} height={38}
+                    style={{ width: 38, height: 38 }}
                     className="rounded-full object-cover shrink-0"
                   />
                 ) : (
-                  <div className="size-10 rounded-full bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
-                    <RiUserLine size={18} className="text-[var(--brand)]" />
+                  <div className={`size-[38px] rounded-full flex items-center justify-center shrink-0 ${r.isStudent ? "bg-[var(--brand)]/10" : "bg-gray-100"}`}>
+                    <RiUserLine size={20} className={r.isStudent ? "text-[var(--brand)]" : "text-gray-400"} />
                   </div>
                 )}
-                <div className="flex flex-col gap-y-1 min-w-0">
-                  <div className="flex items-center gap-x-2.5">
-                    <span className="text-sm font-semibold text-[var(--ink)]">{r.user.fullName}</span>
-                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${r.isStudent ? "bg-[var(--brand)]/10 text-[var(--brand)]" : "bg-gray-100 text-gray-400"}`}>
-                      {r.isStudent ? t("student_label") : t("user_label")}
-                    </span>
-                    <Stars rating={r.rating} size={12} />
-                  </div>
-                  {r.comment && <p className="text-sm text-gray-500 leading-7">{r.comment}</p>}
-                  <div className="flex items-center gap-x-2">
-                    <span className="text-[11px] text-gray-300">{r.createdAt.slice(0, 10)}</span>
-                    {!r.isApproved && (isAdmin || (me && r.userId === me.id)) && (
-                      <span className="text-[11px] text-gray-400">· {t("review_pending_notice")}</span>
-                    )}
-                  </div>
+                <div className="flex flex-col gap-y-2 min-w-0">
+                  <span className="text-sm font-semibold text-[var(--ink)] truncate">{r.user.fullName}</span>
+                  <span className={`self-start text-xs font-bold px-2 py-0.5 rounded-full ${r.isStudent ? "bg-[var(--brand)]/10 text-[var(--brand)]" : "bg-gray-100 text-gray-500"}`}>
+                    {r.isStudent ? t("student_label") : t("user_label")}
+                  </span>
+                </div>
+                <div className="flex items-center gap-x-2 ms-auto shrink-0 self-start">
+                  <Stars rating={r.rating} size={14} />
+                  <span className="text-sm font-medium text-gray-500">{r.createdAt.slice(0, 10)}</span>
+                  {!r.isApproved && (isAdmin || (me && r.userId === me.id)) && (
+                    <span className="text-xs text-gray-400">· {t("review_pending_notice")}</span>
+                  )}
                 </div>
               </div>
+              {/* Comment */}
+              {r.comment && <p className="text-sm font-medium text-gray-600 leading-7 mt-4 ps-[50px]">{r.comment}</p>}
 
               {r.instructorReply && (
-                <div className="flex items-start gap-x-3 mt-4 ms-6 sm:ms-10 ps-3.5 border-s-2 border-[var(--brand)]/30">
-                  <div className="size-8 rounded-full bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
-                    <RiCheckboxCircleLine size={16} className="text-[var(--brand)]" />
+                <div className="flex items-start gap-x-3 mt-6 ms-6 sm:ms-10 ps-3.5 border-s-2 border-sky-300">
+                  <div className="size-8 rounded-full bg-sky-50 flex items-center justify-center shrink-0">
+                    <RiCheckboxCircleLine size={16} className="text-sky-500" />
                   </div>
-                  <div className="flex flex-col gap-y-1 min-w-0">
-                    <span className="text-xs font-semibold text-[var(--brand)]">{t("reply_label")}</span>
+                  <div className="flex flex-col gap-y-2 min-w-0">
+                    <div className="flex items-center gap-x-2">
+                      <span className="text-xs font-semibold text-[var(--ink)]">{t("reply_label")}</span>
+                      {r.repliedAt && <span className="text-xs text-gray-400">{r.repliedAt.slice(0, 10)}</span>}
+                    </div>
                     <p className="text-sm text-gray-500 leading-7">{r.instructorReply}</p>
-                    {r.repliedAt && <span className="text-[11px] text-gray-300">{r.repliedAt.slice(0, 10)}</span>}
                   </div>
                 </div>
               )}
@@ -400,7 +439,7 @@ function CourseDetailSkeleton() {
               <Sk className="h-4 w-28" />
             </div>
 
-            <Sk className="block lg:hidden w-full md:w-2/3 mx-auto aspect-video mb-5 sm:mb-6 rounded-xl" />
+            <Sk className="block lg:hidden w-full md:w-2/3 mx-auto aspect-video mb-5 sm:mb-6 rounded-lg" />
 
             <div className="flex flex-col gap-y-3">
               <Sk className="h-8 sm:h-9 w-4/5 mx-auto lg:mx-0" />
@@ -409,16 +448,16 @@ function CourseDetailSkeleton() {
             </div>
 
             <div className="mt-6 sm:mt-8 lg:mt-auto">
-              <Sk className="h-14 w-full mb-5 rounded-xl" />
+              <Sk className="h-14 w-full mb-5 rounded-lg" />
               <div className="flex items-end justify-between gap-x-4">
-                <Sk className="h-12 w-36 rounded-xl" />
+                <Sk className="h-12 w-36 rounded-lg" />
                 <Sk className="h-8 w-24" />
               </div>
             </div>
           </div>
 
           <div className="hidden lg:block order-1 lg:order-2">
-            <Sk className="w-full aspect-video rounded-xl" />
+            <Sk className="w-full aspect-video rounded-lg" />
           </div>
         </section>
       </div>
@@ -429,7 +468,7 @@ function CourseDetailSkeleton() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="flex flex-col md:flex-row items-center gap-x-3 gap-y-1.5 bg-white py-3.5 md:px-4 rounded-xl border border-gray-50">
+                <div key={i} className="flex flex-col md:flex-row items-center gap-x-3 gap-y-1.5 bg-white py-5 md:px-4 rounded-lg border border-gray-50">
                   <Sk className="size-7 rounded-full shrink-0" />
                   <div className="flex flex-col items-center md:items-start gap-y-1.5 w-full">
                     <Sk className="h-4 w-12" />
@@ -439,7 +478,7 @@ function CourseDetailSkeleton() {
               ))}
             </div>
 
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
+            <div className="bg-white p-5 sm:p-7 rounded-lg border border-gray-50">
               <Sk className="h-5 w-40 mb-6" />
               <div className="flex flex-col gap-y-3">
                 <Sk className="h-3.5 w-full" />
@@ -449,7 +488,7 @@ function CourseDetailSkeleton() {
               </div>
             </div>
 
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
+            <div className="bg-white p-5 sm:p-7 rounded-lg border border-gray-50">
               <Sk className="h-5 w-40 mb-6" />
               <div className="space-y-4 sm:space-y-5">
                 {Array.from({ length: 4 }).map((_, i) => (
@@ -458,11 +497,11 @@ function CourseDetailSkeleton() {
               </div>
             </div>
 
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
+            <div className="bg-white p-5 sm:p-7 rounded-lg border border-gray-50">
               <Sk className="h-5 w-40 mb-6" />
               <Sk className="h-4 w-3/4 mb-5" />
               <div className="flex items-center gap-x-3">
-                <Sk className="size-12 sm:size-14 rounded-xl shrink-0" />
+                <Sk className="size-12 sm:size-14 rounded-lg shrink-0" />
                 <div className="flex flex-col gap-y-1.5 w-1/2">
                   <Sk className="h-4 w-full" />
                   <Sk className="h-3 w-2/3" />
@@ -470,7 +509,7 @@ function CourseDetailSkeleton() {
               </div>
             </div>
 
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
+            <div className="bg-white p-5 sm:p-7 rounded-lg border border-gray-50">
               <Sk className="h-5 w-40 mb-6" />
               <div className="flex flex-col gap-y-4">
                 {Array.from({ length: 2 }).map((_, i) => (
@@ -487,7 +526,7 @@ function CourseDetailSkeleton() {
           </div>
 
           <aside className="lg:w-[340px] xl:w-[360px] flex flex-col gap-y-5 shrink-0">
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
+            <div className="bg-white p-5 sm:p-7 rounded-lg border border-gray-50">
               <div className="flex items-center justify-between mb-4">
                 <Sk className="h-4 w-20" />
                 <Sk className="h-4 w-10" />
@@ -495,13 +534,13 @@ function CourseDetailSkeleton() {
               <Sk className="h-2 w-full rounded-full" />
             </div>
 
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
+            <div className="bg-white p-5 sm:p-7 rounded-lg border border-gray-50">
               <Sk className="size-20 rounded-full mx-auto" />
               <Sk className="h-4 w-2/3 mx-auto mt-4" />
-              <Sk className="h-10 w-full mt-6 rounded-xl" />
+              <Sk className="h-10 w-full mt-6 rounded-lg" />
             </div>
 
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
+            <div className="bg-white p-5 sm:p-7 rounded-lg border border-gray-50">
               <div className="flex items-center justify-between">
                 <Sk className="h-4 w-16" />
                 <div className="flex gap-x-2">
@@ -603,7 +642,6 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
   const t = useTranslations("CourseDetail");
   const locale = useLocale() as "ar" | "ur";
   const [descExpanded, setDescExpanded] = useState(false);
-  const [playingIntro, setPlayingIntro] = useState(false);
 
   const { data: course, isLoading: loadingCourse } = useCourse(courseSlug);
   const { data: sections, isLoading: loadingSections } = useCourseSections(courseSlug);
@@ -638,7 +676,7 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
   return (
     <div className="bg-[var(--bg)] min-h-screen">
 
-      <div className="container pt-8 sm:pt-10">
+      <div className="container pt-12 sm:pt-16">
         <section className="lg:grid grid-cols-2 gap-x-8 xl:gap-x-14 mb-8 sm:mb-12 lg:mb-16">
 
           <div className="flex flex-col cursor-default order-2 lg:order-1">
@@ -651,31 +689,18 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
             </nav>
 
             {(thumb || introVideo) && (
-              <div className="relative block lg:hidden w-full md:w-2/3 mx-auto rounded-xl overflow-hidden aspect-video mb-5 sm:mb-6 bg-gray-900">
-                {playingIntro && introVideo ? (
-                  <video src={introVideo} controls autoPlay className="absolute inset-0 w-full h-full object-cover" />
-                ) : (
-                  <>
-                    {thumb && (
-                      <Image src={thumb} alt={course.title[locale]} fill className="object-cover" sizes="100vw" />
-                    )}
-                    {introVideo && (
-                      <button
-                        type="button"
-                        onClick={() => setPlayingIntro(true)}
-                        className="absolute inset-0 flex items-center justify-center bg-black/10 hover:bg-black/20 transition-colors cursor-pointer"
-                      >
-                        <span className="size-14 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition-colors">
-                          <RiPlayCircleLine size={32} className="text-white" />
-                        </span>
-                      </button>
-                    )}
-                  </>
-                )}
+              <div className="block lg:hidden w-full md:w-2/3 mx-auto rounded-lg overflow-hidden mb-5 sm:mb-6 bg-gray-900">
+                {introVideo ? (
+                  <VideoPlayer url={introVideo} poster={thumb || undefined} />
+                ) : thumb ? (
+                  <div className="relative aspect-video">
+                    <Image src={thumb} alt={course.title[locale]} fill className="object-cover" sizes="100vw" />
+                  </div>
+                ) : null}
               </div>
             )}
 
-            <div className="flex flex-col gap-y-3 md:text-center lg:text-start">
+            <div className="flex flex-col gap-y-5 md:text-center lg:text-start">
               <h1 className="text-2xl md:text-3xl xl:text-4xl font-extrabold text-[var(--ink)]">{course.title[locale]}</h1>
               <p className="text-sm md:text-base text-gray-500 leading-7 line-clamp-3">
                 {course.description[locale].split("\n")[0]}
@@ -683,94 +708,74 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
             </div>
 
             <div className="mt-6 sm:mt-8 lg:mt-auto">
-              {discPct > 0 && (
-                <div className="flex items-center justify-center gap-x-1.5 py-2 mb-2 text-sm md:text-base font-bold text-rose-500">
-                  <RiGiftLine size={16} />
-                  {discPct}٪ {t("discount_badge")}
+              {/* discount banner + countdown */}
+              {discPct > 0 && course.discount?.isActive && (
+                <div className="mb-4 flex items-center justify-between gap-x-3 bg-white rounded-lg px-4 py-3">
+                  <div className="flex items-center gap-x-2">
+                    <RiGiftLine size={22} className="text-rose-500 shrink-0" />
+                    <span className="text-base font-bold text-rose-600">{discPct}٪ {t("discount_badge")}</span>
+                  </div>
+                  {course.discount.expiresAt && (
+                    <DiscountCountdown expiresAt={course.discount.expiresAt} />
+                  )}
                 </div>
               )}
-              <div className="flex gap-x-3 mb-5">
-                <div className="flex-1 flex items-center justify-center gap-x-1.5 py-3 px-3 md:px-6 bg-white rounded-xl border border-gray-100 text-sm md:text-base text-gray-500 text-center">
-                  <span>{hoursTotal} {t("hours")}</span>
-                </div>
-                <div className="flex-1 flex items-center justify-center gap-x-1.5 py-3 px-3 md:px-6 bg-white rounded-xl border border-gray-100 text-sm md:text-base text-gray-500 text-center">
-                  <span>{totalLessons} {t("lessons")}</span>
-                </div>
-              </div>
 
-              <div className="flex items-end justify-between gap-x-4">
-                <div className="flex items-center gap-x-2.5">
-                  <button
-                    onClick={() => addToCart(course.id)}
-                    disabled={addingToCart}
-                    className="flex items-center justify-center gap-x-2 h-12 px-6 rounded-xl bg-[var(--brand)] text-white font-bold text-sm md:text-base hover:opacity-90 active:scale-[0.98] transition-all shrink-0 disabled:opacity-60"
-                  >
-                    {addingToCart ? <RiLoader4Line size={18} className="animate-spin" /> : <RiShoppingCartLine size={18} />}
-                    {t("add_to_cart")}
-                  </button>
-                  <CourseFavoriteButton courseId={course.id} t={t} />
-                </div>
+              {/* price + actions */}
+              <div className="flex items-center justify-between gap-x-4">
+                {/* price */}
                 {free ? (
                   <span className="text-2xl font-extrabold text-[var(--brand)]">
                     {locale === "ar" ? "مجاني" : "مفت"}
                   </span>
                 ) : (
-                  <div className="flex items-end flex-col sm:flex-row gap-x-2.5 gap-y-0.5">
-                    {course.price && (
-                      <span className="text-base md:text-2xl text-gray-300 line-through">
-                        {formatMoney(course.price, locale)}
-                      </span>
+                  <div className="flex flex-col gap-y-0.5">
+                    {course.price && discPct > 0 && (
+                      <span className="text-sm text-gray-400 line-through">{formatMoney(course.price, locale)}</span>
                     )}
-                    <span className="text-lg md:text-2xl font-extrabold text-[var(--ink)]">
+                    <span className="text-2xl font-extrabold text-[var(--ink)]">
                       {formatMoney(course.effectivePrice, locale)}
                     </span>
                   </div>
                 )}
+                {/* buttons */}
+                <div className="flex items-center gap-x-2">
+                  <CourseFavoriteButton courseId={course.id} t={t} />
+                  <button
+                    onClick={() => addToCart(course.id)}
+                    disabled={addingToCart}
+                    className="flex items-center justify-center gap-x-2 h-11 px-5 rounded-lg bg-[var(--brand)] text-white font-bold text-sm hover:opacity-90 active:scale-[0.98] transition-all shrink-0 disabled:opacity-60"
+                  >
+                    {addingToCart ? <RiLoader4Line size={18} className="animate-spin" /> : <RiShoppingCartLine size={18} />}
+                    {t("add_to_cart")}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
           <div className="hidden lg:block order-1 lg:order-2">
-            <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-gray-900">
-              {playingIntro && introVideo ? (
-                <video src={introVideo} controls autoPlay className="absolute inset-0 w-full h-full object-cover" />
-              ) : (
-                <>
-                  {thumb && (
-                    <Image src={thumb} alt={course.title[locale]} fill className="object-cover opacity-90" sizes="50vw" priority />
-                  )}
-                  {introVideo ? (
-                    <button
-                      type="button"
-                      onClick={() => setPlayingIntro(true)}
-                      className="absolute inset-0 flex items-center justify-center cursor-pointer"
-                    >
-                      <span className="size-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition-colors">
-                        <RiPlayCircleLine size={36} className="text-white" />
-                      </span>
-                    </button>
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="size-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
-                        <RiPlayCircleLine size={36} className="text-white" />
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
+            <div className="rounded-lg overflow-hidden bg-gray-900">
+              {introVideo ? (
+                <VideoPlayer url={introVideo} poster={thumb || undefined} />
+              ) : thumb ? (
+                <div className="relative aspect-video">
+                  <Image src={thumb} alt={course.title[locale]} fill className="object-cover opacity-90" sizes="50vw" priority />
+                </div>
+              ) : null}
             </div>
           </div>
         </section>
       </div>
 
       <div className="container">
-        <div className="flex flex-col lg:flex-row gap-7">
+        <div className="flex flex-col lg:flex-row lg:items-start gap-7">
 
           <div className="flex flex-col gap-y-6 md:gap-y-8 lg:grow min-w-0">
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
               {stats.map(({ icon, val, label }, i) => (
-                <div key={i} className="flex flex-col md:flex-row items-center gap-x-3 gap-y-1.5 bg-white py-3.5 md:px-4 rounded-xl cursor-default border border-gray-50">
+                <div key={i} className="flex flex-col md:flex-row items-center gap-x-3 gap-y-1.5 bg-white py-5 md:px-4 rounded-lg cursor-default border border-gray-50">
                   <span className="shrink-0">{icon}</span>
                   <div className="flex flex-col items-center md:items-start text-center md:text-start gap-y-0.5">
                     <span className="font-bold text-sm text-[var(--ink)] leading-tight">{val}</span>
@@ -780,28 +785,28 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
               ))}
             </div>
 
-            <div className="relative bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
+            <div className="relative bg-white p-5 sm:p-7 rounded-lg border border-gray-50">
               <SectionHead icon={<RiBookOpenLine size={28} />} title={t("section_description")} />
-              <div className={`text-sm md:text-base text-gray-600 leading-8 whitespace-pre-line overflow-hidden transition-all ${!descExpanded ? "max-h-56" : ""}`}>
+              <div className={`text-sm md:text-base text-gray-600 leading-8 whitespace-pre-line overflow-hidden transition-all ${!descExpanded ? "max-h-14" : ""}`}>
                 {course.description[locale]}
               </div>
               {!descExpanded && (
                 <div className="absolute bottom-0 start-0 end-0 h-32 bg-gradient-to-t from-white from-20% to-white/0 rounded-b-xl flex items-end justify-center pb-2">
-                  <button onClick={() => setDescExpanded(true)} className="size-10 flex items-center justify-center shadow-md bg-white border border-gray-100 rounded-xl hover:border-[var(--brand)] transition-colors">
+                  <button onClick={() => setDescExpanded(true)} className="size-10 flex items-center justify-center shadow-md bg-white border border-gray-100 rounded-lg hover:border-[var(--brand)] transition-colors">
                     <RiAddLine size={16} />
                   </button>
                 </div>
               )}
               {descExpanded && (
                 <div className="flex justify-center mt-4">
-                  <button onClick={() => setDescExpanded(false)} className="size-10 flex items-center justify-center shadow-md bg-white border border-gray-100 rounded-xl hover:border-[var(--brand)] transition-colors">
+                  <button onClick={() => setDescExpanded(false)} className="size-10 flex items-center justify-center shadow-md bg-white border border-gray-100 rounded-lg hover:border-[var(--brand)] transition-colors">
                     <RiSubtractLine size={16} />
                   </button>
                 </div>
               )}
             </div>
 
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
+            <div className="bg-white p-5 sm:p-7 rounded-lg border border-gray-50">
               <SectionHead icon={<RiBookOpenLine size={28} />} title={t("section_curriculum")} />
               {loadingSections ? (
                 <div className="space-y-4 sm:space-y-5">
@@ -818,11 +823,11 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
               )}
             </div>
 
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
+            <div className="bg-white p-5 sm:p-7 rounded-lg border border-gray-50">
               <SectionHead icon={<RiMessageLine size={28} />} title={t("section_support")} />
               <p className="text-sm sm:text-base text-gray-600 leading-7 mb-1">{t("support_body")}</p>
               <div className="flex items-center gap-x-3 mt-5">
-                <div className="size-12 sm:size-14 rounded-xl bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
+                <div className="size-12 sm:size-14 rounded-lg bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
                   <RiMessageLine size={24} className="text-[var(--brand)]" />
                 </div>
                 <div className="flex flex-col">
@@ -838,7 +843,7 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
 
           <aside className="lg:w-[340px] xl:w-[360px] flex flex-col gap-y-5 shrink-0 lg:sticky lg:top-24 lg:self-start">
 
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
+            <div className="bg-white p-5 sm:p-7 rounded-lg border border-gray-50">
               <div className="flex items-center justify-between text-sm md:text-base mb-4">
                 <span className="text-[var(--ink)] font-semibold">{t("progress_label")}</span>
                 <span className="text-[var(--brand)] font-bold">{progress?.progressPercent ?? 0}٪</span>
@@ -851,7 +856,7 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
               </div>
             </div>
 
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
+            <div className="bg-white p-5 sm:p-7 rounded-lg border border-gray-50">
               {course.instructor.avatarUrl ? (
                 <Image
                   src={course.instructor.avatarUrl}
@@ -870,26 +875,40 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
               </div>
               <Link
                 href={`/teacher/${course.instructor.slug}`}
-                className="flex items-center justify-center gap-x-2 w-full mt-6 h-10 rounded-xl border border-[var(--brand)]/30 text-[var(--brand)] text-sm font-semibold hover:bg-[var(--brand)]/5 transition-colors"
+                className="flex items-center justify-center gap-x-2 w-full mt-6 h-10 rounded-lg border border-[var(--brand)]/30 text-[var(--brand)] text-sm font-semibold hover:bg-[var(--brand)]/5 transition-colors"
               >
-                <RiArrowLeftSLine size={16} />
                 {locale === "ar" ? "عرض ملف المدرس" : "استاد کا پروفائل"}
+                <RiArrowLeftSLine size={16} />
               </Link>
             </div>
 
-            <div className="bg-white p-5 sm:p-7 rounded-xl border border-gray-50">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-x-2.5">
-                  <RiShareLine size={20} className="text-[var(--ink)]" />
-                  <span className="text-sm md:text-base font-semibold text-[var(--ink)]">{t("share")}</span>
-                </div>
-                <div className="flex gap-x-2">
-                  {["TG", "IG", "X"].map((s) => (
-                    <button key={s} className="size-9 flex items-center justify-center bg-gray-400 hover:bg-[var(--brand)] rounded-lg transition-colors text-white text-xs font-bold">
-                      {s}
-                    </button>
-                  ))}
-                </div>
+            <div className="bg-white p-4 rounded-lg border border-gray-100">
+              <div className="flex items-center gap-x-2 mb-3">
+                <RiShareLine size={16} className="text-[var(--ink)]" />
+                <span className="text-sm font-semibold text-[var(--ink)]">{t("share")}</span>
+              </div>
+              <div className="flex gap-x-2">
+                <a
+                  href={`https://t.me/share/url?url=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex-1 h-9 flex items-center justify-center bg-gray-100 hover:bg-[#0088CC] hover:text-white rounded-md transition-colors text-gray-500"
+                >
+                  <RiTelegramLine size={18} />
+                </a>
+                <button
+                  type="button"
+                  onClick={() => { navigator.clipboard.writeText(typeof window !== "undefined" ? window.location.href : ""); toast.success(t("link_copied")); }}
+                  className="flex-1 h-9 flex items-center justify-center bg-gray-100 hover:bg-[#E1306C] hover:text-white rounded-md transition-colors text-gray-500 cursor-pointer"
+                >
+                  <RiInstagramLine size={18} />
+                </button>
+                <a
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex-1 h-9 flex items-center justify-center bg-gray-100 hover:bg-black hover:text-white rounded-md transition-colors text-gray-500"
+                >
+                  <RiTwitterXLine size={18} />
+                </a>
               </div>
             </div>
 

@@ -45,7 +45,7 @@ export default function TeacherPage({ slug }: { slug: string }) {
     <div className="min-h-screen bg-[var(--bg)]">
       <div className="container py-10">
 
-        <nav className="flex items-center gap-x-2 text-sm text-gray-400 mb-8 overflow-x-hidden">
+        <nav className="flex items-center gap-x-2 text-sm text-gray-400 mb-14 overflow-x-hidden">
           <Link href="/" className="hover:text-[var(--brand)] transition-colors whitespace-nowrap">{ui.home}</Link>
           <RiArrowRightSLine size={14} className="rotate-180 text-gray-300 shrink-0" />
           <Link href="/courses" className="hover:text-[var(--brand)] transition-colors whitespace-nowrap">{ui.courses}</Link>
@@ -56,8 +56,8 @@ export default function TeacherPage({ slug }: { slug: string }) {
         <div className="flex flex-col lg:flex-row gap-8 items-start">
 
           <aside className="lg:w-[300px] shrink-0 sticky top-24 self-start">
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="bg-gradient-to-b from-[#edfaf5] to-white px-6 pt-8 pb-6 flex flex-col items-center text-center">
+            <div className="bg-white rounded-lg overflow-hidden">
+              <div className="px-6 pt-8 flex flex-col items-center text-center">
                 <div className="relative mb-4">
                   {instructor.avatarUrl ? (
                     <Image
@@ -65,35 +65,19 @@ export default function TeacherPage({ slug }: { slug: string }) {
                       alt={instructor.name[locale]}
                       width={100}
                       height={100}
-                      className="rounded-full object-cover border-4 border-white shadow-lg"
+                      className="rounded-full object-cover border-4 border-white"
                       style={{ width: 100, height: 100 }}
                     />
                   ) : (
-                    <div className="size-[100px] rounded-full bg-[var(--brand)]/10 flex items-center justify-center border-4 border-white shadow-lg">
+                    <div className="size-[100px] rounded-full bg-[var(--brand)]/10 flex items-center justify-center border-4 border-white">
                       <RiUserStarLine size={40} className="text-[var(--brand)]" />
                     </div>
                   )}
-                  <span className="absolute -bottom-1 -end-1 size-7 rounded-full bg-[var(--brand)] flex items-center justify-center shadow">
-                    <RiUserStarLine size={14} className="text-white" />
-                  </span>
                 </div>
                 <h1 className="font-extrabold text-[var(--ink)] text-lg leading-snug">{instructor.name[locale]}</h1>
               </div>
-              <div className="grid grid-cols-3 divide-x divide-x-reverse divide-gray-100 border-t border-gray-100">
-                {[
-                  { icon: <RiGroupLine size={18} className="text-[var(--brand)]" />, val: instructorCourses.length.toString(), label: ui.course },
-                  { icon: <RiBookOpenLine size={18} className="text-[var(--brand)]" />, val: "—", label: ui.student },
-                  { icon: <RiStarFill size={18} className="text-[var(--cta)]" />, val: "—", label: ui.rating },
-                ].map((s, i) => (
-                  <div key={i} className="flex flex-col items-center gap-y-1 py-4 text-center">
-                    {s.icon}
-                    <span className="font-bold text-[var(--ink)] text-sm">{s.val}</span>
-                    <span className="text-[11px] text-gray-400">{s.label}</span>
-                  </div>
-                ))}
-              </div>
               {instructor.bio && (
-                <div className="px-5 py-5 border-t border-gray-100">
+                <div className="px-5 pt-2 pb-8">
                   <p className="text-sm text-gray-500 leading-7">{instructor.bio[locale]}</p>
                 </div>
               )}
@@ -101,10 +85,6 @@ export default function TeacherPage({ slug }: { slug: string }) {
           </aside>
 
           <main className="flex-1 min-w-0">
-            <h2 className="text-lg font-bold text-[var(--ink)] mb-5 flex items-center gap-x-2">
-              <RiBookOpenLine size={20} className="text-[var(--brand)]" />
-              {ui.teacherCourses}
-            </h2>
             {loadingCourses ? (
               <div className="flex items-center justify-center py-20">
                 <RiLoader4Line size={32} className="text-[var(--brand)] animate-spin" />

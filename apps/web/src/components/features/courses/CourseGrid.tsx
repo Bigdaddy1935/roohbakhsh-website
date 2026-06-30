@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { RiInboxLine, RiLoader4Line } from "react-icons/ri";
+import { RiInboxLine } from "react-icons/ri";
 import { useCourses } from "@/hooks/queries/use-courses";
 import { useCourseFilters } from "@/hooks/useCourseFilters";
 import { formatMoney, isFree, discountPercent } from "@/lib/format";
@@ -34,13 +35,31 @@ function courseToCard(course: CourseRecord, locale: "ar" | "ur", currency: strin
 export default function CourseGrid() {
   const t = useTranslations("Courses");
   const locale = useLocale() as "ar" | "ur";
-  const { cats, sort, q } = useCourseFilters();
+  const { cats, sort, q, clearAll } = useCourseFilters();
   const { data, isLoading, isError } = useCourses({ limit: 50 });
+  const [ready, setReady] = useState(false);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!isLoading) setReady(true);
+  }, [isLoading]);
+
+  if (!ready) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <RiLoader4Line size={36} className="text-[var(--brand)] animate-spin" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 content-start self-start">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="flex flex-col gap-y-3 bg-white rounded-xl overflow-hidden border border-gray-100">
+            <div className="w-full aspect-video bg-gray-200 animate-pulse" />
+            <div className="p-4 flex flex-col gap-y-3">
+              <div className="h-4 w-3/4 rounded bg-gray-200 animate-pulse" />
+              <div className="h-3 w-full rounded bg-gray-100 animate-pulse" />
+              <div className="h-3 w-2/3 rounded bg-gray-100 animate-pulse" />
+              <div className="flex items-center justify-between mt-2">
+                <div className="h-4 w-16 rounded bg-gray-200 animate-pulse" />
+                <div className="h-3 w-20 rounded bg-gray-100 animate-pulse" />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
@@ -76,10 +95,23 @@ export default function CourseGrid() {
 
   if (courses.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-center gap-y-3">
-        <RiInboxLine size={52} className="text-gray-300" />
-        <p className="font-bold text-[var(--ink)]">{t("no_results")}</p>
-        <p className="text-sm text-gray-400">{t("no_results_hint")}</p>
+      <div className="flex flex-col items-center justify-center py-20 text-center gap-y-6">
+        <div className="relative flex items-center justify-center size-28">
+          <div className="absolute inset-0 rounded-full bg-[var(--brand)]/8" />
+          <div className="absolute inset-4 rounded-full bg-[var(--brand)]/12" />
+          <RiInboxLine size={44} className="relative text-[var(--brand)]/50" />
+        </div>
+        <div className="flex flex-col gap-y-2 max-w-xs">
+          <p className="text-lg font-extrabold text-[var(--ink)]">{t("no_results")}</p>
+          <p className="text-sm text-gray-400 leading-6">{t("no_results_hint")}</p>
+        </div>
+        <button
+          type="button"
+          onClick={clearAll}
+          className="h-10 px-6 rounded-lg bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+        >
+          {t("clear_filters")}
+        </button>
       </div>
     );
   }
