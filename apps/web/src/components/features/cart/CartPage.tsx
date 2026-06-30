@@ -14,6 +14,7 @@ import { useInitiatePayment } from "@/hooks/queries/use-payments";
 import { useValidateCoupon } from "@/hooks/queries/use-coupons";
 import { formatMoney } from "@/lib/format";
 import type { ApiError } from "@roohbakhsh/shared";
+import { CartPageSkeleton } from "@/components/dashboard/DashboardSkeleton";
 
 function CartContent() {
   const t = useTranslations("Cart");
@@ -35,7 +36,15 @@ function CartContent() {
     createOrder({ couponCode: couponData?.couponId ? couponCode : undefined }, {
       onSuccess: (order) => {
         if (order.total.amountMinor === 0) {
-          initiatePayment(order.id);
+          initiatePayment(order.id, {
+            onSuccess: (data) => {
+              if (data.gatewayUrl) {
+                window.location.href = data.gatewayUrl;
+              } else {
+                router.push("/dashboard/my-courses");
+              }
+            },
+          });
         } else {
           router.push(`/orders/${order.id}/payment`);
         }
@@ -51,16 +60,12 @@ function CartContent() {
   const total = couponData ? couponData.finalTotal : cart?.total;
   const discount = couponData ? couponData.discountAmount : null;
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <RiLoader4Line size={36} className="text-[var(--brand)] animate-spin" />
-      </div>
-    );
+  if (isLoading || (!cart && items.length === 0)) {
+    return <CartPageSkeleton />;
   }
 
   return (
-    <div className="bg-[var(--bg)] min-h-[800px]">
+    <div className="bg-[var(--bg)] min-h-[80vh]">
       <div className="container py-16">
 
         {items.length === 0 ? (
@@ -231,7 +236,7 @@ function CartContent() {
 
 export default function CartPage() {
   return (
-    <Suspense>
+    <Suspense fallback={<CartPageSkeleton />}>
       <CartContent />
     </Suspense>
   );

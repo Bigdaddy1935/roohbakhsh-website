@@ -11,6 +11,7 @@ import { useMyOrder } from "@/hooks/queries/use-orders";
 import { useDestinationAccount, useUploadReceipt, useSubmitCardToCard } from "@/hooks/queries/use-payments";
 import { formatMoney } from "@/lib/format";
 import type { ApiError } from "@roohbakhsh/shared";
+import { OrderPaymentPageSkeleton } from "@/components/dashboard/DashboardSkeleton";
 
 type SubmitMode = "receipt" | "text";
 
@@ -66,12 +67,8 @@ export default function OrderPaymentPage({ orderId }: { orderId: string }) {
     });
   }
 
-  if (orderLoading || destLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <RiLoader4Line size={36} className="text-[var(--brand)] animate-spin" />
-      </div>
-    );
+  if (orderLoading || destLoading || (!order && !orderError)) {
+    return <OrderPaymentPageSkeleton />;
   }
 
   if (orderError || !order) {
@@ -84,7 +81,7 @@ export default function OrderPaymentPage({ orderId }: { orderId: string }) {
   }
 
   return (
-    <div className="bg-[var(--bg)] min-h-screen">
+    <div className="bg-[var(--bg)] min-h-[70vh]">
       <div className="container py-8 max-w-5xl">
 
         <div className="flex items-center gap-x-2 text-sm text-gray-400 mb-6">
@@ -122,7 +119,7 @@ export default function OrderPaymentPage({ orderId }: { orderId: string }) {
             </div>
 
             {/* Two boxes side by side on desktop */}
-            <div className="flex flex-col lg:flex-row-reverse gap-5 items-start">
+            <div className="flex flex-col lg:flex-row gap-5 items-start">
 
               {/* Destination account — right on desktop (start in RTL = flex-row-reverse end) */}
               <div className="bg-white rounded-md p-5 flex flex-col gap-y-3 w-full lg:w-72 lg:shrink-0">
