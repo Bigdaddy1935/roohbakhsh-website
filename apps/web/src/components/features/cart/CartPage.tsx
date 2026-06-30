@@ -90,44 +90,46 @@ function CartContent() {
             <div className="flex flex-col gap-y-4">
               <h1 className="text-lg font-extrabold text-[var(--ink)]">{t("title")}</h1>
 
-              {items.map((item) => {
-                const thumb = item.thumbnailUrl?.[locale] ?? item.thumbnailUrl?.ar ?? "";
-                return (
-                  <div key={item.courseId}
-                    className="bg-white rounded-lg border border-gray-100 h-[101px] flex flex-row items-center justify-between px-4 overflow-hidden">
+              <div className="bg-white rounded-lg border border-gray-100 overflow-hidden divide-y divide-gray-100">
+                {items.map((item) => {
+                  const thumb = item.thumbnailUrl?.[locale] ?? item.thumbnailUrl?.ar ?? "";
+                  return (
+                    <div key={item.courseId}
+                      className="h-[101px] flex flex-row items-center justify-between px-4 overflow-hidden">
 
-                    {/* thumbnail + title + mobile trash */}
-                    <div className="flex items-center gap-x-3 sm:gap-x-5 min-w-0 flex-1">
-                      <div className="relative h-[101px] aspect-video shrink-0 overflow-hidden bg-gray-100">
-                        {thumb && (
-                          <Image src={thumb} alt={item.title[locale]} fill className="object-cover" sizes="180px" />
-                        )}
+                      {/* thumbnail + title + mobile trash */}
+                      <div className="flex items-center gap-x-3 sm:gap-x-5 min-w-0 flex-1">
+                        <div className="relative h-[101px] aspect-video shrink-0 overflow-hidden bg-gray-100">
+                          {thumb && (
+                            <Image src={thumb} alt={item.title[locale]} fill className="object-cover" sizes="180px" />
+                          )}
+                        </div>
+                        <h3 className="flex-1 text-sm sm:text-[15px] font-semibold text-[var(--ink)] line-clamp-2 leading-6 hover:text-[var(--brand)] transition-colors cursor-default">
+                          {item.title[locale]}
+                        </h3>
+                        <button onClick={() => removeItem(item.courseId)} disabled={removing}
+                          className="sm:hidden shrink-0 text-gray-300 hover:text-red-500 transition-colors disabled:opacity-50"
+                          aria-label={t("remove")}>
+                          <RiDeleteBin6Line size={16} />
+                        </button>
                       </div>
-                      <h3 className="flex-1 text-sm sm:text-[15px] font-semibold text-[var(--ink)] line-clamp-2 leading-6 hover:text-[var(--brand)] transition-colors cursor-default">
-                        {item.title[locale]}
-                      </h3>
-                      <button onClick={() => removeItem(item.courseId)} disabled={removing}
-                        className="sm:hidden shrink-0 text-gray-300 hover:text-red-500 transition-colors disabled:opacity-50"
-                        aria-label={t("remove")}>
-                        <RiDeleteBin6Line size={16} />
-                      </button>
-                    </div>
 
-                    {/* price + desktop trash */}
-                    <div className="flex items-center gap-x-5 shrink-0 ms-4">
-                      <span className="text-sm sm:text-base font-extrabold text-[var(--brand)] whitespace-nowrap">
-                        {formatMoney(item.effectivePrice, locale)}
-                      </span>
-                      <button onClick={() => removeItem(item.courseId)} disabled={removing}
-                        className="hidden sm:flex text-gray-300 hover:text-red-500 transition-colors disabled:opacity-50"
-                        aria-label={t("remove")}>
-                        <RiDeleteBin6Line size={18} />
-                      </button>
-                    </div>
+                      {/* price + desktop trash */}
+                      <div className="flex items-center gap-x-5 shrink-0 ms-4">
+                        <span className="text-sm sm:text-base font-extrabold text-[var(--brand)] whitespace-nowrap">
+                          {formatMoney(item.effectivePrice, locale)}
+                        </span>
+                        <button onClick={() => removeItem(item.courseId)} disabled={removing}
+                          className="hidden sm:flex text-gray-300 hover:text-red-500 transition-colors disabled:opacity-50"
+                          aria-label={t("remove")}>
+                          <RiDeleteBin6Line size={18} />
+                        </button>
+                      </div>
 
-                  </div>
-                );
-              })}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="flex flex-col gap-y-4 sticky top-24 self-start">
