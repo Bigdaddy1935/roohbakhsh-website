@@ -196,6 +196,113 @@ export function TransactionsPageSkeleton() {
   );
 }
 
+export function OrderPaymentPageSkeleton() {
+  return (
+    <div className="bg-[var(--bg)] min-h-screen">
+      <div className="container py-8 max-w-5xl">
+        {/* breadcrumb */}
+        <div className="flex items-center gap-x-2 mb-6">
+          <Sk className="h-3 w-16" />
+          <Sk className="h-3 w-3 rounded-full" />
+          <Sk className="h-3 w-12" />
+          <Sk className="h-3 w-3 rounded-full" />
+          <Sk className="h-3 w-20" />
+        </div>
+        {/* title */}
+        <Sk className="h-6 w-44 mb-6" />
+        {/* order summary bar */}
+        <div className="bg-white rounded-md p-5 flex justify-between items-center mb-5">
+          <Sk className="h-4 w-24" />
+          <Sk className="h-5 w-32" />
+        </div>
+        {/* two columns */}
+        <div className="flex flex-col lg:flex-row gap-5 items-start">
+          {/* destination account — right on desktop (first in DOM) */}
+          <div className="bg-white rounded-md p-5 w-full lg:w-72 lg:shrink-0 flex flex-col gap-y-4">
+            <Sk className="h-4 w-36" />
+            <div className="flex flex-col gap-y-3">
+              <Sk className="h-3 w-20" />
+              <Sk className="h-4 w-40" />
+              <Sk className="h-3 w-24" />
+              <Sk className="h-4 w-28" />
+              <Sk className="h-3 w-20" />
+              <Sk className="h-4 w-32" />
+            </div>
+          </div>
+          {/* form — left on desktop */}
+          <div className="bg-white rounded-md p-5 w-full lg:flex-1 flex flex-col gap-y-4">
+            <Sk className="h-4 w-32" />
+            <div className="flex gap-x-2">
+              <Sk className="h-11 flex-1 rounded-md" />
+              <Sk className="h-11 flex-1 rounded-md" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex flex-col gap-y-1.5">
+                  <Sk className="h-3 w-24" />
+                  <Sk className="h-12 w-full rounded-md" />
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-end">
+              <Sk className="h-11 w-32 rounded-md" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function CartPageSkeleton() {
+  return (
+    <div className="bg-[var(--bg)] min-h-[800px]">
+      <div className="container py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
+          {/* items list */}
+          <div className="bg-white rounded-lg p-6">
+            <Sk className="h-5 w-28 mb-6" />
+            <div className="flex flex-col divide-y divide-gray-100">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="py-4 flex items-center justify-between gap-x-4">
+                  <div className="flex items-center gap-x-4 flex-1 min-w-0">
+                    <Sk className="h-[101px] w-[180px] shrink-0 rounded-md" />
+                    <Sk className="h-5 flex-1 max-w-xs" />
+                  </div>
+                  <div className="flex items-center gap-x-4 shrink-0">
+                    <div className="flex flex-col gap-y-1 items-end">
+                      <Sk className="h-3 w-16" />
+                      <Sk className="h-5 w-20" />
+                    </div>
+                    <Sk className="size-5 rounded-sm" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* summary sidebar */}
+          <div className="bg-white rounded-lg px-6 py-6 flex flex-col gap-y-4 sticky top-24 self-start">
+            <Sk className="h-5 w-28" />
+            <div className="flex flex-col gap-y-3 pb-5 border-b border-gray-100">
+              <div className="flex justify-between">
+                <Sk className="h-3 w-20" />
+                <Sk className="h-3 w-16" />
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <Sk className="h-4 w-24" />
+              <Sk className="h-5 w-20" />
+            </div>
+            <Sk className="h-12 w-full rounded-md mt-2" />
+            <Sk className="h-3 w-full" />
+            <Sk className="h-3 w-3/4" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function AccountPageSkeleton() {
   return (
     <div className="bg-white p-4 sm:p-5 lg:rounded-md lg:p-7">
