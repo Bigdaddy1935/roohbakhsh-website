@@ -180,7 +180,7 @@ export default function OrderPaymentPage({ orderId }: { orderId: string }) {
                     value={trackingCode}
                     onChange={(e) => setTrackingCode(e.target.value)}
                     placeholder={t("tracking_code_placeholder")}
-                    className="h-10 rounded-md border border-gray-200 px-3 text-sm text-[var(--ink)] placeholder-gray-400 focus:outline-none focus:border-[var(--brand)] transition-colors"
+                    className="h-12 rounded-md border border-gray-200 px-3 text-sm text-[var(--ink)] placeholder-gray-400 focus:outline-none focus:border-[var(--brand)] transition-colors"
                   />
                 </div>
                 <div className="flex flex-col gap-y-1.5">
@@ -191,7 +191,7 @@ export default function OrderPaymentPage({ orderId }: { orderId: string }) {
                     onChange={(e) => setSourceCardNumber(e.target.value)}
                     placeholder={t("source_card_number_placeholder")}
                     dir="ltr"
-                    className="h-10 rounded-md border border-gray-200 px-3 text-sm text-[var(--ink)] placeholder-gray-400 focus:outline-none focus:border-[var(--brand)] transition-colors"
+                    className="h-12 rounded-md border border-gray-200 px-3 text-sm text-[var(--ink)] placeholder-gray-400 focus:outline-none focus:border-[var(--brand)] transition-colors"
                   />
                 </div>
                 <div className="flex flex-col gap-y-1.5">
@@ -200,14 +200,14 @@ export default function OrderPaymentPage({ orderId }: { orderId: string }) {
                     type="datetime-local"
                     value={transferredAt}
                     onChange={(e) => setTransferredAt(e.target.value)}
-                    className="h-10 rounded-md border border-gray-200 px-3 text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--brand)] transition-colors"
+                    className="h-12 rounded-md border border-gray-200 px-3 text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--brand)] transition-colors"
                   />
                 </div>
 
                 {mode === "receipt" && (
                   <div className="flex flex-col gap-y-1.5">
                     <label className="text-[12px] text-gray-500">{t("receipt_upload_label")}</label>
-                    <label className="h-10 rounded-md border border-dashed border-gray-300 px-3 flex items-center gap-x-2 text-sm text-gray-400 cursor-pointer hover:border-[var(--brand)] transition-colors">
+                    <label className="h-12 rounded-md border border-dashed border-gray-300 px-3 flex items-center gap-x-2 text-sm text-gray-400 cursor-pointer hover:border-[var(--brand)] transition-colors">
                       <RiImageAddLine size={16} />
                       <span className="truncate">
                         {uploading ? t("uploading") : receiptFile ? receiptFile.name : t("receipt_upload_hint")}
