@@ -230,7 +230,7 @@ export default function OrderPaymentPage({ orderId }: { orderId: string }) {
               <button
                 onClick={handleSubmit}
                 disabled={submitting || uploading}
-                className="w-full h-12 rounded-md bg-[var(--cta)] text-white font-extrabold text-[14px] hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-x-2"
+                className="self-end h-11 px-8 rounded-md bg-[var(--cta)] text-white font-extrabold text-[14px] hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-x-2"
               >
                 {submitting && <RiLoader4Line size={18} className="animate-spin" />}
                 {submitting ? t("submitting") : t("submit_btn")}
