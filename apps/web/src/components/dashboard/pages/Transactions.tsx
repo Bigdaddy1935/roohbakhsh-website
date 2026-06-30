@@ -34,8 +34,8 @@ export default function Transactions() {
 
   if (invoices.length === 0) {
     return (
-      <div className="bg-white p-4 sm:p-5 lg:rounded-2xl lg:p-7 min-h-full flex flex-col items-center justify-center py-24 gap-y-4">
-        <div className="size-20 rounded-2xl bg-[var(--brand)]/10 flex items-center justify-center">
+      <div className="bg-white p-4 sm:p-5 lg:rounded-lg lg:p-7 min-h-full flex flex-col items-center justify-center py-24 gap-y-4">
+        <div className="size-20 rounded-lg bg-[var(--brand)]/10 flex items-center justify-center">
           <RiBankCardLine size={36} className="text-[var(--brand)]" />
         </div>
         <div className="text-center">
@@ -47,14 +47,14 @@ export default function Transactions() {
   }
 
   return (
-    <div className="bg-white p-4 sm:p-5 lg:rounded-2xl lg:p-7 min-h-full">
+    <div className="bg-white p-4 sm:p-5 lg:rounded-lg lg:p-7 min-h-full">
       <div className="mb-6">
         <h1 className="text-lg font-bold text-[var(--ink)]">{ui.title}</h1>
         <p className="text-sm text-gray-400 mt-0.5">{ui.subtitle}</p>
       </div>
 
       {/* Desktop table */}
-      <div className="hidden md:block rounded-2xl overflow-hidden border border-gray-100">
+      <div className="hidden md:block rounded-lg overflow-hidden border border-gray-100">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-100">
@@ -94,7 +94,7 @@ export default function Transactions() {
       {/* Mobile cards */}
       <div className="flex flex-col gap-y-3 md:hidden">
         {invoices.map((inv) => (
-          <div key={inv.id} className="bg-gray-50 rounded-2xl p-4 flex flex-col gap-y-3">
+          <div key={inv.id} className="bg-gray-50 rounded-lg p-4 flex flex-col gap-y-3">
             <div className="flex items-center justify-between gap-x-3">
               <p className="text-sm font-semibold text-[var(--ink)] line-clamp-2 flex-1">
                 {inv.items.map((it) => it.titleSnapshot[locale]).join("، ")}

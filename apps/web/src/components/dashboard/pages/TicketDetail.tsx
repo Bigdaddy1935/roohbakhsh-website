@@ -93,8 +93,8 @@ export default function TicketDetail({ id }: { id: string }) {
 
   if (isError || !ticket) {
     return (
-      <div className="bg-white p-4 sm:p-5 lg:rounded-2xl lg:p-7 min-h-full flex flex-col items-center justify-center py-24 gap-y-4">
-        <div className="size-20 rounded-2xl bg-red-50 flex items-center justify-center">
+      <div className="bg-white p-4 sm:p-5 lg:rounded-lg lg:p-7 min-h-full flex flex-col items-center justify-center py-24 gap-y-4">
+        <div className="size-20 rounded-lg bg-red-50 flex items-center justify-center">
           <RiErrorWarningLine size={36} className="text-red-400" />
         </div>
         <p className="text-[var(--ink)] font-semibold">{ui.notFound}</p>
@@ -108,7 +108,7 @@ export default function TicketDetail({ id }: { id: string }) {
   const isClosed = ticket.status === "closed";
 
   return (
-    <div className="bg-white p-4 sm:p-5 lg:rounded-2xl lg:p-7 min-h-full flex flex-col gap-y-5">
+    <div className="bg-white p-4 sm:p-5 lg:rounded-lg lg:p-7 min-h-full flex flex-col gap-y-5">
       {/* Back */}
       <Link
         href="/dashboard/tickets"
@@ -129,7 +129,7 @@ export default function TicketDetail({ id }: { id: string }) {
             <span>{ticket.createdAt.slice(0, 10)}</span>
           </div>
         </div>
-        <span className={`text-xs font-bold px-3 py-1.5 rounded-xl shrink-0 ${STATUS_BADGE[ticket.status]}`}>
+        <span className={`text-xs font-bold px-3 py-1.5 rounded-md shrink-0 ${STATUS_BADGE[ticket.status]}`}>
           {ui.status[ticket.status]}
         </span>
       </div>
@@ -149,7 +149,7 @@ export default function TicketDetail({ id }: { id: string }) {
               </div>
               <div className={`max-w-[80%] ${isSupport ? "" : "flex flex-col items-end"}`}>
                 <div
-                  className={`rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed ${
+                  className={`rounded-lg px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed ${
                     isSupport
                       ? "bg-[var(--brand)]/8 text-[var(--ink)] rounded-ss-none"
                       : "bg-gray-100 text-[var(--ink)] rounded-se-none"
@@ -169,7 +169,7 @@ export default function TicketDetail({ id }: { id: string }) {
       {/* Reply or closed notice */}
       {isClosed ? (
         <div className="mt-auto border-t border-gray-100 pt-5 text-center">
-          <div className="inline-flex items-center gap-x-2 text-sm text-gray-400 bg-gray-50 rounded-xl px-4 py-3">
+          <div className="inline-flex items-center gap-x-2 text-sm text-gray-400 bg-gray-50 rounded-md px-4 py-3">
             <RiCheckLine size={16} className="text-gray-300" />
             {ui.closedNotice}
           </div>
@@ -177,7 +177,7 @@ export default function TicketDetail({ id }: { id: string }) {
       ) : (
         <div className="mt-auto border-t border-gray-100 pt-5 flex flex-col gap-y-3">
           {replyTicket.isError && (
-            <div className="flex items-center gap-x-2 text-xs text-red-600 bg-red-50 rounded-xl px-4 py-3">
+            <div className="flex items-center gap-x-2 text-xs text-red-600 bg-red-50 rounded-md px-4 py-3">
               <RiErrorWarningLine size={15} />
               {ui.error}
             </div>
@@ -188,7 +188,7 @@ export default function TicketDetail({ id }: { id: string }) {
             onChange={(e) => setBody(e.target.value)}
             rows={5}
             placeholder={ui.replyPlaceholder}
-            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-none"
+            className="w-full rounded-md border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-none"
           />
           <div className="flex items-center justify-between gap-x-3">
             <div className="flex items-center gap-x-2">
@@ -203,7 +203,7 @@ export default function TicketDetail({ id }: { id: string }) {
               <label
                 htmlFor="ticket-attach"
                 title={ui.attachSoon}
-                className="flex items-center gap-x-1.5 h-9 px-3 rounded-xl border border-gray-200 text-xs text-gray-400 cursor-not-allowed select-none"
+                className="flex items-center gap-x-1.5 h-9 px-3 rounded-md border border-gray-200 text-xs text-gray-400 cursor-not-allowed select-none"
               >
                 <RiAttachment2 size={15} />
                 {attachedName ?? ui.attach}
@@ -214,7 +214,7 @@ export default function TicketDetail({ id }: { id: string }) {
                 type="button"
                 onClick={() => closeTicket.mutate(id)}
                 disabled={closeTicket.isPending}
-                className="h-9 px-4 rounded-xl border border-gray-200 text-gray-500 text-xs font-semibold hover:bg-gray-50 transition-colors disabled:opacity-60 cursor-pointer"
+                className="h-9 px-4 rounded-md border border-gray-200 text-gray-500 text-xs font-semibold hover:bg-gray-50 transition-colors disabled:opacity-60 cursor-pointer"
               >
                 {closeTicket.isPending ? ui.closing : ui.closeTicket}
               </button>
@@ -222,7 +222,7 @@ export default function TicketDetail({ id }: { id: string }) {
                 type="button"
                 onClick={handleSend}
                 disabled={replyTicket.isPending}
-                className="flex items-center gap-x-2 h-9 px-5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer"
+                className="flex items-center gap-x-2 h-9 px-5 rounded-md bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer"
               >
                 {replyTicket.isPending
                   ? <RiLoader4Line size={16} className="animate-spin" />

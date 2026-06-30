@@ -39,7 +39,7 @@ export default function Notifications() {
   }
 
   return (
-    <div className="bg-white p-4 sm:p-5 lg:rounded-2xl lg:p-7 min-h-full">
+    <div className="bg-white p-4 sm:p-5 lg:rounded-lg lg:p-7 min-h-full">
       <div className="flex items-start justify-between mb-6 gap-x-4">
         <div>
           <h1 className="text-lg font-bold text-[var(--ink)]">{ui.title}</h1>
@@ -50,7 +50,7 @@ export default function Notifications() {
             type="button"
             onClick={() => markAllRead.mutate()}
             disabled={markAllRead.isPending}
-            className="shrink-0 flex items-center gap-x-1.5 h-9 px-4 rounded-xl bg-[var(--brand)]/10 text-[var(--brand)] text-xs font-semibold hover:bg-[var(--brand)]/20 transition-colors disabled:opacity-60 cursor-pointer"
+            className="shrink-0 flex items-center gap-x-1.5 h-9 px-4 rounded-md bg-[var(--brand)]/10 text-[var(--brand)] text-xs font-semibold hover:bg-[var(--brand)]/20 transition-colors disabled:opacity-60 cursor-pointer"
           >
             <RiCheckDoubleLine size={15} />
             {ui.markAllRead}
@@ -62,7 +62,7 @@ export default function Notifications() {
         <NotificationsPageSkeleton />
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 gap-y-4">
-          <div className="size-20 rounded-2xl bg-[var(--brand)]/10 flex items-center justify-center">
+          <div className="size-20 rounded-lg bg-[var(--brand)]/10 flex items-center justify-center">
             <RiNotification3Line size={36} className="text-[var(--brand)]" />
           </div>
           <p className="font-bold text-[var(--ink)]">{ui.empty}</p>
@@ -73,7 +73,7 @@ export default function Notifications() {
             const content = (
               <>
                 <div
-                  className={`size-10 sm:size-11 shrink-0 rounded-xl flex items-center justify-center ${
+                  className={`size-10 sm:size-11 shrink-0 rounded-md flex items-center justify-center ${
                     n.isRead ? "bg-gray-100 text-gray-400" : "bg-[var(--brand)]/10 text-[var(--brand)]"
                   }`}
                 >
@@ -100,7 +100,7 @@ export default function Notifications() {
               </>
             );
 
-            const cls = `flex items-start gap-x-3 p-3 sm:p-4 rounded-xl transition-all cursor-pointer ${
+            const cls = `flex items-start gap-x-3 p-3 sm:p-4 rounded-md transition-all cursor-pointer ${
               n.isRead ? "hover:bg-gray-50" : "bg-[var(--brand)]/5 hover:bg-[var(--brand)]/10"
             }`;
 

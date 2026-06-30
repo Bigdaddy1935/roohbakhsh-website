@@ -109,10 +109,10 @@ export default function DashboardHome() {
           <Link
             key={i}
             href={ui.statLinks[i]}
-            className="bg-white rounded-2xl p-4 sm:p-5 flex items-center gap-x-4 hover:shadow-md transition-all duration-200 group"
+            className="bg-white rounded-lg p-4 sm:p-5 flex items-center gap-x-4 hover:shadow-md transition-all duration-200 group"
           >
             <div
-              className={`size-12 sm:size-14 rounded-xl ${iconBg} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}
+              className={`size-12 sm:size-14 rounded-md ${iconBg} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}
             >
               <Icon size={24} className={iconColor} />
             </div>
@@ -127,7 +127,7 @@ export default function DashboardHome() {
       </div>
 
       {/* Recent views */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6">
+      <div className="bg-white rounded-lg p-5 sm:p-6">
         <SectionHeader title={ui.recentCourses} href="/dashboard/my-courses" label={ui.viewAll} />
         {!data || data.recentViews.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 gap-y-2 text-gray-300">
@@ -142,7 +142,7 @@ export default function DashboardHome() {
                 <Link
                   key={`${v.type}-${v.id}`}
                   href={`/courses/${v.courseId}`}
-                  className="group flex flex-col rounded-xl overflow-hidden hover:shadow-md transition-all duration-200"
+                  className="group flex flex-col rounded-md overflow-hidden hover:shadow-md transition-all duration-200"
                 >
                   <div className="aspect-video bg-gradient-to-br from-[var(--brand)]/20 to-[var(--brand)]/5 flex items-center justify-center">
                     <RiPlayCircleLine
@@ -172,7 +172,7 @@ export default function DashboardHome() {
       </div>
 
       {/* Recent tickets */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6">
+      <div className="bg-white rounded-lg p-5 sm:p-6">
         <SectionHeader title={ui.recentTickets} href="/dashboard/tickets" label={ui.viewAll} />
         {!data || data.recentTickets.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 gap-y-2 text-gray-300">
@@ -187,7 +187,7 @@ export default function DashboardHome() {
                 <Link
                   key={tk.id}
                   href={`/dashboard/tickets/${tk.id}`}
-                  className="flex items-center gap-x-3 py-3.5 hover:bg-gray-50 -mx-2 px-2 rounded-xl transition-colors"
+                  className="flex items-center gap-x-3 py-3.5 hover:bg-gray-50 -mx-2 px-2 rounded-md transition-colors"
                 >
                   <span className={`size-2 shrink-0 rounded-full ${STATUS_DOT[tk.status]}`} />
                   <span className="flex-1 text-sm text-[var(--ink)] font-medium line-clamp-1">

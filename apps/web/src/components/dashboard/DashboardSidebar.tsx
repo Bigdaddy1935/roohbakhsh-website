@@ -74,8 +74,8 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
   return (
     <>
       {/* User card */}
-      <div className="flex items-center gap-x-3 p-3 mb-5 rounded-2xl bg-gradient-to-l from-[var(--brand)]/8 to-[var(--brand)]/4">
-        <div className="size-10 rounded-xl bg-[var(--brand)] flex items-center justify-center shrink-0 shadow-md shadow-[var(--brand)]/30">
+      <div className="flex items-center gap-x-3 p-3 mb-5 rounded-lg bg-gradient-to-l from-[var(--brand)]/8 to-[var(--brand)]/4">
+        <div className="size-10 rounded-md bg-[var(--brand)] flex items-center justify-center shrink-0 shadow-md shadow-[var(--brand)]/30">
           <RiUserLine size={20} className="text-white" />
         </div>
         <div className="flex flex-col min-w-0">
@@ -100,7 +100,7 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
               key={key}
               href={href}
               onClick={onClose}
-              className={`flex items-center gap-x-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
+              className={`flex items-center gap-x-3 px-3 py-2.5 rounded-md transition-all duration-200 ${
                 active
                   ? "bg-[var(--brand)]/10 text-[var(--brand)]"
                   : "text-gray-500 hover:bg-gray-50 hover:text-[var(--ink)]"
@@ -129,7 +129,7 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
           type="button"
           onClick={handleLogout}
           disabled={logout.isPending}
-          className="flex items-center gap-x-3 px-3 py-2.5 w-full rounded-xl text-red-400 hover:bg-red-50 hover:text-red-500 transition-all duration-200 disabled:opacity-60 cursor-pointer"
+          className="flex items-center gap-x-3 px-3 py-2.5 w-full rounded-md text-red-400 hover:bg-red-50 hover:text-red-500 transition-all duration-200 disabled:opacity-60 cursor-pointer"
         >
           <RiShutDownLine size={20} />
           <span className="text-sm font-medium">
@@ -154,7 +154,7 @@ export default function DashboardSidebar({ open, onClose }: Props) {
         <SidebarContent onClose={onClose} />
       </aside>
 
-      <aside className={`hidden md:block lg:sticky lg:top-5 lg:h-max lg:rounded-2xl ${BASE}`}>
+      <aside className={`hidden md:block lg:sticky lg:top-5 lg:h-max lg:rounded-lg ${BASE}`}>
         <SidebarContent onClose={onClose} />
       </aside>
     </>
