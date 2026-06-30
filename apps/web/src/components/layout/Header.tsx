@@ -49,9 +49,11 @@ const UI = {
     account: "تفاصيل الحساب",
     transactions: "المعاملات",
     logout: "تسجيل الخروج",
+    cartTitle: "سلة الشراء",
+    cartCourse: "دورة",
     cartEmpty: "سلة الشراء فارغة",
-    cartTotal: "الإجمالي",
-    checkout: "إتمام الشراء",
+    cartTotal: "قابل للدفع",
+    checkout: "متابعة الشراء",
     remove: "حذف",
   },
   ur: {
@@ -60,9 +62,11 @@ const UI = {
     account: "اکاؤنٹ کی تفصیلات",
     transactions: "لین دین",
     logout: "لاگ آؤٹ",
+    cartTitle: "میری ٹوکری",
+    cartCourse: "کورس",
     cartEmpty: "کارٹ خالی ہے",
-    cartTotal: "کل رقم",
-    checkout: "خریداری مکمل کریں",
+    cartTotal: "قابل ادائیگی",
+    checkout: "خریداری جاری رکھیں",
     remove: "ہٹائیں",
   },
 };
@@ -136,7 +140,7 @@ export default function Header() {
                 <RiArrowDownSLine size={18} className="transition-transform duration-200 group-hover:rotate-180" />
               </Link>
               <div className="absolute top-full right-0 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-150 pt-4 z-50">
-                <div className="flex bg-white border border-gray-200 rounded-xl shadow-xl shadow-black/[0.08] overflow-hidden">
+                <div className="flex bg-white border border-gray-200 rounded-lg overflow-hidden">
                   {/* Left: category list */}
                   <div className="flex flex-col gap-y-1 p-4 w-72 shrink-0">
                     {categories.map((cat) => {
@@ -224,42 +228,54 @@ export default function Header() {
               </button>
               {/* Cart popup */}
               <div className="absolute top-full end-0 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-150 pt-3 z-50 w-80">
-                <div className="bg-white border border-gray-200 rounded-xl shadow-xl shadow-black/[0.08] overflow-hidden">
+                <div className="bg-white border border-gray-200 rounded-lg p-5">
+                  {/* Header */}
+                  <div className="flex items-center justify-between pb-4 mb-4 border-b border-gray-100">
+                    <span className="text-sm font-bold text-[var(--ink)]">{ui.cartTitle}</span>
+                    <span className="text-xs text-gray-400">{cartItems.length} {ui.cartCourse}</span>
+                  </div>
+
                   {cartItems.length === 0 ? (
-                    <div className="py-10 text-center text-sm text-gray-400">{ui.cartEmpty}</div>
+                    <div className="py-6 text-center text-sm text-gray-400">{ui.cartEmpty}</div>
                   ) : (
                     <>
-                      <div className="flex flex-col divide-y divide-gray-100 max-h-72 overflow-y-auto">
+                      {/* Items */}
+                      <div className="space-y-4 max-h-60 overflow-y-auto">
                         {cartItems.map((item) => {
                           const thumb = item.thumbnailUrl?.[locale] ?? item.thumbnailUrl?.ar ?? "";
                           return (
-                            <div key={item.courseId} className="flex items-center gap-x-3 px-4 py-3">
-                              {thumb ? (
-                                <Image src={thumb} alt={item.title[locale]} width={48} height={48} className="size-12 rounded-lg object-cover shrink-0" />
-                              ) : (
-                                <div className="size-12 rounded-lg bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
-                                  <RiBookOpenLine size={20} className="text-[var(--brand)]" />
+                            <div key={item.courseId} className="flex items-center justify-between gap-x-3">
+                              <div className="flex items-center gap-x-2.5 min-w-0">
+                                {thumb ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img src={thumb} alt={item.title[locale]} className="h-14 w-20 rounded-lg object-cover shrink-0" loading="lazy" />
+                                ) : (
+                                  <div className="h-14 w-20 rounded-lg bg-[var(--brand)]/10 flex items-center justify-center shrink-0">
+                                    <RiBookOpenLine size={20} className="text-[var(--brand)]" />
+                                  </div>
+                                )}
+                                <div className="flex flex-col gap-y-1 min-w-0">
+                                  <span className="text-xs font-semibold text-[var(--ink)] line-clamp-2 leading-5">{item.title[locale]}</span>
+                                  <span className="text-xs font-bold text-[var(--brand)]">{formatMoney(item.effectivePrice, locale)}</span>
                                 </div>
-                              )}
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs font-semibold text-[var(--ink)] truncate">{item.title[locale]}</p>
-                                <p className="text-xs text-[var(--brand)] mt-0.5">{formatMoney(item.effectivePrice, locale)}</p>
                               </div>
                               <button type="button" onClick={() => removeFromCart(item.courseId)}
-                                className="shrink-0 size-7 flex items-center justify-center rounded-lg text-red-400 hover:bg-red-50 transition-colors">
-                                <RiDeleteBinLine size={15} />
+                                className="shrink-0 text-gray-300 hover:text-red-500 transition-colors cursor-pointer">
+                                <RiDeleteBinLine size={16} />
                               </button>
                             </div>
                           );
                         })}
                       </div>
-                      <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between">
-                        <span className="text-xs text-gray-500">{ui.cartTotal}:</span>
-                        <span className="text-sm font-bold text-[var(--ink)]">{formatMoney(cart?.total, locale)}</span>
-                      </div>
-                      <div className="px-4 pb-4">
+
+                      {/* Footer */}
+                      <div className="flex items-end justify-between pt-4 mt-4 border-t border-gray-100">
+                        <div>
+                          <div className="text-[11px] text-gray-400 mb-0.5">{ui.cartTotal}</div>
+                          <div className="text-sm font-bold text-[var(--ink)]">{formatMoney(cart?.total, locale)}</div>
+                        </div>
                         <Link href="/cart"
-                          className="block w-full h-9 rounded-lg bg-[var(--cta)] text-white text-sm font-bold text-center leading-9 hover:opacity-90 transition-opacity">
+                          className="h-9 px-4 rounded-lg bg-[var(--brand)] text-white text-sm font-semibold flex items-center justify-center hover:opacity-90 transition-opacity">
                           {ui.checkout}
                         </Link>
                       </div>
@@ -281,7 +297,7 @@ export default function Header() {
               </button>
               {/* User menu popup */}
               <div className="absolute top-full end-0 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-150 pt-3 z-50 w-64">
-                <div className="bg-white border border-gray-200 rounded-xl shadow-xl shadow-black/[0.08] p-5">
+                <div className="bg-white border border-gray-200 rounded-lg p-5">
                   {isLoggedIn ? (
                     <>
                       <div className="flex items-center gap-x-3 pb-3 mb-1 border-b border-gray-100">
