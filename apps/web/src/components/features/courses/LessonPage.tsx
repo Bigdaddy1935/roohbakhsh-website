@@ -75,6 +75,10 @@ function fmtDuration(minutes: number): string {
   return `${m}m`;
 }
 
+function LessonSkeletonBox({ className }: { className: string }) {
+  return <div className={`bg-gray-100 animate-pulse rounded-md ${className}`} />;
+}
+
 function SidebarChapter({
   section, courseSlug, activeLessonId, locale, defaultOpen,
 }: {
@@ -396,17 +400,14 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
   const toggleFavorite = useToggleFavorite();
 
   if (loadingCourse || loadingSections) {
-    const Sk = ({ className }: { className: string }) => (
-      <div className={`bg-gray-100 animate-pulse rounded-md ${className}`} />
-    );
     return (
       <div className="min-h-screen bg-[var(--bg)]">
         {/* breadcrumb + player */}
         <div className="container pt-10 pb-5 px-4">
           <div className="flex items-center gap-x-2 mb-7">
-            <Sk className="h-4 w-16" /><Sk className="h-4 w-4" /><Sk className="h-4 w-24" /><Sk className="h-4 w-4" /><Sk className="h-4 w-32" />
+            <LessonSkeletonBox className="h-4 w-16" /><LessonSkeletonBox className="h-4 w-4" /><LessonSkeletonBox className="h-4 w-24" /><LessonSkeletonBox className="h-4 w-4" /><LessonSkeletonBox className="h-4 w-32" />
           </div>
-          <Sk className="w-full aspect-video rounded-lg" />
+          <LessonSkeletonBox className="w-full aspect-video rounded-lg" />
         </div>
 
         <div className="container pb-14 pt-8">
@@ -417,34 +418,34 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
               {/* lesson info card */}
               <div className="bg-white rounded-lg border border-gray-100 p-5 md:p-6">
                 <div className="flex items-start gap-x-3 mb-4">
-                  <Sk className="size-9 rounded-lg shrink-0" />
-                  <Sk className="h-6 flex-1 mt-1" />
+                  <LessonSkeletonBox className="size-9 rounded-lg shrink-0" />
+                  <LessonSkeletonBox className="h-6 flex-1 mt-1" />
                 </div>
                 <div className="flex gap-x-2 mb-5">
-                  <Sk className="h-6 w-24 rounded-full" />
-                  <Sk className="h-6 w-12 rounded-full" />
+                  <LessonSkeletonBox className="h-6 w-24 rounded-full" />
+                  <LessonSkeletonBox className="h-6 w-12 rounded-full" />
                 </div>
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                  <Sk className="h-9 w-24 rounded-lg" />
+                  <LessonSkeletonBox className="h-9 w-24 rounded-lg" />
                   <div className="flex gap-x-2">
-                    <Sk className="size-9 rounded-lg" />
-                    <Sk className="size-9 rounded-lg" />
-                    <Sk className="size-9 rounded-lg" />
+                    <LessonSkeletonBox className="size-9 rounded-lg" />
+                    <LessonSkeletonBox className="size-9 rounded-lg" />
+                    <LessonSkeletonBox className="size-9 rounded-lg" />
                   </div>
-                  <Sk className="h-9 w-24 rounded-lg" />
+                  <LessonSkeletonBox className="h-9 w-24 rounded-lg" />
                 </div>
               </div>
               {/* QA section */}
               <div className="bg-white rounded-lg border border-gray-100 p-5">
-                <Sk className="h-5 w-36 mb-5" />
+                <LessonSkeletonBox className="h-5 w-36 mb-5" />
                 {Array.from({ length: 2 }).map((_, i) => (
                   <div key={i} className="flex items-center gap-x-3 py-5 border-b border-gray-100 last:border-0">
-                    <Sk className="size-[38px] rounded-full shrink-0" />
+                    <LessonSkeletonBox className="size-[38px] rounded-full shrink-0" />
                     <div className="flex flex-col gap-y-2 flex-1">
-                      <Sk className="h-4 w-28" />
-                      <Sk className="h-4 w-16 rounded-full" />
+                      <LessonSkeletonBox className="h-4 w-28" />
+                      <LessonSkeletonBox className="h-4 w-16 rounded-full" />
                     </div>
-                    <Sk className="h-4 w-20 ms-auto" />
+                    <LessonSkeletonBox className="h-4 w-20 ms-auto" />
                   </div>
                 ))}
               </div>
@@ -455,13 +456,13 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
               {/* lesson list */}
               <div className="bg-white rounded-lg border border-gray-100 overflow-hidden">
                 <div className="flex items-center gap-x-2.5 px-4 py-4 border-b border-gray-100">
-                  <Sk className="size-5 rounded" />
-                  <Sk className="h-5 w-28" />
+                  <LessonSkeletonBox className="size-5 rounded" />
+                  <LessonSkeletonBox className="h-5 w-28" />
                 </div>
                 <div className="p-3 flex flex-col gap-y-1.5">
-                  <Sk className="h-9 w-full rounded-md" />
+                  <LessonSkeletonBox className="h-9 w-full rounded-md" />
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Sk key={i} className="h-8 w-full rounded-md" />
+                    <LessonSkeletonBox key={i} className="h-8 w-full rounded-md" />
                   ))}
                 </div>
               </div>
@@ -470,18 +471,18 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
                 <div className="grid grid-cols-3">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <div key={i} className={`flex flex-col items-center gap-y-2 py-5 px-3${i < 2 ? " border-e border-gray-100" : ""}`}>
-                      <Sk className="size-9 rounded-lg" />
-                      <Sk className="h-4 w-10" />
-                      <Sk className="h-3 w-14" />
+                      <LessonSkeletonBox className="size-9 rounded-lg" />
+                      <LessonSkeletonBox className="h-4 w-10" />
+                      <LessonSkeletonBox className="h-3 w-14" />
                     </div>
                   ))}
                 </div>
               </div>
               {/* instructor */}
               <div className="bg-white rounded-lg border border-gray-100 p-5 flex flex-col items-center gap-y-3">
-                <Sk className="size-20 rounded-full" />
-                <Sk className="h-5 w-36" />
-                <Sk className="h-10 w-full rounded-lg mt-2" />
+                <LessonSkeletonBox className="size-20 rounded-full" />
+                <LessonSkeletonBox className="h-5 w-36" />
+                <LessonSkeletonBox className="h-10 w-full rounded-lg mt-2" />
               </div>
             </aside>
 

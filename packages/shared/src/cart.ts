@@ -4,7 +4,7 @@ export interface CartItemRecord {
   courseId: string;
   title: Localized;
   thumbnailUrl: Localized<string | null>;
-  originalPrice: Money | null;
+  originalPrice?: Money | null;
   effectivePrice: Money | null;
   addedAt: ISODate;
 }

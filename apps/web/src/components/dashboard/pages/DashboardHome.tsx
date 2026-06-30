@@ -108,7 +108,7 @@ export default function DashboardHome() {
         {STAT_CONFIG.map(({ Icon, iconBg, iconColor }, i) => (
           <Link
             key={i}
-            href={ui.statLinks[i]}
+            href={ui.statLinks[i] ?? "#"}
             className="bg-white rounded-lg p-4 sm:p-5 flex items-center gap-x-4 hover:shadow-md transition-all duration-200 group"
           >
             <div
