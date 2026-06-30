@@ -116,18 +116,6 @@ export default function AccountDetails() {
             </div>
           </div>
         </section>
-
-        {/* Security */}
-        <section>
-          <h2 className="text-sm font-bold text-[var(--ink)] mb-4 flex items-center gap-x-2">
-            <RiShieldKeyholeLine size={16} className="text-[var(--brand)]" />
-            {ui.security}
-          </h2>
-          <div className="flex items-start gap-x-3 p-4 rounded-md bg-amber-50 border border-amber-100">
-            <RiShieldKeyholeLine size={18} className="text-amber-400 shrink-0 mt-0.5" />
-            <p className="text-xs text-amber-700 leading-relaxed">{ui.notAvailable}</p>
-          </div>
-        </section>
       </div>
     </div>
   );
