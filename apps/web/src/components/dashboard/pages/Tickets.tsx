@@ -183,7 +183,7 @@ export default function Tickets() {
           onClick={closeForm}
         >
           <div
-            className="bg-white rounded-t-3xl sm:rounded-lg w-full sm:max-w-lg max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-lg w-full sm:max-w-lg max-h-[90vh] overflow-y-auto"
             dir="rtl"
             onClick={(e) => e.stopPropagation()}
           >
