@@ -93,33 +93,38 @@ function CartContent() {
               {items.map((item) => {
                 const thumb = item.thumbnailUrl?.[locale] ?? item.thumbnailUrl?.ar ?? "";
                 return (
-                  <div
-                    key={item.courseId}
-                    className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex gap-x-4 items-start"
-                  >
-                    <div className="relative h-24 w-36 shrink-0 rounded-xl overflow-hidden bg-gray-100">
-                      {thumb && (
-                        <Image src={thumb} alt={item.title[locale]} fill className="object-cover" sizes="144px" />
-                      )}
-                    </div>
-                    <div className="flex flex-col flex-1 gap-y-1.5 min-w-0">
-                      <h3 className="font-bold text-[var(--ink)] text-[14px] leading-6 line-clamp-2">
+                  <div key={item.courseId}
+                    className="bg-white rounded-lg border border-gray-100 h-[101px] flex flex-row items-center justify-between px-4 overflow-hidden">
+
+                    {/* thumbnail + title + mobile trash */}
+                    <div className="flex items-center gap-x-3 sm:gap-x-5 min-w-0 flex-1">
+                      <div className="relative h-[101px] aspect-video shrink-0 overflow-hidden bg-gray-100">
+                        {thumb && (
+                          <Image src={thumb} alt={item.title[locale]} fill className="object-cover" sizes="180px" />
+                        )}
+                      </div>
+                      <h3 className="flex-1 text-sm sm:text-[15px] font-semibold text-[var(--ink)] line-clamp-2 leading-6 hover:text-[var(--brand)] transition-colors cursor-default">
                         {item.title[locale]}
                       </h3>
-                      <div className="flex items-center gap-x-3 mt-1">
-                        <span className="text-[14px] font-extrabold text-[var(--brand)]">
-                          {formatMoney(item.effectivePrice, locale)}
-                        </span>
-                      </div>
+                      <button onClick={() => removeItem(item.courseId)} disabled={removing}
+                        className="sm:hidden shrink-0 text-gray-300 hover:text-red-500 transition-colors disabled:opacity-50"
+                        aria-label={t("remove")}>
+                        <RiDeleteBin6Line size={16} />
+                      </button>
                     </div>
-                    <button
-                      onClick={() => removeItem(item.courseId)}
-                      disabled={removing}
-                      className="shrink-0 size-9 rounded-xl border border-gray-100 flex items-center justify-center text-gray-400 hover:text-rose-500 hover:border-rose-200 transition-colors disabled:opacity-50"
-                      aria-label={t("remove")}
-                    >
-                      <RiDeleteBin6Line size={16} />
-                    </button>
+
+                    {/* price + desktop trash */}
+                    <div className="flex items-center gap-x-5 shrink-0 ms-4">
+                      <span className="text-sm sm:text-base font-extrabold text-[var(--brand)] whitespace-nowrap">
+                        {formatMoney(item.effectivePrice, locale)}
+                      </span>
+                      <button onClick={() => removeItem(item.courseId)} disabled={removing}
+                        className="hidden sm:flex text-gray-300 hover:text-red-500 transition-colors disabled:opacity-50"
+                        aria-label={t("remove")}>
+                        <RiDeleteBin6Line size={18} />
+                      </button>
+                    </div>
+
                   </div>
                 );
               })}
