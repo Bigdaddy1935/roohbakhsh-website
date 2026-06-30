@@ -2,7 +2,7 @@
 
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { RiBell3Line, RiCheckDoubleLine, RiNotification3Line } from "react-icons/ri";
+import { RiBellLine, RiCheckDoubleLine, RiNotification3Line } from "react-icons/ri";
 import { NotificationsPageSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { useNotificationItems, useUnreadCount, useMarkRead, useMarkAllRead } from "@/hooks/queries/use-notifications";
 import type { NotificationItem } from "@roohbakhsh/shared";
@@ -77,7 +77,7 @@ export default function Notifications() {
                     n.isRead ? "bg-gray-100 text-gray-400" : "bg-[var(--brand)]/10 text-[var(--brand)]"
                   }`}
                 >
-                  <RiBell3Line size={20} />
+                  <RiBellLine size={20} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-x-2">

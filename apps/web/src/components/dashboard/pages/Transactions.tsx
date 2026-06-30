@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { RiCreditCard2Line, RiCalendar2Line, RiHashtag } from "react-icons/ri";
+import { RiBankCardLine, RiCalendar2Line, RiHashtag } from "react-icons/ri";
 import { TransactionsPageSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { useMyInvoices } from "@/hooks/queries/use-invoices";
 import { formatMoney } from "@/lib/format";
@@ -36,7 +36,7 @@ export default function Transactions() {
     return (
       <div className="bg-white p-4 sm:p-5 lg:rounded-2xl lg:p-7 min-h-full flex flex-col items-center justify-center py-24 gap-y-4">
         <div className="size-20 rounded-2xl bg-[var(--brand)]/10 flex items-center justify-center">
-          <RiCreditCard2Line size={36} className="text-[var(--brand)]" />
+          <RiBankCardLine size={36} className="text-[var(--brand)]" />
         </div>
         <div className="text-center">
           <p className="font-bold text-[var(--ink)]">{ui.empty}</p>
