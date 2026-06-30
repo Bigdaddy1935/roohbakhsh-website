@@ -61,13 +61,7 @@ function CartContent() {
 
   return (
     <div className="bg-[var(--bg)] min-h-[800px]">
-      <div className="container py-8">
-
-        <div className="flex items-center gap-x-2 text-sm text-gray-400 mb-6">
-          <Link href="/" className="hover:text-[var(--brand)] transition-colors">{t("breadcrumb_home")}</Link>
-          <RiArrowLeftSLine size={16} className="rotate-180 shrink-0" />
-          <span className="text-[var(--ink)] font-semibold">{t("breadcrumb_cart")}</span>
-        </div>
+      <div className="container py-16">
 
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 gap-y-4 text-center">
@@ -88,20 +82,24 @@ function CartContent() {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
 
             <div className="flex flex-col gap-y-4">
-              <h1 className="text-lg font-extrabold text-[var(--ink)]">{t("title")}</h1>
-
-              <div className="bg-white rounded-lg border border-gray-100 overflow-hidden divide-y divide-gray-100">
+              <div className="bg-white rounded-lg overflow-hidden p-6">
+              <div className="mb-4">
+                <h1 className="text-lg font-extrabold text-[var(--ink)]">{t("title")}</h1>
+              </div>
+              <div className="divide-y divide-gray-100 pt-2">
                 {items.map((item) => {
                   const thumb = item.thumbnailUrl?.[locale] ?? item.thumbnailUrl?.ar ?? "";
+                  const hasDiscount = item.originalPrice && item.effectivePrice &&
+                    item.originalPrice.amountMinor > item.effectivePrice.amountMinor;
                   return (
                     <div key={item.courseId}
-                      className="h-[101px] flex flex-row items-center justify-between px-4 overflow-hidden">
+                      className="py-3 flex flex-row items-center justify-between">
 
                       {/* thumbnail + title + mobile trash */}
                       <div className="flex items-center gap-x-3 sm:gap-x-5 min-w-0 flex-1">
-                        <div className="relative h-[101px] aspect-video shrink-0 overflow-hidden bg-gray-100">
+                        <div className="relative h-[101px] w-[180px] shrink-0 rounded-md overflow-hidden bg-gray-100">
                           {thumb && (
-                            <Image src={thumb} alt={item.title[locale]} fill className="object-cover" sizes="180px" />
+                            <Image src={thumb} alt={item.title[locale]} fill className="object-cover" sizes="140px" />
                           )}
                         </div>
                         <h3 className="flex-1 text-sm sm:text-[15px] font-semibold text-[var(--ink)] line-clamp-2 leading-6 hover:text-[var(--brand)] transition-colors cursor-default">
@@ -116,9 +114,16 @@ function CartContent() {
 
                       {/* price + desktop trash */}
                       <div className="flex items-center gap-x-5 shrink-0 ms-4">
-                        <span className="text-sm sm:text-base font-extrabold text-[var(--brand)] whitespace-nowrap">
-                          {formatMoney(item.effectivePrice, locale)}
-                        </span>
+                        <div className="flex flex-col items-end gap-y-0.5">
+                          {hasDiscount && (
+                            <span className="text-xs text-gray-400 line-through whitespace-nowrap">
+                              {formatMoney(item.originalPrice, locale)}
+                            </span>
+                          )}
+                          <span className="text-sm sm:text-base font-extrabold text-[var(--brand)] whitespace-nowrap">
+                            {formatMoney(item.effectivePrice, locale)}
+                          </span>
+                        </div>
                         <button onClick={() => removeItem(item.courseId)} disabled={removing}
                           className="hidden sm:flex text-gray-300 hover:text-red-500 transition-colors disabled:opacity-50"
                           aria-label={t("remove")}>
@@ -130,48 +135,41 @@ function CartContent() {
                   );
                 })}
               </div>
+              </div>
             </div>
 
             <div className="flex flex-col gap-y-4 sticky top-24 self-start">
-              <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex flex-col gap-y-4">
-                <div className="-mx-5 -mt-5 px-5 py-4 rounded-t-2xl bg-[var(--brand)] text-white font-extrabold text-[15px]">
-                  {t("summary_title")}
-                </div>
+              <div className="bg-white rounded-lg px-6 py-6 flex flex-col">
+                <h2 className="text-[15px] font-extrabold text-[var(--ink)] mb-8">{t("summary_title")}</h2>
 
-                <div className="flex flex-col gap-y-3 text-[13px]">
-                  <div className="flex justify-between items-center">
+                <div className="flex flex-col gap-y-3 pb-5 mb-5 border-b border-gray-100 text-[13px]">
+                  <div className="flex items-center justify-between">
                     <span className="text-gray-500">{t("summary_total")}</span>
-                    <span className="font-semibold text-[var(--ink)]">
-                      {formatMoney(cart?.total, locale)}
-                    </span>
+                    <span className="font-bold text-[var(--ink)]">{formatMoney(cart?.total, locale)}</span>
                   </div>
                   {discount && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-500">{t("summary_discount")}</span>
-                      <span className="font-bold text-[var(--brand)]">
-                        {formatMoney(discount, locale)}
-                      </span>
+                    <div className="flex items-center justify-between text-[var(--brand)]">
+                      <span>{t("summary_discount")}</span>
+                      <span className="font-bold">{formatMoney(discount, locale)}</span>
                     </div>
                   )}
-                  <div className="h-px bg-gray-100" />
-                  <div className="flex justify-between items-center">
-                    <span className="font-extrabold text-[var(--ink)] text-[14px]">{t("summary_payable")}</span>
-                    <span className="font-extrabold text-[var(--brand)] text-[16px]">
-                      {formatMoney(total, locale)}
-                    </span>
-                  </div>
+                </div>
+
+                <div className="flex items-center justify-between mb-6">
+                  <span className="text-[13px] text-gray-600">{t("summary_payable")}</span>
+                  <span className="text-[17px] font-extrabold text-[var(--ink)]">{formatMoney(total, locale)}</span>
                 </div>
 
                 <button
                   onClick={handleCheckout}
                   disabled={ordering || paying}
-                  className="w-full h-12 rounded-xl bg-[var(--brand)] text-white font-extrabold text-[14px] hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-x-2"
+                  className="w-full h-12 rounded-md bg-[var(--brand)] text-white font-extrabold text-[14px] hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-x-2 mb-4"
                 >
                   {(ordering || paying) && <RiLoader4Line size={18} className="animate-spin" />}
                   {t("pay_btn")}
                 </button>
 
-                <p className="text-[11px] text-gray-400 text-center leading-5">
+                <p className="text-[11px] text-gray-400 leading-5">
                   {t("terms_pre")}
                   <Link href="/terms" className="text-[var(--brand)] hover:underline">{t("terms_link1")}</Link>
                   {t("terms_and")}
@@ -180,10 +178,10 @@ function CartContent() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="bg-white rounded-lg overflow-hidden">
                 <button
                   onClick={() => setCouponOpen((o) => !o)}
-                  className="w-full flex items-center justify-between px-5 py-4 text-[13px] font-bold text-[var(--ink)]"
+                  className="w-full flex items-center justify-between px-6 py-5 text-[13px] font-bold text-[var(--ink)]"
                 >
                   <span className="flex items-center gap-x-2">
                     <RiTicket2Line size={17} className="text-[var(--brand)]" />
@@ -193,19 +191,19 @@ function CartContent() {
                 </button>
 
                 {couponOpen && (
-                  <div className="px-5 pb-5 flex flex-col gap-y-2">
+                  <div className="px-6 pb-6 flex flex-col gap-y-2">
                     <div className="flex gap-x-2">
                       <input
                         type="text"
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value)}
                         placeholder={t("coupon_placeholder")}
-                        className="flex-1 h-10 rounded-xl border border-gray-200 px-3 text-sm text-[var(--ink)] placeholder-gray-400 focus:outline-none focus:border-[var(--brand)] transition-colors"
+                        className="flex-1 h-10 rounded-md border border-gray-200 px-3 text-sm text-[var(--ink)] placeholder-gray-400 focus:outline-none focus:border-[var(--brand)] transition-colors"
                       />
                       <button
                         onClick={handleApplyCoupon}
                         disabled={validatingCoupon}
-                        className="h-10 px-4 rounded-xl bg-gray-800 text-white text-[13px] font-bold hover:opacity-90 transition-opacity shrink-0 disabled:opacity-60"
+                        className="h-10 px-4 rounded-md bg-gray-800 text-white text-[13px] font-bold hover:opacity-90 transition-opacity shrink-0 disabled:opacity-60"
                       >
                         {t("coupon_apply")}
                       </button>
