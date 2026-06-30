@@ -4,7 +4,7 @@ import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
   RiPlayCircleLine, RiHeart3Line, RiMessage2Line,
-  RiCreditCard2Line, RiArrowLeftSLine, RiBookReadLine,
+  RiBankCardLine, RiArrowLeftSLine, RiBookReadLine,
   RiTimeLine, RiInformationLine, RiCheckboxCircleLine, RiErrorWarningLine,
 } from "react-icons/ri";
 import { HomePageSkeleton } from "@/components/dashboard/DashboardSkeleton";
@@ -57,7 +57,7 @@ const STAT_CONFIG = [
   { Icon: RiPlayCircleLine, iconBg: "bg-blue-100",    iconColor: "text-blue-500"    },
   { Icon: RiHeart3Line,     iconBg: "bg-rose-100",    iconColor: "text-rose-500"    },
   { Icon: RiMessage2Line,   iconBg: "bg-amber-100",   iconColor: "text-amber-500"   },
-  { Icon: RiCreditCard2Line, iconBg: "bg-emerald-100", iconColor: "text-emerald-600" },
+  { Icon: RiBankCardLine, iconBg: "bg-emerald-100", iconColor: "text-emerald-600" },
 ];
 
 function SectionHeader({ title, href, label }: { title: string; href: string; label: string }) {

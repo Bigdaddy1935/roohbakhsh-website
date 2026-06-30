@@ -6,9 +6,9 @@ import {
   RiHome3Line,
   RiPlayCircleLine,
   RiHeart3Line,
-  RiCreditCard2Line,
+  RiBankCardLine,
   RiMessage2Line,
-  RiBell3Line,
+  RiBellLine,
   RiUser3Line,
   RiShutDownLine,
   RiUserLine,
@@ -45,9 +45,9 @@ const NAV = [
   { key: "home",          href: "/dashboard",               Icon: RiHome3Line },
   { key: "myCourses",     href: "/dashboard/my-courses",    Icon: RiPlayCircleLine },
   { key: "favorites",     href: "/dashboard/favorites",     Icon: RiHeart3Line },
-  { key: "transactions",  href: "/dashboard/transactions",  Icon: RiCreditCard2Line },
+  { key: "transactions",  href: "/dashboard/transactions",  Icon: RiBankCardLine },
   { key: "tickets",       href: "/dashboard/tickets",       Icon: RiMessage2Line },
-  { key: "notifications", href: "/dashboard/notifications", Icon: RiBell3Line },
+  { key: "notifications", href: "/dashboard/notifications", Icon: RiBellLine },
   { key: "account",       href: "/dashboard/account",       Icon: RiUser3Line },
 ] as const;
 
