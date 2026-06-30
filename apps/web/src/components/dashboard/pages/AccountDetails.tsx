@@ -51,7 +51,7 @@ function FieldRow({
     <div className="flex flex-col gap-y-1.5">
       <label className="text-xs font-bold text-gray-400 uppercase tracking-wide">{label}</label>
       <div
-        className={`flex items-center gap-x-3 h-11 px-4 rounded-xl bg-gray-50 ${!value ? "opacity-40" : ""}`}
+        className={`flex items-center gap-x-3 h-11 px-4 rounded-md bg-gray-50 ${!value ? "opacity-40" : ""}`}
         dir={dir}
       >
         {Icon && <Icon size={16} className="text-gray-400 shrink-0" />}
@@ -81,10 +81,10 @@ export default function AccountDetails() {
   if (isLoading) return <AccountPageSkeleton />;
 
   return (
-    <div className="bg-white p-4 sm:p-5 lg:rounded-2xl lg:p-7 min-h-full">
+    <div className="bg-white p-4 sm:p-5 lg:rounded-lg lg:p-7 min-h-full">
       {/* Profile hero */}
-      <div className="flex items-center gap-x-4 sm:gap-x-5 p-5 sm:p-6 rounded-2xl bg-gradient-to-l from-[var(--brand)]/5 to-[var(--brand)]/10 mb-7">
-        <div className="size-16 sm:size-20 rounded-2xl bg-[var(--brand)] flex items-center justify-center shrink-0 shadow-lg shadow-[var(--brand)]/30">
+      <div className="flex items-center gap-x-4 sm:gap-x-5 p-5 sm:p-6 rounded-lg bg-gradient-to-l from-[var(--brand)]/5 to-[var(--brand)]/10 mb-7">
+        <div className="size-16 sm:size-20 rounded-lg bg-[var(--brand)] flex items-center justify-center shrink-0 shadow-lg shadow-[var(--brand)]/30">
           <RiUser3Line size={32} className="text-white" />
         </div>
         <div className="min-w-0">
@@ -123,7 +123,7 @@ export default function AccountDetails() {
             <RiShieldKeyholeLine size={16} className="text-[var(--brand)]" />
             {ui.security}
           </h2>
-          <div className="flex items-start gap-x-3 p-4 rounded-xl bg-amber-50 border border-amber-100">
+          <div className="flex items-start gap-x-3 p-4 rounded-md bg-amber-50 border border-amber-100">
             <RiShieldKeyholeLine size={18} className="text-amber-400 shrink-0 mt-0.5" />
             <p className="text-xs text-amber-700 leading-relaxed">{ui.notAvailable}</p>
           </div>

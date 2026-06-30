@@ -60,7 +60,7 @@ export default function Favorites() {
   }
 
   return (
-    <div className="bg-white p-4 sm:p-5 lg:rounded-2xl lg:p-7 min-h-full">
+    <div className="bg-white p-4 sm:p-5 lg:rounded-lg lg:p-7 min-h-full">
       <div className="mb-6">
         <h1 className="text-lg font-bold text-[var(--ink)]">{ui.title}</h1>
         <p className="text-sm text-gray-400 mt-0.5">{ui.subtitle}</p>
@@ -70,7 +70,7 @@ export default function Favorites() {
         <FavoritesPageSkeleton />
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 gap-y-4">
-          <div className="size-20 rounded-2xl bg-rose-50 flex items-center justify-center">
+          <div className="size-20 rounded-lg bg-rose-50 flex items-center justify-center">
             <RiHeartLine size={36} className="text-rose-400" />
           </div>
           <div className="text-center">
@@ -85,9 +85,9 @@ export default function Favorites() {
             return (
               <div
                 key={`${item.type}-${item.id}`}
-                className="flex items-center gap-x-3 sm:gap-x-4 p-3 rounded-xl hover:bg-gray-50 transition-colors group"
+                className="flex items-center gap-x-3 sm:gap-x-4 p-3 rounded-md hover:bg-gray-50 transition-colors group"
               >
-                <div className={`size-11 sm:size-12 shrink-0 rounded-xl ${cfg.bg} flex items-center justify-center`}>
+                <div className={`size-11 sm:size-12 shrink-0 rounded-md ${cfg.bg} flex items-center justify-center`}>
                   <cfg.Icon size={22} className={cfg.color} />
                 </div>
                 <Link href={hrefFor(item)} className="flex-1 min-w-0">

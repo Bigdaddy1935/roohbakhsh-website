@@ -99,7 +99,7 @@ export default function Tickets() {
   }
 
   return (
-    <div className="bg-white p-4 sm:p-5 lg:rounded-2xl lg:p-7 min-h-full">
+    <div className="bg-white p-4 sm:p-5 lg:rounded-lg lg:p-7 min-h-full">
       <div className="flex items-start justify-between mb-6 gap-x-4">
         <div>
           <h1 className="text-lg font-bold text-[var(--ink)]">{ui.title}</h1>
@@ -108,7 +108,7 @@ export default function Tickets() {
         <button
           type="button"
           onClick={() => setShowForm(true)}
-          className="shrink-0 flex items-center gap-x-2 h-10 px-4 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity shadow-sm shadow-[var(--brand)]/30 cursor-pointer"
+          className="shrink-0 flex items-center gap-x-2 h-10 px-4 rounded-md bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity shadow-sm shadow-[var(--brand)]/30 cursor-pointer"
         >
           <RiAddLine size={18} />
           <span className="hidden sm:inline">{ui.newTicket}</span>
@@ -119,7 +119,7 @@ export default function Tickets() {
         <TicketsPageSkeleton />
       ) : tickets.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 gap-y-4">
-          <div className="size-20 rounded-2xl bg-[var(--brand)]/10 flex items-center justify-center">
+          <div className="size-20 rounded-lg bg-[var(--brand)]/10 flex items-center justify-center">
             <RiMessage2Line size={36} className="text-[var(--brand)]" />
           </div>
           <div className="text-center">
@@ -128,7 +128,7 @@ export default function Tickets() {
           </div>
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-x-2 h-10 px-6 rounded-xl bg-[var(--brand)] text-white text-sm font-bold hover:opacity-90 transition-opacity cursor-pointer"
+            className="flex items-center gap-x-2 h-10 px-6 rounded-md bg-[var(--brand)] text-white text-sm font-bold hover:opacity-90 transition-opacity cursor-pointer"
           >
             <RiAddLine size={16} />
             {ui.newTicket}
@@ -139,7 +139,7 @@ export default function Tickets() {
           {tickets.map((tk) => {
             const cfg = STATUS_CFG[tk.status];
             return (
-              <div key={tk.id} className="group p-4 sm:p-5 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors">
+              <div key={tk.id} className="group p-4 sm:p-5 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
                 <div className="flex items-start justify-between gap-x-3 mb-3">
                   <div className="flex items-start gap-x-3 min-w-0">
                     <div className={`size-8 shrink-0 rounded-lg ${cfg.badge} flex items-center justify-center mt-0.5`}>
@@ -183,7 +183,7 @@ export default function Tickets() {
           onClick={closeForm}
         >
           <div
-            className="bg-white rounded-t-3xl sm:rounded-2xl w-full sm:max-w-lg max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-t-3xl sm:rounded-lg w-full sm:max-w-lg max-h-[90vh] overflow-y-auto"
             dir="rtl"
             onClick={(e) => e.stopPropagation()}
           >
@@ -202,7 +202,7 @@ export default function Tickets() {
             </div>
             <div className="p-6 flex flex-col gap-y-4">
               {createTicket.isError && (
-                <div className="flex items-center gap-x-2 text-xs text-red-600 bg-red-50 rounded-xl px-4 py-3">
+                <div className="flex items-center gap-x-2 text-xs text-red-600 bg-red-50 rounded-md px-4 py-3">
                   <RiErrorWarningLine size={15} />
                   {ui.error}
                 </div>
@@ -213,7 +213,7 @@ export default function Tickets() {
                   type="text"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  className={`w-full h-11 rounded-xl border px-4 text-sm outline-none focus:border-[var(--brand)] transition-colors ${
+                  className={`w-full h-11 rounded-md border px-4 text-sm outline-none focus:border-[var(--brand)] transition-colors ${
                     fieldErrors.subject ? "border-red-400 bg-red-50" : "border-gray-200"
                   }`}
                 />
@@ -228,7 +228,7 @@ export default function Tickets() {
                   onChange={(e) => setBody(e.target.value)}
                   rows={5}
                   placeholder={ui.bodyPlaceholder}
-                  className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-none ${
+                  className={`w-full rounded-md border px-4 py-3 text-sm outline-none focus:border-[var(--brand)] transition-colors resize-none ${
                     fieldErrors.body ? "border-red-400 bg-red-50" : "border-gray-200"
                   }`}
                 />
@@ -241,7 +241,7 @@ export default function Tickets() {
               <button
                 type="button"
                 onClick={closeForm}
-                className="h-11 px-5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition-colors cursor-pointer"
+                className="h-11 px-5 rounded-md border border-gray-200 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 {ui.cancel}
               </button>
@@ -249,7 +249,7 @@ export default function Tickets() {
                 type="button"
                 onClick={handleSubmit}
                 disabled={createTicket.isPending}
-                className="flex-1 h-11 rounded-xl bg-[var(--brand)] text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-x-2 cursor-pointer"
+                className="flex-1 h-11 rounded-md bg-[var(--brand)] text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-x-2 cursor-pointer"
               >
                 {createTicket.isPending && <RiLoader4Line size={16} className="animate-spin" />}
                 {createTicket.isPending ? ui.submitting : ui.submit}

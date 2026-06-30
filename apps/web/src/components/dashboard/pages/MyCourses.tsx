@@ -49,7 +49,7 @@ export default function MyCourses() {
   if (isLoading) return <CoursesPageSkeleton />;
 
   return (
-    <div className="bg-white p-4 sm:p-5 lg:rounded-2xl lg:p-7 min-h-full">
+    <div className="bg-white p-4 sm:p-5 lg:rounded-lg lg:p-7 min-h-full">
       <div className="mb-6">
         <h1 className="text-lg font-bold text-[var(--ink)]">{ui.title}</h1>
         <p className="text-sm text-gray-400 mt-0.5">{ui.subtitle}</p>
@@ -57,7 +57,7 @@ export default function MyCourses() {
 
       {courses.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 gap-y-4">
-          <div className="size-20 rounded-2xl bg-[var(--brand)]/10 flex items-center justify-center">
+          <div className="size-20 rounded-lg bg-[var(--brand)]/10 flex items-center justify-center">
             <RiBookReadLine size={36} className="text-[var(--brand)]" />
           </div>
           <div className="text-center">
@@ -66,7 +66,7 @@ export default function MyCourses() {
           </div>
           <Link
             href="/courses"
-            className="mt-2 flex items-center gap-x-2 h-11 px-7 rounded-xl bg-[var(--brand)] text-white text-sm font-bold hover:opacity-90 transition-opacity"
+            className="mt-2 flex items-center gap-x-2 h-11 px-7 rounded-md bg-[var(--brand)] text-white text-sm font-bold hover:opacity-90 transition-opacity"
           >
             <RiShoppingBag3Line size={18} />
             {ui.browse}
@@ -77,7 +77,7 @@ export default function MyCourses() {
           {courses.map((c) => (
             <div
               key={c.courseId}
-              className="group flex flex-col rounded-2xl overflow-hidden bg-gray-50 hover:shadow-lg transition-all duration-300"
+              className="group flex flex-col rounded-lg overflow-hidden bg-gray-50 hover:shadow-lg transition-all duration-300"
             >
               {/* Thumbnail */}
               <div className="aspect-video bg-gradient-to-br from-[var(--brand)]/20 via-[var(--brand)]/10 to-transparent flex items-center justify-center">
