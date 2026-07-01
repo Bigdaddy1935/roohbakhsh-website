@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import type { OrderRecord } from "@roohbakhsh/shared";
@@ -8,11 +8,11 @@ import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
 
 const STATUS_MAP = {
-  pending: { label: "Ø¯Ø± Ø§Ù†ØªØ¸Ø§Ø±", color: "bg-yellow-50 text-yellow-700" },
-  paid: { label: "Ù¾Ø±Ø¯Ø§Ø®Øªâ€ŒØ´Ø¯Ù‡", color: "bg-green-50 text-green-700" },
-  failed: { label: "Ù†Ø§Ù…ÙˆÙÙ‚", color: "bg-red-50 text-red-700" },
-  cancelled: { label: "Ù„ØºÙˆØ´Ø¯Ù‡", color: "bg-gray-100 text-gray-500" },
-  refunded: { label: "Ø¨Ø§Ø²Ú¯Ø´ØªÛŒ", color: "bg-blue-50 text-blue-700" },
+  pending: { label: "در انتظار", color: "bg-yellow-50 text-yellow-700" },
+  paid: { label: "پرداخت‌شده", color: "bg-green-50 text-green-700" },
+  failed: { label: "ناموفق", color: "bg-red-50 text-red-700" },
+  cancelled: { label: "لغوشده", color: "bg-gray-100 text-gray-500" },
+  refunded: { label: "بازگشتی", color: "bg-blue-50 text-blue-700" },
 };
 
 export default function OrdersPage() {
@@ -25,33 +25,33 @@ export default function OrdersPage() {
   const columns = [
     {
       key: "id",
-      label: "Ø´Ù†Ø§Ø³Ù‡",
+      label: "شناسه",
       render: (r: OrderRecord) => (
         <span className="font-mono text-xs">{r.id.slice(0, 8)}</span>
       ),
     },
-    { key: "userId", label: "Ú©Ø§Ø±Ø¨Ø± (userId)", render: (r: OrderRecord) => r.userId },
+    { key: "userId", label: "کاربر (userId)", render: (r: OrderRecord) => r.userId },
     {
       key: "total",
-      label: "Ù…Ø¨Ù„Øº",
+      label: "مبلغ",
       render: (r: OrderRecord) =>
         r.total ? `${r.total.amountMinor} ${r.total.currency}` : "-",
     },
     {
       key: "status",
-      label: "ÙˆØ¶Ø¹ÛŒØª",
+      label: "وضعیت",
       render: (r: OrderRecord) => <StatusBadge status={r.status} map={STATUS_MAP} />,
     },
     {
       key: "createdAt",
-      label: "ØªØ§Ø±ÛŒØ®",
+      label: "تاریخ",
       render: (r: OrderRecord) => r.createdAt.slice(0, 10),
     },
   ];
 
   return (
     <div>
-      <PageHeader title="Ø³ÙØ§Ø±Ø´â€ŒÙ‡Ø§" description="Ù„ÛŒØ³Øª Ø³ÙØ§Ø±Ø´â€ŒÙ‡Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø±Ø§Ù†" />
+      <PageHeader title="سفارش‌ها" description="لیست سفارش‌های کاربران" />
 
       <DataTable
         columns={columns as Parameters<typeof DataTable>[0]["columns"]}

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, type FormEvent } from "react";
 import type { ArticleRecord, Localized } from "@roohbakhsh/shared";
@@ -18,8 +18,8 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { RiEditLine, RiDeleteBinLine } from "react-icons/ri";
 
 const STATUS_MAP = {
-  draft: { label: "Ù¾ÛŒØ´â€ŒÙ†ÙˆÛŒØ³", color: "bg-gray-100 text-gray-500" },
-  published: { label: "Ù…Ù†ØªØ´Ø±Ø´Ø¯Ù‡", color: "bg-green-50 text-green-700" },
+  draft: { label: "پیش‌نویس", color: "bg-gray-100 text-gray-500" },
+  published: { label: "منتشرشده", color: "bg-green-50 text-green-700" },
 };
 
 const emptyForm = {
@@ -88,11 +88,11 @@ export default function ArticlesPage() {
   const isPending = createMut.isPending || updateMut.isPending;
 
   const columns = [
-    { key: "title", label: "Ø¹Ù†ÙˆØ§Ù† (Ø¹Ø±Ø¨ÛŒ)", render: (r: ArticleRecord) => r.title.ar },
+    { key: "title", label: "عنوان (عربی)", render: (r: ArticleRecord) => r.title.ar },
     { key: "slug", label: "slug" },
     {
       key: "instructor",
-      label: "Ù†ÙˆÛŒØ³Ù†Ø¯Ù‡",
+      label: "نویسنده",
       render: (r: ArticleRecord) => {
         const inst = instructors?.find((i) => i.id === r.instructorId);
         return inst?.name.ar ?? "-";
@@ -100,12 +100,12 @@ export default function ArticlesPage() {
     },
     {
       key: "status",
-      label: "ÙˆØ¶Ø¹ÛŒØª",
+      label: "وضعیت",
       render: (r: ArticleRecord) => <StatusBadge status={r.status ?? "draft"} map={STATUS_MAP} />,
     },
     {
       key: "actions",
-      label: "Ø¹Ù…Ù„ÛŒØ§Øª",
+      label: "عملیات",
       render: (r: ArticleRecord) => (
         <div className="flex gap-2">
           <button
@@ -128,10 +128,10 @@ export default function ArticlesPage() {
   return (
     <div>
       <PageHeader
-        title="Ù…Ù‚Ø§Ù„Ø§Øª"
-        description="Ù…Ø¯ÛŒØ±ÛŒØª Ù…Ù‚Ø§Ù„Ø§Øª ÙˆØ¨Ù„Ø§Ú¯"
+        title="مقالات"
+        description="مدیریت مقالات وبلاگ"
         onAdd={openCreate}
-        addLabel="Ù…Ù‚Ø§Ù„Ù‡ Ø¬Ø¯ÛŒØ¯"
+        addLabel="مقاله جدید"
       />
 
       <DataTable
@@ -146,12 +146,12 @@ export default function ArticlesPage() {
       <FormModal
         isOpen={formOpen}
         onClose={() => setFormOpen(false)}
-        title={editing ? "ÙˆÛŒØ±Ø§ÛŒØ´ Ù…Ù‚Ø§Ù„Ù‡" : "Ù…Ù‚Ø§Ù„Ù‡ Ø¬Ø¯ÛŒØ¯"}
+        title={editing ? "ویرایش مقاله" : "مقاله جدید"}
         onSubmit={handleSubmit}
         isPending={isPending}
       >
         <LocalizedInput
-          label="Ø¹Ù†ÙˆØ§Ù†"
+          label="عنوان"
           value={form.title}
           onChange={(v) => setForm((f) => ({ ...f, title: v }))}
           required
@@ -168,26 +168,26 @@ export default function ArticlesPage() {
           />
         </div>
         <LocalizedInput
-          label="Ø®Ù„Ø§ØµÙ‡"
+          label="خلاصه"
           value={form.summary}
           onChange={(v) => setForm((f) => ({ ...f, summary: v }))}
           multiline
         />
         <LocalizedInput
-          label="Ù…ØªÙ† Ù…Ù‚Ø§Ù„Ù‡"
+          label="متن مقاله"
           value={form.body}
           onChange={(v) => setForm((f) => ({ ...f, body: v }))}
           multiline
         />
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-600">Ù†ÙˆÛŒØ³Ù†Ø¯Ù‡</label>
+            <label className="text-sm font-medium text-gray-600">نویسنده</label>
             <select
               value={form.instructorId}
               onChange={(e) => setForm((f) => ({ ...f, instructorId: e.target.value }))}
               className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[var(--brand)]"
             >
-              <option value="">Ø§Ù†ØªØ®Ø§Ø¨ Ú©Ù†ÛŒØ¯</option>
+              <option value="">انتخاب کنید</option>
               {instructors?.map((i) => (
                 <option key={i.id} value={i.id}>
                   {i.name.ar}
@@ -196,7 +196,7 @@ export default function ArticlesPage() {
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-600">ÙˆØ¶Ø¹ÛŒØª</label>
+            <label className="text-sm font-medium text-gray-600">وضعیت</label>
             <select
               value={form.status}
               onChange={(e) =>
@@ -204,8 +204,8 @@ export default function ArticlesPage() {
               }
               className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[var(--brand)]"
             >
-              <option value="draft">Ù¾ÛŒØ´â€ŒÙ†ÙˆÛŒØ³</option>
-              <option value="published">Ù…Ù†ØªØ´Ø±Ø´Ø¯Ù‡</option>
+              <option value="draft">پیش‌نویس</option>
+              <option value="published">منتشرشده</option>
             </select>
           </div>
         </div>
@@ -221,8 +221,8 @@ export default function ArticlesPage() {
           }
         }}
         isPending={deleteMut.isPending}
-        title="Ø­Ø°Ù Ù…Ù‚Ø§Ù„Ù‡"
-        description={`Ø¢ÛŒØ§ Ø§Ø² Ø­Ø°Ù "${deleteTarget?.title.ar}" Ù…Ø·Ù…Ø¦Ù† Ù‡Ø³ØªÛŒØ¯ØŸ`}
+        title="حذف مقاله"
+        description={`آیا از حذف "${deleteTarget?.title.ar}" مطمئن هستید؟`}
       />
     </div>
   );

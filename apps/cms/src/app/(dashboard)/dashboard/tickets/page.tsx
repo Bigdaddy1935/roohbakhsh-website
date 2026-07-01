@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, type FormEvent } from "react";
 import type { Ticket } from "@roohbakhsh/shared";
@@ -14,9 +14,9 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { RiArrowRightLine, RiSendPlaneLine } from "react-icons/ri";
 
 const STATUS_MAP = {
-  open: { label: "Ø¨Ø§Ø²", color: "bg-blue-50 text-blue-700" },
-  answered: { label: "Ù¾Ø§Ø³Ø®â€ŒØ¯Ø§Ø¯Ù‡â€ŒØ´Ø¯Ù‡", color: "bg-yellow-50 text-yellow-700" },
-  closed: { label: "Ø¨Ø³ØªÙ‡", color: "bg-gray-100 text-gray-500" },
+  open: { label: "باز", color: "bg-blue-50 text-blue-700" },
+  answered: { label: "پاسخ‌داده‌شده", color: "bg-yellow-50 text-yellow-700" },
+  closed: { label: "بسته", color: "bg-gray-100 text-gray-500" },
 };
 
 export default function TicketsPage() {
@@ -60,7 +60,7 @@ export default function TicketsPage() {
               disabled={closeMut.isPending}
               className="mr-auto px-3 py-1.5 text-sm rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
             >
-              Ø¨Ø³ØªÙ† ØªÛŒÚ©Øª
+              بستن تیکت
             </button>
           )}
         </div>
@@ -77,7 +77,7 @@ export default function TicketsPage() {
             >
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs font-medium text-gray-500">
-                  {msg.authorType === "support" ? "Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ" : "Ú©Ø§Ø±Ø¨Ø±"}
+                  {msg.authorType === "support" ? "پشتیبانی" : "کاربر"}
                 </span>
                 <span className="text-xs text-gray-400">{msg.createdAt.slice(0, 10)}</span>
               </div>
@@ -92,7 +92,7 @@ export default function TicketsPage() {
               value={replyBody}
               onChange={(e) => setReplyBody(e.target.value)}
               rows={4}
-              placeholder="Ù…ØªÙ† Ù¾Ø§Ø³Ø® Ø±Ø§ ÙˆØ§Ø±Ø¯ Ú©Ù†ÛŒØ¯..."
+              placeholder="متن پاسخ را وارد کنید..."
               className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[var(--brand)]"
             />
             <div className="flex justify-end">
@@ -102,7 +102,7 @@ export default function TicketsPage() {
                 className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md bg-[var(--brand)] text-white hover:opacity-90 disabled:opacity-50"
               >
                 <RiSendPlaneLine />
-                {replyMut.isPending ? "Ø¯Ø± Ø­Ø§Ù„ Ø§Ø±Ø³Ø§Ù„..." : "Ø§Ø±Ø³Ø§Ù„ Ù¾Ø§Ø³Ø®"}
+                {replyMut.isPending ? "در حال ارسال..." : "ارسال پاسخ"}
               </button>
             </div>
           </form>
@@ -112,31 +112,31 @@ export default function TicketsPage() {
   }
 
   const columns = [
-    { key: "subject", label: "Ù…ÙˆØ¶ÙˆØ¹", render: (r: Ticket) => r.subject },
+    { key: "subject", label: "موضوع", render: (r: Ticket) => r.subject },
     {
       key: "status",
-      label: "ÙˆØ¶Ø¹ÛŒØª",
+      label: "وضعیت",
       render: (r: Ticket) => <StatusBadge status={r.status} map={STATUS_MAP} />,
     },
     {
       key: "contact",
-      label: "Ø§ÛŒÙ…ÛŒÙ„/Ú©Ø§Ø±Ø¨Ø±",
+      label: "ایمیل/کاربر",
       render: (r: Ticket) => r.guestEmail ?? r.userId ?? "-",
     },
     {
       key: "createdAt",
-      label: "ØªØ§Ø±ÛŒØ®",
+      label: "تاریخ",
       render: (r: Ticket) => r.createdAt.slice(0, 10),
     },
     {
       key: "actions",
-      label: "Ù…Ø´Ø§Ù‡Ø¯Ù‡",
+      label: "مشاهده",
       render: (r: Ticket) => (
         <button
           onClick={() => setSelectedId(r.id)}
           className="px-3 py-1.5 text-xs rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50"
         >
-          Ù…Ø´Ø§Ù‡Ø¯Ù‡
+          مشاهده
         </button>
       ),
     },
@@ -144,7 +144,7 @@ export default function TicketsPage() {
 
   return (
     <div>
-      <PageHeader title="ØªÛŒÚ©Øªâ€ŒÙ‡Ø§" description="Ù…Ø¯ÛŒØ±ÛŒØª ØªÛŒÚ©Øªâ€ŒÙ‡Ø§ÛŒ Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ" />
+      <PageHeader title="تیکت‌ها" description="مدیریت تیکت‌های پشتیبانی" />
 
       <DataTable
         columns={columns as Parameters<typeof DataTable>[0]["columns"]}

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, type FormEvent } from "react";
 import type { Category, Localized } from "@roohbakhsh/shared";
@@ -72,11 +72,11 @@ export default function CategoriesPage() {
   const isPending = createMut.isPending || updateMut.isPending;
 
   const columns = [
-    { key: "name", label: "Ù†Ø§Ù… (Ø¹Ø±Ø¨ÛŒ)", render: (r: Category) => r.name.ar },
+    { key: "name", label: "نام (عربی)", render: (r: Category) => r.name.ar },
     { key: "slug", label: "slug" },
     {
       key: "parentId",
-      label: "ÙˆØ§Ù„Ø¯",
+      label: "والد",
       render: (r: Category) => {
         if (!r.parentId) return "-";
         const parent = items.find((c) => c.id === r.parentId);
@@ -85,12 +85,12 @@ export default function CategoriesPage() {
     },
     {
       key: "courseCount",
-      label: "ØªØ¹Ø¯Ø§Ø¯ Ø¯ÙˆØ±Ù‡",
+      label: "تعداد دوره",
       render: (r: Category) => (r as Category & { courseCount?: number }).courseCount ?? "-",
     },
     {
       key: "actions",
-      label: "Ø¹Ù…Ù„ÛŒØ§Øª",
+      label: "عملیات",
       render: (r: Category) => (
         <div className="flex gap-2">
           <button
@@ -113,10 +113,10 @@ export default function CategoriesPage() {
   return (
     <div>
       <PageHeader
-        title="Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒâ€ŒÙ‡Ø§"
-        description="Ù…Ø¯ÛŒØ±ÛŒØª Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒ Ø¯ÙˆØ±Ù‡â€ŒÙ‡Ø§"
+        title="دسته‌بندی‌ها"
+        description="مدیریت دسته‌بندی دوره‌ها"
         onAdd={openCreate}
-        addLabel="Ø¯Ø³ØªÙ‡ Ø¬Ø¯ÛŒØ¯"
+        addLabel="دسته جدید"
       />
 
       <DataTable
@@ -131,12 +131,12 @@ export default function CategoriesPage() {
       <FormModal
         isOpen={formOpen}
         onClose={() => setFormOpen(false)}
-        title={editing ? "ÙˆÛŒØ±Ø§ÛŒØ´ Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒ" : "Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒ Ø¬Ø¯ÛŒØ¯"}
+        title={editing ? "ویرایش دسته‌بندی" : "دسته‌بندی جدید"}
         onSubmit={handleSubmit}
         isPending={isPending}
       >
         <LocalizedInput
-          label="Ù†Ø§Ù…"
+          label="نام"
           value={form.name}
           onChange={(v) => setForm((f) => ({ ...f, name: v }))}
           required
@@ -153,13 +153,13 @@ export default function CategoriesPage() {
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium text-gray-600">Ø¯Ø³ØªÙ‡ ÙˆØ§Ù„Ø¯</label>
+          <label className="text-sm font-medium text-gray-600">دسته والد</label>
           <select
             value={form.parentId}
             onChange={(e) => setForm((f) => ({ ...f, parentId: e.target.value }))}
             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[var(--brand)]"
           >
-            <option value="">Ø¨Ø¯ÙˆÙ† ÙˆØ§Ù„Ø¯</option>
+            <option value="">بدون والد</option>
             {items
               .filter((c) => c.id !== editing?.id)
               .map((c) => (
@@ -170,7 +170,7 @@ export default function CategoriesPage() {
           </select>
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium text-gray-600">ØªØ±ØªÛŒØ¨</label>
+          <label className="text-sm font-medium text-gray-600">ترتیب</label>
           <input
             type="number"
             value={form.order}
@@ -191,8 +191,8 @@ export default function CategoriesPage() {
           }
         }}
         isPending={deleteMut.isPending}
-        title="Ø­Ø°Ù Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒ"
-        description={`Ø¢ÛŒØ§ Ø§Ø² Ø­Ø°Ù "${deleteTarget?.name.ar}" Ù…Ø·Ù…Ø¦Ù† Ù‡Ø³ØªÛŒØ¯ØŸ`}
+        title="حذف دسته‌بندی"
+        description={`آیا از حذف "${deleteTarget?.name.ar}" مطمئن هستید؟`}
       />
     </div>
   );

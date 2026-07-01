@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, type FormEvent } from "react";
 import type { InstructorDetail, Localized } from "@roohbakhsh/shared";
@@ -72,11 +72,11 @@ export default function InstructorsPage() {
   const isPending = createMut.isPending || updateMut.isPending;
 
   const columns = [
-    { key: "name", label: "Ù†Ø§Ù… (Ø¹Ø±Ø¨ÛŒ)", render: (r: InstructorDetail) => r.name.ar },
+    { key: "name", label: "نام (عربی)", render: (r: InstructorDetail) => r.name.ar },
     { key: "slug", label: "slug" },
     {
       key: "actions",
-      label: "Ø¹Ù…Ù„ÛŒØ§Øª",
+      label: "عملیات",
       render: (r: InstructorDetail) => (
         <div className="flex gap-2">
           <button
@@ -99,10 +99,10 @@ export default function InstructorsPage() {
   return (
     <div>
       <PageHeader
-        title="Ø§Ø³Ø§ØªÛŒØ¯"
-        description="Ù…Ø¯ÛŒØ±ÛŒØª Ø§Ø³Ø§ØªÛŒØ¯"
+        title="اساتید"
+        description="مدیریت اساتید"
         onAdd={openCreate}
-        addLabel="Ø§Ø³ØªØ§Ø¯ Ø¬Ø¯ÛŒØ¯"
+        addLabel="استاد جدید"
       />
 
       <DataTable
@@ -117,12 +117,12 @@ export default function InstructorsPage() {
       <FormModal
         isOpen={formOpen}
         onClose={() => setFormOpen(false)}
-        title={editing ? "ÙˆÛŒØ±Ø§ÛŒØ´ Ø§Ø³ØªØ§Ø¯" : "Ø§Ø³ØªØ§Ø¯ Ø¬Ø¯ÛŒØ¯"}
+        title={editing ? "ویرایش استاد" : "استاد جدید"}
         onSubmit={handleSubmit}
         isPending={isPending}
       >
         <LocalizedInput
-          label="Ù†Ø§Ù…"
+          label="نام"
           value={form.name}
           onChange={(v) => setForm((f) => ({ ...f, name: v }))}
           required
@@ -139,7 +139,7 @@ export default function InstructorsPage() {
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium text-gray-600">Ø¢Ø¯Ø±Ø³ ØªØµÙˆÛŒØ±</label>
+          <label className="text-sm font-medium text-gray-600">آدرس تصویر</label>
           <input
             type="text"
             value={form.avatarUrl}
@@ -149,7 +149,7 @@ export default function InstructorsPage() {
           />
         </div>
         <LocalizedInput
-          label="Ø¨ÛŒÙˆÚ¯Ø±Ø§ÙÛŒ"
+          label="بیوگرافی"
           value={form.bio}
           onChange={(v) => setForm((f) => ({ ...f, bio: v }))}
           multiline
@@ -166,8 +166,8 @@ export default function InstructorsPage() {
           }
         }}
         isPending={deleteMut.isPending}
-        title="Ø­Ø°Ù Ø§Ø³ØªØ§Ø¯"
-        description={`Ø¢ÛŒØ§ Ø§Ø² Ø­Ø°Ù "${deleteTarget?.name.ar}" Ù…Ø·Ù…Ø¦Ù† Ù‡Ø³ØªÛŒØ¯ØŸ`}
+        title="حذف استاد"
+        description={`آیا از حذف "${deleteTarget?.name.ar}" مطمئن هستید؟`}
       />
     </div>
   );

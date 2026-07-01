@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, type FormEvent } from "react";
 import type { CourseRecord, Localized } from "@roohbakhsh/shared";
@@ -19,14 +19,14 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { RiEditLine, RiDeleteBinLine } from "react-icons/ri";
 
 const LEVEL_MAP = {
-  beginner: { label: "Ù…Ø¨ØªØ¯ÛŒ", color: "bg-green-50 text-green-700" },
-  intermediate: { label: "Ù…ØªÙˆØ³Ø·", color: "bg-yellow-50 text-yellow-700" },
-  advanced: { label: "Ù¾ÛŒØ´Ø±ÙØªÙ‡", color: "bg-red-50 text-red-700" },
+  beginner: { label: "مبتدی", color: "bg-green-50 text-green-700" },
+  intermediate: { label: "متوسط", color: "bg-yellow-50 text-yellow-700" },
+  advanced: { label: "پیشرفته", color: "bg-red-50 text-red-700" },
 };
 
 const PUBLISHED_MAP = {
-  true: { label: "Ù…Ù†ØªØ´Ø±Ø´Ø¯Ù‡", color: "bg-green-50 text-green-700" },
-  false: { label: "Ù¾ÛŒØ´â€ŒÙ†ÙˆÛŒØ³", color: "bg-gray-100 text-gray-500" },
+  true: { label: "منتشرشده", color: "bg-green-50 text-green-700" },
+  false: { label: "پیش‌نویس", color: "bg-gray-100 text-gray-500" },
 };
 
 const emptyForm = {
@@ -106,16 +106,16 @@ export default function CoursesPage() {
   const isPending = createMut.isPending || updateMut.isPending;
 
   const columns = [
-    { key: "title", label: "Ø¹Ù†ÙˆØ§Ù† (Ø¹Ø±Ø¨ÛŒ)", render: (r: CourseRecord) => r.title.ar },
+    { key: "title", label: "عنوان (عربی)", render: (r: CourseRecord) => r.title.ar },
     { key: "slug", label: "slug" },
     {
       key: "level",
-      label: "Ø³Ø·Ø­",
+      label: "سطح",
       render: (r: CourseRecord) => <StatusBadge status={r.level} map={LEVEL_MAP} />,
     },
     {
       key: "instructor",
-      label: "Ø§Ø³ØªØ§Ø¯",
+      label: "استاد",
       render: (r: CourseRecord) => {
         const inst = instructors?.find((i) => i.id === r.instructorId);
         return inst?.name.ar ?? r.instructorId ?? "-";
@@ -123,14 +123,14 @@ export default function CoursesPage() {
     },
     {
       key: "isPublished",
-      label: "ÙˆØ¶Ø¹ÛŒØª",
+      label: "وضعیت",
       render: (r: CourseRecord) => (
         <StatusBadge status={String(r.isPublished)} map={PUBLISHED_MAP} />
       ),
     },
     {
       key: "actions",
-      label: "Ø¹Ù…Ù„ÛŒØ§Øª",
+      label: "عملیات",
       render: (r: CourseRecord) => (
         <div className="flex gap-2">
           <button
@@ -153,10 +153,10 @@ export default function CoursesPage() {
   return (
     <div>
       <PageHeader
-        title="Ø¯ÙˆØ±Ù‡â€ŒÙ‡Ø§"
-        description="Ù…Ø¯ÛŒØ±ÛŒØª Ø¯ÙˆØ±Ù‡â€ŒÙ‡Ø§ÛŒ Ø¢Ù…ÙˆØ²Ø´ÛŒ"
+        title="دوره‌ها"
+        description="مدیریت دوره‌های آموزشی"
         onAdd={openCreate}
-        addLabel="Ø¯ÙˆØ±Ù‡ Ø¬Ø¯ÛŒØ¯"
+        addLabel="دوره جدید"
       />
 
       <DataTable
@@ -171,12 +171,12 @@ export default function CoursesPage() {
       <FormModal
         isOpen={formOpen}
         onClose={() => setFormOpen(false)}
-        title={editing ? "ÙˆÛŒØ±Ø§ÛŒØ´ Ø¯ÙˆØ±Ù‡" : "Ø¯ÙˆØ±Ù‡ Ø¬Ø¯ÛŒØ¯"}
+        title={editing ? "ویرایش دوره" : "دوره جدید"}
         onSubmit={handleSubmit}
         isPending={isPending}
       >
         <LocalizedInput
-          label="Ø¹Ù†ÙˆØ§Ù†"
+          label="عنوان"
           value={form.title}
           onChange={(v) => setForm((f) => ({ ...f, title: v }))}
           required
@@ -193,14 +193,14 @@ export default function CoursesPage() {
           />
         </div>
         <LocalizedInput
-          label="ØªÙˆØ¶ÛŒØ­Ø§Øª"
+          label="توضیحات"
           value={form.description}
           onChange={(v) => setForm((f) => ({ ...f, description: v }))}
           multiline
         />
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-600">Ø³Ø·Ø­</label>
+            <label className="text-sm font-medium text-gray-600">سطح</label>
             <select
               value={form.level}
               onChange={(e) =>
@@ -211,20 +211,20 @@ export default function CoursesPage() {
               }
               className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[var(--brand)]"
             >
-              <option value="beginner">Ù…Ø¨ØªØ¯ÛŒ</option>
-              <option value="intermediate">Ù…ØªÙˆØ³Ø·</option>
-              <option value="advanced">Ù¾ÛŒØ´Ø±ÙØªÙ‡</option>
+              <option value="beginner">مبتدی</option>
+              <option value="intermediate">متوسط</option>
+              <option value="advanced">پیشرفته</option>
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-600">Ø§Ø³ØªØ§Ø¯ <span className="text-red-500">*</span></label>
+            <label className="text-sm font-medium text-gray-600">استاد <span className="text-red-500">*</span></label>
             <select
               value={form.instructorId}
               onChange={(e) => setForm((f) => ({ ...f, instructorId: e.target.value }))}
               required
               className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[var(--brand)]"
             >
-              <option value="">Ø§Ù†ØªØ®Ø§Ø¨ Ú©Ù†ÛŒØ¯</option>
+              <option value="">انتخاب کنید</option>
               {instructors?.map((i) => (
                 <option key={i.id} value={i.id}>
                   {i.name.ar}
@@ -234,13 +234,13 @@ export default function CoursesPage() {
           </div>
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium text-gray-600">Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒ</label>
+          <label className="text-sm font-medium text-gray-600">دسته‌بندی</label>
           <select
             value={form.categoryId}
             onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))}
             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[var(--brand)]"
           >
-            <option value="">Ø¨Ø¯ÙˆÙ† Ø¯Ø³ØªÙ‡</option>
+            <option value="">بدون دسته</option>
             {categories?.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name.ar}
@@ -250,7 +250,7 @@ export default function CoursesPage() {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-600">Ù‚ÛŒÙ…Øª (Ú©ÙˆÚ†Ú©â€ŒØªØ±ÛŒÙ† ÙˆØ§Ø­Ø¯)</label>
+            <label className="text-sm font-medium text-gray-600">قیمت (کوچک‌ترین واحد)</label>
             <input
               type="number"
               value={form.priceAmountMinor}
@@ -261,7 +261,7 @@ export default function CoursesPage() {
             />
           </div>
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-600">Ø§Ø±Ø²</label>
+            <label className="text-sm font-medium text-gray-600">ارز</label>
             <select
               value={form.priceCurrency}
               onChange={(e) =>
@@ -285,7 +285,7 @@ export default function CoursesPage() {
             onChange={(e) => setForm((f) => ({ ...f, isPublished: e.target.checked }))}
             className="rounded"
           />
-          Ù…Ù†ØªØ´Ø± Ø´ÙˆØ¯
+          منتشر شود
         </label>
       </FormModal>
 
@@ -299,8 +299,8 @@ export default function CoursesPage() {
           }
         }}
         isPending={deleteMut.isPending}
-        title="Ø­Ø°Ù Ø¯ÙˆØ±Ù‡"
-        description={`Ø¢ÛŒØ§ Ø§Ø² Ø­Ø°Ù "${deleteTarget?.title.ar}" Ù…Ø·Ù…Ø¦Ù† Ù‡Ø³ØªÛŒØ¯ØŸ`}
+        title="حذف دوره"
+        description={`آیا از حذف "${deleteTarget?.title.ar}" مطمئن هستید؟`}
       />
     </div>
   );
