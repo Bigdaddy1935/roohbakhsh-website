@@ -24,3 +24,25 @@ export interface ArticleRecord {
 }
 
 export type PaginatedArticles = Paginated<ArticleRecord>;
+
+export interface CreateArticleRequest {
+  title: Localized;
+  slug: string;
+  summary: Localized;
+  body: Localized;
+  thumbnailUrl?: Localized<string | null>;
+  instructorId: string;
+  categoryId?: string | null;
+  status?: ArticleStatus;
+}
+
+export interface UpdateArticleRequest {
+  title?: Localized;
+  slug?: string;
+  summary?: Localized;
+  body?: Localized;
+  thumbnailUrl?: Localized<string | null>;
+  instructorId?: string;
+  categoryId?: string | null;
+  status?: ArticleStatus;
+}
