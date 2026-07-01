@@ -23,7 +23,7 @@ export default function ConfirmModal({
   return (
     <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
       <Modal.Backdrop>
-        <Modal.Container placement="center" className="max-w-sm w-full mx-4">
+        <Modal.Container placement="center" className="max-w-lg w-full mx-4">
           <Modal.Dialog className="bg-white rounded-lg">
             <Modal.Header className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
               <Modal.Heading className="text-[var(--ink)] font-bold text-base">

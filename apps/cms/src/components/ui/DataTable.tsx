@@ -31,8 +31,8 @@ export default function DataTable<T>({
         <Table.ScrollContainer className="overflow-x-auto">
           <Table.Content>
             <Table.Header>
-              {columns.map((col) => (
-                <Table.Column key={col.key}>{col.label}</Table.Column>
+              {columns.map((col, idx) => (
+                <Table.Column key={col.key} isRowHeader={idx === 0}>{col.label}</Table.Column>
               ))}
             </Table.Header>
             <Table.Body>

@@ -87,21 +87,17 @@ export default function CouponsPage() {
 
       <FormModal isOpen={createOpen} onClose={() => setCreateOpen(false)} title="کوپن جدید" onSubmit={handleCreate} isPending={createMut.isPending}>
         <FormField label="کد کوپن" value={createForm.code} onChange={(e) => setCreateForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))} required dir="ltr" />
-        <div className="grid grid-cols-2 gap-3">
-          <FormField as="select" label="نوع تخفیف" value={createForm.discountType} onChange={(e) => setCreateForm((f) => ({ ...f, discountType: e.target.value as typeof f.discountType }))}>
-            <option value="percentage">درصدی</option>
-            <option value="fixed">ثابت</option>
-          </FormField>
-          <FormField label="مقدار" type="number" value={createForm.discountValue} onChange={(e) => setCreateForm((f) => ({ ...f, discountValue: e.target.value }))} required dir="ltr" />
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <FormField as="select" label="ارز" value={createForm.currency} onChange={(e) => setCreateForm((f) => ({ ...f, currency: e.target.value as typeof f.currency }))}>
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="IRR">IRR</option>
-          </FormField>
-          <FormField label="حداکثر استفاده" type="number" value={createForm.maxUses} onChange={(e) => setCreateForm((f) => ({ ...f, maxUses: e.target.value }))} dir="ltr" />
-        </div>
+        <FormField as="select" label="نوع تخفیف" value={createForm.discountType} onChange={(e) => setCreateForm((f) => ({ ...f, discountType: e.target.value as typeof f.discountType }))}>
+          <option value="percentage">درصدی</option>
+          <option value="fixed">ثابت</option>
+        </FormField>
+        <FormField label="مقدار" type="number" value={createForm.discountValue} onChange={(e) => setCreateForm((f) => ({ ...f, discountValue: e.target.value }))} required dir="ltr" />
+        <FormField as="select" label="ارز" value={createForm.currency} onChange={(e) => setCreateForm((f) => ({ ...f, currency: e.target.value as typeof f.currency }))}>
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+          <option value="IRR">IRR</option>
+        </FormField>
+        <FormField label="حداکثر استفاده" type="number" value={createForm.maxUses} onChange={(e) => setCreateForm((f) => ({ ...f, maxUses: e.target.value }))} dir="ltr" />
         <FormField label="تاریخ انقضا" type="date" value={createForm.expiresAt} onChange={(e) => setCreateForm((f) => ({ ...f, expiresAt: e.target.value }))} dir="ltr" />
         <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
           <input

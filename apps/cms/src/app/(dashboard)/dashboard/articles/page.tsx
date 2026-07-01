@@ -94,16 +94,14 @@ export default function ArticlesPage() {
         <FormField label="Slug" value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} required dir="ltr" />
         <LocalizedInput label="خلاصه" value={form.summary} onChange={(v) => setForm((f) => ({ ...f, summary: v }))} multiline />
         <LocalizedInput label="متن مقاله" value={form.body} onChange={(v) => setForm((f) => ({ ...f, body: v }))} multiline />
-        <div className="grid grid-cols-2 gap-3">
-          <FormField as="select" label="نویسنده" value={form.instructorId} onChange={(e) => setForm((f) => ({ ...f, instructorId: e.target.value }))}>
-            <option value="">انتخاب کنید</option>
-            {instructors?.map((i) => <option key={i.id} value={i.id}>{i.name.ar}</option>)}
-          </FormField>
-          <FormField as="select" label="وضعیت" value={form.status} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as typeof form.status }))}>
-            <option value="draft">پیش‌نویس</option>
-            <option value="published">منتشرشده</option>
-          </FormField>
-        </div>
+        <FormField as="select" label="نویسنده" value={form.instructorId} onChange={(e) => setForm((f) => ({ ...f, instructorId: e.target.value }))}>
+          <option value="">انتخاب کنید</option>
+          {instructors?.map((i) => <option key={i.id} value={i.id}>{i.name.ar}</option>)}
+        </FormField>
+        <FormField as="select" label="وضعیت" value={form.status} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as typeof form.status }))}>
+          <option value="draft">پیش‌نویس</option>
+          <option value="published">منتشرشده</option>
+        </FormField>
       </FormModal>
 
       <ConfirmModal
