@@ -937,9 +937,35 @@ interface NotificationsSummary {
 
 ## فرایند تغییر قرارداد (مهم)
 
+---
+
+## §19 — Admin Stats (آمار داشبورد ادمین)
+
+### `GET /admin/stats` 🔒 admin
+
+آمار کلی سیستم برای نمایش در داشبورد CMS.
+
+```ts
+interface AdminStats {
+  totalUsers: number;       // کل کاربران
+  totalCourses: number;     // کل دوره‌ها
+  publishedCourses: number; // دوره‌های منتشرشده
+  totalArticles: number;    // کل مقالات
+  paidOrders: number;       // سفارش‌های پرداخت‌شده
+  pendingTickets: number;   // تیکت‌های باز (open)
+  pendingReviews: number;   // نظرات در انتظار تأیید (isApproved = false)
+}
+```
+
+پاسخ: `AdminStats`
+خطاها: `401 Unauthorized`, `403 FORBIDDEN`
+
+---
+
 اگر وسط کار نیاز به تغییر یک API بود:
 1. اول این فایل را آپدیت کن و تایپش را در `packages/shared` عوض کن.
 2. در همان PR، بک‌اند را با تایپ جدید هماهنگ کن.
 3. ادیتور فرانت خودکار قرمز می‌شود → فرانت‌کار می‌داند کجا را باید عوض کند.
 
 این چرخه تضمین می‌کند فرانت و بک هیچ‌وقت از هم جدا نشوند.
+

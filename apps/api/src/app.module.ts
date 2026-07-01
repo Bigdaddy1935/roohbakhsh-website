@@ -21,6 +21,7 @@ import { FavoritesModule } from "./modules/favorites/favorites.module";
 import { ProgressModule } from "./modules/progress/progress.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { SeedModule } from "./db/seed/seed.module";
+import { AdminModule } from "./modules/admin/admin.module";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { JwtAuthGuard } from "./modules/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "./common/guards/roles.guard";
@@ -53,6 +54,7 @@ import { RolesGuard } from "./common/guards/roles.guard";
     FavoritesModule,
     ProgressModule,
     NotificationsModule,
+    AdminModule,
     // فقط در توسعه: داده‌های نمونه را خودکار seed می‌کند (هیچ‌وقت در production)
     ...(process.env.NODE_ENV !== "production" ? [SeedModule] : []),
   ],

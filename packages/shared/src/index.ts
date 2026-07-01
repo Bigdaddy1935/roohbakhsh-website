@@ -21,3 +21,4 @@ export * from "./recently-viewed";
 export * from "./favorite";
 export * from "./progress";
 export * from "./notification";
+export * from "./admin";
