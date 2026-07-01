@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import type { User, UserRole } from "@roohbakhsh/shared";
@@ -10,9 +10,9 @@ import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
 
 const ROLE_MAP = {
-  admin: { label: "ادمین", color: "bg-purple-50 text-purple-700" },
-  instructor: { label: "استاد", color: "bg-blue-50 text-blue-700" },
-  user: { label: "کاربر", color: "bg-gray-100 text-gray-500" },
+  admin: { label: "Ø§Ø¯Ù…ÛŒÙ†", color: "bg-purple-50 text-purple-700" },
+  instructor: { label: "Ø§Ø³ØªØ§Ø¯", color: "bg-blue-50 text-blue-700" },
+  user: { label: "Ú©Ø§Ø±Ø¨Ø±", color: "bg-gray-100 text-gray-500" },
 };
 
 export default function UsersPage() {
@@ -29,11 +29,11 @@ export default function UsersPage() {
   const totalPages = data?.totalPages ?? 1;
 
   const columns = [
-    { key: "fullName", label: "نام کامل", render: (r: User) => r.fullName ?? "-" },
-    { key: "email", label: "ایمیل", render: (r: User) => r.email },
+    { key: "fullName", label: "Ù†Ø§Ù… Ú©Ø§Ù…Ù„", render: (r: User) => r.fullName ?? "-" },
+    { key: "email", label: "Ø§ÛŒÙ…ÛŒÙ„", render: (r: User) => r.email },
     {
       key: "role",
-      label: "نقش",
+      label: "Ù†Ù‚Ø´",
       render: (r: User) => (
         <select
           value={r.role}
@@ -42,26 +42,26 @@ export default function UsersPage() {
           }
           className="border border-gray-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:border-[var(--brand)]"
         >
-          <option value="user">کاربر</option>
-          <option value="instructor">استاد</option>
-          <option value="admin">ادمین</option>
+          <option value="user">Ú©Ø§Ø±Ø¨Ø±</option>
+          <option value="instructor">Ø§Ø³ØªØ§Ø¯</option>
+          <option value="admin">Ø§Ø¯Ù…ÛŒÙ†</option>
         </select>
       ),
     },
     {
       key: "createdAt",
-      label: "تاریخ عضویت",
+      label: "ØªØ§Ø±ÛŒØ® Ø¹Ø¶ÙˆÛŒØª",
       render: (r: User) => (r as User & { createdAt?: string }).createdAt?.slice(0, 10) ?? "-",
     },
   ];
 
   return (
     <div>
-      <PageHeader title="کاربران" description="مدیریت کاربران سایت" />
+      <PageHeader title="Ú©Ø§Ø±Ø¨Ø±Ø§Ù†" description="Ù…Ø¯ÛŒØ±ÛŒØª Ú©Ø§Ø±Ø¨Ø±Ø§Ù† Ø³Ø§ÛŒØª" />
 
       <DataTable
         columns={columns as Parameters<typeof DataTable>[0]["columns"]}
-        data={items as Record<string, unknown>[]}
+        data={items}
         isLoading={isLoading}
         page={page}
         totalPages={totalPages}
@@ -70,3 +70,4 @@ export default function UsersPage() {
     </div>
   );
 }
+

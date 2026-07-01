@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, type FormEvent } from "react";
 import type { CouponRecord } from "@roohbakhsh/shared";
@@ -16,13 +16,13 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { RiEditLine, RiDeleteBinLine } from "react-icons/ri";
 
 const ACTIVE_MAP = {
-  true: { label: "فعال", color: "bg-green-50 text-green-700" },
-  false: { label: "غیرفعال", color: "bg-gray-100 text-gray-500" },
+  true: { label: "ÙØ¹Ø§Ù„", color: "bg-green-50 text-green-700" },
+  false: { label: "ØºÛŒØ±ÙØ¹Ø§Ù„", color: "bg-gray-100 text-gray-500" },
 };
 
 const TYPE_MAP = {
-  percentage: { label: "درصدی", color: "bg-blue-50 text-blue-700" },
-  fixed: { label: "ثابت", color: "bg-yellow-50 text-yellow-700" },
+  percentage: { label: "Ø¯Ø±ØµØ¯ÛŒ", color: "bg-blue-50 text-blue-700" },
+  fixed: { label: "Ø«Ø§Ø¨Øª", color: "bg-yellow-50 text-yellow-700" },
 };
 
 const emptyCreateForm = {
@@ -94,37 +94,37 @@ export default function CouponsPage() {
   }
 
   const columns = [
-    { key: "code", label: "کد" },
+    { key: "code", label: "Ú©Ø¯" },
     {
       key: "discountType",
-      label: "نوع تخفیف",
+      label: "Ù†ÙˆØ¹ ØªØ®ÙÛŒÙ",
       render: (r: CouponRecord) => <StatusBadge status={r.discountType} map={TYPE_MAP} />,
     },
     {
       key: "discountValue",
-      label: "مقدار",
+      label: "Ù…Ù‚Ø¯Ø§Ø±",
       render: (r: CouponRecord) =>
-        r.discountType === "percentage" ? `${r.discountValue}٪` : String(r.discountValue),
+        r.discountType === "percentage" ? `${r.discountValue}Ùª` : String(r.discountValue),
     },
     {
       key: "usage",
-      label: "استفاده‌شده/max",
+      label: "Ø§Ø³ØªÙØ§Ø¯Ù‡â€ŒØ´Ø¯Ù‡/max",
       render: (r: CouponRecord) =>
-        `${r.usedCount} / ${r.maxUses ?? "∞"}`,
+        `${r.usedCount} / ${r.maxUses ?? "âˆž"}`,
     },
     {
       key: "expiresAt",
-      label: "انقضا",
+      label: "Ø§Ù†Ù‚Ø¶Ø§",
       render: (r: CouponRecord) => r.expiresAt?.slice(0, 10) ?? "-",
     },
     {
       key: "isActive",
-      label: "فعال",
+      label: "ÙØ¹Ø§Ù„",
       render: (r: CouponRecord) => <StatusBadge status={String(r.isActive)} map={ACTIVE_MAP} />,
     },
     {
       key: "actions",
-      label: "عملیات",
+      label: "Ø¹Ù…Ù„ÛŒØ§Øª",
       render: (r: CouponRecord) => (
         <div className="flex gap-2">
           <button
@@ -147,15 +147,15 @@ export default function CouponsPage() {
   return (
     <div>
       <PageHeader
-        title="کوپن‌های تخفیف"
-        description="مدیریت کدهای تخفیف"
+        title="Ú©ÙˆÙ¾Ù†â€ŒÙ‡Ø§ÛŒ ØªØ®ÙÛŒÙ"
+        description="Ù…Ø¯ÛŒØ±ÛŒØª Ú©Ø¯Ù‡Ø§ÛŒ ØªØ®ÙÛŒÙ"
         onAdd={() => setCreateOpen(true)}
-        addLabel="کوپن جدید"
+        addLabel="Ú©ÙˆÙ¾Ù† Ø¬Ø¯ÛŒØ¯"
       />
 
       <DataTable
         columns={columns as Parameters<typeof DataTable>[0]["columns"]}
-        data={items as Record<string, unknown>[]}
+        data={items}
         isLoading={isLoading}
         page={page}
         totalPages={totalPages}
@@ -166,12 +166,12 @@ export default function CouponsPage() {
       <FormModal
         isOpen={createOpen}
         onClose={() => setCreateOpen(false)}
-        title="کوپن جدید"
+        title="Ú©ÙˆÙ¾Ù† Ø¬Ø¯ÛŒØ¯"
         onSubmit={handleCreate}
         isPending={createMut.isPending}
       >
         <div className="space-y-1">
-          <label className="text-sm font-medium text-gray-600">کد <span className="text-red-500">*</span></label>
+          <label className="text-sm font-medium text-gray-600">Ú©Ø¯ <span className="text-red-500">*</span></label>
           <input
             type="text"
             value={createForm.code}
@@ -183,7 +183,7 @@ export default function CouponsPage() {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-600">نوع تخفیف</label>
+            <label className="text-sm font-medium text-gray-600">Ù†ÙˆØ¹ ØªØ®ÙÛŒÙ</label>
             <select
               value={createForm.discountType}
               onChange={(e) =>
@@ -194,12 +194,12 @@ export default function CouponsPage() {
               }
               className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[var(--brand)]"
             >
-              <option value="percentage">درصدی</option>
-              <option value="fixed">ثابت</option>
+              <option value="percentage">Ø¯Ø±ØµØ¯ÛŒ</option>
+              <option value="fixed">Ø«Ø§Ø¨Øª</option>
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-600">مقدار <span className="text-red-500">*</span></label>
+            <label className="text-sm font-medium text-gray-600">Ù…Ù‚Ø¯Ø§Ø± <span className="text-red-500">*</span></label>
             <input
               type="number"
               value={createForm.discountValue}
@@ -213,7 +213,7 @@ export default function CouponsPage() {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-600">ارز</label>
+            <label className="text-sm font-medium text-gray-600">Ø§Ø±Ø²</label>
             <select
               value={createForm.currency}
               onChange={(e) =>
@@ -230,12 +230,12 @@ export default function CouponsPage() {
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-600">حداکثر استفاده</label>
+            <label className="text-sm font-medium text-gray-600">Ø­Ø¯Ø§Ú©Ø«Ø± Ø§Ø³ØªÙØ§Ø¯Ù‡</label>
             <input
               type="number"
               value={createForm.maxUses}
               onChange={(e) => setCreateForm((f) => ({ ...f, maxUses: e.target.value }))}
-              placeholder="نامحدود"
+              placeholder="Ù†Ø§Ù…Ø­Ø¯ÙˆØ¯"
               min={1}
               className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[var(--brand)]"
               dir="ltr"
@@ -243,7 +243,7 @@ export default function CouponsPage() {
           </div>
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium text-gray-600">تاریخ انقضا</label>
+          <label className="text-sm font-medium text-gray-600">ØªØ§Ø±ÛŒØ® Ø§Ù†Ù‚Ø¶Ø§</label>
           <input
             type="date"
             value={createForm.expiresAt}
@@ -259,7 +259,7 @@ export default function CouponsPage() {
             onChange={(e) => setCreateForm((f) => ({ ...f, isActive: e.target.checked }))}
             className="rounded"
           />
-          فعال باشد
+          ÙØ¹Ø§Ù„ Ø¨Ø§Ø´Ø¯
         </label>
       </FormModal>
 
@@ -267,24 +267,24 @@ export default function CouponsPage() {
       <FormModal
         isOpen={!!editTarget}
         onClose={() => setEditTarget(null)}
-        title={`ویرایش کوپن: ${editTarget?.code ?? ""}`}
+        title={`ÙˆÛŒØ±Ø§ÛŒØ´ Ú©ÙˆÙ¾Ù†: ${editTarget?.code ?? ""}`}
         onSubmit={handleEdit}
         isPending={updateMut.isPending}
       >
         <div className="space-y-1">
-          <label className="text-sm font-medium text-gray-600">حداکثر استفاده</label>
+          <label className="text-sm font-medium text-gray-600">Ø­Ø¯Ø§Ú©Ø«Ø± Ø§Ø³ØªÙØ§Ø¯Ù‡</label>
           <input
             type="number"
             value={editForm.maxUses}
             onChange={(e) => setEditForm((f) => ({ ...f, maxUses: e.target.value }))}
-            placeholder="نامحدود"
+            placeholder="Ù†Ø§Ù…Ø­Ø¯ÙˆØ¯"
             min={1}
             className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[var(--brand)]"
             dir="ltr"
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium text-gray-600">تاریخ انقضا</label>
+          <label className="text-sm font-medium text-gray-600">ØªØ§Ø±ÛŒØ® Ø§Ù†Ù‚Ø¶Ø§</label>
           <input
             type="date"
             value={editForm.expiresAt}
@@ -300,7 +300,7 @@ export default function CouponsPage() {
             onChange={(e) => setEditForm((f) => ({ ...f, isActive: e.target.checked }))}
             className="rounded"
           />
-          فعال باشد
+          ÙØ¹Ø§Ù„ Ø¨Ø§Ø´Ø¯
         </label>
       </FormModal>
 
@@ -314,9 +314,10 @@ export default function CouponsPage() {
           }
         }}
         isPending={deleteMut.isPending}
-        title="حذف کوپن"
-        description={`آیا از حذف کوپن "${deleteTarget?.code}" مطمئن هستید؟`}
+        title="Ø­Ø°Ù Ú©ÙˆÙ¾Ù†"
+        description={`Ø¢ÛŒØ§ Ø§Ø² Ø­Ø°Ù Ú©ÙˆÙ¾Ù† "${deleteTarget?.code}" Ù…Ø·Ù…Ø¦Ù† Ù‡Ø³ØªÛŒØ¯ØŸ`}
       />
     </div>
   );
 }
+
