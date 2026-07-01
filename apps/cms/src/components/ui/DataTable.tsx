@@ -32,7 +32,7 @@ export default function DataTable<T>({
           <Table.Content>
             <Table.Header>
               {columns.map((col, idx) => (
-                <Table.Column key={col.key} isRowHeader={idx === 0}>{col.label}</Table.Column>
+                <Table.Column key={col.key} isRowHeader={idx === 0} className="text-right">{col.label}</Table.Column>
               ))}
             </Table.Header>
             <Table.Body>
@@ -40,7 +40,7 @@ export default function DataTable<T>({
                 Array.from({ length: 5 }).map((_, i) => (
                   <Table.Row key={i}>
                     {columns.map((col) => (
-                      <Table.Cell key={col.key}>
+                      <Table.Cell key={col.key} className="text-right">
                         <Skeleton className="h-4 w-3/4 rounded-md" />
                       </Table.Cell>
                     ))}
@@ -60,7 +60,7 @@ export default function DataTable<T>({
                 data.map((row, i) => (
                   <Table.Row key={i}>
                     {columns.map((col) => (
-                      <Table.Cell key={col.key}>
+                      <Table.Cell key={col.key} className="text-right">
                         {col.render
                           ? col.render(row)
                           : String((row as Record<string, unknown>)[col.key] ?? "-")}
