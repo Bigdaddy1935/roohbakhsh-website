@@ -12,6 +12,7 @@ interface FormModalProps {
   onSubmit: (e: FormEvent) => void;
   isPending: boolean;
   submitLabel?: string;
+  size?: "default" | "cover";
 }
 
 export default function FormModal({
@@ -22,13 +23,25 @@ export default function FormModal({
   onSubmit,
   isPending,
   submitLabel = "ذخیره",
+  size = "default",
 }: FormModalProps) {
+  const isCover = size === "cover";
+
   return (
     <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
       <Modal.Backdrop>
-        <Modal.Container placement="center" className="max-w-2xl w-full mx-4">
-          <Modal.Dialog className="bg-white rounded-lg">
-            <Modal.Header className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <Modal.Container
+          placement="center"
+          className={
+            isCover
+              ? "w-full h-full max-w-full mx-0 my-0"
+              : "max-w-2xl w-full mx-4"
+          }
+        >
+          <Modal.Dialog
+            className={`bg-white ${isCover ? "h-full rounded-none" : "rounded-lg"}`}
+          >
+            <Modal.Header className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
               <Modal.Heading className="text-[var(--ink)] font-bold text-base">
                 {title}
               </Modal.Heading>
@@ -40,12 +53,16 @@ export default function FormModal({
               </Modal.CloseTrigger>
             </Modal.Header>
 
-            <form onSubmit={onSubmit} className="flex flex-col">
-              <Modal.Body className="flex flex-col gap-4 px-5 py-5 max-h-[60vh] overflow-y-auto">
+            <form onSubmit={onSubmit} className="flex flex-col min-h-0 flex-1">
+              <Modal.Body
+                className={`flex flex-col gap-4 px-5 py-5 overflow-y-auto ${
+                  isCover ? "flex-1" : "max-h-[60vh]"
+                }`}
+              >
                 {children}
               </Modal.Body>
 
-              <Modal.Footer className="flex gap-3 px-5 py-4 border-t border-gray-100">
+              <Modal.Footer className="flex gap-3 px-5 py-4 border-t border-gray-100 shrink-0">
                 <button
                   type="button"
                   onClick={onClose}

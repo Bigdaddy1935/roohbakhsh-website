@@ -12,6 +12,7 @@ import LocalizedInput from "@/components/ui/LocalizedInput";
 import FormField from "@/components/ui/FormField";
 import SelectField from "@/components/ui/SelectField";
 import StatusBadge from "@/components/ui/StatusBadge";
+import TextEditor from "@/components/ui/TextEditor";
 import { RiEditLine, RiDeleteBinLine } from "react-icons/ri";
 
 const STATUS_MAP = {
@@ -23,7 +24,8 @@ const emptyForm = {
   title: { ar: "", ur: "" } as Localized,
   slug: "",
   summary: { ar: "", ur: "" } as Localized,
-  body: { ar: "", ur: "" } as Localized,
+  bodyAr: "",
+  bodyUr: "",
   instructorId: "",
   status: "draft" as "draft" | "published",
 };
@@ -52,7 +54,8 @@ export default function ArticlesPage() {
       title: { ar: item.title.ar, ur: item.title.ur },
       slug: item.slug,
       summary: { ar: item.summary?.ar ?? "", ur: item.summary?.ur ?? "" },
-      body: { ar: item.body?.ar ?? "", ur: item.body?.ur ?? "" },
+      bodyAr: item.body?.ar ?? "",
+      bodyUr: item.body?.ur ?? "",
       instructorId: item.instructorId ?? "",
       status: item.status as "draft" | "published",
     });
@@ -61,7 +64,14 @@ export default function ArticlesPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const payload = { title: form.title, slug: form.slug, summary: form.summary, body: form.body, instructorId: form.instructorId || "", status: form.status };
+    const payload = {
+      title: form.title,
+      slug: form.slug,
+      summary: form.summary,
+      body: { ar: form.bodyAr, ur: form.bodyUr },
+      instructorId: form.instructorId || "",
+      status: form.status,
+    };
     if (editing) await updateMut.mutateAsync(payload);
     else await createMut.mutateAsync(payload);
     setFormOpen(false);
@@ -90,11 +100,29 @@ export default function ArticlesPage() {
       <PageHeader title="مقالات" description="مدیریت مقالات وبلاگ" onAdd={openCreate} addLabel="مقاله جدید" />
       <DataTable columns={columns} data={items} isLoading={isLoading} page={page} totalPages={totalPages} onPageChange={setPage} />
 
-      <FormModal isOpen={formOpen} onClose={() => setFormOpen(false)} title={editing ? "ویرایش مقاله" : "مقاله جدید"} onSubmit={handleSubmit} isPending={isPending}>
+      <FormModal
+        isOpen={formOpen}
+        onClose={() => setFormOpen(false)}
+        title={editing ? "ویرایش مقاله" : "مقاله جدید"}
+        onSubmit={handleSubmit}
+        isPending={isPending}
+        size="cover"
+      >
         <LocalizedInput label="عنوان" value={form.title} onChange={(v) => setForm((f) => ({ ...f, title: v }))} required />
         <FormField label="Slug" value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} required dir="ltr" />
         <LocalizedInput label="خلاصه" value={form.summary} onChange={(v) => setForm((f) => ({ ...f, summary: v }))} multiline />
-        <LocalizedInput label="متن مقاله" value={form.body} onChange={(v) => setForm((f) => ({ ...f, body: v }))} multiline />
+
+        <TextEditor
+          label="متن مقاله — عربی"
+          value={form.bodyAr}
+          onChange={(v) => setForm((f) => ({ ...f, bodyAr: v }))}
+        />
+        <TextEditor
+          label="متن مقاله — اردو"
+          value={form.bodyUr}
+          onChange={(v) => setForm((f) => ({ ...f, bodyUr: v }))}
+        />
+
         <SelectField
           label="نویسنده"
           value={form.instructorId}
