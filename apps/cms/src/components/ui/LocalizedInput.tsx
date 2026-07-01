@@ -1,6 +1,7 @@
 "use client";
 
 import type { Localized } from "@roohbakhsh/shared";
+import { TextField, Label, Input, TextArea } from "@heroui/react";
 
 interface LocalizedInputProps {
   label: string;
@@ -19,62 +20,53 @@ export default function LocalizedInput({
   required,
   multiline,
 }: LocalizedInputProps) {
-  const baseClass =
-    "w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--brand)]";
-
   return (
-    <div className="space-y-1.5">
-      <label className="text-sm font-medium text-gray-600">
+    <div className="flex flex-col gap-2">
+      <span className="text-sm font-medium text-gray-700">
         {label}
         {required && <span className="text-red-500 mr-1">*</span>}
-      </label>
+      </span>
       <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1">
-          <span className="text-xs text-gray-400">عربی</span>
+        <TextField className="flex flex-col gap-1.5">
+          <Label className="text-xs text-gray-400">عربی</Label>
           {multiline ? (
-            <textarea
+            <TextArea
               value={value.ar}
               onChange={(e) => onChange({ ...value, ar: e.target.value })}
               placeholder={placeholder?.ar}
               required={required}
               rows={3}
-              className={baseClass}
               dir="rtl"
             />
           ) : (
-            <input
-              type="text"
+            <Input
               value={value.ar}
               onChange={(e) => onChange({ ...value, ar: e.target.value })}
               placeholder={placeholder?.ar}
               required={required}
-              className={baseClass}
               dir="rtl"
             />
           )}
-        </div>
-        <div className="space-y-1">
-          <span className="text-xs text-gray-400">اردو</span>
+        </TextField>
+        <TextField className="flex flex-col gap-1.5">
+          <Label className="text-xs text-gray-400">اردو</Label>
           {multiline ? (
-            <textarea
+            <TextArea
               value={value.ur}
               onChange={(e) => onChange({ ...value, ur: e.target.value })}
               placeholder={placeholder?.ur}
               rows={3}
-              className={baseClass}
               dir="rtl"
             />
           ) : (
-            <input
-              type="text"
+            <Input
               value={value.ur}
               onChange={(e) => onChange({ ...value, ur: e.target.value })}
               placeholder={placeholder?.ur}
-              className={baseClass}
               dir="rtl"
             />
           )}
-        </div>
+        </TextField>
       </div>
     </div>
   );

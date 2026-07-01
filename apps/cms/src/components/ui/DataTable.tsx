@@ -1,5 +1,7 @@
 "use client";
 
+import { Table, Skeleton, Pagination } from "@heroui/react";
+
 interface Column<T> {
   key: string;
   label: string;
@@ -25,75 +27,85 @@ export default function DataTable<T>({
 }: DataTableProps<T>) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="overflow-x-auto rounded-lg border border-gray-100">
-        <table className="w-full text-sm text-right">
-          <thead className="bg-gray-50 text-gray-500">
-            <tr>
+      <Table>
+        <Table.ScrollContainer className="overflow-x-auto">
+          <Table.Content>
+            <Table.Header>
               {columns.map((col) => (
-                <th key={col.key} className="px-4 py-3 font-medium">
-                  {col.label}
-                </th>
+                <Table.Column key={col.key}>{col.label}</Table.Column>
               ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="animate-pulse">
-                  {columns.map((col) => (
-                    <td key={col.key} className="px-4 py-3">
-                      <div className="h-4 bg-gray-100 rounded w-3/4" />
-                    </td>
-                  ))}
-                </tr>
-              ))
-            ) : data.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={columns.length}
-                  className="px-4 py-8 text-center text-gray-400"
-                >
-                  موردی یافت نشد
-                </td>
-              </tr>
-            ) : (
-              data.map((row, i) => (
-                <tr key={i} className="hover:bg-gray-50">
-                  {columns.map((col) => (
-                    <td key={col.key} className="px-4 py-3 text-[var(--ink)]">
-                      {col.render
-                        ? col.render(row)
-                        : String((row as Record<string, unknown>)[col.key] ?? "-")}
-                    </td>
-                  ))}
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+            </Table.Header>
+            <Table.Body>
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <Table.Row key={i}>
+                    {columns.map((col) => (
+                      <Table.Cell key={col.key}>
+                        <Skeleton className="h-4 w-3/4 rounded-md" />
+                      </Table.Cell>
+                    ))}
+                  </Table.Row>
+                ))
+              ) : data.length === 0 ? (
+                <Table.Row>
+                  <Table.Cell className="text-center text-gray-400 py-8 col-span-full">
+                    موردی یافت نشد
+                  </Table.Cell>
+                </Table.Row>
+              ) : (
+                data.map((row, i) => (
+                  <Table.Row key={i}>
+                    {columns.map((col) => (
+                      <Table.Cell key={col.key}>
+                        {col.render
+                          ? col.render(row)
+                          : String((row as Record<string, unknown>)[col.key] ?? "-")}
+                      </Table.Cell>
+                    ))}
+                  </Table.Row>
+                ))
+              )}
+            </Table.Body>
+          </Table.Content>
+        </Table.ScrollContainer>
+      </Table>
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between text-sm text-gray-500">
-          <span>
-            صفحه {page} از {totalPages}
-          </span>
-          <div className="flex gap-2">
-            <button
-              onClick={() => onPageChange(page - 1)}
-              disabled={page <= 1}
-              className="px-3 py-1.5 rounded-md border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              قبلی
-            </button>
-            <button
-              onClick={() => onPageChange(page + 1)}
-              disabled={page >= totalPages}
-              className="px-3 py-1.5 rounded-md border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              بعدی
-            </button>
-          </div>
+          <span>صفحه {page} از {totalPages}</span>
+          <Pagination>
+            <Pagination.Content>
+              <Pagination.Item>
+                <Pagination.Previous
+                  onClick={() => onPageChange(page - 1)}
+                  aria-disabled={page <= 1}
+                  className={page <= 1 ? "pointer-events-none opacity-40" : "cursor-pointer"}
+                >
+                  <Pagination.PreviousIcon />
+                </Pagination.Previous>
+              </Pagination.Item>
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <Pagination.Item key={i}>
+                  <Pagination.Link
+                    isActive={page === i + 1}
+                    onClick={() => onPageChange(i + 1)}
+                    className="cursor-pointer"
+                  >
+                    {i + 1}
+                  </Pagination.Link>
+                </Pagination.Item>
+              ))}
+              <Pagination.Item>
+                <Pagination.Next
+                  onClick={() => onPageChange(page + 1)}
+                  aria-disabled={page >= totalPages}
+                  className={page >= totalPages ? "pointer-events-none opacity-40" : "cursor-pointer"}
+                >
+                  <Pagination.NextIcon />
+                </Pagination.Next>
+              </Pagination.Item>
+            </Pagination.Content>
+          </Pagination>
         </div>
       )}
     </div>
