@@ -44,3 +44,25 @@ export function useReplyReview() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["reviews"] }),
   });
 }
+
+export function useReplyCourseReview() {
+  const qc = useQueryClient();
+  return useMutation<unknown, Error, { courseSlug: string; reviewId: string; body: string }>({
+    mutationFn: ({ courseSlug, reviewId, body }) =>
+      api.post(`/courses/${courseSlug}/reviews/${reviewId}/reply`, { body }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["reviews"] }),
+  });
+}
+
+export function useLessonReviews(lessonId: string, params?: { page?: number; limit?: number }) {
+  const qs = new URLSearchParams();
+  if (params?.page) qs.set("page", String(params.page));
+  if (params?.limit) qs.set("limit", String(params.limit));
+  const query = qs.toString() ? `?${qs}` : "";
+
+  return useQuery<Paginated<ReviewWithTarget>>({
+    queryKey: ["reviews", "lesson", lessonId, params],
+    queryFn: () => api.get<Paginated<ReviewWithTarget>>(`/lessons/${lessonId}/reviews${query}`),
+    enabled: !!lessonId,
+  });
+}

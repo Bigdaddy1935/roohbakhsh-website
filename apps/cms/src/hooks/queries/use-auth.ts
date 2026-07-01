@@ -42,3 +42,15 @@ export function useLogout() {
     },
   });
 }
+
+export function useForgotPassword() {
+  return useMutation<void, Error, { email: string }>({
+    mutationFn: (body) => api.post<void>("/auth/forgot-password", body),
+  });
+}
+
+export function useResetPassword() {
+  return useMutation<void, Error, { token: string; newPassword: string }>({
+    mutationFn: (body) => api.post<void>("/auth/reset-password", body),
+  });
+}
