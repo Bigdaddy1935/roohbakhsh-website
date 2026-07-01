@@ -45,11 +45,11 @@ export default function UsersPage() {
           variant="secondary"
           className="min-w-[120px]"
         >
-          <Select.Trigger className="shadow-none border border-gray-200 rounded-md text-xs py-1">
+          <Select.Trigger className="shadow-none border border-gray-200 rounded-md bg-white px-3 py-1.5 text-xs">
             <Select.Value />
             <Select.Indicator />
           </Select.Trigger>
-          <Select.Popover>
+          <Select.Popover className="rounded-md border border-gray-200 shadow-sm">
             <ListBox>
               <ListBox.Item id="user" textValue="کاربر">کاربر<ListBox.ItemIndicator /></ListBox.Item>
               <ListBox.Item id="instructor" textValue="استاد">استاد<ListBox.ItemIndicator /></ListBox.Item>
