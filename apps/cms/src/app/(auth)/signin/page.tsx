@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { RiMailLine, RiEyeLine, RiEyeOffLine } from "react-icons/ri";
 import { useLogin } from "@/hooks/queries/use-auth";
-import type { ApiError } from "@roohbakhsh/shared";
+import { tokenStore } from "@/lib/api-client";
+import type { ApiError, AuthResponse } from "@roohbakhsh/shared";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -36,7 +37,12 @@ export default function SignInPage() {
     login.mutate(
       { email: email.trim(), password },
       {
-        onSuccess: () => {
+        onSuccess: (data: AuthResponse) => {
+          if (data.user.role !== "admin") {
+            tokenStore.clear();
+            setServerError("دسترسی به پنل مدیریت فقط برای ادمین‌ها مجاز است.");
+            return;
+          }
           router.replace("/dashboard");
         },
         onError: (err) => {
