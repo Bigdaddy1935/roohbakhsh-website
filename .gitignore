@@ -8,3 +8,4 @@ dist/
 .env.developer
 .env.production
 .DS_Store
+*.tsbuildinfo
