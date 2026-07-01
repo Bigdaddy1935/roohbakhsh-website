@@ -1,7 +1,7 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException, ForbiddenException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import type { User as UserContract, UserDashboard, Paginated, Money } from "@roohbakhsh/shared";
+import type { User as UserContract, UserDashboard, Paginated, Money, UserRole } from "@roohbakhsh/shared";
 import { User } from "../auth/entities/user.entity";
 import { Order } from "../orders/entities/order.entity";
 import { TicketsService } from "../tickets/tickets.service";
@@ -70,6 +70,21 @@ export class UsersService {
       unreadNotificationsCount,
       recentNotifications,
     };
+  }
+
+  async updateRole(id: string, role: UserRole): Promise<UserContract> {
+    const user = await this.repo.findOne({ where: { id } });
+    if (!user) throw new NotFoundException("USER_NOT_FOUND");
+    user.role = role;
+    await this.repo.save(user);
+    return this.toContract(user);
+  }
+
+  /** فقط وقتی صفر admin در DB هست کار می‌کند — bootstrap اولین ادمین */
+  async bootstrapAdmin(id: string): Promise<UserContract> {
+    const adminCount = await this.repo.count({ where: { role: "admin" } });
+    if (adminCount > 0) throw new ForbiddenException("ADMIN_ALREADY_EXISTS");
+    return this.updateRole(id, "admin");
   }
 
   private toContract(user: User): UserContract {
