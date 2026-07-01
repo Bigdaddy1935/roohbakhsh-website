@@ -1,15 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { RiMailLine, RiEyeLine, RiEyeOffLine } from "react-icons/ri";
+import { useLogin } from "@/hooks/queries/use-auth";
+import type { ApiError } from "@roohbakhsh/shared";
 
 export default function SignInPage() {
+  const router = useRouter();
+  const login = useLogin();
+
   const [showPass, setShowPass] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
-  const [isPending, setIsPending] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -24,11 +30,30 @@ export default function SignInPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setServerError(null);
     if (!validate()) return;
-    setIsPending(true);
-    // TODO: wire up api.post("/auth/login")
-    setTimeout(() => setIsPending(false), 1500);
+
+    login.mutate(
+      { email: email.trim(), password },
+      {
+        onSuccess: () => {
+          router.replace("/dashboard");
+        },
+        onError: (err) => {
+          const apiErr = err as unknown as ApiError;
+          if (apiErr.statusCode === 401 || apiErr.code === "INVALID_CREDENTIALS") {
+            setServerError("ایمیل یا رمز عبور اشتباه است");
+          } else if (apiErr.statusCode === 0) {
+            setServerError("اتصال به سرور برقرار نشد. لطفاً اینترنت خود را بررسی کنید.");
+          } else {
+            setServerError(apiErr.message ?? "خطایی رخ داد. لطفاً دوباره تلاش کنید.");
+          }
+        },
+      },
+    );
   }
+
+  const isPending = login.isPending;
 
   return (
     <div className="relative min-h-screen bg-[#F0F4F8] flex flex-col items-center justify-center px-4 py-10 overflow-hidden">
@@ -55,6 +80,12 @@ export default function SignInPage() {
           <h1 className="text-2xl font-extrabold text-[var(--ink)] text-center">ورود به پنل</h1>
           <p className="text-sm text-gray-400 mt-2 mb-7 text-center">آکادمی روح‌بخش</p>
 
+          {serverError && (
+            <div className="mb-4 px-3 py-2.5 rounded-md bg-red-50 border border-red-200 text-sm text-red-600 text-center">
+              {serverError}
+            </div>
+          )}
+
           <form className="flex flex-col gap-y-3" onSubmit={handleSubmit} noValidate>
             <div>
               <div className="relative">
@@ -66,6 +97,7 @@ export default function SignInPage() {
                   onChange={(e) => {
                     setEmail(e.target.value);
                     if (fieldErrors.email) setFieldErrors((f) => ({ ...f, email: undefined }));
+                    if (serverError) setServerError(null);
                   }}
                   disabled={isPending}
                   aria-invalid={!!fieldErrors.email}
@@ -90,6 +122,7 @@ export default function SignInPage() {
                   onChange={(e) => {
                     setPassword(e.target.value);
                     if (fieldErrors.password) setFieldErrors((f) => ({ ...f, password: undefined }));
+                    if (serverError) setServerError(null);
                   }}
                   disabled={isPending}
                   aria-invalid={!!fieldErrors.password}
@@ -121,14 +154,20 @@ export default function SignInPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full h-11 rounded-md bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity mt-1 disabled:opacity-60"
+              className="w-full h-11 rounded-md bg-[var(--ink)] text-white text-sm font-bold hover:opacity-90 transition-opacity mt-1 disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              {isPending ? "..." : "ورود"}
+              {isPending ? (
+                <>
+                  <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  در حال ورود...
+                </>
+              ) : (
+                "ورود"
+              )}
             </button>
           </form>
         </div>
       </div>
-
     </div>
   );
 }
