@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useState, type FormEvent } from "react";
 import type { Localized } from "@roohbakhsh/shared";
 import { useSendNotification } from "@/hooks/queries/use-notifications";
 import PageHeader from "@/components/ui/PageHeader";
 import LocalizedInput from "@/components/ui/LocalizedInput";
-import { RiSendPlanLine } from "react-icons/ri";
+import { RiSendPlaneLine } from "react-icons/ri";
 
 const emptyForm = {
   title: { ar: "", ur: "" } as Localized,
@@ -33,27 +33,27 @@ export default function NotificationsPage() {
   return (
     <div>
       <PageHeader
-        title="ارسال اعلان"
-        description="ارسال اعلان برای همه‌ی کاربران"
+        title="Ø§Ø±Ø³Ø§Ù„ Ø§Ø¹Ù„Ø§Ù†"
+        description="Ø§Ø±Ø³Ø§Ù„ Ø§Ø¹Ù„Ø§Ù† Ø¨Ø±Ø§ÛŒ Ù‡Ù…Ù‡â€ŒÛŒ Ú©Ø§Ø±Ø¨Ø±Ø§Ù†"
       />
 
       <div className="max-w-2xl">
         <form onSubmit={handleSubmit} className="space-y-4">
           <LocalizedInput
-            label="عنوان"
+            label="Ø¹Ù†ÙˆØ§Ù†"
             value={form.title}
             onChange={(v) => setForm((f) => ({ ...f, title: v }))}
             required
           />
           <LocalizedInput
-            label="متن اعلان"
+            label="Ù…ØªÙ† Ø§Ø¹Ù„Ø§Ù†"
             value={form.body}
             onChange={(v) => setForm((f) => ({ ...f, body: v }))}
             multiline
             required
           />
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-600">لینک (اختیاری)</label>
+            <label className="text-sm font-medium text-gray-600">Ù„ÛŒÙ†Ú© (Ø§Ø®ØªÛŒØ§Ø±ÛŒ)</label>
             <input
               type="text"
               value={form.link}
@@ -66,13 +66,13 @@ export default function NotificationsPage() {
 
           {sent && (
             <p className="text-sm text-green-600 bg-green-50 rounded-md px-3 py-2">
-              اعلان با موفقیت ارسال شد.
+              Ø§Ø¹Ù„Ø§Ù† Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø§Ø±Ø³Ø§Ù„ Ø´Ø¯.
             </p>
           )}
 
           {sendMut.isError && (
             <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">
-              خطا در ارسال اعلان. لطفاً دوباره تلاش کنید.
+              Ø®Ø·Ø§ Ø¯Ø± Ø§Ø±Ø³Ø§Ù„ Ø§Ø¹Ù„Ø§Ù†. Ù„Ø·ÙØ§Ù‹ Ø¯ÙˆØ¨Ø§Ø±Ù‡ ØªÙ„Ø§Ø´ Ú©Ù†ÛŒØ¯.
             </p>
           )}
 
@@ -82,8 +82,8 @@ export default function NotificationsPage() {
               disabled={sendMut.isPending}
               className="flex items-center gap-1.5 px-5 py-2 text-sm rounded-md bg-[var(--brand)] text-white hover:opacity-90 disabled:opacity-50"
             >
-              <RiSendPlanLine />
-              {sendMut.isPending ? "در حال ارسال..." : "ارسال اعلان"}
+              <RiSendPlaneLine />
+              {sendMut.isPending ? "Ø¯Ø± Ø­Ø§Ù„ Ø§Ø±Ø³Ø§Ù„..." : "Ø§Ø±Ø³Ø§Ù„ Ø§Ø¹Ù„Ø§Ù†"}
             </button>
           </div>
         </form>
@@ -91,3 +91,4 @@ export default function NotificationsPage() {
     </div>
   );
 }
+

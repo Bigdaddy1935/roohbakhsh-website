@@ -15,7 +15,7 @@ interface DataTableProps<T> {
   onPageChange: (page: number) => void;
 }
 
-export default function DataTable<T extends Record<string, unknown>>({
+export default function DataTable<T>({
   columns,
   data,
   isLoading,
@@ -63,7 +63,7 @@ export default function DataTable<T extends Record<string, unknown>>({
                     <td key={col.key} className="px-4 py-3 text-[var(--ink)]">
                       {col.render
                         ? col.render(row)
-                        : String(row[col.key] ?? "-")}
+                        : String((row as Record<string, unknown>)[col.key] ?? "-")}
                     </td>
                   ))}
                 </tr>

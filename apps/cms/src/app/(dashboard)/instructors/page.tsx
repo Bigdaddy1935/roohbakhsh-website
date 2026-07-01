@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, type FormEvent } from "react";
 import type { InstructorDetail, Localized } from "@roohbakhsh/shared";
@@ -72,12 +72,11 @@ export default function InstructorsPage() {
   const isPending = createMut.isPending || updateMut.isPending;
 
   const columns = [
-    { key: "name", label: "نام (عربی)", render: (r: InstructorDetail) => r.name.ar },
+    { key: "name", label: "Ù†Ø§Ù… (Ø¹Ø±Ø¨ÛŒ)", render: (r: InstructorDetail) => r.name.ar },
     { key: "slug", label: "slug" },
-    { key: "createdAt", label: "تاریخ ساخت", render: (r: InstructorDetail) => r.createdAt?.slice(0, 10) ?? "-" },
     {
       key: "actions",
-      label: "عملیات",
+      label: "Ø¹Ù…Ù„ÛŒØ§Øª",
       render: (r: InstructorDetail) => (
         <div className="flex gap-2">
           <button
@@ -100,15 +99,15 @@ export default function InstructorsPage() {
   return (
     <div>
       <PageHeader
-        title="اساتید"
-        description="مدیریت اساتید"
+        title="Ø§Ø³Ø§ØªÛŒØ¯"
+        description="Ù…Ø¯ÛŒØ±ÛŒØª Ø§Ø³Ø§ØªÛŒØ¯"
         onAdd={openCreate}
-        addLabel="استاد جدید"
+        addLabel="Ø§Ø³ØªØ§Ø¯ Ø¬Ø¯ÛŒØ¯"
       />
 
       <DataTable
         columns={columns as Parameters<typeof DataTable>[0]["columns"]}
-        data={items as Record<string, unknown>[]}
+        data={items}
         isLoading={isLoading}
         page={1}
         totalPages={1}
@@ -118,12 +117,12 @@ export default function InstructorsPage() {
       <FormModal
         isOpen={formOpen}
         onClose={() => setFormOpen(false)}
-        title={editing ? "ویرایش استاد" : "استاد جدید"}
+        title={editing ? "ÙˆÛŒØ±Ø§ÛŒØ´ Ø§Ø³ØªØ§Ø¯" : "Ø§Ø³ØªØ§Ø¯ Ø¬Ø¯ÛŒØ¯"}
         onSubmit={handleSubmit}
         isPending={isPending}
       >
         <LocalizedInput
-          label="نام"
+          label="Ù†Ø§Ù…"
           value={form.name}
           onChange={(v) => setForm((f) => ({ ...f, name: v }))}
           required
@@ -140,7 +139,7 @@ export default function InstructorsPage() {
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium text-gray-600">آدرس تصویر</label>
+          <label className="text-sm font-medium text-gray-600">Ø¢Ø¯Ø±Ø³ ØªØµÙˆÛŒØ±</label>
           <input
             type="text"
             value={form.avatarUrl}
@@ -150,7 +149,7 @@ export default function InstructorsPage() {
           />
         </div>
         <LocalizedInput
-          label="بیوگرافی"
+          label="Ø¨ÛŒÙˆÚ¯Ø±Ø§ÙÛŒ"
           value={form.bio}
           onChange={(v) => setForm((f) => ({ ...f, bio: v }))}
           multiline
@@ -167,9 +166,11 @@ export default function InstructorsPage() {
           }
         }}
         isPending={deleteMut.isPending}
-        title="حذف استاد"
-        description={`آیا از حذف "${deleteTarget?.name.ar}" مطمئن هستید؟`}
+        title="Ø­Ø°Ù Ø§Ø³ØªØ§Ø¯"
+        description={`Ø¢ÛŒØ§ Ø§Ø² Ø­Ø°Ù "${deleteTarget?.name.ar}" Ù…Ø·Ù…Ø¦Ù† Ù‡Ø³ØªÛŒØ¯ØŸ`}
       />
     </div>
   );
 }
+
+
