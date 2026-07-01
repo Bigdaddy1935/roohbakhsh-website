@@ -1,7 +1,8 @@
 "use client";
 
 import type { Localized } from "@roohbakhsh/shared";
-import { TextField, Label, Input, TextArea } from "@heroui/react";
+
+const inputCls = "w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--brand)] bg-white transition-colors";
 
 interface LocalizedInputProps {
   label: string;
@@ -27,50 +28,50 @@ export default function LocalizedInput({
         {required && <span className="text-red-500 mr-1">*</span>}
       </span>
       <div className="flex flex-col gap-3">
-        <TextField className="flex flex-col gap-1.5">
-          <Label className="text-xs text-gray-400">عربی</Label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs text-gray-400">عربی</label>
           {multiline ? (
-            <TextArea
+            <textarea
               value={value.ar}
               onChange={(e) => onChange({ ...value, ar: e.target.value })}
               placeholder={placeholder?.ar}
               required={required}
               rows={3}
               dir="rtl"
-              className="w-full shadow-none"
+              className={inputCls}
             />
           ) : (
-            <Input
+            <input
               value={value.ar}
               onChange={(e) => onChange({ ...value, ar: e.target.value })}
               placeholder={placeholder?.ar}
               required={required}
               dir="rtl"
-              className="w-full shadow-none"
+              className={inputCls}
             />
           )}
-        </TextField>
-        <TextField className="flex flex-col gap-1.5">
-          <Label className="text-xs text-gray-400">اردو</Label>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs text-gray-400">اردو</label>
           {multiline ? (
-            <TextArea
+            <textarea
               value={value.ur}
               onChange={(e) => onChange({ ...value, ur: e.target.value })}
               placeholder={placeholder?.ur}
               rows={3}
               dir="rtl"
-              className="w-full shadow-none"
+              className={inputCls}
             />
           ) : (
-            <Input
+            <input
               value={value.ur}
               onChange={(e) => onChange({ ...value, ur: e.target.value })}
               placeholder={placeholder?.ur}
               dir="rtl"
-              className="w-full shadow-none"
+              className={inputCls}
             />
           )}
-        </TextField>
+        </div>
       </div>
     </div>
   );
