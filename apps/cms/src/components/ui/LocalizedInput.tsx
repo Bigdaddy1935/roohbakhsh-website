@@ -26,7 +26,7 @@ export default function LocalizedInput({
         {label}
         {required && <span className="text-red-500 mr-1">*</span>}
       </span>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="flex flex-col gap-3">
         <TextField className="flex flex-col gap-1.5">
           <Label className="text-xs text-gray-400">عربی</Label>
           {multiline ? (
@@ -37,6 +37,7 @@ export default function LocalizedInput({
               required={required}
               rows={3}
               dir="rtl"
+              className="w-full shadow-none"
             />
           ) : (
             <Input
@@ -45,6 +46,7 @@ export default function LocalizedInput({
               placeholder={placeholder?.ar}
               required={required}
               dir="rtl"
+              className="w-full shadow-none"
             />
           )}
         </TextField>
@@ -57,6 +59,7 @@ export default function LocalizedInput({
               placeholder={placeholder?.ur}
               rows={3}
               dir="rtl"
+              className="w-full shadow-none"
             />
           ) : (
             <Input
@@ -64,6 +67,7 @@ export default function LocalizedInput({
               onChange={(e) => onChange({ ...value, ur: e.target.value })}
               placeholder={placeholder?.ur}
               dir="rtl"
+              className="w-full shadow-none"
             />
           )}
         </TextField>

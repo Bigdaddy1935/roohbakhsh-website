@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import type { Key } from "@heroui/react";
 import type { User, UserRole } from "@roohbakhsh/shared";
 import { useUsers } from "@/hooks/queries/use-users";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
+import { Select, ListBox } from "@heroui/react";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -35,17 +37,26 @@ export default function UsersPage() {
       key: "role",
       label: "نقش",
       render: (r: User) => (
-        <select
+        <Select
           value={r.role}
-          onChange={(e) =>
-            updateRoleMut.mutate({ id: r.id, role: e.target.value as UserRole })
+          onChange={(val: Key | Key[] | null) =>
+            updateRoleMut.mutate({ id: r.id, role: String(val ?? r.role) as UserRole })
           }
-          className="border border-gray-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:border-[var(--brand)]"
+          variant="secondary"
+          className="min-w-[120px]"
         >
-          <option value="user">کاربر</option>
-          <option value="instructor">استاد</option>
-          <option value="admin">ادمین</option>
-        </select>
+          <Select.Trigger className="shadow-none border border-gray-200 rounded-md text-xs py-1">
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              <ListBox.Item id="user" textValue="کاربر">کاربر<ListBox.ItemIndicator /></ListBox.Item>
+              <ListBox.Item id="instructor" textValue="استاد">استاد<ListBox.ItemIndicator /></ListBox.Item>
+              <ListBox.Item id="admin" textValue="ادمین">ادمین<ListBox.ItemIndicator /></ListBox.Item>
+            </ListBox>
+          </Select.Popover>
+        </Select>
       ),
     },
     {
@@ -70,4 +81,3 @@ export default function UsersPage() {
     </div>
   );
 }
-

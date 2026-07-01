@@ -48,9 +48,13 @@ export default function DataTable<T>({
                 ))
               ) : data.length === 0 ? (
                 <Table.Row>
-                  <Table.Cell className="text-center text-gray-400 py-8 col-span-full">
-                    موردی یافت نشد
-                  </Table.Cell>
+                  {columns.map((col, idx) => (
+                    <Table.Cell key={col.key}>
+                      {idx === 0 ? (
+                        <span className="text-gray-400 text-sm">موردی یافت نشد</span>
+                      ) : null}
+                    </Table.Cell>
+                  ))}
                 </Table.Row>
               ) : (
                 data.map((row, i) => (

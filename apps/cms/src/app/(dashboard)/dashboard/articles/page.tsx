@@ -10,6 +10,7 @@ import FormModal from "@/components/ui/FormModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import LocalizedInput from "@/components/ui/LocalizedInput";
 import FormField from "@/components/ui/FormField";
+import SelectField from "@/components/ui/SelectField";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { RiEditLine, RiDeleteBinLine } from "react-icons/ri";
 
@@ -94,14 +95,26 @@ export default function ArticlesPage() {
         <FormField label="Slug" value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} required dir="ltr" />
         <LocalizedInput label="خلاصه" value={form.summary} onChange={(v) => setForm((f) => ({ ...f, summary: v }))} multiline />
         <LocalizedInput label="متن مقاله" value={form.body} onChange={(v) => setForm((f) => ({ ...f, body: v }))} multiline />
-        <FormField as="select" label="نویسنده" value={form.instructorId} onChange={(e) => setForm((f) => ({ ...f, instructorId: e.target.value }))}>
-          <option value="">انتخاب کنید</option>
-          {instructors?.map((i) => <option key={i.id} value={i.id}>{i.name.ar}</option>)}
-        </FormField>
-        <FormField as="select" label="وضعیت" value={form.status} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as typeof form.status }))}>
-          <option value="draft">پیش‌نویس</option>
-          <option value="published">منتشرشده</option>
-        </FormField>
+        <SelectField
+          label="نویسنده"
+          value={form.instructorId}
+          onChange={(v) => setForm((f) => ({ ...f, instructorId: v }))}
+          options={[
+            { value: "", label: "انتخاب کنید" },
+            ...(instructors?.map((i) => ({ value: i.id, label: i.name.ar })) ?? []),
+          ]}
+          placeholder="انتخاب کنید"
+        />
+        <SelectField
+          label="وضعیت"
+          value={form.status}
+          onChange={(v) => setForm((f) => ({ ...f, status: v as typeof form.status }))}
+          options={[
+            { value: "draft", label: "پیش‌نویس" },
+            { value: "published", label: "منتشرشده" },
+          ]}
+          required
+        />
       </FormModal>
 
       <ConfirmModal

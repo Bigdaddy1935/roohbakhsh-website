@@ -45,19 +45,19 @@ export default function FormModal({
                 {children}
               </Modal.Body>
 
-              <Modal.Footer className="flex gap-3 justify-end px-5 py-4 border-t border-gray-100">
+              <Modal.Footer className="flex gap-3 px-5 py-4 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={onClose}
                   disabled={isPending}
-                  className="px-4 py-2 text-sm rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  className="flex-1 py-2.5 text-sm rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
                 >
                   انصراف
                 </button>
                 <button
                   type="submit"
                   disabled={isPending}
-                  className="px-4 py-2 text-sm rounded-md bg-[var(--brand)] text-white hover:opacity-90 disabled:opacity-50 transition-opacity"
+                  className="flex-1 py-2.5 text-sm rounded-md bg-[var(--brand)] text-white hover:opacity-90 disabled:opacity-50 transition-opacity"
                 >
                   {isPending ? "در حال ذخیره..." : submitLabel}
                 </button>

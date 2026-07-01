@@ -1,6 +1,5 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { TextField, Label, Input, TextArea } from "@heroui/react";
 
 type ChangeHandler = (e: { target: { value: string } }) => void;
@@ -26,13 +25,7 @@ interface TextareaFieldProps extends BaseProps {
   rows?: number;
 }
 
-interface SelectFieldProps extends BaseProps {
-  as: "select";
-  value: string;
-  children: ReactNode;
-}
-
-type FormFieldProps = InputFieldProps | TextareaFieldProps | SelectFieldProps;
+type FormFieldProps = InputFieldProps | TextareaFieldProps;
 
 export default function FormField(props: FormFieldProps) {
   const { label, required, dir = "rtl" } = props;
@@ -52,18 +45,8 @@ export default function FormField(props: FormFieldProps) {
           required={required}
           rows={props.rows ?? 3}
           dir={dir}
-          className="w-full"
+          className="w-full shadow-none"
         />
-      ) : props.as === "select" ? (
-        <select
-          value={props.value}
-          onChange={(e) => props.onChange({ target: { value: e.target.value } })}
-          required={required}
-          dir={dir}
-          className="w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--brand)] bg-white"
-        >
-          {props.children}
-        </select>
       ) : (
         <Input
           type={(props as InputFieldProps).type ?? "text"}
@@ -72,7 +55,7 @@ export default function FormField(props: FormFieldProps) {
           placeholder={(props as InputFieldProps).placeholder}
           required={required}
           dir={dir}
-          className="w-full"
+          className="w-full shadow-none"
         />
       )}
     </TextField>

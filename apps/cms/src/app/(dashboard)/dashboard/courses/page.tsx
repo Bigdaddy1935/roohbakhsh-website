@@ -11,6 +11,7 @@ import FormModal from "@/components/ui/FormModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import LocalizedInput from "@/components/ui/LocalizedInput";
 import FormField from "@/components/ui/FormField";
+import SelectField from "@/components/ui/SelectField";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { RiEditLine, RiDeleteBinLine } from "react-icons/ri";
 
@@ -112,25 +113,47 @@ export default function CoursesPage() {
         <LocalizedInput label="عنوان" value={form.title} onChange={(v) => setForm((f) => ({ ...f, title: v }))} required />
         <FormField label="Slug" value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} required dir="ltr" />
         <LocalizedInput label="توضیحات" value={form.description} onChange={(v) => setForm((f) => ({ ...f, description: v }))} multiline />
-        <FormField as="select" label="سطح" value={form.level} onChange={(e) => setForm((f) => ({ ...f, level: e.target.value as typeof form.level }))}>
-          <option value="beginner">مبتدی</option>
-          <option value="intermediate">متوسط</option>
-          <option value="advanced">پیشرفته</option>
-        </FormField>
-        <FormField as="select" label="استاد" value={form.instructorId} onChange={(e) => setForm((f) => ({ ...f, instructorId: e.target.value }))} required>
-          <option value="">انتخاب کنید</option>
-          {instructors?.map((i) => <option key={i.id} value={i.id}>{i.name.ar}</option>)}
-        </FormField>
-        <FormField as="select" label="دسته‌بندی" value={form.categoryId} onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))}>
-          <option value="">بدون دسته</option>
-          {categories?.map((c) => <option key={c.id} value={c.id}>{c.name.ar}</option>)}
-        </FormField>
+        <SelectField
+          label="سطح"
+          value={form.level}
+          onChange={(v) => setForm((f) => ({ ...f, level: v as typeof form.level }))}
+          options={[
+            { value: "beginner", label: "مبتدی" },
+            { value: "intermediate", label: "متوسط" },
+            { value: "advanced", label: "پیشرفته" },
+          ]}
+          required
+        />
+        <SelectField
+          label="استاد"
+          value={form.instructorId}
+          onChange={(v) => setForm((f) => ({ ...f, instructorId: v }))}
+          options={instructors?.map((i) => ({ value: i.id, label: i.name.ar })) ?? []}
+          required
+          placeholder="انتخاب استاد"
+        />
+        <SelectField
+          label="دسته‌بندی"
+          value={form.categoryId}
+          onChange={(v) => setForm((f) => ({ ...f, categoryId: v }))}
+          options={[
+            { value: "", label: "بدون دسته" },
+            ...(categories?.map((c) => ({ value: c.id, label: c.name.ar })) ?? []),
+          ]}
+          placeholder="بدون دسته"
+        />
         <FormField label="قیمت (واحد کوچک)" type="number" value={form.priceAmountMinor} onChange={(e) => setForm((f) => ({ ...f, priceAmountMinor: e.target.value }))} dir="ltr" />
-        <FormField as="select" label="ارز" value={form.priceCurrency} onChange={(e) => setForm((f) => ({ ...f, priceCurrency: e.target.value as typeof form.priceCurrency }))}>
-          <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
-          <option value="IRR">IRR</option>
-        </FormField>
+        <SelectField
+          label="ارز"
+          value={form.priceCurrency}
+          onChange={(v) => setForm((f) => ({ ...f, priceCurrency: v as typeof form.priceCurrency }))}
+          options={[
+            { value: "USD", label: "USD" },
+            { value: "EUR", label: "EUR" },
+            { value: "IRR", label: "IRR" },
+          ]}
+          required
+        />
         <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
           <input
             type="checkbox"

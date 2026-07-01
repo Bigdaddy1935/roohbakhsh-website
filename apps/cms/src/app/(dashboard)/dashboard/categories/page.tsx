@@ -14,6 +14,7 @@ import FormModal from "@/components/ui/FormModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import LocalizedInput from "@/components/ui/LocalizedInput";
 import FormField from "@/components/ui/FormField";
+import SelectField from "@/components/ui/SelectField";
 import { RiEditLine, RiDeleteBinLine } from "react-icons/ri";
 
 const emptyForm = {
@@ -87,12 +88,16 @@ export default function CategoriesPage() {
       <FormModal isOpen={formOpen} onClose={() => setFormOpen(false)} title={editing ? "ویرایش دسته‌بندی" : "دسته‌بندی جدید"} onSubmit={handleSubmit} isPending={isPending}>
         <LocalizedInput label="نام" value={form.name} onChange={(v) => setForm((f) => ({ ...f, name: v }))} required />
         <FormField label="Slug" value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} required dir="ltr" />
-        <FormField as="select" label="دسته والد" value={form.parentId} onChange={(e) => setForm((f) => ({ ...f, parentId: e.target.value }))}>
-          <option value="">بدون والد</option>
-          {items.filter((c) => c.id !== editing?.id).map((c) => (
-            <option key={c.id} value={c.id}>{c.name.ar}</option>
-          ))}
-        </FormField>
+        <SelectField
+          label="دسته والد"
+          value={form.parentId}
+          onChange={(v) => setForm((f) => ({ ...f, parentId: v }))}
+          options={[
+            { value: "", label: "بدون والد" },
+            ...items.filter((c) => c.id !== editing?.id).map((c) => ({ value: c.id, label: c.name.ar })),
+          ]}
+          placeholder="بدون والد"
+        />
         <FormField label="ترتیب" type="number" value={form.order} onChange={(e) => setForm((f) => ({ ...f, order: Number(e.target.value) }))} dir="ltr" />
       </FormModal>
 
