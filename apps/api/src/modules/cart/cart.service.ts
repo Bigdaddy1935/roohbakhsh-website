@@ -70,6 +70,7 @@ export class CartService {
       courseId: item.courseId,
       title: item.course.title,
       thumbnailUrl: item.course.thumbnailUrl ?? { ar: null, ur: null },
+      originalPrice: item.course.price,
       effectivePrice: this.effectivePrice(item.course),
       addedAt: item.addedAt.toISOString(),
     }));
