@@ -86,6 +86,43 @@ class EnvConfig {
 
   @IsString()
   FRONTEND_URL: string = "http://localhost:3000";
+
+  // ── پرداخت کارت‌به‌کارت — اطلاعات حساب مقصد ──────────────
+  @IsString()
+  PAYMENT_DESTINATION_CARD_NUMBER!: string;
+
+  @IsOptional()
+  @IsString()
+  PAYMENT_DESTINATION_ACCOUNT_NUMBER?: string;
+
+  @IsString()
+  PAYMENT_DESTINATION_ACCOUNT_HOLDER!: string;
+
+  @IsString()
+  PAYMENT_DESTINATION_BANK_NAME!: string;
+
+  // ── آپلود رسید پرداخت روی FTP ─────────────────────────────
+  @IsString()
+  FTP_HOST!: string;
+
+  @IsInt()
+  @Min(1)
+  FTP_PORT: number = 21;
+
+  @IsString()
+  FTP_USER!: string;
+
+  @IsString()
+  FTP_PASSWORD!: string;
+
+  @IsString()
+  FTP_UPLOAD_DIR: string = "/receipts";
+
+  @IsString()
+  FTP_PUBLIC_BASE_URL!: string;
+
+  @IsBoolean()
+  FTP_SECURE: boolean = false;
 }
 
 function validate(config: Record<string, unknown>): EnvConfig {

@@ -5,6 +5,7 @@ import { OrdersModule } from "../orders/orders.module";
 import { InvoicesModule } from "../invoices/invoices.module";
 import { PaymentsService } from "./payments.service";
 import { PaymentsController } from "./payments.controller";
+import { FtpUploaderService } from "./ftp-uploader.service";
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { PaymentsController } from "./payments.controller";
     InvoicesModule,
   ],
   controllers: [PaymentsController],
-  providers: [PaymentsService],
+  providers: [PaymentsService, FtpUploaderService],
 })
 export class PaymentsModule {}

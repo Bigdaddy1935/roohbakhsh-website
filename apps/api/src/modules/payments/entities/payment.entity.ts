@@ -7,6 +7,8 @@ import {
 } from "typeorm";
 import type { Money, PaymentStatus } from "@roohbakhsh/shared";
 
+export type PaymentMethod = "gateway" | "card_to_card";
+
 @Entity("payments")
 export class Payment {
   @PrimaryGeneratedColumn("uuid")
@@ -38,6 +40,25 @@ export class Payment {
 
   @Column({ type: "varchar", length: 512, nullable: true, default: null })
   description!: string | null;
+
+  @Column({ type: "enum", enum: ["gateway", "card_to_card"], default: "gateway" })
+  method!: PaymentMethod;
+
+  /** کد رهگیری تراکنش بانکی — فقط کارت‌به‌کارت */
+  @Column({ name: "tracking_code", type: "varchar", length: 64, nullable: true, default: null })
+  trackingCode!: string | null;
+
+  /** شماره کارت مبدأ (کارت پرداخت‌کننده) — فقط کارت‌به‌کارت */
+  @Column({ name: "source_card_number", type: "varchar", length: 32, nullable: true, default: null })
+  sourceCardNumber!: string | null;
+
+  /** زمان انجام تراکنش طبق اعلام کاربر — فقط کارت‌به‌کارت */
+  @Column({ name: "transferred_at", type: "datetime", nullable: true, default: null })
+  transferredAt!: Date | null;
+
+  /** لینک تصویر رسید — فقط کارت‌به‌کارت */
+  @Column({ name: "receipt_image_url", type: "varchar", length: 512, nullable: true, default: null })
+  receiptImageUrl!: string | null;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt!: Date;

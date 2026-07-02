@@ -548,6 +548,9 @@ Accept-Language: ar
 | GET | `/payments/verify` | Public | ZarinPal callback — verifies payment |
 | GET | `/payments/logs` | Admin | All payment logs (paginated) |
 | GET | `/payments/mine` | User | Current user payment history |
+| GET | `/payments/manual/destination-info` | User | اطلاعات حساب مقصد برای پرداخت کارت‌به‌کارت |
+| POST | `/payments/upload-receipt` | User | آپلود تصویر رسید کارت‌به‌کارت روی FTP — لینک عمومی برمی‌گرداند |
+| POST | `/payments/manual/:orderId` | User | ثبت اطلاعات پرداخت کارت‌به‌کارت — وضعیت `pending` تا تأیید دستی ادمین |
 
 ### POST /payments/initiate/:orderId — response
 ```json
@@ -582,6 +585,34 @@ Amount must be in **Rials (IRR)**. Use `Money.amountMinor` with `currency: "IRR"
   "createdAt": "...", "updatedAt": "..."
 }
 ```
+
+### GET /payments/manual/destination-info — response
+```json
+{
+  "bankName": "بانک ملی",
+  "accountNumber": "0123456789",
+  "cardNumber": "6037-XXXX-XXXX-XXXX",
+  "accountHolder": "آکادمی بین‌المللی اسلامی روح‌بخش"
+}
+```
+از `PAYMENT_DESTINATION_*` در `.env` خوانده می‌شود — نه hard-code در کد.
+
+### POST /payments/upload-receipt — multipart/form-data (`file`) → response
+```json
+{ "paymentId": "", "url": "https://cdn.roohbakhsh.ac/receipts/uuid.jpg" }
+```
+فایل روی FTP (`FTP_*` env vars) آپلود می‌شود. `paymentId` در این مرحله خالی است چون هنوز پرداختی ثبت نشده — فرانت فقط از `url` استفاده می‌کند.
+
+### POST /payments/manual/:orderId — body
+```json
+{
+  "trackingCode": "123456789012",
+  "cardNumber": "6219-8619-1234-5678",
+  "transferredAt": "2026-07-01T10:00:00.000Z",
+  "receiptImageUrl": "https://cdn.roohbakhsh.ac/receipts/uuid.jpg"
+}
+```
+پرداخت با `method: "card_to_card"` و `status: "pending"` ثبت/به‌روزرسانی می‌شود — تأیید نهایی (تغییر به `paid`) دستی توسط ادمین انجام می‌شود (فعلاً از طریق دیتابیس/CMS؛ پنل تأیید مدیریتی در فاز بعد اضافه می‌شود).
 
 ---
 
