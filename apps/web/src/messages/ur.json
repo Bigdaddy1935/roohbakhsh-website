@@ -200,7 +200,8 @@
     "review_rejected_toast": "تبصرہ حذف ہو گیا",
     "reply_placeholder": "استاد کا جواب لکھیں...",
     "submit_reply": "جواب بھیجیں",
-    "reply_submitted_toast": "جواب بھیج دیا گیا"
+    "reply_submitted_toast": "جواب بھیج دیا گیا",
+    "reply_submit_error_toast": "جواب بھیجنے میں مسئلہ پیش آیا"
   },
   "ArticleDetail": {
     "breadcrumb_home": "ہوم",
