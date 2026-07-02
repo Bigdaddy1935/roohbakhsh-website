@@ -30,6 +30,17 @@ export function useArticle(slug: string) {
   });
 }
 
+export function useArticleAdminById(id: string) {
+  return useQuery<ArticleRecord | undefined>({
+    queryKey: ["articles", "admin-detail", id],
+    queryFn: async () => {
+      const res = await api.get<Paginated<ArticleRecord>>(`/articles/admin/all?limit=1000`);
+      return res.items.find((a) => a.id === id);
+    },
+    enabled: !!id,
+  });
+}
+
 export function useCreateArticle() {
   const qc = useQueryClient();
   return useMutation<ArticleRecord, Error, CreateArticleRequest>({
