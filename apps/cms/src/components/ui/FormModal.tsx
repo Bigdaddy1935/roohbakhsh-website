@@ -28,20 +28,20 @@ export default function FormModal({
   const isCover = size === "cover";
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()} isDismissable={false}>
       <Modal.Backdrop>
         <Modal.Container
           placement="center"
           className={
             isCover
-              ? "w-full h-full max-w-full mx-0 my-0"
+              ? "!w-[95vw] !h-[92vh] !max-w-none !m-auto"
               : "max-w-2xl w-full mx-4"
           }
         >
           <Modal.Dialog
-            className={`bg-white ${isCover ? "h-full rounded-none" : "rounded-lg"}`}
+            className={`bg-white ${isCover ? "!w-full !h-full !max-w-none rounded-lg flex flex-col" : "rounded-lg"}`}
           >
-            <Modal.Header className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
+            <Modal.Header className="flex items-center justify-between px-5 py-4 shrink-0">
               <Modal.Heading className="text-[var(--ink)] font-bold text-base">
                 {title}
               </Modal.Heading>
@@ -55,14 +55,14 @@ export default function FormModal({
 
             <form onSubmit={onSubmit} className="flex flex-col min-h-0 flex-1">
               <Modal.Body
-                className={`flex flex-col gap-4 px-5 py-5 overflow-y-auto ${
+                className={`flex flex-col gap-4 overflow-y-auto ${
                   isCover ? "flex-1" : "max-h-[60vh]"
                 }`}
               >
                 {children}
               </Modal.Body>
 
-              <Modal.Footer className="flex gap-3 px-5 py-4 border-t border-gray-100 shrink-0">
+              <Modal.Footer className="flex gap-3 shrink-0">
                 <button
                   type="button"
                   onClick={onClose}

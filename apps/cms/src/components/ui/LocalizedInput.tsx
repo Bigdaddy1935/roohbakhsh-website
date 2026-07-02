@@ -11,6 +11,7 @@ interface LocalizedInputProps {
   placeholder?: Localized;
   required?: boolean;
   multiline?: boolean;
+  layout?: "stacked" | "grid";
 }
 
 export default function LocalizedInput({
@@ -20,6 +21,7 @@ export default function LocalizedInput({
   placeholder,
   required,
   multiline,
+  layout = "stacked",
 }: LocalizedInputProps) {
   return (
     <div className="flex flex-col gap-2">
@@ -27,7 +29,7 @@ export default function LocalizedInput({
         {label}
         {required && <span className="text-red-500 mr-1">*</span>}
       </span>
-      <div className="flex flex-col gap-3">
+      <div className={layout === "grid" ? "grid grid-cols-1 md:grid-cols-2 gap-3" : "flex flex-col gap-3"}>
         <div className="flex flex-col gap-1.5">
           <label className="text-xs text-gray-400">عربی</label>
           {multiline ? (

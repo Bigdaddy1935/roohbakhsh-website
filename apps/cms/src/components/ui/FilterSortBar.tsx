@@ -76,7 +76,7 @@ export default function FilterSortBar({
         <Modal.Backdrop>
           <Modal.Container placement="bottom">
             <Modal.Dialog className="rounded-t-lg bg-white">
-              <Modal.Header className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <Modal.Header className="flex items-center justify-between px-5 py-4">
                 <Modal.Heading className="text-[var(--ink)] font-bold text-base">
                   {L.filterModalTitle}
                 </Modal.Heading>
@@ -98,7 +98,7 @@ export default function FilterSortBar({
                   </Checkbox>
                 ))}
               </Modal.Body>
-              <Modal.Footer className="px-5 py-4 border-t border-gray-100">
+              <Modal.Footer className="px-5 py-4">
                 <button
                   type="button"
                   onClick={() => setFilterOpen(false)}
@@ -117,7 +117,7 @@ export default function FilterSortBar({
         <Modal.Backdrop>
           <Modal.Container placement="bottom">
             <Modal.Dialog className="rounded-t-lg bg-white">
-              <Modal.Header className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <Modal.Header className="flex items-center justify-between px-5 py-4">
                 <Modal.Heading className="text-[var(--ink)] font-bold text-base">
                   {L.sortModalTitle}
                 </Modal.Heading>

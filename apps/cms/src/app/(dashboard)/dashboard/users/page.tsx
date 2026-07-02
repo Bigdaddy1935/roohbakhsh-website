@@ -50,10 +50,10 @@ export default function UsersPage() {
             <Select.Indicator />
           </Select.Trigger>
           <Select.Popover className="rounded-md border border-gray-200 shadow-sm">
-            <ListBox>
-              <ListBox.Item id="user" textValue="کاربر">کاربر<ListBox.ItemIndicator /></ListBox.Item>
-              <ListBox.Item id="instructor" textValue="استاد">استاد<ListBox.ItemIndicator /></ListBox.Item>
-              <ListBox.Item id="admin" textValue="ادمین">ادمین<ListBox.ItemIndicator /></ListBox.Item>
+            <ListBox className="text-right" dir="rtl">
+              <ListBox.Item id="user" textValue="کاربر" className="text-right" dir="rtl">کاربر<ListBox.ItemIndicator /></ListBox.Item>
+              <ListBox.Item id="instructor" textValue="استاد" className="text-right" dir="rtl">استاد<ListBox.ItemIndicator /></ListBox.Item>
+              <ListBox.Item id="admin" textValue="ادمین" className="text-right" dir="rtl">ادمین<ListBox.ItemIndicator /></ListBox.Item>
             </ListBox>
           </Select.Popover>
         </Select>

@@ -60,8 +60,9 @@ export default function CategoriesPage() {
   const isPending = createMut.isPending || updateMut.isPending;
 
   const columns = [
-    { key: "name", label: "نام (عربی)", render: (r: Category) => r.name.ar },
-    { key: "slug", label: "Slug" },
+    { key: "nameAr", label: "نام (عربی)", render: (r: Category) => r.name.ar },
+    { key: "nameUr", label: "نام (اردو)", render: (r: Category) => r.name.ur },
+    { key: "order", label: "ترتیب", render: (r: Category) => r.order ?? 0 },
     { key: "parentId", label: "والد", render: (r: Category) => r.parentId ? (items.find((c) => c.id === r.parentId)?.name.ar ?? "-") : "-" },
     {
       key: "actions",

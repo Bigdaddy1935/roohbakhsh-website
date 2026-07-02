@@ -1,5 +1,6 @@
 "use client";
 
+import { forwardRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -34,7 +35,7 @@ const NAV_ITEMS = [
   { href: "/dashboard/notifications", label: "اعلان‌ها", icon: RiNotificationLine },
 ];
 
-export default function Sidebar() {
+const Sidebar = forwardRef<HTMLElement>(function Sidebar(_props, ref) {
   const pathname = usePathname();
   const router = useRouter();
   const logout = useLogout();
@@ -46,7 +47,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-[var(--sidebar-w)] shrink-0 bg-white border-e border-gray-100 min-h-screen flex flex-col">
+    <aside ref={ref} className="w-[var(--sidebar-w)] shrink-0 bg-white border border-gray-100 rounded-[20px] max-h-[90vh] flex flex-col overflow-hidden self-center">
 
       {/* Logo */}
       <div className="flex items-center justify-center py-6 px-4 border-b border-gray-100">
@@ -90,4 +91,6 @@ export default function Sidebar() {
       </div>
     </aside>
   );
-}
+});
+
+export default Sidebar;

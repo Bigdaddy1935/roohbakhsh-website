@@ -31,10 +31,10 @@ export default function NotificationsPage() {
     <div>
       <PageHeader title="ارسال اعلان" description="ارسال اعلان برای همه‌ی کاربران" />
 
-      <div className="max-w-2xl">
+      <div className="w-full bg-white border border-gray-100 rounded-[20px] p-6">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <LocalizedInput label="عنوان" value={form.title} onChange={(v) => setForm((f) => ({ ...f, title: v }))} required />
-          <LocalizedInput label="متن اعلان" value={form.body} onChange={(v) => setForm((f) => ({ ...f, body: v }))} multiline required />
+          <LocalizedInput label="عنوان" value={form.title} onChange={(v) => setForm((f) => ({ ...f, title: v }))} required layout="grid" />
+          <LocalizedInput label="متن اعلان" value={form.body} onChange={(v) => setForm((f) => ({ ...f, body: v }))} multiline required layout="grid" />
           <FormField label="لینک (اختیاری)" value={form.link} onChange={(e) => setForm((f) => ({ ...f, link: e.target.value }))} dir="ltr" type="url" />
 
           {sent && (

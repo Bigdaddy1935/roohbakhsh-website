@@ -21,11 +21,11 @@ export default function ConfirmModal({
   description,
 }: ConfirmModalProps) {
   return (
-    <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()} isDismissable={false}>
       <Modal.Backdrop>
         <Modal.Container placement="center" className="max-w-lg w-full mx-4">
           <Modal.Dialog className="bg-white rounded-lg">
-            <Modal.Header className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <Modal.Header className="flex items-center justify-between pb-5">
               <Modal.Heading className="text-[var(--ink)] font-bold text-base">
                 {title}
               </Modal.Heading>
@@ -38,12 +38,12 @@ export default function ConfirmModal({
             </Modal.Header>
 
             {description && (
-              <Modal.Body className="px-5 py-4">
+              <Modal.Body>
                 <p className="text-sm text-gray-500">{description}</p>
               </Modal.Body>
             )}
 
-            <Modal.Footer className="flex gap-3 justify-end px-5 py-4 border-t border-gray-100">
+            <Modal.Footer className="flex gap-2 justify-end">
               <button
                 type="button"
                 onClick={onClose}

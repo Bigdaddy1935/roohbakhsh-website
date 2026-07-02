@@ -1,6 +1,7 @@
 "use client";
 
 import { useAdminStats } from "@/hooks/queries/use-admin-stats";
+import PageHeader from "@/components/ui/PageHeader";
 import {
   RiUserLine,
   RiBookOpenLine,
@@ -77,11 +78,8 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-xl font-extrabold text-[var(--ink)]">داشبورد</h1>
-        <p className="text-sm text-gray-400 mt-1">نگاه کلی به وضعیت آکادمی روح‌بخش</p>
-      </div>
+    <div>
+      <PageHeader title="داشبورد" description="نگاه کلی به وضعیت آکادمی روح‌بخش" />
 
       {isLoading ? (
         <div className="grid grid-cols-3 gap-4">
