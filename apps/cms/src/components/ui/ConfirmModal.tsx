@@ -21,7 +21,7 @@ export default function ConfirmModal({
   description,
 }: ConfirmModalProps) {
   return (
-    <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()} isDismissable={false}>
+    <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
       <Modal.Backdrop>
         <Modal.Container placement="center" className="max-w-lg w-full mx-4">
           <Modal.Dialog className="bg-white rounded-lg">
