@@ -1,0 +1,37 @@
+@import "@heroui/styles";
+@import "tailwindcss";
+@import "./scroll.css";
+@import "./fonts.css";
+
+/* ── Brand palette (60-30-10) ─────────────────────────────── */
+:root {
+  --bg:       #F8F9FA;
+  --brand:    #0CA789;
+  --cta:      #FF9F1C;
+  --ink:      #2B2D42;
+  --sidebar-w: 260px;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    font-family: Dana-DemiBold !important;
+  }
+
+  html, body { overflow-x: clip; }
+
+  body {
+    @apply p-0 m-0 box-border min-h-[100vh] h-full font-[Dana-DemiBold] bg-gray-100 text-sm;
+    font-feature-settings: "ss01", "ss02", "locl";
+    color: var(--ink);
+    direction: rtl;
+    scrollbar-width: thin;
+  }
+}
+
+@layer utilities {
+  .container-cms {
+    @apply w-full mx-auto px-6;
+    max-width: 1400px;
+  }
+}

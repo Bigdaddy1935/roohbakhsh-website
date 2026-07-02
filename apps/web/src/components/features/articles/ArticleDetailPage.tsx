@@ -12,13 +12,13 @@ import {
   RiTelegramLine, RiInstagramLine, RiTwitterXLine,
   RiLoader4Line, RiChat3Line, RiCloseLine,
   RiHeartFill, RiHeartLine, RiLockLine,
-  RiCheckLine, RiReplyLine, RiSendPlaneLine,
+  RiCheckLine,
 } from "react-icons/ri";
 import { toast } from "sonner";
 import { useArticle } from "@/hooks/queries/use-articles";
 import {
   useArticleReviews, useCreateArticleReview,
-  useApproveReview, useRejectReview, useReplyToReview, usePendingReviews,
+  useApproveReview, useRejectReview, usePendingReviews,
 } from "@/hooks/queries/use-reviews";
 import { useMe } from "@/hooks/queries/use-auth";
 import { useMyFavorites, useToggleFavorite } from "@/hooks/queries/use-favorites";
@@ -95,21 +95,10 @@ function Sk({ className = "" }: { className?: string }) {
 function AdminReviewActions({ review, t }: { review: ReviewRecord; t: (k: string) => string }) {
   const approveReview = useApproveReview();
   const rejectReview = useRejectReview();
-  const replyToReview = useReplyToReview();
-  const [replyOpen, setReplyOpen] = useState(false);
-  const [reply, setReply] = useState(review.instructorReply ?? "");
 
   function handleReject() {
     if (!confirm(t("confirm_reject"))) return;
     rejectReview.mutate(review.id, { onSuccess: () => toast.success(t("review_rejected_toast")) });
-  }
-
-  function handleSubmitReply() {
-    if (!reply.trim()) return;
-    replyToReview.mutate(
-      { reviewId: review.id, reply: reply.trim() },
-      { onSuccess: () => { toast.success(t("reply_submitted_toast")); setReplyOpen(false); } },
-    );
   }
 
   return (
@@ -137,36 +126,7 @@ function AdminReviewActions({ review, t }: { review: ReviewRecord; t: (k: string
             </button>
           </>
         )}
-        <button
-          type="button"
-          onClick={() => setReplyOpen((o) => !o)}
-          title={t("reply_label")}
-          className="text-gray-300 hover:text-[var(--brand)] transition-colors cursor-pointer"
-        >
-          <RiReplyLine size={16} />
-        </button>
       </div>
-
-      {replyOpen && (
-        <div className="flex items-end gap-x-2">
-          <textarea
-            value={reply}
-            onChange={(e) => setReply(e.target.value)}
-            placeholder={t("reply_placeholder")}
-            rows={3}
-            className="flex-1 rounded-md border border-gray-200 px-3 py-2 text-xs outline-none focus:border-[var(--brand)] transition-colors resize-y"
-          />
-          <button
-            type="button"
-            onClick={handleSubmitReply}
-            disabled={replyToReview.isPending}
-            title={t("submit_reply")}
-            className="shrink-0 text-gray-400 hover:text-[var(--brand)] transition-colors disabled:opacity-50 cursor-pointer"
-          >
-            <RiSendPlaneLine size={16} />
-          </button>
-        </div>
-      )}
     </div>
   );
 }

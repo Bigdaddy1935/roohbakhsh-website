@@ -169,7 +169,7 @@ function StarsInput({ value, onChange }: { value: number; onChange: (v: number) 
   );
 }
 
-function AdminReviewActions({ review, t }: { review: ReviewRecord; t: (k: string) => string }) {
+function AdminReviewActions({ review, courseSlug, t }: { review: ReviewRecord; courseSlug: string; t: (k: string) => string }) {
   const approveReview = useApproveReview();
   const rejectReview = useRejectReview();
   const replyToReview = useReplyToReview();
@@ -184,8 +184,11 @@ function AdminReviewActions({ review, t }: { review: ReviewRecord; t: (k: string
   function handleSubmitReply() {
     if (!reply.trim()) return;
     replyToReview.mutate(
-      { reviewId: review.id, reply: reply.trim() },
-      { onSuccess: () => { toast.success(t("reply_submitted_toast")); setReplyOpen(false); } },
+      { courseSlug, reviewId: review.id, reply: reply.trim() },
+      {
+        onSuccess: () => { toast.success(t("reply_submitted_toast")); setReplyOpen(false); },
+        onError: () => toast.error(t("reply_submit_error_toast")),
+      },
     );
   }
 
@@ -418,7 +421,7 @@ function ReviewsSection({ courseId, courseSlug, t }: { courseId: string; courseS
                 </div>
               )}
 
-              {isAdmin && <AdminReviewActions review={r} t={t} />}
+              {isAdmin && <AdminReviewActions review={r} courseSlug={courseSlug} t={t} />}
             </div>
           ))}
         </div>

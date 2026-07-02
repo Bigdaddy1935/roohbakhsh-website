@@ -8,12 +8,20 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import type { PaymentRecord, InitiatePaymentResponse, Paginated } from "@roohbakhsh/shared";
+import type {
+  PaymentRecord,
+  InitiatePaymentResponse,
+  Paginated,
+  PaymentDestinationAccount,
+  UploadReceiptResponse,
+} from "@roohbakhsh/shared";
 import { toPaginated } from "../../common/utils/paginate";
 import { Payment } from "./entities/payment.entity";
 import { OrdersService } from "../orders/orders.service";
 import { InvoicesService } from "../invoices/invoices.service";
 import { EnvConfig } from "../../config/env";
+import { FtpUploaderService } from "./ftp-uploader.service";
+import { SubmitCardToCardDto } from "./dto/submit-card-to-card.dto";
 
 const ZARINPAL_REQUEST_URL = "https://api.zarinpal.com/pg/v4/payment/request.json";
 const ZARINPAL_VERIFY_URL  = "https://api.zarinpal.com/pg/v4/payment/verify.json";
@@ -33,7 +41,50 @@ export class PaymentsService {
     private readonly ordersService: OrdersService,
     private readonly invoicesService: InvoicesService,
     private readonly config: ConfigService<EnvConfig>,
+    private readonly ftpUploader: FtpUploaderService,
   ) {}
+
+  /** اطلاعات حساب مقصد آکادمی برای پرداخت کارت‌به‌کارت. */
+  getDestinationAccount(): PaymentDestinationAccount {
+    return {
+      bankName: this.config.get("PAYMENT_DESTINATION_BANK_NAME", { infer: true })!,
+      accountNumber: this.config.get("PAYMENT_DESTINATION_ACCOUNT_NUMBER", { infer: true }) ?? "",
+      cardNumber: this.config.get("PAYMENT_DESTINATION_CARD_NUMBER", { infer: true })!,
+      accountHolder: this.config.get("PAYMENT_DESTINATION_ACCOUNT_HOLDER", { infer: true })!,
+    };
+  }
+
+  /** آپلود تصویر رسید کارت‌به‌کارت روی FTP — لینک عمومی برمی‌گرداند. */
+  async uploadReceipt(file: Express.Multer.File): Promise<UploadReceiptResponse> {
+    const url = await this.ftpUploader.upload(file.buffer, file.originalname);
+    return { paymentId: "", url };
+  }
+
+  /** ثبت اطلاعات پرداخت کارت‌به‌کارت برای یک سفارش — منتظر تأیید دستی ادمین. */
+  async submitCardToCard(orderId: string, userId: string, dto: SubmitCardToCardDto): Promise<PaymentRecord> {
+    const order = await this.ordersService.findOne(orderId, userId);
+
+    if (order.status === "paid") {
+      throw new BadRequestException("ORDER_ALREADY_PAID");
+    }
+    if (order.status === "cancelled" || order.status === "refunded" || order.status === "failed") {
+      throw new BadRequestException("ORDER_NOT_PAYABLE");
+    }
+
+    let payment = await this.repo.findOne({ where: { orderId, method: "card_to_card" } });
+    if (!payment) {
+      payment = this.repo.create({ orderId, userId, amount: order.total, method: "card_to_card" });
+    }
+
+    payment.status = "pending";
+    payment.trackingCode = dto.trackingCode;
+    payment.sourceCardNumber = dto.cardNumber;
+    payment.transferredAt = dto.transferredAt ? new Date(dto.transferredAt) : null;
+    payment.receiptImageUrl = dto.receiptImageUrl ?? null;
+
+    await this.repo.save(payment);
+    return this.toContract(payment);
+  }
 
   async initiate(orderId: string, userId: string): Promise<InitiatePaymentResponse> {
     const order = await this.ordersService.findOne(orderId, userId);

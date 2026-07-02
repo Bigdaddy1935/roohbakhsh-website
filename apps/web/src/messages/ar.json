@@ -200,7 +200,8 @@
     "review_rejected_toast": "تم حذف التقييم",
     "reply_placeholder": "اكتب رد المدرس...",
     "submit_reply": "إرسال الرد",
-    "reply_submitted_toast": "تم إرسال الرد"
+    "reply_submitted_toast": "تم إرسال الرد",
+    "reply_submit_error_toast": "حدث خطأ أثناء إرسال الرد"
   },
   "ArticleDetail": {
     "breadcrumb_home": "الرئيسية",

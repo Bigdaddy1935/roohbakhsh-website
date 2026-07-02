@@ -126,7 +126,7 @@ function SidebarChapter({
   );
 }
 
-function AdminReviewActions({ review, t }: { review: ReviewRecord; t: (k: string) => string }) {
+function AdminReviewActions({ review, courseSlug, t }: { review: ReviewRecord; courseSlug: string; t: (k: string) => string }) {
   const approveReview = useApproveReview();
   const rejectReview = useRejectReview();
   const replyToReview = useReplyToReview();
@@ -141,7 +141,7 @@ function AdminReviewActions({ review, t }: { review: ReviewRecord; t: (k: string
   function handleSubmitReply() {
     if (!reply.trim()) return;
     replyToReview.mutate(
-      { reviewId: review.id, reply: reply.trim() },
+      { courseSlug, reviewId: review.id, reply: reply.trim() },
       { onSuccess: () => { toast.success(t("reply_submitted_toast")); setReplyOpen(false); } },
     );
   }
@@ -205,7 +205,7 @@ function AdminReviewActions({ review, t }: { review: ReviewRecord; t: (k: string
   );
 }
 
-function QASection({ lessonId, t }: { lessonId: string; t: (k: string) => string }) {
+function QASection({ lessonId, courseSlug, t }: { lessonId: string; courseSlug: string; t: (k: string) => string }) {
   const locale = useLocale() as "ar" | "ur";
   const { data, isLoading } = useLessonReviews(lessonId, { limit: 10 });
   const { data: me } = useMe();
@@ -376,7 +376,7 @@ function QASection({ lessonId, t }: { lessonId: string; t: (k: string) => string
                 </div>
               )}
 
-              {isAdmin && <AdminReviewActions review={r} t={t} />}
+              {isAdmin && <AdminReviewActions review={r} courseSlug={courseSlug} t={t} />}
             </div>
           ))}
         </div>
@@ -685,7 +685,7 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
             </div>
 
             <div ref={qaRef}>
-              <QASection lessonId={lesson.id} t={t} />
+              <QASection lessonId={lesson.id} courseSlug={courseId} t={t} />
             </div>
           </main>
 

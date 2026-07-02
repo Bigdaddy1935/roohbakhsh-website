@@ -1,0 +1,175 @@
+"use client";
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api-client";
+import type {
+  CourseRecord, CourseStatsSummary, SectionRecord, Lesson, Paginated,
+  CreateCourseRequest, UpdateCourseRequest,
+  CreateSectionRequest, UpdateSectionRequest,
+  CreateLessonRequest, UpdateLessonRequest,
+} from "@roohbakhsh/shared";
+
+export const courseKeys = {
+  stats: () => ["courses", "stats"] as const,
+  list: (params?: Record<string, unknown>) => ["courses", "list", params] as const,
+  detail: (slug: string) => ["courses", "detail", slug] as const,
+  sections: (slug: string) => ["courses", "sections", slug] as const,
+  sectionDetail: (courseSlug: string, sectionId: string) =>
+    ["courses", "section", courseSlug, sectionId] as const,
+  lessons: (courseSlug: string, sectionId: string) =>
+    ["courses", "lessons", courseSlug, sectionId] as const,
+  lesson: (courseSlug: string, sectionId: string, lessonId: string) =>
+    ["courses", "lesson", courseSlug, sectionId, lessonId] as const,
+};
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
+
+export function useCourseStats() {
+  return useQuery<CourseStatsSummary>({
+    queryKey: courseKeys.stats(),
+    queryFn: () => api.get<CourseStatsSummary>("/courses/stats"),
+  });
+}
+
+// ── Courses ──────────────────────────────────────────────────────────────────
+
+export function useCourses(params?: { page?: number; limit?: number; q?: string }) {
+  const qs = new URLSearchParams();
+  if (params?.page) qs.set("page", String(params.page));
+  if (params?.limit) qs.set("limit", String(params.limit));
+  if (params?.q) qs.set("q", params.q);
+  const query = qs.toString() ? `?${qs}` : "";
+
+  return useQuery<Paginated<CourseRecord>>({
+    queryKey: courseKeys.list(params),
+    queryFn: () => api.get<Paginated<CourseRecord>>(`/courses${query}`),
+    enabled: !params?.q || params.q.trim().length >= 3,
+  });
+}
+
+export function useCourse(slug: string) {
+  return useQuery<CourseRecord>({
+    queryKey: courseKeys.detail(slug),
+    queryFn: () => api.get<CourseRecord>(`/courses/${slug}`),
+    enabled: !!slug,
+  });
+}
+
+export function useCreateCourse() {
+  const qc = useQueryClient();
+  return useMutation<CourseRecord, Error, CreateCourseRequest>({
+    mutationFn: (body) => api.post<CourseRecord>("/courses", body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["courses", "list"] }),
+  });
+}
+
+export function useUpdateCourse(id: string) {
+  const qc = useQueryClient();
+  return useMutation<CourseRecord, Error, UpdateCourseRequest>({
+    mutationFn: (body) => api.patch<CourseRecord>(`/courses/${id}`, body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["courses"] }),
+  });
+}
+
+export function useDeleteCourse() {
+  const qc = useQueryClient();
+  return useMutation<void, Error, string>({
+    mutationFn: (id) => api.delete<void>(`/courses/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["courses", "list"] }),
+  });
+}
+
+// ── Sections ─────────────────────────────────────────────────────────────────
+
+export function useCourseSections(courseSlug: string) {
+  return useQuery<SectionRecord[]>({
+    queryKey: courseKeys.sections(courseSlug),
+    queryFn: () => api.get<SectionRecord[]>(`/courses/${courseSlug}/sections`),
+    enabled: !!courseSlug,
+  });
+}
+
+export function useCreateSection(courseSlug: string) {
+  const qc = useQueryClient();
+  return useMutation<SectionRecord, Error, CreateSectionRequest>({
+    mutationFn: (body) => api.post<SectionRecord>(`/courses/${courseSlug}/sections`, body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: courseKeys.sections(courseSlug) }),
+  });
+}
+
+export function useUpdateSection(courseSlug: string, sectionId: string) {
+  const qc = useQueryClient();
+  return useMutation<SectionRecord, Error, UpdateSectionRequest>({
+    mutationFn: (body) => api.patch<SectionRecord>(`/courses/${courseSlug}/sections/${sectionId}`, body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: courseKeys.sections(courseSlug) }),
+  });
+}
+
+export function useDeleteSection(courseSlug: string) {
+  const qc = useQueryClient();
+  return useMutation<void, Error, string>({
+    mutationFn: (sectionId) => api.delete<void>(`/courses/${courseSlug}/sections/${sectionId}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: courseKeys.sections(courseSlug) }),
+  });
+}
+
+// ── Lessons ──────────────────────────────────────────────────────────────────
+
+export function useCourseLessons(courseSlug: string, sectionId: string, params?: { page?: number; limit?: number }) {
+  const qs = new URLSearchParams();
+  if (params?.page) qs.set("page", String(params.page));
+  if (params?.limit) qs.set("limit", String(params.limit));
+  const query = qs.toString() ? `?${qs}` : "";
+
+  return useQuery<Paginated<Lesson>>({
+    queryKey: courseKeys.lessons(courseSlug, sectionId),
+    queryFn: () =>
+      api.get<Paginated<Lesson>>(`/courses/${courseSlug}/sections/${sectionId}/lessons${query}`),
+    enabled: !!courseSlug && !!sectionId,
+  });
+}
+
+export function useLesson(courseSlug: string, sectionId: string, lessonId: string) {
+  return useQuery<Lesson>({
+    queryKey: courseKeys.lesson(courseSlug, sectionId, lessonId),
+    queryFn: () =>
+      api.get<Lesson>(`/courses/${courseSlug}/sections/${sectionId}/lessons/${lessonId}`),
+    enabled: !!courseSlug && !!sectionId && !!lessonId,
+  });
+}
+
+export function useCreateLesson(courseSlug: string, sectionId: string) {
+  const qc = useQueryClient();
+  return useMutation<Lesson, Error, CreateLessonRequest>({
+    mutationFn: (body) =>
+      api.post<Lesson>(`/courses/${courseSlug}/sections/${sectionId}/lessons`, body),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: courseKeys.lessons(courseSlug, sectionId) });
+      qc.invalidateQueries({ queryKey: courseKeys.sections(courseSlug) });
+    },
+  });
+}
+
+export function useUpdateLesson(courseSlug: string, sectionId: string, lessonId: string) {
+  const qc = useQueryClient();
+  return useMutation<Lesson, Error, UpdateLessonRequest>({
+    mutationFn: (body) =>
+      api.patch<Lesson>(`/courses/${courseSlug}/sections/${sectionId}/lessons/${lessonId}`, body),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: courseKeys.lessons(courseSlug, sectionId) });
+      qc.invalidateQueries({ queryKey: courseKeys.lesson(courseSlug, sectionId, lessonId) });
+    },
+  });
+}
+
+export function useDeleteLesson(courseSlug: string, sectionId: string) {
+  const qc = useQueryClient();
+  return useMutation<void, Error, string>({
+    mutationFn: (lessonId) =>
+      api.delete<void>(`/courses/${courseSlug}/sections/${sectionId}/lessons/${lessonId}`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: courseKeys.lessons(courseSlug, sectionId) });
+      qc.invalidateQueries({ queryKey: courseKeys.sections(courseSlug) });
+    },
+  });
+}

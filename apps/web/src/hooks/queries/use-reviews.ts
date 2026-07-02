@@ -154,8 +154,9 @@ export function useRejectReview() {
 
 export function useReplyToReview() {
   const queryClient = useQueryClient();
-  return useMutation<ReviewRecord, Error, { reviewId: string } & ReplyToReviewRequest>({
-    mutationFn: ({ reviewId, ...body }) => api.post<ReviewRecord>(`/reviews/${reviewId}/reply`, body),
+  return useMutation<ReviewRecord, Error, { courseSlug: string; reviewId: string } & ReplyToReviewRequest>({
+    mutationFn: ({ courseSlug, reviewId, ...body }) =>
+      api.post<ReviewRecord>(`/courses/${courseSlug}/reviews/${reviewId}/reply`, body),
     onSuccess: () => invalidateAllReviewQueries(queryClient),
   });
 }

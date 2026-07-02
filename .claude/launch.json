@@ -6,6 +6,18 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "@roohbakhsh/web", "dev"],
       "port": 3000
+    },
+    {
+      "name": "cms",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@roohbakhsh/cms", "dev"],
+      "port": 3002
+    },
+    {
+      "name": "api",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@roohbakhsh/api", "dev"],
+      "port": 3001
     }
   ]
 }
