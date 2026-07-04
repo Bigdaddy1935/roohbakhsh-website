@@ -2,6 +2,7 @@
 
 import { useAdminStats } from "@/hooks/queries/use-admin-stats";
 import PageHeader from "@/components/ui/PageHeader";
+import AdminMonthlyChart from "@/components/dashboard/AdminMonthlyChart";
 import {
   RiUserLine,
   RiBookOpenLine,
@@ -47,7 +48,6 @@ export default function DashboardPage() {
     {
       label: "دوره‌ها",
       value: data?.totalCourses,
-      sub: data ? `${data.publishedCourses} منتشرشده` : undefined,
       icon: <RiBookOpenLine size={20} className="text-[var(--brand)]" />,
       color: "bg-emerald-50",
     },
@@ -80,6 +80,8 @@ export default function DashboardPage() {
   return (
     <div>
       <PageHeader title="داشبورد" description="نگاه کلی به وضعیت آکادمی روح‌بخش" />
+
+      <AdminMonthlyChart />
 
       {isLoading ? (
         <div className="grid grid-cols-3 gap-4">

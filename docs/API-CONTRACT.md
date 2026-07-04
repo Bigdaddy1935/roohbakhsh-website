@@ -1016,6 +1016,24 @@ interface AdminStats {
 پاسخ: `AdminStats`
 خطاها: `401 Unauthorized`, `403 FORBIDDEN`
 
+### `GET /admin/stats/monthly?year=2026` 🔒 admin
+
+آمار ماهانه‌ی یک سال میلادی — برای نمودار داشبورد CMS. `year` اختیاری است (پیش‌فرض سال جاری میلادی).
+
+```ts
+interface AdminMonthlyStats {
+  year: number;
+  months: string[];                        // نام ماه‌ها به فارسی، ژانویه تا دسامبر — طول ۱۲
+  paidOrdersCount: number[];                // تعداد سفارش‌های paid هر ماه — طول ۱۲
+  newUsersCount: number[];                  // تعداد کاربران ثبت‌نام‌شده هر ماه — طول ۱۲
+  revenueByCurrency: Record<string, number[]>; // جمع amountMinor سفارش‌های paid هر ماه، به‌تفکیک ارز (چون سفارش‌ها می‌توانند چند ارز داشته باشند) — مثلاً { "IRR": [12 عدد], "USD": [12 عدد] }
+  reviewsCount: number[];                   // تعداد کل نظرات ثبت‌شده هر ماه، چه تأییدشده چه نشده — طول ۱۲
+}
+```
+
+پاسخ: `AdminMonthlyStats`
+خطاها: `401 Unauthorized`, `403 FORBIDDEN`
+
 ---
 
 ## §20 — Media (آپلود تصویر عمومی)
