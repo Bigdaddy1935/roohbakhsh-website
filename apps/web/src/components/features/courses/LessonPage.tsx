@@ -34,6 +34,7 @@ import {
   useApproveReview, useRejectReview, useReplyToReview, usePendingReviews,
 } from "@/hooks/queries/use-reviews";
 import { useMe } from "@/hooks/queries/use-auth";
+import { useRecordView } from "@/hooks/queries/use-recently-viewed";
 import { tokenStore } from "@/lib/api-client";
 import type { SectionRecord, Lesson, ReviewRecord } from "@roohbakhsh/shared";
 
@@ -398,6 +399,14 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
   const watchLesson = useWatchLesson();
   const { data: favorites } = useMyFavorites();
   const toggleFavorite = useToggleFavorite();
+  const { mutate: recordView } = useRecordView();
+
+  useEffect(() => {
+    if (isAuthed && lessonId) {
+      recordView({ type: "lesson", id: lessonId });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- فقط وقتی lessonId عوض شد یک بار ثبت شود
+  }, [lessonId]);
 
   if (loadingCourse || loadingSections) {
     return (

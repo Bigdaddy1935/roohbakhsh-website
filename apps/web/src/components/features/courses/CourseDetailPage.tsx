@@ -30,6 +30,7 @@ import {
 } from "@/hooks/queries/use-reviews";
 import { useMe } from "@/hooks/queries/use-auth";
 import { useMyFavorites, useToggleFavorite } from "@/hooks/queries/use-favorites";
+import { useRecordView } from "@/hooks/queries/use-recently-viewed";
 import { tokenStore } from "@/lib/api-client";
 import { formatMoney, isFree, discountPercent } from "@/lib/format";
 import VideoPlayer from "@/components/ui/VideoPlayer";
@@ -169,7 +170,7 @@ function StarsInput({ value, onChange }: { value: number; onChange: (v: number) 
   );
 }
 
-function AdminReviewActions({ review, courseSlug, t }: { review: ReviewRecord; courseSlug: string; t: (k: string) => string }) {
+function AdminReviewActions({ review, t }: { review: ReviewRecord; t: (k: string) => string }) {
   const approveReview = useApproveReview();
   const rejectReview = useRejectReview();
   const replyToReview = useReplyToReview();
@@ -184,7 +185,7 @@ function AdminReviewActions({ review, courseSlug, t }: { review: ReviewRecord; c
   function handleSubmitReply() {
     if (!reply.trim()) return;
     replyToReview.mutate(
-      { courseSlug, reviewId: review.id, reply: reply.trim() },
+      { reviewId: review.id, reply: reply.trim() },
       {
         onSuccess: () => { toast.success(t("reply_submitted_toast")); setReplyOpen(false); },
         onError: () => toast.error(t("reply_submit_error_toast")),
@@ -421,7 +422,7 @@ function ReviewsSection({ courseId, courseSlug, t }: { courseId: string; courseS
                 </div>
               )}
 
-              {isAdmin && <AdminReviewActions review={r} courseSlug={courseSlug} t={t} />}
+              {isAdmin && <AdminReviewActions review={r} t={t} />}
             </div>
           ))}
         </div>
@@ -650,6 +651,14 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
   const { data: sections, isLoading: loadingSections } = useCourseSections(courseSlug);
   const { mutate: addToCart, isPending: addingToCart } = useAddToCart();
   const { data: progress } = useCourseProgress(courseSlug);
+  const { mutate: recordView } = useRecordView();
+
+  useEffect(() => {
+    if (course && typeof window !== "undefined" && tokenStore.getAccess()) {
+      recordView({ type: "course", id: course.id });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- فقط وقتی course.id عوض شد یک بار ثبت شود
+  }, [course?.id]);
 
   if (loadingCourse) {
     return <CourseDetailSkeleton />;
