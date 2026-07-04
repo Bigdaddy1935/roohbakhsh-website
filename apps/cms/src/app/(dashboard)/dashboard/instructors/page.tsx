@@ -14,6 +14,7 @@ import FormModal from "@/components/ui/FormModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import LocalizedInput from "@/components/ui/LocalizedInput";
 import FormField from "@/components/ui/FormField";
+import ImageUploadField from "@/components/ui/ImageUploadField";
 import { RiEditLine, RiDeleteBinLine } from "react-icons/ri";
 
 const emptyForm = {
@@ -91,7 +92,7 @@ export default function InstructorsPage() {
       <FormModal isOpen={formOpen} onClose={() => setFormOpen(false)} title={editing ? "ویرایش استاد" : "استاد جدید"} onSubmit={handleSubmit} isPending={isPending}>
         <LocalizedInput label="نام" value={form.name} onChange={(v) => setForm((f) => ({ ...f, name: v }))} required />
         <FormField label="Slug" value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} required dir="ltr" />
-        <FormField label="آدرس تصویر" value={form.avatarUrl} onChange={(e) => setForm((f) => ({ ...f, avatarUrl: e.target.value }))} dir="ltr" />
+        <ImageUploadField label="تصویر" value={form.avatarUrl} onChange={(url) => setForm((f) => ({ ...f, avatarUrl: url }))} />
         <LocalizedInput label="بیوگرافی" value={form.bio} onChange={(v) => setForm((f) => ({ ...f, bio: v }))} multiline />
       </FormModal>
 

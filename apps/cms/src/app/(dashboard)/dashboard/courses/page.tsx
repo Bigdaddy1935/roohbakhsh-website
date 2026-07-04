@@ -12,6 +12,7 @@ import ConfirmModal from "@/components/ui/ConfirmModal";
 import LocalizedInput from "@/components/ui/LocalizedInput";
 import FormField from "@/components/ui/FormField";
 import SelectField from "@/components/ui/SelectField";
+import ImageUploadField from "@/components/ui/ImageUploadField";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { RiEditLine, RiDeleteBinLine } from "react-icons/ri";
 
@@ -29,6 +30,8 @@ const emptyForm = {
   title: { ar: "", ur: "" } as Localized,
   slug: "",
   description: { ar: "", ur: "" } as Localized,
+  thumbnailAr: "",
+  thumbnailUr: "",
   level: "beginner" as "beginner" | "intermediate" | "advanced",
   instructorId: "",
   categoryId: "",
@@ -62,6 +65,8 @@ export default function CoursesPage() {
       title: { ar: item.title.ar, ur: item.title.ur },
       slug: item.slug,
       description: { ar: item.description.ar, ur: item.description.ur },
+      thumbnailAr: item.thumbnailUrl?.ar ?? "",
+      thumbnailUr: item.thumbnailUrl?.ur ?? "",
       level: item.level,
       instructorId: item.instructorId ?? "",
       categoryId: item.categoryId ?? "",
@@ -76,6 +81,7 @@ export default function CoursesPage() {
     e.preventDefault();
     const payload = {
       title: form.title, slug: form.slug, description: form.description, level: form.level,
+      thumbnailUrl: { ar: form.thumbnailAr || null, ur: form.thumbnailUr || null },
       instructorId: form.instructorId, categoryId: form.categoryId || undefined,
       price: form.priceAmountMinor ? { amountMinor: Number(form.priceAmountMinor), currency: form.priceCurrency } : undefined,
       isPublished: form.isPublished,
@@ -113,6 +119,8 @@ export default function CoursesPage() {
         <LocalizedInput label="عنوان" value={form.title} onChange={(v) => setForm((f) => ({ ...f, title: v }))} required />
         <FormField label="Slug" value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} required dir="ltr" />
         <LocalizedInput label="توضیحات" value={form.description} onChange={(v) => setForm((f) => ({ ...f, description: v }))} multiline />
+        <ImageUploadField label="تصویر کاور — عربی" value={form.thumbnailAr} onChange={(url) => setForm((f) => ({ ...f, thumbnailAr: url }))} />
+        <ImageUploadField label="تصویر کاور — اردو" value={form.thumbnailUr} onChange={(url) => setForm((f) => ({ ...f, thumbnailUr: url }))} />
         <SelectField
           label="سطح"
           value={form.level}

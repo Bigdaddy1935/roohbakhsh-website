@@ -28,8 +28,8 @@ export default function FormModal({
   const isCover = size === "cover";
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()} isDismissable={false}>
-      <Modal.Backdrop>
+    <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <Modal.Backdrop isDismissable={false}>
         <Modal.Container
           placement="center"
           className={
