@@ -21,6 +21,19 @@ export function useReviewsPending(params?: { page?: number; limit?: number }) {
   });
 }
 
+/** همه‌ی نظرات تأییدشده (دوره + مقاله) — برای مرور تاریخچه. */
+export function useAllReviews(params?: { page?: number; limit?: number }) {
+  const qs = new URLSearchParams();
+  if (params?.page) qs.set("page", String(params.page));
+  if (params?.limit) qs.set("limit", String(params.limit));
+  const query = qs.toString() ? `?${qs}` : "";
+
+  return useQuery<Paginated<ReviewWithTarget>>({
+    queryKey: reviewKeys.all(params),
+    queryFn: () => api.get<Paginated<ReviewWithTarget>>(`/reviews${query}`),
+  });
+}
+
 export function useApproveReview() {
   const qc = useQueryClient();
   return useMutation<unknown, Error, string>({

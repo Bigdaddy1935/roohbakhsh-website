@@ -728,6 +728,8 @@ interface ArticleRecord {
 | `GET` | `/reviews` | Public | همه‌ی نظرات **تأیید‌شده** دوره و مقاله با هم (صفحه‌بندی)، شامل اطلاعات هدف هر نظر |
 | `GET` | `/reviews/pending` | فقط admin | صف نظرات در انتظار تأیید (`isApproved: false`)، قدیمی‌ترین اول |
 | `POST` | `/reviews/:id/approve` | فقط admin | تأیید یک نظر — بعد از آن در لیست‌های عمومی نمایش داده می‌شود |
+| `POST` | `/reviews/:id/reject` | فقط admin | رد یک نظر — نظر کاملاً حذف می‌شود (پاسخ `204`) |
+| `POST` | `/reviews/:id/reply` | فقط admin | ثبت/ویرایش پاسخ روی هر نظری (دوره یا مقاله) بدون نیاز به دانستن courseSlug/articleSlug — معادل عمومی همان reply زیر §Courses |
 
 ### شیء ReviewRecord
 
