@@ -1016,14 +1016,14 @@ interface AdminStats {
 پاسخ: `AdminStats`
 خطاها: `401 Unauthorized`, `403 FORBIDDEN`
 
-### `GET /admin/stats/monthly?year=2026` 🔒 admin
+### `GET /admin/stats/monthly?year=1405` 🔒 admin
 
-آمار ماهانه‌ی یک سال میلادی — برای نمودار داشبورد CMS. `year` اختیاری است (پیش‌فرض سال جاری میلادی).
+آمار ماهانه‌ی یک سال **شمسی (جلالی)** — برای نمودار داشبورد CMS. `year` اختیاری است (سال شمسی؛ پیش‌فرض سال شمسی جاری). تبدیل تاریخ با `jalaali-js` انجام می‌شود.
 
 ```ts
 interface AdminMonthlyStats {
-  year: number;
-  months: string[];                        // نام ماه‌ها به فارسی، ژانویه تا دسامبر — طول ۱۲
+  year: number;                            // سال شمسی، مثلاً 1405
+  months: string[];                        // نام ماه‌های شمسی، فروردین تا اسفند — طول ۱۲
   paidOrdersCount: number[];                // تعداد سفارش‌های paid هر ماه — طول ۱۲
   newUsersCount: number[];                  // تعداد کاربران ثبت‌نام‌شده هر ماه — طول ۱۲
   revenueByCurrency: Record<string, number[]>; // جمع amountMinor سفارش‌های paid هر ماه، به‌تفکیک ارز (چون سفارش‌ها می‌توانند چند ارز داشته باشند) — مثلاً { "IRR": [12 عدد], "USD": [12 عدد] }

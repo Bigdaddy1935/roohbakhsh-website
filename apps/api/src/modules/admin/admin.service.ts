@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Between, Repository } from "typeorm";
+import { toJalaali, toGregorian } from "jalaali-js";
 import type { AdminStats, AdminMonthlyStats } from "@roohbakhsh/shared";
 import { User } from "../auth/entities/user.entity";
 import { Course } from "../courses/entities/course.entity";
@@ -9,10 +10,15 @@ import { Order } from "../orders/entities/order.entity";
 import { Ticket } from "../tickets/entities/ticket.entity";
 import { Review } from "../reviews/entities/review.entity";
 
-const PERSIAN_MONTHS = [
-  "ژانویه", "فوریه", "مارس", "آوریل", "می", "ژوئن",
-  "ژوئیه", "اوت", "سپتامبر", "اکتبر", "نوامبر", "دسامبر",
+const JALALI_MONTHS = [
+  "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
+  "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند",
 ];
+
+/** ماه شمسی (۱ تا ۱۲) این تاریخ میلادی. */
+function jalaliMonthOf(date: Date): number {
+  return toJalaali(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate()).jm;
+}
 
 @Injectable()
 export class AdminService {
@@ -55,10 +61,13 @@ export class AdminService {
     };
   }
 
-  /** آمار ماهانه‌ی یک سال میلادی — سفارش‌های paid، کاربران جدید، درآمد به‌تفکیک ارز، تعداد نظرات. */
-  async getMonthlyStats(year: number): Promise<AdminMonthlyStats> {
-    const startDate = new Date(Date.UTC(year, 0, 1));
-    const endDate = new Date(Date.UTC(year + 1, 0, 1));
+  /** آمار ماهانه‌ی یک سال شمسی (جلالی) — سفارش‌های paid، کاربران جدید، درآمد به‌تفکیک ارز، تعداد نظرات. */
+  async getMonthlyStats(year?: number): Promise<AdminMonthlyStats> {
+    const jalaliYear = year ?? toJalaali(new Date()).jy;
+    const start = toGregorian(jalaliYear, 1, 1);
+    const end = toGregorian(jalaliYear + 1, 1, 1);
+    const startDate = new Date(Date.UTC(start.gy, start.gm - 1, start.gd));
+    const endDate = new Date(Date.UTC(end.gy, end.gm - 1, end.gd));
 
     const [paidOrders, users, reviews] = await Promise.all([
       this.orderRepo.find({
@@ -81,7 +90,7 @@ export class AdminService {
     const revenueByCurrency: Record<string, number[]> = {};
 
     for (const order of paidOrders) {
-      const month = order.createdAt.getUTCMonth();
+      const month = jalaliMonthOf(order.createdAt) - 1;
       paidOrdersCount[month]!++;
       const currency = order.total.currency;
       const series = revenueByCurrency[currency] ?? (revenueByCurrency[currency] = Array(12).fill(0));
@@ -89,16 +98,16 @@ export class AdminService {
     }
 
     for (const user of users) {
-      newUsersCount[user.createdAt.getUTCMonth()]!++;
+      newUsersCount[jalaliMonthOf(user.createdAt) - 1]!++;
     }
 
     for (const review of reviews) {
-      reviewsCount[review.createdAt.getUTCMonth()]!++;
+      reviewsCount[jalaliMonthOf(review.createdAt) - 1]!++;
     }
 
     return {
-      year,
-      months: PERSIAN_MONTHS,
+      year: jalaliYear,
+      months: JALALI_MONTHS,
       paidOrdersCount,
       newUsersCount,
       revenueByCurrency,

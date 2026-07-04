@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards, DefaultValuePipe, ParseIntPipe } from "@nestjs/common";
+import { Controller, Get, Query, UseGuards } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiHeader, ApiQuery } from "@nestjs/swagger";
 import { AdminService } from "./admin.service";
 import { RolesGuard, Roles } from "../../common/guards/roles.guard";
@@ -28,18 +28,16 @@ export class AdminController {
 
   @Get("stats/monthly")
   @ApiOperation({
-    summary: "آمار ماهانه‌ی یک سال میلادی 🔒 admin",
+    summary: "آمار ماهانه‌ی یک سال شمسی (جلالی) 🔒 admin",
     description:
-      "تعداد سفارش‌های paid، کاربران ثبت‌نام‌شده، جمع درآمد به‌تفکیک ارز، و تعداد نظرات (چه تأییدشده چه نشده) — برای هر ماه از سال درخواستی. برای نمودار داشبورد.",
+      "تعداد سفارش‌های paid، کاربران ثبت‌نام‌شده، جمع درآمد به‌تفکیک ارز، و تعداد نظرات (چه تأییدشده چه نشده) — برای هر ماه از سال شمسی درخواستی. برای نمودار داشبورد.",
   })
   @ApiHeader(LANG_HEADER)
-  @ApiQuery({ name: "year", required: false, type: Number, example: 2026, description: "پیش‌فرض سال جاری میلادی" })
+  @ApiQuery({ name: "year", required: false, type: Number, example: 1405, description: "سال شمسی (جلالی) — پیش‌فرض سال جاری" })
   @ApiResponse({ status: 200, description: "AdminMonthlyStats" })
   @ApiResponse({ status: 401, description: "احراز هویت نشده", type: ApiErrorSchema })
   @ApiResponse({ status: 403, description: "دسترسی ندارید", type: ApiErrorSchema })
-  getMonthlyStats(
-    @Query("year", new DefaultValuePipe(new Date().getUTCFullYear()), ParseIntPipe) year: number,
-  ) {
-    return this.adminService.getMonthlyStats(year);
+  getMonthlyStats(@Query("year") year?: string) {
+    return this.adminService.getMonthlyStats(year ? Number(year) : undefined);
   }
 }

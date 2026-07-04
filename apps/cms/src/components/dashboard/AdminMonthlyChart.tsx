@@ -16,6 +16,7 @@ import { Line, Bar } from "react-chartjs-2";
 import { useAdminMonthlyStats } from "@/hooks/queries/use-admin-monthly-stats";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
+ChartJS.defaults.font.family = "Dana-DemiBold";
 
 const CURRENCY_COLORS: Record<string, string> = {
   IRR: "#0CA789",
@@ -24,8 +25,7 @@ const CURRENCY_COLORS: Record<string, string> = {
 };
 
 export default function AdminMonthlyChart() {
-  const year = new Date().getFullYear();
-  const { data, isLoading } = useAdminMonthlyStats(year);
+  const { data, isLoading } = useAdminMonthlyStats();
 
   const countsData = useMemo(() => {
     if (!data) return null;
@@ -84,12 +84,12 @@ export default function AdminMonthlyChart() {
     );
   }
 
-  if (!countsData || !revenueData) return null;
+  if (!data || !countsData || !revenueData) return null;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
       <div className="bg-white border border-gray-100 rounded-[20px] p-5">
-        <h2 className="text-sm font-bold text-[var(--ink)] mb-4">آمار ماهانه {year}</h2>
+        <h2 className="text-sm font-bold text-[var(--ink)] mb-4">آمار ماهانه {data.year}</h2>
         <div className="h-64">
           <Line
             data={countsData}
@@ -104,7 +104,7 @@ export default function AdminMonthlyChart() {
       </div>
 
       <div className="bg-white border border-gray-100 rounded-[20px] p-5">
-        <h2 className="text-sm font-bold text-[var(--ink)] mb-4">درآمد ماهانه {year}</h2>
+        <h2 className="text-sm font-bold text-[var(--ink)] mb-4">درآمد ماهانه {data.year}</h2>
         <div className="h-64">
           <Bar
             data={revenueData}
