@@ -5,7 +5,7 @@ import { OrdersModule } from "../orders/orders.module";
 import { InvoicesModule } from "../invoices/invoices.module";
 import { PaymentsService } from "./payments.service";
 import { PaymentsController } from "./payments.controller";
-import { FtpUploaderService } from "./ftp-uploader.service";
+import { FtpUploaderService } from "../../common/ftp/ftp-uploader.service";
 
 @Module({
   imports: [

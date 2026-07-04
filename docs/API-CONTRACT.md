@@ -551,6 +551,9 @@ Accept-Language: ar
 | GET | `/payments/manual/destination-info` | User | اطلاعات حساب مقصد برای پرداخت کارت‌به‌کارت |
 | POST | `/payments/upload-receipt` | User | آپلود تصویر رسید کارت‌به‌کارت روی FTP — لینک عمومی برمی‌گرداند |
 | POST | `/payments/manual/:orderId` | User | ثبت اطلاعات پرداخت کارت‌به‌کارت — وضعیت `pending` تا تأیید دستی ادمین |
+| GET | `/payments/manual/pending` | Admin | پرداخت‌های کارت‌به‌کارت منتظر تأیید (paginated) |
+| POST | `/payments/manual/:paymentId/approve` | Admin | تأیید پرداخت — سفارش `paid` می‌شود و فاکتور ساخته می‌شود |
+| POST | `/payments/manual/:paymentId/reject` | Admin | رد پرداخت — پرداخت `failed` می‌شود، کاربر باید دوباره ارسال کند |
 
 ### POST /payments/initiate/:orderId — response
 ```json
@@ -578,13 +581,19 @@ Amount must be in **Rials (IRR)**. Use `Money.amountMinor` with `currency: "IRR"
   "id": "uuid", "orderId": "uuid", "userId": "uuid",
   "amount": { "amountMinor": 350000, "currency": "IRR" },
   "status": "paid",
+  "method": "gateway",
   "authority": "A00000000000000000000000000000000000",
   "refId": "123456789",
   "gatewayUrl": "https://www.zarinpal.com/pg/StartPay/...",
   "description": "Order uuid",
+  "trackingCode": null,
+  "sourceCardNumber": null,
+  "transferredAt": null,
+  "receiptImageUrl": null,
   "createdAt": "...", "updatedAt": "..."
 }
 ```
+`method` یا `"gateway"` (زرین‌پال) یا `"card_to_card"` است. فیلدهای `trackingCode`/`sourceCardNumber`/`transferredAt`/`receiptImageUrl` فقط برای `method: "card_to_card"` مقدار دارند.
 
 ### GET /payments/manual/destination-info — response
 ```json
@@ -612,7 +621,13 @@ Amount must be in **Rials (IRR)**. Use `Money.amountMinor` with `currency: "IRR"
   "receiptImageUrl": "https://cdn.roohbakhsh.ac/receipts/uuid.jpg"
 }
 ```
-پرداخت با `method: "card_to_card"` و `status: "pending"` ثبت/به‌روزرسانی می‌شود — تأیید نهایی (تغییر به `paid`) دستی توسط ادمین انجام می‌شود (فعلاً از طریق دیتابیس/CMS؛ پنل تأیید مدیریتی در فاز بعد اضافه می‌شود).
+پرداخت با `method: "card_to_card"` و `status: "pending"` ثبت/به‌روزرسانی می‌شود — تأیید نهایی (تغییر به `paid`) دستی توسط ادمین در CMS (صفحه‌ی پرداخت‌ها) انجام می‌شود.
+
+### POST /payments/manual/:paymentId/approve — response
+پرداخت `status: "paid"` می‌شود، سفارش مرتبط `paid` می‌شود و فاکتور ساخته می‌شود (`refId: "MANUAL-<trackingCode>"`). خروجی همان Payment log object بالاست.
+
+### POST /payments/manual/:paymentId/reject — response
+پرداخت `status: "failed"` می‌شود. وضعیت سفارش تغییر نمی‌کند (همچنان `pending`) تا کاربر بتواند دوباره اطلاعات پرداخت را ارسال کند.
 
 ---
 
@@ -990,6 +1005,20 @@ interface AdminStats {
 
 پاسخ: `AdminStats`
 خطاها: `401 Unauthorized`, `403 FORBIDDEN`
+
+---
+
+## §20 — Media (آپلود تصویر عمومی)
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/media/upload` | Admin | آپلود تصویر عمومی (کاور دوره، آواتار استاد و...) روی FTP |
+
+### POST /media/upload — multipart/form-data (`file`) → response
+```json
+{ "url": "https://cdn.roohbakhsh.ac/media/uuid.jpg" }
+```
+فایل در پوشه‌ی `FTP_MEDIA_DIR` (پیش‌فرض `/media`، جدا از `/receipts` که مخصوص رسید پرداخت است) روی همان سرور FTP آپلود می‌شود. حداکثر حجم ۵ مگابایت، فرمت‌های مجاز: jpg/jpeg/png/webp. برای دوره‌ها و اساتید، ابتدا این endpoint صدا زده می‌شود تا `url` گرفته شود، سپس همان `url` در payload معمولی `POST/PATCH /courses` یا `/instructor` به‌عنوان `thumbnailUrl`/`avatarUrl` فرستاده می‌شود — این endpoint خودش رکورد دوره/استاد را تغییر نمی‌دهد.
 
 ---
 

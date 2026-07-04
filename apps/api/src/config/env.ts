@@ -118,6 +118,10 @@ class EnvConfig {
   @IsString()
   FTP_UPLOAD_DIR: string = "/receipts";
 
+  /** پوشه‌ی جداگانه روی همان FTP برای تصاویر عمومی (کاور دوره، آواتار استاد و...) */
+  @IsString()
+  FTP_MEDIA_DIR: string = "/media";
+
   @IsString()
   FTP_PUBLIC_BASE_URL!: string;
 

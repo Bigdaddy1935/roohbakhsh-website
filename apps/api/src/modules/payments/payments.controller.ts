@@ -130,6 +130,54 @@ export class PaymentsController {
     return this.service.uploadReceipt(file);
   }
 
+  @Get("manual/pending")
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles("admin")
+  @ApiOperation({
+    summary: "[Admin] پرداخت‌های کارت‌به‌کارت منتظر تأیید",
+    description: "لیست پرداخت‌هایی که کاربر رسید/اطلاعات پرداخت فرستاده ولی هنوز ادمین تأیید نکرده.",
+  })
+  @ApiResponse({ status: 200, description: "لیست صفحه‌بندی‌شده پرداخت‌های منتظر تأیید" })
+  @ApiResponse({ status: 403, description: "فقط admin" })
+  findPendingManual(@Query() query: PaginationDto) {
+    return this.service.findPendingManual(query.page ?? 1, query.limit ?? 20);
+  }
+
+  @Post("manual/:paymentId/approve")
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles("admin")
+  @ApiOperation({
+    summary: "[Admin] تأیید پرداخت کارت‌به‌کارت",
+    description: "پرداخت paid می‌شود، سفارش paid می‌شود و فاکتور ساخته می‌شود.",
+  })
+  @ApiParam({ name: "paymentId", description: "Payment UUID" })
+  @ApiResponse({ status: 201, description: "پرداخت تأیید شد" })
+  @ApiResponse({ status: 400, description: "PAYMENT_ALREADY_PROCESSED" })
+  @ApiResponse({ status: 404, description: "PAYMENT_NOT_FOUND" })
+  @ApiResponse({ status: 403, description: "فقط admin" })
+  approveManual(@Param("paymentId") paymentId: string) {
+    return this.service.approveManual(paymentId);
+  }
+
+  @Post("manual/:paymentId/reject")
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles("admin")
+  @ApiOperation({
+    summary: "[Admin] رد پرداخت کارت‌به‌کارت",
+    description: "پرداخت failed می‌شود — کاربر باید دوباره اطلاعات پرداخت را ارسال کند.",
+  })
+  @ApiParam({ name: "paymentId", description: "Payment UUID" })
+  @ApiResponse({ status: 201, description: "پرداخت رد شد" })
+  @ApiResponse({ status: 400, description: "PAYMENT_ALREADY_PROCESSED" })
+  @ApiResponse({ status: 404, description: "PAYMENT_NOT_FOUND" })
+  @ApiResponse({ status: 403, description: "فقط admin" })
+  rejectManual(@Param("paymentId") paymentId: string) {
+    return this.service.rejectManual(paymentId);
+  }
+
   @Post("manual/:orderId")
   @ApiBearerAuth()
   @ApiOperation({

@@ -20,7 +20,7 @@ import { Payment } from "./entities/payment.entity";
 import { OrdersService } from "../orders/orders.service";
 import { InvoicesService } from "../invoices/invoices.service";
 import { EnvConfig } from "../../config/env";
-import { FtpUploaderService } from "./ftp-uploader.service";
+import { FtpUploaderService } from "../../common/ftp/ftp-uploader.service";
 import { SubmitCardToCardDto } from "./dto/submit-card-to-card.dto";
 
 const ZARINPAL_REQUEST_URL = "https://api.zarinpal.com/pg/v4/payment/request.json";
@@ -56,7 +56,8 @@ export class PaymentsService {
 
   /** آپلود تصویر رسید کارت‌به‌کارت روی FTP — لینک عمومی برمی‌گرداند. */
   async uploadReceipt(file: Express.Multer.File): Promise<UploadReceiptResponse> {
-    const url = await this.ftpUploader.upload(file.buffer, file.originalname);
+    const uploadDir = this.config.get("FTP_UPLOAD_DIR", { infer: true })!;
+    const url = await this.ftpUploader.upload(file.buffer, file.originalname, uploadDir);
     return { paymentId: "", url };
   }
 
@@ -231,6 +232,48 @@ export class PaymentsService {
     throw new BadRequestException(`ZARINPAL_VERIFY_ERROR_${errCode}`);
   }
 
+  /** پرداخت‌های کارت‌به‌کارت که منتظر تأیید دستی ادمین هستند. */
+  async findPendingManual(page: number, limit: number): Promise<Paginated<PaymentRecord>> {
+    const [items, total] = await this.repo.findAndCount({
+      where: { method: "card_to_card", status: "pending" },
+      order: { createdAt: "DESC" },
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+    return toPaginated(items.map((p) => this.toContract(p)), total, page, limit);
+  }
+
+  /** تأیید دستی پرداخت کارت‌به‌کارت توسط ادمین — سفارش paid می‌شود و فاکتور ساخته می‌شود. */
+  async approveManual(paymentId: string): Promise<PaymentRecord> {
+    const payment = await this.repo.findOne({ where: { id: paymentId, method: "card_to_card" } });
+    if (!payment) throw new NotFoundException("PAYMENT_NOT_FOUND");
+    if (payment.status !== "pending") {
+      throw new BadRequestException("PAYMENT_ALREADY_PROCESSED");
+    }
+
+    const refId = `MANUAL-${payment.trackingCode ?? payment.id}`;
+    await this.repo.update(payment.id, { status: "paid", refId });
+    await this.ordersService.updateStatus(payment.orderId, "paid");
+    const order = await this.ordersService.findEntity(payment.orderId);
+    await this.invoicesService.createFromOrder(order, refId);
+
+    this.logger.log(`Manual payment ${payment.id} approved by admin. RefID: ${refId}`);
+    return this.toContract({ ...payment, status: "paid", refId });
+  }
+
+  /** رد پرداخت کارت‌به‌کارت توسط ادمین — کاربر باید دوباره اطلاعات پرداخت را ارسال کند. */
+  async rejectManual(paymentId: string): Promise<PaymentRecord> {
+    const payment = await this.repo.findOne({ where: { id: paymentId, method: "card_to_card" } });
+    if (!payment) throw new NotFoundException("PAYMENT_NOT_FOUND");
+    if (payment.status !== "pending") {
+      throw new BadRequestException("PAYMENT_ALREADY_PROCESSED");
+    }
+
+    await this.repo.update(payment.id, { status: "failed" });
+    this.logger.log(`Manual payment ${payment.id} rejected by admin.`);
+    return this.toContract({ ...payment, status: "failed" });
+  }
+
   async findLogs(page: number, limit: number): Promise<Paginated<PaymentRecord>> {
     const [items, total] = await this.repo.findAndCount({
       order: { createdAt: "DESC" },
@@ -257,10 +300,15 @@ export class PaymentsService {
       userId: p.userId,
       amount: p.amount,
       status: p.status,
+      method: p.method,
       authority: p.authority,
       refId: p.refId,
       gatewayUrl: p.gatewayUrl,
       description: p.description,
+      trackingCode: p.trackingCode,
+      sourceCardNumber: p.sourceCardNumber,
+      transferredAt: p.transferredAt ? p.transferredAt.toISOString() : null,
+      receiptImageUrl: p.receiptImageUrl,
       createdAt: p.createdAt.toISOString(),
       updatedAt: p.updatedAt.toISOString(),
     };

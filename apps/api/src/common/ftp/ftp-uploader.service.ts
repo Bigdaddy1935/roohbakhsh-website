@@ -11,13 +11,12 @@ export class FtpUploaderService {
 
   constructor(private readonly config: ConfigService<EnvConfig>) {}
 
-  /** فایل را روی FTP آپلود می‌کند و لینک عمومی آن را برمی‌گرداند. */
-  async upload(buffer: Buffer, originalName: string): Promise<string> {
+  /** فایل را در پوشه‌ی مشخص‌شده روی FTP آپلود می‌کند و لینک عمومی آن را برمی‌گرداند. */
+  async upload(buffer: Buffer, originalName: string, uploadDir: string): Promise<string> {
     const host = this.config.get("FTP_HOST", { infer: true })!;
     const port = this.config.get("FTP_PORT", { infer: true })!;
     const user = this.config.get("FTP_USER", { infer: true })!;
     const password = this.config.get("FTP_PASSWORD", { infer: true })!;
-    const uploadDir = this.config.get("FTP_UPLOAD_DIR", { infer: true })!;
     const publicBaseUrl = this.config.get("FTP_PUBLIC_BASE_URL", { infer: true })!;
     const secure = this.config.get("FTP_SECURE", { infer: true })!;
 
@@ -31,7 +30,7 @@ export class FtpUploaderService {
       await client.uploadFrom(Readable.from(buffer), fileName);
     } catch (err) {
       this.logger.error("FTP upload failed", err);
-      throw new InternalServerErrorException("RECEIPT_UPLOAD_FAILED");
+      throw new InternalServerErrorException("FILE_UPLOAD_FAILED");
     } finally {
       client.close();
     }
