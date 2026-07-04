@@ -14,7 +14,8 @@ import FormField from "@/components/ui/FormField";
 import SelectField from "@/components/ui/SelectField";
 import ImageUploadField from "@/components/ui/ImageUploadField";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { RiEditLine, RiDeleteBinLine } from "react-icons/ri";
+import Link from "next/link";
+import { RiEditLine, RiDeleteBinLine, RiListCheck2 } from "react-icons/ri";
 
 const LEVEL_MAP = {
   beginner: { label: "مبتدی", color: "bg-green-50 text-green-700" },
@@ -32,11 +33,17 @@ const emptyForm = {
   description: { ar: "", ur: "" } as Localized,
   thumbnailAr: "",
   thumbnailUr: "",
+  introVideoAr: "",
+  introVideoUr: "",
   level: "beginner" as "beginner" | "intermediate" | "advanced",
+  runStatus: "ongoing" as "ongoing" | "upcoming" | "completed",
+  accessType: "online_only" as "online_only" | "downloadable",
   instructorId: "",
   categoryId: "",
   priceAmountMinor: "",
   priceCurrency: "USD" as "USD" | "EUR" | "IRR",
+  discountPriceAmountMinor: "",
+  discountExpiresAt: "",
   isPublished: false,
 };
 
@@ -67,11 +74,17 @@ export default function CoursesPage() {
       description: { ar: item.description.ar, ur: item.description.ur },
       thumbnailAr: item.thumbnailUrl?.ar ?? "",
       thumbnailUr: item.thumbnailUrl?.ur ?? "",
+      introVideoAr: item.introVideoUrl?.ar ?? "",
+      introVideoUr: item.introVideoUrl?.ur ?? "",
       level: item.level,
+      runStatus: item.runStatus,
+      accessType: item.accessType,
       instructorId: item.instructorId ?? "",
       categoryId: item.categoryId ?? "",
       priceAmountMinor: item.price?.amountMinor != null ? String(item.price.amountMinor) : "",
       priceCurrency: (item.price?.currency ?? "USD") as "USD" | "EUR" | "IRR",
+      discountPriceAmountMinor: item.discount?.price.amountMinor != null ? String(item.discount.price.amountMinor) : "",
+      discountExpiresAt: item.discount?.expiresAt ? item.discount.expiresAt.slice(0, 10) : "",
       isPublished: item.isPublished,
     });
     setFormOpen(true);
@@ -82,8 +95,12 @@ export default function CoursesPage() {
     const payload = {
       title: form.title, slug: form.slug, description: form.description, level: form.level,
       thumbnailUrl: { ar: form.thumbnailAr || null, ur: form.thumbnailUr || null },
+      introVideoUrl: { ar: form.introVideoAr || null, ur: form.introVideoUr || null },
+      runStatus: form.runStatus, accessType: form.accessType,
       instructorId: form.instructorId, categoryId: form.categoryId || undefined,
       price: form.priceAmountMinor ? { amountMinor: Number(form.priceAmountMinor), currency: form.priceCurrency } : undefined,
+      discountPrice: form.discountPriceAmountMinor ? { amountMinor: Number(form.discountPriceAmountMinor), currency: form.priceCurrency } : null,
+      discountExpiresAt: form.discountExpiresAt ? new Date(form.discountExpiresAt).toISOString() : null,
       isPublished: form.isPublished,
     };
     if (editing) await updateMut.mutateAsync(payload);
@@ -103,6 +120,9 @@ export default function CoursesPage() {
       key: "actions", label: "عملیات",
       render: (r: CourseRecord) => (
         <div className="flex gap-2">
+          <Link href={`/dashboard/courses/${r.slug}/content`} className="p-1.5 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors" title="مدیریت سرفصل و درس‌ها">
+            <RiListCheck2 size={16} />
+          </Link>
           <button onClick={() => openEdit(r)} className="p-1.5 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors"><RiEditLine size={16} /></button>
           <button onClick={() => setDeleteTarget(r)} className="p-1.5 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><RiDeleteBinLine size={16} /></button>
         </div>
@@ -121,6 +141,8 @@ export default function CoursesPage() {
         <LocalizedInput label="توضیحات" value={form.description} onChange={(v) => setForm((f) => ({ ...f, description: v }))} multiline />
         <ImageUploadField label="تصویر کاور — عربی" value={form.thumbnailAr} onChange={(url) => setForm((f) => ({ ...f, thumbnailAr: url }))} />
         <ImageUploadField label="تصویر کاور — اردو" value={form.thumbnailUr} onChange={(url) => setForm((f) => ({ ...f, thumbnailUr: url }))} />
+        <FormField label="ویدیوی معرفی — عربی" value={form.introVideoAr} onChange={(e) => setForm((f) => ({ ...f, introVideoAr: e.target.value }))} dir="ltr" />
+        <FormField label="ویدیوی معرفی — اردو" value={form.introVideoUr} onChange={(e) => setForm((f) => ({ ...f, introVideoUr: e.target.value }))} dir="ltr" />
         <SelectField
           label="سطح"
           value={form.level}
@@ -129,6 +151,27 @@ export default function CoursesPage() {
             { value: "beginner", label: "مبتدی" },
             { value: "intermediate", label: "متوسط" },
             { value: "advanced", label: "پیشرفته" },
+          ]}
+          required
+        />
+        <SelectField
+          label="وضعیت برگزاری"
+          value={form.runStatus}
+          onChange={(v) => setForm((f) => ({ ...f, runStatus: v as typeof form.runStatus }))}
+          options={[
+            { value: "ongoing", label: "در حال برگزاری" },
+            { value: "upcoming", label: "به‌زودی" },
+            { value: "completed", label: "پایان‌یافته" },
+          ]}
+          required
+        />
+        <SelectField
+          label="نحوه دسترسی"
+          value={form.accessType}
+          onChange={(v) => setForm((f) => ({ ...f, accessType: v as typeof form.accessType }))}
+          options={[
+            { value: "online_only", label: "فقط آنلاین" },
+            { value: "downloadable", label: "قابل دانلود" },
           ]}
           required
         />
@@ -162,6 +205,8 @@ export default function CoursesPage() {
           ]}
           required
         />
+        <FormField label="قیمت تخفیف‌خورده (واحد کوچک)" type="number" value={form.discountPriceAmountMinor} onChange={(e) => setForm((f) => ({ ...f, discountPriceAmountMinor: e.target.value }))} dir="ltr" />
+        <FormField label="تاریخ انقضای تخفیف" type="date" value={form.discountExpiresAt} onChange={(e) => setForm((f) => ({ ...f, discountExpiresAt: e.target.value }))} dir="ltr" />
         <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
           <input
             type="checkbox"
