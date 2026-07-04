@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import type { Localized } from "@roohbakhsh/shared";
-import { useSendNotification } from "@/hooks/queries/use-notifications";
+import type { Localized, NotificationItem } from "@roohbakhsh/shared";
+import { useSendNotification, useNotificationsHistory } from "@/hooks/queries/use-notifications";
 import PageHeader from "@/components/ui/PageHeader";
+import DataTable from "@/components/ui/DataTable";
 import LocalizedInput from "@/components/ui/LocalizedInput";
 import FormField from "@/components/ui/FormField";
 import { RiSendPlaneLine, RiCheckLine } from "react-icons/ri";
@@ -18,6 +19,9 @@ export default function NotificationsPage() {
   const [form, setForm] = useState(emptyForm);
   const [sent, setSent] = useState(false);
   const sendMut = useSendNotification();
+
+  const [page, setPage] = useState(1);
+  const { data: history, isLoading: historyLoading } = useNotificationsHistory({ page, limit: 10 });
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -60,6 +64,23 @@ export default function NotificationsPage() {
             </button>
           </div>
         </form>
+      </div>
+
+      <div className="mt-6">
+        <h2 className="text-base font-bold text-[var(--ink)] mb-4">تاریخچه اعلان‌های ارسالی</h2>
+        <DataTable
+          columns={[
+            { key: "title", label: "عنوان", render: (r: NotificationItem) => r.title.ar },
+            { key: "body", label: "متن", render: (r: NotificationItem) => <span className="line-clamp-2 max-w-md block">{r.body.ar}</span> },
+            { key: "link", label: "لینک", render: (r: NotificationItem) => r.link ?? "-" },
+            { key: "createdAt", label: "تاریخ", render: (r: NotificationItem) => r.createdAt.slice(0, 10) },
+          ]}
+          data={history?.items ?? []}
+          isLoading={historyLoading}
+          page={page}
+          totalPages={history?.totalPages ?? 1}
+          onPageChange={setPage}
+        />
       </div>
     </div>
   );
