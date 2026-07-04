@@ -276,8 +276,15 @@ effectivePrice: Money|null  // قیمت واقعی: discountedPrice (اگر isAc
 
 > ساختار محتوا: **دوره → سرفصل → درس**
 > هر دوره یک یا چند سرفصل دارد. هر سرفصل یک یا چند درس دارد.
-> عملیات نوشتن فقط برای `role: admin` مجاز است. خواندن برای همه آزاد است.
+> عملیات نوشتن فقط برای `role: admin` مجاز است. خواندن برای همه آزاد است (auth اختیاری — `OptionalJwtAuthGuard`).
 > `title` از نوع `Localized` است: `{ ar: string, ur: string }`.
+>
+> **⚠️ کنترل دسترسی به `videoUrl`:** فیلد `videoUrl` هر درس فقط در این حالت‌ها مقدار واقعی دارد؛ در غیر این صورت `{ ar: null, ur: null }` برمی‌گردد:
+> - `isFreePreview: true` (پیش‌نمایش رایگان — برای همه)
+> - کاربر لاگین‌شده‌ای که این دوره را با سفارش `paid` خریده باشد
+> - `role: admin`
+>
+> این محافظت مستقیماً در `SectionService`/`LessonService` اعمال می‌شود (نه فقط UI) — قبلاً این endpoint بدون هیچ محدودیتی لینک ویدیوی کامل همه‌ی درس‌های همه‌ی دوره‌ها (حتی پولی) را به کاربر مهمان برمی‌گرداند.
 
 ### `GET /api/courses/:courseSlug/sections`
 تمام سرفصل‌های یک دوره به‌ترتیب `order`، همراه با درس‌هایشان.
@@ -325,6 +332,7 @@ effectivePrice: Money|null  // قیمت واقعی: discountedPrice (اگر isAc
 > درس‌ها زیر سرفصل قرار دارند. مسیر کامل: `/api/courses/:courseSlug/sections/:sectionId/lessons`
 > پس از هر تغییر درس، `lessonCount` و `durationMinutes` دوره به‌صورت خودکار sync می‌شوند.
 > `title` از نوع `Localized` است.
+> همان قانون کنترل دسترسی به `videoUrl` که بالای بخش سرفصل‌ها توضیح داده شد، اینجا هم صدق می‌کند.
 
 ### `GET /api/courses/:courseSlug/sections/:sectionId/lessons`
 لیست صفحه‌بندی‌شده درس‌های یک سرفصل به‌ترتیب `order`.

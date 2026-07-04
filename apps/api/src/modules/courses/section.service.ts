@@ -6,6 +6,7 @@ import { Section } from "./entities/section.entity";
 import { Course } from "./entities/course.entity";
 import { CreateSectionDto } from "./dto/create-section.dto";
 import { UpdateSectionDto } from "./dto/update-section.dto";
+import { CourseAccessService } from "./course-access.service";
 
 @Injectable()
 export class SectionService {
@@ -14,19 +15,21 @@ export class SectionService {
     private readonly sectionRepo: Repository<Section>,
     @InjectRepository(Course)
     private readonly courseRepo: Repository<Course>,
+    private readonly courseAccess: CourseAccessService,
   ) {}
 
-  async findByCourse(courseSlug: string): Promise<SectionRecord[]> {
+  async findByCourse(courseSlug: string, userId?: string, isAdmin?: boolean): Promise<SectionRecord[]> {
     const course = await this.courseBySlug(courseSlug);
     const sections = await this.sectionRepo.find({
       where: { courseId: course.id },
       relations: { lessons: true },
       order: { order: "ASC", lessons: { order: "ASC" } },
     });
-    return sections.map((s) => this.toContract(s));
+    const hasPurchased = isAdmin || (await this.courseAccess.hasPurchased(userId, course.id));
+    return sections.map((s) => this.toContract(s, hasPurchased));
   }
 
-  async findOne(courseSlug: string, sectionId: string): Promise<SectionRecord> {
+  async findOne(courseSlug: string, sectionId: string, userId?: string, isAdmin?: boolean): Promise<SectionRecord> {
     const course = await this.courseBySlug(courseSlug);
     const section = await this.sectionRepo.findOne({
       where: { id: sectionId, courseId: course.id },
@@ -34,7 +37,8 @@ export class SectionService {
       order: { lessons: { order: "ASC" } },
     });
     if (!section) throw new NotFoundException("SECTION_NOT_FOUND");
-    return this.toContract(section);
+    const hasPurchased = isAdmin || (await this.courseAccess.hasPurchased(userId, course.id));
+    return this.toContract(section, hasPurchased);
   }
 
   async create(courseSlug: string, dto: CreateSectionDto): Promise<SectionRecord> {
@@ -46,7 +50,7 @@ export class SectionService {
     });
     const saved = await this.sectionRepo.save(section);
     saved.lessons = [];
-    return this.toContract(saved);
+    return this.toContract(saved, true);
   }
 
   async update(courseSlug: string, sectionId: string, dto: UpdateSectionDto): Promise<SectionRecord> {
@@ -61,7 +65,7 @@ export class SectionService {
     if (dto.title !== undefined) section.title = dto.title;
     if (dto.order !== undefined) section.order = dto.order;
 
-    return this.toContract(await this.sectionRepo.save(section));
+    return this.toContract(await this.sectionRepo.save(section), true);
   }
 
   async remove(courseSlug: string, sectionId: string): Promise<void> {
@@ -88,7 +92,7 @@ export class SectionService {
     return course;
   }
 
-  private toContract(section: Section): SectionRecord {
+  private toContract(section: Section, hasPurchased = false): SectionRecord {
     return {
       id: section.id,
       courseId: section.courseId,
@@ -97,7 +101,7 @@ export class SectionService {
       lessons: (section.lessons ?? []).map((l) => ({
         id: l.id,
         title: l.title,
-        videoUrl: l.videoUrl ?? { ar: null, ur: null },
+        videoUrl: l.isFreePreview || hasPurchased ? (l.videoUrl ?? { ar: null, ur: null }) : { ar: null, ur: null },
         order: l.order,
         durationMinutes: l.durationMinutes,
         isFreePreview: l.isFreePreview,

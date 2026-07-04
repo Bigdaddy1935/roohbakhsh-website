@@ -10,6 +10,7 @@ import { ReviewsModule } from "../reviews/reviews.module";
 import { CourseService } from "./course.service";
 import { SectionService } from "./section.service";
 import { LessonService } from "./lesson.service";
+import { CourseAccessService } from "./course-access.service";
 import { CourseController } from "./course.controller";
 import { SectionController } from "./section.controller";
 import { LessonController } from "./lesson.controller";
@@ -20,6 +21,6 @@ import { LessonController } from "./lesson.controller";
     ReviewsModule,
   ],
   controllers: [CourseController, SectionController, LessonController],
-  providers: [CourseService, SectionService, LessonService],
+  providers: [CourseService, SectionService, LessonService, CourseAccessService],
 })
 export class CoursesModule {}

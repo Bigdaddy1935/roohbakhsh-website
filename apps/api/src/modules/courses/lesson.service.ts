@@ -8,6 +8,7 @@ import { Section } from "./entities/section.entity";
 import { Course } from "./entities/course.entity";
 import { CreateLessonDto } from "./dto/create-lesson.dto";
 import { UpdateLessonDto } from "./dto/update-lesson.dto";
+import { CourseAccessService } from "./course-access.service";
 
 @Injectable()
 export class LessonService {
@@ -18,6 +19,7 @@ export class LessonService {
     private readonly sectionRepo: Repository<Section>,
     @InjectRepository(Course)
     private readonly courseRepo: Repository<Course>,
+    private readonly courseAccess: CourseAccessService,
   ) {}
 
   async findBySection(
@@ -25,6 +27,8 @@ export class LessonService {
     sectionId: string,
     page: number,
     limit: number,
+    userId?: string,
+    isAdmin?: boolean,
   ): Promise<Paginated<LessonContract>> {
     const section = await this.sectionByIdAndCourseSlug(courseSlug, sectionId);
     const [lessons, total] = await this.lessonRepo.findAndCount({
@@ -33,14 +37,22 @@ export class LessonService {
       take: limit,
       skip: (page - 1) * limit,
     });
-    return toPaginated(lessons.map(this.toContract), total, page, limit);
+    const hasPurchased = isAdmin || (await this.courseAccess.hasPurchased(userId, section.courseId));
+    return toPaginated(lessons.map((l) => this.toContract(l, hasPurchased)), total, page, limit);
   }
 
-  async findOne(courseSlug: string, sectionId: string, lessonId: string): Promise<LessonContract> {
+  async findOne(
+    courseSlug: string,
+    sectionId: string,
+    lessonId: string,
+    userId?: string,
+    isAdmin?: boolean,
+  ): Promise<LessonContract> {
     const section = await this.sectionByIdAndCourseSlug(courseSlug, sectionId);
     const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, sectionId: section.id } });
     if (!lesson) throw new NotFoundException("LESSON_NOT_FOUND");
-    return this.toContract(lesson);
+    const hasPurchased = isAdmin || (await this.courseAccess.hasPurchased(userId, section.courseId));
+    return this.toContract(lesson, hasPurchased);
   }
 
   async create(courseSlug: string, sectionId: string, dto: CreateLessonDto): Promise<LessonContract> {
@@ -58,7 +70,7 @@ export class LessonService {
 
     const saved = await this.lessonRepo.save(lesson);
 
-    return this.toContract(saved);
+    return this.toContract(saved, true);
   }
 
   async update(
@@ -79,7 +91,7 @@ export class LessonService {
 
     const saved = await this.lessonRepo.save(lesson);
 
-    return this.toContract(saved);
+    return this.toContract(saved, true);
   }
 
   async remove(courseSlug: string, sectionId: string, lessonId: string): Promise<void> {
@@ -100,11 +112,11 @@ export class LessonService {
     return section;
   }
 
-  private toContract(lesson: Lesson): LessonContract {
+  private toContract(lesson: Lesson, hasPurchased = false): LessonContract {
     return {
       id: lesson.id,
       title: lesson.title,
-      videoUrl: lesson.videoUrl ?? { ar: null, ur: null },
+      videoUrl: lesson.isFreePreview || hasPurchased ? (lesson.videoUrl ?? { ar: null, ur: null }) : { ar: null, ur: null },
       order: lesson.order,
       durationMinutes: lesson.durationMinutes,
       isFreePreview: lesson.isFreePreview,
