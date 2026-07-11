@@ -140,6 +140,18 @@
 - **پاسخ:** `200 Paginated<User>`
 - **خطاها:** `401 Unauthorized` | `403 FORBIDDEN`
 
+### `PATCH /api/users/:id/role` 🔒 admin
+role کاربر را به `user` / `instructor` / `admin` تغییر می‌دهد.
+- **بدنه:** `{ role: "user" | "instructor" | "admin" }`
+- **پاسخ:** `200 User`
+- **خطا:** `404 USER_NOT_FOUND`
+
+### `PATCH /api/users/:id/status` 🔒 admin
+کاربر را فعال یا غیرفعال می‌کند. کاربر غیرفعال (`isActive: false`) دیگر نمی‌تواند لاگین کند و توکن دسترسی فعلی‌اش هم بلافاصله بی‌اثر می‌شود (چون `JwtStrategy` در هر درخواست `isActive` را دوباره از دیتابیس چک می‌کند — نه فقط هنگام لاگین).
+- **بدنه:** `{ isActive: boolean }`
+- **پاسخ:** `200 User`
+- **خطا:** `404 USER_NOT_FOUND`
+
 ---
 
 # بخش ۳-ب — دسته‌بندی (منبع: NestJS)
@@ -229,12 +241,23 @@
 
 ### `GET /api/courses`
 لیست صفحه‌بندی‌شده دوره‌ها با اطلاعات خلاصه استاد. با پارامتر `q` می‌توان روی عنوان دوره (`title.ar` یا `title.ur`) سرچ کرد.
+**فقط دوره‌های `isPublished: true` را برمی‌گرداند** — این endpoint برای سایت عمومی است.
 - **Query:** `page` (پیش‌فرض ۱)، `limit` (پیش‌فرض ۱۲، حداکثر ۱۰۰)، `q?` (سرچ روی عنوان — حداقل ۳ کاراکتر)
 - **پاسخ:** `200 Paginated<CourseRecord>`
 - **خطا:** `400 SEARCH_QUERY_TOO_SHORT` — اگر `q` ارسال شود ولی کمتر از ۳ کاراکتر باشد
 
 ### `GET /api/courses/:slug`
-مشخصات یک دوره با slug آن.
+مشخصات یک دوره با slug آن. **فقط اگر `isPublished: true` باشد** — دوره‌ی پیش‌نویس مثل نبودنش `404` می‌دهد.
+- **پاسخ:** `200 CourseRecord`
+- **خطا:** `404 COURSE_NOT_FOUND`
+
+### `GET /api/courses/admin/all` 🔒 admin
+لیست کامل دوره‌ها **شامل پیش‌نویس** — برای پنل CMS.
+- **Query:** همان `GET /api/courses`
+- **پاسخ:** `200 Paginated<CourseRecord>`
+
+### `GET /api/courses/admin/:slug` 🔒 admin
+مشخصات یک دوره با slug — **شامل پیش‌نویس** — برای پنل CMS.
 - **پاسخ:** `200 CourseRecord`
 - **خطا:** `404 COURSE_NOT_FOUND`
 
@@ -277,6 +300,7 @@ effectivePrice: Money|null  // قیمت واقعی: discountedPrice (اگر isAc
 > ساختار محتوا: **دوره → سرفصل → درس**
 > هر دوره یک یا چند سرفصل دارد. هر سرفصل یک یا چند درس دارد.
 > عملیات نوشتن فقط برای `role: admin` مجاز است. خواندن برای همه آزاد است (auth اختیاری — `OptionalJwtAuthGuard`).
+> اگر دوره‌ی مالک سرفصل/درس `isPublished: false` باشد، مسیرهای خواندن عمومی `404 COURSE_NOT_FOUND` می‌دهند مگر درخواست از طرف `role: admin` باشد (برای این‌که پنل CMS بتواند روی دوره‌های پیش‌نویس هم کار کند).
 > `title` از نوع `Localized` است: `{ ar: string, ur: string }`.
 >
 > **⚠️ کنترل دسترسی به `videoUrl`:** فیلد `videoUrl` هر درس فقط در این حالت‌ها مقدار واقعی دارد؛ در غیر این صورت `{ ar: null, ur: null }` برمی‌گردد:
@@ -648,6 +672,7 @@ Amount must be in **Rials (IRR)**. Use `Money.amountMinor` with `currency: "IRR"
 |-----|------|-------|
 | `GET /invoices/mine` | user | لیست فاکتورهای کاربر (paginated) |
 | `GET /invoices/mine/:invoiceNumber` | user (owner) | جزئیات یک فاکتور |
+| `GET /invoices/mine/:invoiceNumber/pdf` | user (owner) | دانلود فاکتور به‌صورت PDF — با هدر `Accept-Language` زبان سند تعیین می‌شود (`ar` پیش‌فرض) |
 
 ### Invoice object
 ```json
