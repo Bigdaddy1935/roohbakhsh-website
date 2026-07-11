@@ -1,4 +1,15 @@
 {
+  "Meta": {
+    "site_name": "أكاديمية روح‌بخش",
+    "default_title": "أكاديمية روح‌بخش الإسلامية الدولية",
+    "default_description": "أكاديمية روح‌بخش وجهتك الأولى لتعلم القرآن الكريم، الفقه، العقيدة، التاريخ الإسلامي، واللغة العربية — بأساليب حديثة وشهادات معتمدة.",
+    "courses_title": "الدورات",
+    "courses_description": "تصفح جميع الدورات الإسلامية المتاحة في أكاديمية روح‌بخش.",
+    "articles_title": "المقالات",
+    "articles_description": "أحدث المقالات والمعرفة الإسلامية من أكاديمية روح‌بخش.",
+    "about_title": "من نحن",
+    "about_description": "تعرّف على أكاديمية روح‌بخش الإسلامية الدولية ورسالتها."
+  },
   "Common": {
     "login_required_toast": "يجب تسجيل الدخول أولاً",
     "favorite_added_toast": "تمت الإضافة إلى المفضلة",
@@ -148,6 +159,9 @@
     "enroll_btn": "اشترك الآن"
   },
   "CourseDetail": {
+    "not_found_title": "لم يتم العثور على الدورة",
+    "not_found_desc": "قد تكون هذه الدورة غير منشورة حالياً أو تم حذفها أو أن الرابط غير صحيح.",
+    "not_found_back": "العودة إلى كل الدورات",
     "breadcrumb_home": "الرئيسية",
     "breadcrumb_courses": "الدورات",
     "discount_badge": "خصم شگفت‌انگیز",
@@ -159,9 +173,12 @@
     "lessons": "درس",
     "updated": "آخر تحديث",
     "rating": "تقييم الدورة",
-    "status_complete": "مكتملة",
-    "status_label": "تقييم الدورة",
-    "watch_mode": "أونلاين فقط",
+    "run_status_ongoing": "قيد الانعقاد",
+    "run_status_upcoming": "قريبًا",
+    "run_status_completed": "مكتملة",
+    "status_label": "حالة الدورة",
+    "access_online_only": "أونلاين فقط",
+    "access_downloadable": "قابل للتحميل",
     "watch_label": "طريقة المشاهدة",
     "progress_label": "نسبة اكتمال الدورة",
     "share": "مشاركة",
@@ -387,6 +404,7 @@
   "LessonPage": {
     "not_found": "الدرس غير موجود",
     "no_video": "لا يوجد فيديو لهذا الدرس بعد",
+    "download_lesson": "تحميل الفيديو",
     "lesson_list": "جلسات الدورة",
     "total_lessons": "مجموع الدروس",
     "course_duration": "مدة الدورة",
