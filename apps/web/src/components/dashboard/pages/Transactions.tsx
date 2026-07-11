@@ -1,25 +1,32 @@
 "use client";
 
+import { useState } from "react";
 import { useLocale } from "next-intl";
-import { RiBankCardLine, RiCalendar2Line, RiHashtag } from "react-icons/ri";
+import { RiBankCardLine, RiCalendar2Line, RiHashtag, RiDownload2Line, RiLoader4Line } from "react-icons/ri";
+import { toast } from "sonner";
 import { TransactionsPageSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { useMyInvoices } from "@/hooks/queries/use-invoices";
 import { formatMoney } from "@/lib/format";
+import { apiDownload } from "@/lib/api-client";
 
 const UI = {
   ar: {
     title: "المعاملات",
     subtitle: "سجل جميع مشترياتك وفواتيرك",
-    cols: ["رقم الفاتورة", "الدورات", "التاريخ", "المبلغ"],
+    cols: ["رقم الفاتورة", "الدورات", "التاريخ", "المبلغ", ""],
     empty: "لا توجد معاملات بعد",
     emptyHint: "ستظهر فواتيرك هنا بعد أول عملية شراء",
+    download: "تحميل PDF",
+    downloadError: "تعذّر تحميل الفاتورة. حاول مرة أخرى.",
   },
   ur: {
     title: "لین دین",
     subtitle: "آپ کی تمام خریداریوں اور انوائسز کا ریکارڈ",
-    cols: ["انوائس نمبر", "کورسز", "تاریخ", "رقم"],
+    cols: ["انوائس نمبر", "کورسز", "تاریخ", "رقم", ""],
     empty: "ابھی کوئی لین دین نہیں",
     emptyHint: "پہلی خریداری کے بعد آپ کے انوائس یہاں ظاہر ہوں گے",
+    download: "PDF ڈاؤن لوڈ کریں",
+    downloadError: "انوائس ڈاؤن لوڈ نہیں ہو سکا۔ دوبارہ کوشش کریں۔",
   },
 };
 
@@ -29,6 +36,18 @@ export default function Transactions() {
 
   const { data, isLoading } = useMyInvoices({ limit: 50 });
   const invoices = data?.items ?? [];
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  async function handleDownload(invoiceNumber: string) {
+    setDownloadingId(invoiceNumber);
+    try {
+      await apiDownload(`/invoices/mine/${invoiceNumber}/pdf`, `${invoiceNumber}.pdf`, locale);
+    } catch {
+      toast.error(ui.downloadError);
+    } finally {
+      setDownloadingId(null);
+    }
+  }
 
   if (isLoading) return <TransactionsPageSkeleton />;
 
@@ -85,6 +104,20 @@ export default function Transactions() {
                 <td className="px-5 py-4">
                   <span className="font-bold text-[var(--brand)]">{formatMoney(inv.total, locale)}</span>
                 </td>
+                <td className="px-5 py-4">
+                  <button
+                    type="button"
+                    onClick={() => handleDownload(inv.invoiceNumber)}
+                    disabled={downloadingId === inv.invoiceNumber}
+                    className="flex items-center gap-x-1.5 text-xs font-semibold text-[var(--brand)] hover:opacity-75 transition-opacity disabled:opacity-50 cursor-pointer"
+                  >
+                    {downloadingId === inv.invoiceNumber
+                      ? <RiLoader4Line size={14} className="animate-spin" />
+                      : <RiDownload2Line size={14} />
+                    }
+                    {ui.download}
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -113,6 +146,18 @@ export default function Transactions() {
                 <span>{inv.issuedAt.slice(0, 10)}</span>
               </div>
             </div>
+            <button
+              type="button"
+              onClick={() => handleDownload(inv.invoiceNumber)}
+              disabled={downloadingId === inv.invoiceNumber}
+              className="flex items-center justify-center gap-x-1.5 h-9 rounded-md border border-[var(--brand)]/30 text-xs font-semibold text-[var(--brand)] hover:bg-[var(--brand)]/5 transition-colors disabled:opacity-50 cursor-pointer"
+            >
+              {downloadingId === inv.invoiceNumber
+                ? <RiLoader4Line size={14} className="animate-spin" />
+                : <RiDownload2Line size={14} />
+              }
+              {ui.download}
+            </button>
           </div>
         ))}
       </div>

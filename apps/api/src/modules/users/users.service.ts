@@ -80,6 +80,15 @@ export class UsersService {
     return this.toContract(user);
   }
 
+  /** فعال/غیرفعال کردن کاربر — کاربر غیرفعال نه می‌تواند لاگین کند و نه توکن فعلی‌اش کار می‌کند (JwtStrategy هم isActive را چک می‌کند). */
+  async updateStatus(id: string, isActive: boolean): Promise<UserContract> {
+    const user = await this.repo.findOne({ where: { id } });
+    if (!user) throw new NotFoundException("USER_NOT_FOUND");
+    user.isActive = isActive;
+    await this.repo.save(user);
+    return this.toContract(user);
+  }
+
   /** فقط وقتی صفر admin در DB هست کار می‌کند — bootstrap اولین ادمین */
   async bootstrapAdmin(id: string): Promise<UserContract> {
     const adminCount = await this.repo.count({ where: { role: "admin" } });

@@ -20,6 +20,7 @@ import {
   ApiBody,
 } from "@nestjs/swagger";
 import type { Response } from "express";
+import { Throttle } from "@nestjs/throttler";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
@@ -45,6 +46,7 @@ export class AuthController {
   // ── Register ────────────────────────────────────────────────────────────
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post("register")
   @ApiOperation({
     summary: "ثبت‌نام کاربر جدید",
@@ -67,6 +69,7 @@ export class AuthController {
   // ── Login ────────────────────────────────────────────────────────────────
 
   @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post("login")
   @ApiOperation({
     summary: "ورود کاربر",
@@ -129,6 +132,7 @@ export class AuthController {
   // ── Forgot password ─────────────────────────────────────────────────────
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post("forgot-password")
   @ApiOperation({
@@ -147,6 +151,7 @@ export class AuthController {
   // ── Reset password ───────────────────────────────────────────────────────
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post("reset-password")
   @ApiOperation({
@@ -185,6 +190,7 @@ export class AuthController {
   // ── Resend verification ──────────────────────────────────────────────────
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post("resend-verification")
   @ApiOperation({

@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { APP_FILTER, APP_GUARD } from "@nestjs/core";
+import { ThrottlerModule, ThrottlerGuard } from "@nestjs/throttler";
 import { validate } from "./config/env";
 import { DatabaseModule } from "./db/database.module";
 import { AuthModule } from "./modules/auth/auth.module";
@@ -37,6 +38,8 @@ import { RolesGuard } from "./common/guards/roles.guard";
           : ".env.developer",
       validate,
     }),
+    // محدودیت نرخ درخواست سراسری — پیش‌فرض ۱۰۰ درخواست در دقیقه برای هر IP
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     DatabaseModule,
     AuthModule,
     InstructorModule,
@@ -62,6 +65,8 @@ import { RolesGuard } from "./common/guards/roles.guard";
   ],
   providers: [
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
+    // محدودیت نرخ درخواست قبل از هر گارد دیگری اجرا می‌شود
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
     // JwtAuthGuard به‌صورت سراسری — مسیرهای عمومی با @Public() علامت می‌خورند
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     RolesGuard,

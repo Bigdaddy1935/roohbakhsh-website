@@ -87,6 +87,14 @@ class EnvConfig {
   @IsString()
   FRONTEND_URL: string = "http://localhost:3000";
 
+  /** دامنه‌های مجاز CORS — با کاما جدا شوند (وب‌سایت + پنل CMS). در production حتماً به دامنه‌های واقعی محدود شود. */
+  @IsString()
+  CORS_ORIGINS: string = "http://localhost:3000,http://localhost:3002";
+
+  /** آدرس عمومی خود API — برای ساخت لینک فایل‌های آپلودشده وقتی FTP در دسترس نیست (fallback دیسک لوکال). */
+  @IsString()
+  API_PUBLIC_URL: string = "http://localhost:3001";
+
   // ── پرداخت کارت‌به‌کارت — اطلاعات حساب مقصد ──────────────
   @IsString()
   PAYMENT_DESTINATION_CARD_NUMBER!: string;

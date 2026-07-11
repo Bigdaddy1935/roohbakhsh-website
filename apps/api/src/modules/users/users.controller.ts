@@ -9,6 +9,7 @@ import { ApiErrorSchema } from "../../common/swagger/api-error.schema";
 import { LANG_HEADER } from "../../common/swagger/lang-header";
 import { PaginationDto } from "../../common/dto/pagination.dto";
 import { UpdateRoleDto } from "./dto/update-role.dto";
+import { UpdateStatusDto } from "./dto/update-status.dto";
 import { Public } from "../auth/decorators/public.decorator";
 
 @ApiTags("users")
@@ -66,6 +67,24 @@ export class UsersController {
   @ApiResponse({ status: 404, description: "کاربر یافت نشد — کد: USER_NOT_FOUND", type: ApiErrorSchema })
   updateRole(@Param("id") id: string, @Body() dto: UpdateRoleDto) {
     return this.usersService.updateRole(id, dto.role);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles("admin")
+  @Patch(":id/status")
+  @ApiOperation({
+    summary: "فعال/غیرفعال کردن کاربر 🔒 admin",
+    description:
+      "کاربر غیرفعال دیگر نمی‌تواند لاگین کند و توکن دسترسی فعلی‌اش هم بلافاصله بی‌اثر می‌شود " +
+      "(چون JwtStrategy در هر درخواست isActive را دوباره چک می‌کند).",
+  })
+  @ApiHeader(LANG_HEADER)
+  @ApiParam({ name: "id", description: "UUID کاربر" })
+  @ApiResponse({ status: 200, description: "وضعیت به‌روز شد — User" })
+  @ApiResponse({ status: 403, description: "دسترسی ندارید", type: ApiErrorSchema })
+  @ApiResponse({ status: 404, description: "کاربر یافت نشد — کد: USER_NOT_FOUND", type: ApiErrorSchema })
+  updateStatus(@Param("id") id: string, @Body() dto: UpdateStatusDto) {
+    return this.usersService.updateStatus(id, dto.isActive);
   }
 
   @Get("me/dashboard")

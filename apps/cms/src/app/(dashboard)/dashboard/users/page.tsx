@@ -10,6 +10,7 @@ import { Select, ListBox } from "@heroui/react";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
+import SwitchField from "@/components/ui/SwitchField";
 
 const ROLE_MAP = {
   admin: { label: "ادمین", color: "bg-purple-50 text-purple-700" },
@@ -24,6 +25,11 @@ export default function UsersPage() {
 
   const updateRoleMut = useMutation<User, Error, { id: string; role: UserRole }>({
     mutationFn: ({ id, role }) => api.patch<User>(`/users/${id}/role`, { role }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
+  });
+
+  const updateStatusMut = useMutation<User, Error, { id: string; isActive: boolean }>({
+    mutationFn: ({ id, isActive }) => api.patch<User>(`/users/${id}/status`, { isActive }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
   });
 
@@ -57,6 +63,17 @@ export default function UsersPage() {
             </ListBox>
           </Select.Popover>
         </Select>
+      ),
+    },
+    {
+      key: "isActive",
+      label: "وضعیت",
+      render: (r: User) => (
+        <SwitchField
+          label={r.isActive ? "فعال" : "غیرفعال"}
+          checked={r.isActive}
+          onChange={(checked) => updateStatusMut.mutate({ id: r.id, isActive: checked })}
+        />
       ),
     },
     {

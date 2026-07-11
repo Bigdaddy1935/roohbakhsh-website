@@ -136,6 +136,40 @@ export async function apiUpload<T>(path: string, formData: FormData): Promise<T>
   return res.json() as Promise<T>;
 }
 
+// ── binary download (مثل PDF فاکتور) ────────────────────────────
+export async function apiDownload(path: string, filename: string, locale?: string): Promise<void> {
+  const access = tokenStore.getAccess();
+  const headers: Record<string, string> = {};
+  if (access) headers["Authorization"] = `Bearer ${access}`;
+  if (locale) headers["Accept-Language"] = locale;
+
+  let res: Response;
+  try {
+    res = await fetch(`${BASE}${path}`, { headers });
+  } catch {
+    const err: ApiError = { statusCode: 0, code: "NETWORK_ERROR", message: "اتصال به سرور برقرار نشد" };
+    throw err;
+  }
+
+  if (!res.ok) {
+    let err: ApiError;
+    try {
+      err = await res.json();
+    } catch {
+      err = { statusCode: res.status, code: "UNKNOWN", message: res.statusText };
+    }
+    throw err;
+  }
+
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ── convenience methods ──────────────────────────────────────────
 export const api = {
   get: <T>(path: string) => apiRequest<T>(path, { method: "GET" }),
