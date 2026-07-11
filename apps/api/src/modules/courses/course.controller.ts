@@ -56,6 +56,35 @@ export class CourseController {
 
   @UseGuards(RolesGuard)
   @Roles("admin")
+  @Get("admin/all")
+  @ApiOperation({
+    summary: "لیست کامل دوره‌ها شامل پیش‌نویس 🔒 admin",
+    description: "برای پنل CMS — بر خلاف `GET /courses`، دوره‌های `isPublished: false` را هم برمی‌گرداند.",
+  })
+  @ApiHeader(LANG_HEADER)
+  @ApiQuery({ name: "q", required: false, type: String, description: "متن سرچ روی عنوان دوره — حداقل ۳ کاراکتر", example: "تفسیر" })
+  @ApiResponse({ status: 200, description: "لیست صفحه‌بندی‌شده دوره‌ها — Paginated<CourseRecord>" })
+  findAllAdmin(@Query() query: PaginationDto, @Query("q") q?: string) {
+    return this.courseService.findAllAdmin(query.page ?? 1, query.limit ?? 12, q);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles("admin")
+  @Get("admin/:slug")
+  @ApiOperation({
+    summary: "مشخصات یک دوره شامل پیش‌نویس 🔒 admin",
+    description: "برای پنل CMS — بر خلاف `GET /courses/:slug`، دوره‌ی `isPublished: false` را هم برمی‌گرداند.",
+  })
+  @ApiHeader(LANG_HEADER)
+  @ApiParam({ name: "slug", description: "slug دوره", example: "tafsir-quran-mobtadi" })
+  @ApiResponse({ status: 200, description: "دوره پیدا شد", type: CourseSchema })
+  @ApiResponse({ status: 404, description: "دوره پیدا نشد — کد: COURSE_NOT_FOUND", type: ApiErrorSchema })
+  findOneAdmin(@Param("slug") slug: string) {
+    return this.courseService.findOneAdmin(slug);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles("admin")
   @Post()
   @ApiOperation({
     summary: "ایجاد دوره جدید 🔒 admin",

@@ -19,7 +19,7 @@ export class SectionService {
   ) {}
 
   async findByCourse(courseSlug: string, userId?: string, isAdmin?: boolean): Promise<SectionRecord[]> {
-    const course = await this.courseBySlug(courseSlug);
+    const course = isAdmin ? await this.courseBySlug(courseSlug) : await this.publishedCourseBySlug(courseSlug);
     const sections = await this.sectionRepo.find({
       where: { courseId: course.id },
       relations: { lessons: true },
@@ -30,7 +30,7 @@ export class SectionService {
   }
 
   async findOne(courseSlug: string, sectionId: string, userId?: string, isAdmin?: boolean): Promise<SectionRecord> {
-    const course = await this.courseBySlug(courseSlug);
+    const course = isAdmin ? await this.courseBySlug(courseSlug) : await this.publishedCourseBySlug(courseSlug);
     const section = await this.sectionRepo.findOne({
       where: { id: sectionId, courseId: course.id },
       relations: { lessons: true },
@@ -88,6 +88,13 @@ export class SectionService {
 
   private async courseBySlug(slug: string): Promise<Course> {
     const course = await this.courseRepo.findOne({ where: { slug } });
+    if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
+    return course;
+  }
+
+  /** برای مسیرهای عمومی — دوره‌ی پیش‌نویس هم مثل نبود آن ۴۰۴ برمی‌گرداند. */
+  private async publishedCourseBySlug(slug: string): Promise<Course> {
+    const course = await this.courseRepo.findOne({ where: { slug, isPublished: true } });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
     return course;
   }

@@ -58,6 +58,43 @@ export class CourseService {
     const qb = this.repo
       .createQueryBuilder("course")
       .leftJoinAndSelect("course.instructor", "instructor")
+      .where("course.isPublished = :isPublished", { isPublished: true })
+      .orderBy("course.createdAt", "DESC")
+      .take(limit)
+      .skip((page - 1) * limit);
+
+    if (search) {
+      qb.andWhere(
+        "(JSON_UNQUOTE(JSON_EXTRACT(course.title, '$.ar')) LIKE :q OR JSON_UNQUOTE(JSON_EXTRACT(course.title, '$.ur')) LIKE :q)",
+        { q: `%${search}%` },
+      );
+    }
+
+    const [items, total] = await qb.getManyAndCount();
+    const courseIds = items.map((c) => c.id);
+    const [lessonStats, ratingStats, participantStats] = await Promise.all([
+      this.lessonStatsForCourses(courseIds),
+      this.reviewsService.ratingSummaries(courseIds),
+      this.participantCountsForCourses(courseIds),
+    ]);
+    return toPaginated(
+      items.map((c) => this.toContract(c, this.mergeStats(c.id, lessonStats, ratingStats, participantStats))),
+      total,
+      page,
+      limit,
+    );
+  }
+
+  /** لیست کامل دوره‌ها (شامل پیش‌نویس) — فقط برای پنل ادمین. */
+  async findAllAdmin(page: number, limit: number, q?: string): Promise<Paginated<CourseRecord>> {
+    const search = q?.trim();
+    if (search && search.length < 3) {
+      throw new BadRequestException("SEARCH_QUERY_TOO_SHORT");
+    }
+
+    const qb = this.repo
+      .createQueryBuilder("course")
+      .leftJoinAndSelect("course.instructor", "instructor")
       .orderBy("course.createdAt", "DESC")
       .take(limit)
       .skip((page - 1) * limit);
@@ -85,6 +122,14 @@ export class CourseService {
   }
 
   async findOne(slug: string): Promise<CourseRecord> {
+    const course = await this.repo.findOne({ where: { slug, isPublished: true }, relations: { instructor: true } });
+    if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
+    const stats = await this.statsForCourse(course.id);
+    return this.toContract(course, stats);
+  }
+
+  /** مشخصات یک دوره با slug — شامل پیش‌نویس. فقط برای پنل ادمین. */
+  async findOneAdmin(slug: string): Promise<CourseRecord> {
     const course = await this.repo.findOne({ where: { slug }, relations: { instructor: true } });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
     const stats = await this.statsForCourse(course.id);

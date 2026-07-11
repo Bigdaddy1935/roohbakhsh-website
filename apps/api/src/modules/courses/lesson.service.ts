@@ -30,7 +30,9 @@ export class LessonService {
     userId?: string,
     isAdmin?: boolean,
   ): Promise<Paginated<LessonContract>> {
-    const section = await this.sectionByIdAndCourseSlug(courseSlug, sectionId);
+    const section = isAdmin
+      ? await this.sectionByIdAndCourseSlug(courseSlug, sectionId)
+      : await this.publishedSectionByIdAndCourseSlug(courseSlug, sectionId);
     const [lessons, total] = await this.lessonRepo.findAndCount({
       where: { sectionId: section.id },
       order: { order: "ASC" },
@@ -48,7 +50,9 @@ export class LessonService {
     userId?: string,
     isAdmin?: boolean,
   ): Promise<LessonContract> {
-    const section = await this.sectionByIdAndCourseSlug(courseSlug, sectionId);
+    const section = isAdmin
+      ? await this.sectionByIdAndCourseSlug(courseSlug, sectionId)
+      : await this.publishedSectionByIdAndCourseSlug(courseSlug, sectionId);
     const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, sectionId: section.id } });
     if (!lesson) throw new NotFoundException("LESSON_NOT_FOUND");
     const hasPurchased = isAdmin || (await this.courseAccess.hasPurchased(userId, section.courseId));
@@ -104,6 +108,17 @@ export class LessonService {
 
   private async sectionByIdAndCourseSlug(courseSlug: string, sectionId: string): Promise<Section> {
     const course = await this.courseRepo.findOne({ where: { slug: courseSlug } });
+    if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
+
+    const section = await this.sectionRepo.findOne({ where: { id: sectionId, courseId: course.id } });
+    if (!section) throw new NotFoundException("SECTION_NOT_FOUND");
+
+    return section;
+  }
+
+  /** برای مسیرهای عمومی — دوره‌ی پیش‌نویس هم مثل نبود آن ۴۰۴ برمی‌گرداند. */
+  private async publishedSectionByIdAndCourseSlug(courseSlug: string, sectionId: string): Promise<Section> {
+    const course = await this.courseRepo.findOne({ where: { slug: courseSlug, isPublished: true } });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
 
     const section = await this.sectionRepo.findOne({ where: { id: sectionId, courseId: course.id } });

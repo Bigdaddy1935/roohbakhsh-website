@@ -12,6 +12,7 @@ import {
   RiUserLine, RiTimeLine, RiBookOpenLine,
   RiCalendarLine, RiStarFill,
   RiCheckboxCircleLine, RiWifiLine,
+  RiSearchLine,
   RiShareLine, RiTelegramLine, RiInstagramLine, RiTwitterXLine,
   RiShoppingCartLine,
   RiGiftLine, RiMessageLine,
@@ -592,6 +593,7 @@ function ChapterRow({
       {open && (
         <div className="flex flex-col gap-y-2.5 sm:ps-4 mt-3">
           {section.lessons.map((lesson, idx) => {
+            const hasAccess = !!(lesson.videoUrl[locale] ?? lesson.videoUrl.ar ?? lesson.videoUrl.ur);
             const rowCls = "flex items-center justify-between gap-x-4 md:gap-x-6 border border-gray-100 hover:border-[var(--brand)]/40 pe-3.5 ps-1.5 py-3 rounded-lg group transition-colors flex-1 min-w-0";
             const rowContent = (
               <>
@@ -604,7 +606,7 @@ function ChapterRow({
                 </div>
                 <div className="flex items-center gap-x-2 md:gap-x-3 text-gray-400 group-hover:text-[var(--ink)] shrink-0 transition-colors">
                   <span className="text-sm">{fmtDuration(lesson.durationMinutes)}</span>
-                  {lesson.isFreePreview
+                  {hasAccess
                     ? <RiPlayCircleLine size={18} className="text-[var(--brand)]" />
                     : <RiLockLine size={16} />
                   }
@@ -614,7 +616,7 @@ function ChapterRow({
 
             return (
               <div key={lesson.id} className="flex items-center gap-x-2">
-                {lesson.isFreePreview ? (
+                {hasAccess ? (
                   <Link href={`/courses/${courseSlug}/lessons/${lesson.id}`} className={rowCls}>
                     {rowContent}
                   </Link>
@@ -665,7 +667,21 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
   }
 
   if (!course) {
-    return <div className="container py-32 text-center text-gray-400">Course not found.</div>;
+    return (
+      <div className="container py-24 sm:py-32 flex flex-col items-center text-center gap-y-4">
+        <div className="size-16 rounded-lg bg-gray-100 flex items-center justify-center">
+          <RiSearchLine size={32} className="text-gray-300" />
+        </div>
+        <p className="font-bold text-[var(--ink)]">{t("not_found_title")}</p>
+        <p className="text-sm text-gray-400 max-w-sm">{t("not_found_desc")}</p>
+        <Link
+          href="/courses"
+          className="flex items-center gap-x-1.5 h-10 px-5 rounded-lg bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+        >
+          {t("not_found_back")}
+        </Link>
+      </div>
+    );
   }
 
   const allSections = sections ?? [];
@@ -676,13 +692,16 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
   const introVideo = course.introVideoUrl?.[locale] ?? course.introVideoUrl?.ar ?? null;
   const discPct = discountPercent(course.price, course.effectivePrice);
 
+  const runStatusVal = t(`run_status_${course.runStatus}`);
+  const accessTypeVal = t(`access_${course.accessType}`);
+
   const stats = [
-    { icon: <RiCheckboxCircleLine size={28} className="text-[var(--brand)]" />, val: t("status_complete"), label: t("status_label") },
+    { icon: <RiCheckboxCircleLine size={28} className="text-[var(--brand)]" />, val: runStatusVal, label: t("status_label") },
     { icon: <RiTimeLine size={28} className="text-[var(--brand)]" />, val: `${hoursTotal}`, label: t("hours") },
     { icon: <RiUserLine size={28} className="text-[var(--brand)]" />, val: course.participantCount.toLocaleString(locale === "ar" ? "ar-EG" : "ur"), label: t("students") },
     { icon: <RiStarFill size={28} className="text-amber-400" />, val: course.averageRating ? course.averageRating.toFixed(1) : "—", label: t("rating") },
     { icon: <RiCalendarLine size={28} className="text-[var(--brand)]" />, val: course.updatedAt.slice(0, 10), label: t("updated") },
-    { icon: <RiWifiLine size={28} className="text-[var(--brand)]" />, val: t("watch_mode"), label: t("watch_label") },
+    { icon: <RiWifiLine size={28} className="text-[var(--brand)]" />, val: accessTypeVal, label: t("watch_label") },
   ];
 
   return (

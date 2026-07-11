@@ -23,6 +23,7 @@ import {
   RiCloseLine,
   RiReplyLine,
   RiSendPlaneLine,
+  RiDownloadLine,
 } from "react-icons/ri";
 import VideoPlayer from "@/components/ui/VideoPlayer";
 import { toast } from "sonner";
@@ -99,7 +100,7 @@ function SidebarChapter({
         <div className="mt-2 flex flex-col gap-y-0.5">
           {section.lessons.map((lesson, idx) => {
             const active = lesson.id === activeLessonId;
-            const locked = !lesson.isFreePreview;
+            const locked = !(lesson.videoUrl[locale] ?? lesson.videoUrl.ar ?? lesson.videoUrl.ur);
             const itemClass = `flex items-center gap-x-2.5 px-3 py-2 rounded-md text-sm transition-colors flex-1 min-w-0 ${active ? "bg-[var(--brand)]/10 text-[var(--brand)] font-semibold" : locked ? "text-gray-400 cursor-default" : "text-gray-600 hover:bg-gray-100"}`;
             return (
               <div key={lesson.id} className="flex items-center gap-x-1.5">
@@ -537,7 +538,9 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
     return <div className="container py-32 text-center text-gray-400">{t("not_found")}</div>;
   }
 
-  if (!lesson.isFreePreview) {
+  const videoUrl = lesson.videoUrl[locale] ?? lesson.videoUrl.ar ?? lesson.videoUrl.ur;
+
+  if (!videoUrl) {
     return (
       <div className="container py-32 flex flex-col items-center text-center gap-y-4">
         <div className="size-16 rounded-lg bg-gray-100 flex items-center justify-center">
@@ -557,7 +560,6 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
 
   const totalLessons = allLessons.length;
   const hoursTotal = Math.round(course.durationMinutes / 60 * 10) / 10;
-  const videoUrl = lesson.videoUrl[locale] ?? lesson.videoUrl.ar ?? lesson.videoUrl.ur;
 
   const isLessonFavorite = !!favorites?.some((f) => f.type === "lesson" && f.id === lesson.id);
   const isLessonWatched = !!progress?.watchedLessonIds?.includes(lesson.id);
@@ -612,6 +614,19 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
             </div>
           )}
         </div>
+
+        {videoUrl && course.accessType === "downloadable" && (
+          <a
+            href={videoUrl}
+            download
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-x-1.5 w-fit mt-3 h-9 px-4 rounded-lg border border-[var(--brand)]/30 text-[var(--brand)] text-sm font-semibold hover:bg-[var(--brand)]/5 transition-colors"
+          >
+            <RiDownloadLine size={16} />
+            {t("download_lesson")}
+          </a>
+        )}
       </div>
 
       <div className="container pb-14 pt-8">

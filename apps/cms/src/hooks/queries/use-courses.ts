@@ -42,7 +42,7 @@ export function useCourses(params?: { page?: number; limit?: number; q?: string 
 
   return useQuery<Paginated<CourseRecord>>({
     queryKey: courseKeys.list(params),
-    queryFn: () => api.get<Paginated<CourseRecord>>(`/courses${query}`),
+    queryFn: () => api.get<Paginated<CourseRecord>>(`/courses/admin/all${query}`),
     enabled: !params?.q || params.q.trim().length >= 3,
   });
 }
@@ -50,7 +50,7 @@ export function useCourses(params?: { page?: number; limit?: number; q?: string 
 export function useCourse(slug: string) {
   return useQuery<CourseRecord>({
     queryKey: courseKeys.detail(slug),
-    queryFn: () => api.get<CourseRecord>(`/courses/${slug}`),
+    queryFn: () => api.get<CourseRecord>(`/courses/admin/${slug}`),
     enabled: !!slug,
   });
 }
