@@ -12,6 +12,7 @@
   "dependencies": {
     "@heroui/react": "^3.2.0",
     "@heroui/styles": "^3.2.0",
+    "@internationalized/date": "^3.12.2",
     "@roohbakhsh/shared": "workspace:*",
     "@tanstack/react-query": "^5.101.0",
     "@tinymce/tinymce-react": "^6.3.0",

@@ -118,7 +118,7 @@ export default function OrdersPage() {
           onClick={() => setDetailTarget(r)}
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50"
         >
-          <RiEyeLine size={14} />
+          <RiEyeLine size={16} />
           جزئیات
         </button>
       ),

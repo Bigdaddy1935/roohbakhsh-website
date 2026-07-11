@@ -17,6 +17,7 @@ import FormModal from "@/components/ui/FormModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import LocalizedInput from "@/components/ui/LocalizedInput";
 import FormField from "@/components/ui/FormField";
+import SwitchField from "@/components/ui/SwitchField";
 import {
   RiArrowRightLine, RiAddLine, RiEditLine, RiDeleteBinLine,
   RiPlayCircleLine, RiLockLine,
@@ -104,11 +105,11 @@ function SectionCard({ section, courseSlug }: { section: SectionRecord; courseSl
         </div>
         <div className="flex items-center gap-2">
           <button onClick={openCreateLesson} className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
-            <RiAddLine size={14} />
+            <RiAddLine size={16} />
             درس جدید
           </button>
-          <button onClick={openEditSection} className="p-1.5 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors"><RiEditLine size={15} /></button>
-          <button onClick={() => setDeleteSectionTarget(true)} className="p-1.5 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><RiDeleteBinLine size={15} /></button>
+          <button onClick={openEditSection} className="p-2 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors"><RiEditLine size={18} /></button>
+          <button onClick={() => setDeleteSectionTarget(true)} className="p-2 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><RiDeleteBinLine size={18} /></button>
         </div>
       </div>
 
@@ -119,13 +120,13 @@ function SectionCard({ section, courseSlug }: { section: SectionRecord; courseSl
           {section.lessons.map((lesson) => (
             <div key={lesson.id} className="py-2.5 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 min-w-0">
-                {lesson.isFreePreview ? <RiPlayCircleLine size={15} className="text-[var(--brand)] shrink-0" /> : <RiLockLine size={15} className="text-gray-300 shrink-0" />}
+                {lesson.isFreePreview ? <RiPlayCircleLine size={17} className="text-[var(--brand)] shrink-0" /> : <RiLockLine size={17} className="text-gray-300 shrink-0" />}
                 <span className="text-sm text-[var(--ink)] truncate">{lesson.title.ar}</span>
                 <span className="text-xs text-gray-400 shrink-0">{lesson.durationMinutes} دقیقه</span>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
-                <button onClick={() => openEditLesson(lesson)} className="p-1.5 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors"><RiEditLine size={14} /></button>
-                <button onClick={() => setDeleteLessonTarget(lesson)} className="p-1.5 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><RiDeleteBinLine size={14} /></button>
+                <button onClick={() => openEditLesson(lesson)} className="p-2 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors"><RiEditLine size={18} /></button>
+                <button onClick={() => setDeleteLessonTarget(lesson)} className="p-2 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><RiDeleteBinLine size={18} /></button>
               </div>
             </div>
           ))}
@@ -157,15 +158,11 @@ function SectionCard({ section, courseSlug }: { section: SectionRecord; courseSl
         <FormField label="لینک ویدیو — اردو" value={lessonForm.videoUr} onChange={(e) => setLessonForm((f) => ({ ...f, videoUr: e.target.value }))} dir="ltr" />
         <FormField label="مدت زمان (دقیقه)" type="number" value={lessonForm.durationMinutes} onChange={(e) => setLessonForm((f) => ({ ...f, durationMinutes: e.target.value }))} required dir="ltr" />
         <FormField label="ترتیب" type="number" value={lessonForm.order} onChange={(e) => setLessonForm((f) => ({ ...f, order: e.target.value }))} dir="ltr" />
-        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={lessonForm.isFreePreview}
-            onChange={(e) => setLessonForm((f) => ({ ...f, isFreePreview: e.target.checked }))}
-            className="w-4 h-4 accent-[var(--brand)] rounded"
-          />
-          پیش‌نمایش رایگان
-        </label>
+        <SwitchField
+          label="پیش‌نمایش رایگان"
+          checked={lessonForm.isFreePreview}
+          onChange={(checked) => setLessonForm((f) => ({ ...f, isFreePreview: checked }))}
+        />
       </FormModal>
 
       <ConfirmModal

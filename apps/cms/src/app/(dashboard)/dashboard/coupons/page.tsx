@@ -8,6 +8,8 @@ import DataTable from "@/components/ui/DataTable";
 import FormModal from "@/components/ui/FormModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import FormField from "@/components/ui/FormField";
+import DateField from "@/components/ui/DateField";
+import SwitchField from "@/components/ui/SwitchField";
 import SelectField from "@/components/ui/SelectField";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { RiEditLine, RiDeleteBinLine } from "react-icons/ri";
@@ -74,8 +76,8 @@ export default function CouponsPage() {
       key: "actions", label: "عملیات",
       render: (r: CouponRecord) => (
         <div className="flex gap-2">
-          <button onClick={() => openEdit(r)} className="p-1.5 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors"><RiEditLine size={16} /></button>
-          <button onClick={() => setDeleteTarget(r)} className="p-1.5 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><RiDeleteBinLine size={16} /></button>
+          <button onClick={() => openEdit(r)} className="p-2 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors"><RiEditLine size={19} /></button>
+          <button onClick={() => setDeleteTarget(r)} className="p-2 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><RiDeleteBinLine size={19} /></button>
         </div>
       ),
     },
@@ -111,30 +113,22 @@ export default function CouponsPage() {
           required
         />
         <FormField label="حداکثر استفاده" type="number" value={createForm.maxUses} onChange={(e) => setCreateForm((f) => ({ ...f, maxUses: e.target.value }))} dir="ltr" />
-        <FormField label="تاریخ انقضا" type="date" value={createForm.expiresAt} onChange={(e) => setCreateForm((f) => ({ ...f, expiresAt: e.target.value }))} dir="ltr" />
-        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={createForm.isActive}
-            onChange={(e) => setCreateForm((f) => ({ ...f, isActive: e.target.checked }))}
-            className="w-4 h-4 accent-[var(--brand)] rounded"
-          />
-          فعال باشد
-        </label>
+        <DateField label="تاریخ انقضا" value={createForm.expiresAt} onChange={(v) => setCreateForm((f) => ({ ...f, expiresAt: v }))} />
+        <SwitchField
+          label="فعال باشد"
+          checked={createForm.isActive}
+          onChange={(checked) => setCreateForm((f) => ({ ...f, isActive: checked }))}
+        />
       </FormModal>
 
       <FormModal isOpen={!!editTarget} onClose={() => setEditTarget(null)} title={`ویرایش کوپن: ${editTarget?.code ?? ""}`} onSubmit={handleEdit} isPending={updateMut.isPending}>
         <FormField label="حداکثر استفاده" type="number" value={editForm.maxUses} onChange={(e) => setEditForm((f) => ({ ...f, maxUses: e.target.value }))} dir="ltr" />
-        <FormField label="تاریخ انقضا" type="date" value={editForm.expiresAt} onChange={(e) => setEditForm((f) => ({ ...f, expiresAt: e.target.value }))} dir="ltr" />
-        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={editForm.isActive}
-            onChange={(e) => setEditForm((f) => ({ ...f, isActive: e.target.checked }))}
-            className="w-4 h-4 accent-[var(--brand)] rounded"
-          />
-          فعال باشد
-        </label>
+        <DateField label="تاریخ انقضا" value={editForm.expiresAt} onChange={(v) => setEditForm((f) => ({ ...f, expiresAt: v }))} />
+        <SwitchField
+          label="فعال باشد"
+          checked={editForm.isActive}
+          onChange={(checked) => setEditForm((f) => ({ ...f, isActive: checked }))}
+        />
       </FormModal>
 
       <ConfirmModal

@@ -36,8 +36,8 @@ export default function ArticlesPage() {
       key: "actions", label: "عملیات",
       render: (r: ArticleRecord) => (
         <div className="flex gap-2">
-          <button onClick={() => router.push(`/dashboard/articles/${r.id}/edit`)} className="p-1.5 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors"><RiEditLine size={16} /></button>
-          <button onClick={() => setDeleteTarget(r)} className="p-1.5 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><RiDeleteBinLine size={16} /></button>
+          <button onClick={() => router.push(`/dashboard/articles/${r.id}/edit`)} className="p-2 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors"><RiEditLine size={19} /></button>
+          <button onClick={() => setDeleteTarget(r)} className="p-2 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><RiDeleteBinLine size={19} /></button>
         </div>
       ),
     },

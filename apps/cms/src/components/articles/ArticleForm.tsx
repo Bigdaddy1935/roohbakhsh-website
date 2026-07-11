@@ -56,34 +56,30 @@ export default function ArticleForm({ title, initialValues, onSubmit, isPending 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-5xl">
         <LocalizedInput label="عنوان" value={form.title} onChange={(v) => setForm((f) => ({ ...f, title: v }))} required />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField label="Slug" value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} required dir="ltr" />
-          <SelectField
-            label="نویسنده"
-            value={form.instructorId}
-            onChange={(v) => setForm((f) => ({ ...f, instructorId: v }))}
-            options={[
-              { value: "", label: "انتخاب کنید" },
-              ...(instructors?.map((i) => ({ value: i.id, label: i.name.ar })) ?? []),
-            ]}
-            placeholder="انتخاب کنید"
-          />
-        </div>
+        <FormField label="Slug" value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} required dir="ltr" />
+        <SelectField
+          label="نویسنده"
+          value={form.instructorId}
+          onChange={(v) => setForm((f) => ({ ...f, instructorId: v }))}
+          options={[
+            { value: "", label: "انتخاب کنید" },
+            ...(instructors?.map((i) => ({ value: i.id, label: i.name.ar })) ?? []),
+          ]}
+          placeholder="انتخاب کنید"
+        />
 
         <LocalizedInput label="خلاصه" value={form.summary} onChange={(v) => setForm((f) => ({ ...f, summary: v }))} multiline />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <SelectField
-            label="وضعیت"
-            value={form.status}
-            onChange={(v) => setForm((f) => ({ ...f, status: v as ArticleFormValues["status"] }))}
-            options={[
-              { value: "draft", label: "پیش‌نویس" },
-              { value: "published", label: "منتشرشده" },
-            ]}
-            required
-          />
-        </div>
+        <SelectField
+          label="وضعیت"
+          value={form.status}
+          onChange={(v) => setForm((f) => ({ ...f, status: v as ArticleFormValues["status"] }))}
+          options={[
+            { value: "draft", label: "پیش‌نویس" },
+            { value: "published", label: "منتشرشده" },
+          ]}
+          required
+        />
 
         <TextEditor
           label="متن مقاله — عربی"

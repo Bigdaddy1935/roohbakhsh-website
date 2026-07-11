@@ -72,11 +72,11 @@ export default function InstructorsPage() {
       label: "عملیات",
       render: (r: InstructorDetail) => (
         <div className="flex gap-2">
-          <button onClick={() => openEdit(r)} className="p-1.5 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors">
-            <RiEditLine size={16} />
+          <button onClick={() => openEdit(r)} className="p-2 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors">
+            <RiEditLine size={19} />
           </button>
-          <button onClick={() => setDeleteTarget(r)} className="p-1.5 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors">
-            <RiDeleteBinLine size={16} />
+          <button onClick={() => setDeleteTarget(r)} className="p-2 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors">
+            <RiDeleteBinLine size={19} />
           </button>
         </div>
       ),

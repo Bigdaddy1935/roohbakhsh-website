@@ -11,6 +11,8 @@ import FormModal from "@/components/ui/FormModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import LocalizedInput from "@/components/ui/LocalizedInput";
 import FormField from "@/components/ui/FormField";
+import DateField from "@/components/ui/DateField";
+import SwitchField from "@/components/ui/SwitchField";
 import SelectField from "@/components/ui/SelectField";
 import ImageUploadField from "@/components/ui/ImageUploadField";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -120,11 +122,11 @@ export default function CoursesPage() {
       key: "actions", label: "عملیات",
       render: (r: CourseRecord) => (
         <div className="flex gap-2">
-          <Link href={`/dashboard/courses/${r.slug}/content`} className="p-1.5 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors" title="مدیریت سرفصل و درس‌ها">
-            <RiListCheck2 size={16} />
+          <Link href={`/dashboard/courses/${r.slug}/content`} className="p-2 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors" title="مدیریت سرفصل و درس‌ها">
+            <RiListCheck2 size={19} />
           </Link>
-          <button onClick={() => openEdit(r)} className="p-1.5 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors"><RiEditLine size={16} /></button>
-          <button onClick={() => setDeleteTarget(r)} className="p-1.5 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><RiDeleteBinLine size={16} /></button>
+          <button onClick={() => openEdit(r)} className="p-2 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors"><RiEditLine size={19} /></button>
+          <button onClick={() => setDeleteTarget(r)} className="p-2 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><RiDeleteBinLine size={19} /></button>
         </div>
       ),
     },
@@ -206,16 +208,12 @@ export default function CoursesPage() {
           required
         />
         <FormField label="قیمت تخفیف‌خورده (واحد کوچک)" type="number" value={form.discountPriceAmountMinor} onChange={(e) => setForm((f) => ({ ...f, discountPriceAmountMinor: e.target.value }))} dir="ltr" />
-        <FormField label="تاریخ انقضای تخفیف" type="date" value={form.discountExpiresAt} onChange={(e) => setForm((f) => ({ ...f, discountExpiresAt: e.target.value }))} dir="ltr" />
-        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={form.isPublished}
-            onChange={(e) => setForm((f) => ({ ...f, isPublished: e.target.checked }))}
-            className="w-4 h-4 accent-[var(--brand)] rounded"
-          />
-          منتشر شود
-        </label>
+        <DateField label="تاریخ انقضای تخفیف" value={form.discountExpiresAt} onChange={(v) => setForm((f) => ({ ...f, discountExpiresAt: v }))} />
+        <SwitchField
+          label="منتشر شود"
+          checked={form.isPublished}
+          onChange={(checked) => setForm((f) => ({ ...f, isPublished: checked }))}
+        />
       </FormModal>
 
       <ConfirmModal

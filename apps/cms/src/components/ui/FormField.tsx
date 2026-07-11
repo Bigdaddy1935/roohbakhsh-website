@@ -13,7 +13,7 @@ interface BaseProps {
 
 interface InputFieldProps extends BaseProps {
   as?: "input";
-  type?: "text" | "number" | "email" | "url" | "date";
+  type?: "text" | "number" | "email" | "url";
   value: string | number;
   placeholder?: string;
 }

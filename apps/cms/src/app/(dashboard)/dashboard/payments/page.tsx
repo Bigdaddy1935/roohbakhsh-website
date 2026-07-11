@@ -61,7 +61,7 @@ function PendingManualPayments() {
                   rel="noreferrer"
                   className="flex items-center gap-1.5 text-xs text-[var(--brand)] hover:underline shrink-0"
                 >
-                  <RiImageLine size={14} />
+                  <RiImageLine size={16} />
                   مشاهده رسید
                 </a>
               )}
@@ -72,7 +72,7 @@ function PendingManualPayments() {
                   disabled={approveMut.isPending || rejectMut.isPending}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
                 >
-                  <RiCheckLine size={14} />
+                  <RiCheckLine size={16} />
                   تأیید
                 </button>
                 <button
@@ -80,7 +80,7 @@ function PendingManualPayments() {
                   disabled={approveMut.isPending || rejectMut.isPending}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50"
                 >
-                  <RiCloseLine size={14} />
+                  <RiCloseLine size={16} />
                   رد
                 </button>
               </div>
