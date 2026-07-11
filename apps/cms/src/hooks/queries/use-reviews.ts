@@ -53,7 +53,7 @@ export function useRejectReview() {
 export function useReplyReview() {
   const qc = useQueryClient();
   return useMutation<unknown, Error, { id: string; body: string }>({
-    mutationFn: ({ id, body }) => api.post(`/reviews/${id}/reply`, { body }),
+    mutationFn: ({ id, body }) => api.post(`/reviews/${id}/reply`, { reply: body }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["reviews"] }),
   });
 }
@@ -62,7 +62,7 @@ export function useReplyCourseReview() {
   const qc = useQueryClient();
   return useMutation<unknown, Error, { courseSlug: string; reviewId: string; body: string }>({
     mutationFn: ({ courseSlug, reviewId, body }) =>
-      api.post(`/courses/${courseSlug}/reviews/${reviewId}/reply`, { body }),
+      api.post(`/courses/${courseSlug}/reviews/${reviewId}/reply`, { reply: body }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["reviews"] }),
   });
 }

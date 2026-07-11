@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { Tabs } from "@heroui/react";
 import type { ReviewWithTarget } from "@roohbakhsh/shared";
 import {
   useReviewsPending,
@@ -18,6 +19,53 @@ import { RiCheckLine, RiCloseLine, RiReplyLine } from "react-icons/ri";
 
 type Tab = "pending" | "all";
 
+function ReplyModal({
+  target,
+  onClose,
+}: {
+  target: ReviewWithTarget | null;
+  onClose: () => void;
+}) {
+  const replyMut = useReplyReview();
+  const [replyBody, setReplyBody] = useState(target?.instructorReply ?? "");
+
+  // فقط وقتی هدف عوض میشه (مدال جدید باز میشه) مقدار اولیه رو ست کن، نه هر رندر
+  const [lastTargetId, setLastTargetId] = useState(target?.id);
+  if (target && target.id !== lastTargetId) {
+    setLastTargetId(target.id);
+    setReplyBody(target.instructorReply ?? "");
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!target) return;
+    await replyMut.mutateAsync({ id: target.id, body: replyBody });
+    onClose();
+  }
+
+  return (
+    <FormModal
+      isOpen={!!target}
+      onClose={onClose}
+      title="پاسخ به نظر"
+      onSubmit={handleSubmit}
+      isPending={replyMut.isPending}
+    >
+      {target?.comment && (
+        <p className="text-sm text-gray-500 bg-gray-50 rounded-md p-3">{target.comment}</p>
+      )}
+      <FormField
+        as="textarea"
+        label="پاسخ مدیر"
+        value={replyBody}
+        onChange={(e) => setReplyBody(e.target.value)}
+        rows={4}
+        required
+      />
+    </FormModal>
+  );
+}
+
 export default function ReviewsPage() {
   const [tab, setTab] = useState<Tab>("pending");
   const [page, setPage] = useState(1);
@@ -28,11 +76,9 @@ export default function ReviewsPage() {
 
   const approveMut = useApproveReview();
   const rejectMut = useRejectReview();
-  const replyMut = useReplyReview();
 
   const [rejectTarget, setRejectTarget] = useState<ReviewWithTarget | null>(null);
   const [replyTarget, setReplyTarget] = useState<ReviewWithTarget | null>(null);
-  const [replyBody, setReplyBody] = useState("");
 
   const items = data?.items ?? [];
   const totalPages = data?.totalPages ?? 1;
@@ -40,18 +86,6 @@ export default function ReviewsPage() {
   function switchTab(next: Tab) {
     setTab(next);
     setPage(1);
-  }
-
-  function openReply(r: ReviewWithTarget) {
-    setReplyTarget(r);
-    setReplyBody(r.instructorReply ?? "");
-  }
-
-  async function handleReplySubmit(e: FormEvent) {
-    e.preventDefault();
-    if (!replyTarget) return;
-    await replyMut.mutateAsync({ id: replyTarget.id, body: replyBody });
-    setReplyTarget(null);
   }
 
   const columns = [
@@ -110,7 +144,7 @@ export default function ReviewsPage() {
             </>
           )}
           <button
-            onClick={() => openReply(r)}
+            onClick={() => setReplyTarget(r)}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50"
           >
             <RiReplyLine />
@@ -125,24 +159,25 @@ export default function ReviewsPage() {
     <div>
       <PageHeader title="نظرات" description="بررسی و پاسخ به نظرات دوره‌ها و مقالات" />
 
-      <div className="flex gap-2 mb-4">
-        <button
-          onClick={() => switchTab("pending")}
-          className={`px-4 py-2 text-sm rounded-md transition-colors ${
-            tab === "pending" ? "bg-[var(--brand)] text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-          }`}
-        >
-          در انتظار تأیید
-        </button>
-        <button
-          onClick={() => switchTab("all")}
-          className={`px-4 py-2 text-sm rounded-md transition-colors ${
-            tab === "all" ? "bg-[var(--brand)] text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-          }`}
-        >
-          همه‌ی نظرات تأییدشده
-        </button>
-      </div>
+      <Tabs
+        selectedKey={tab}
+        onSelectionChange={(key) => switchTab(key as Tab)}
+        className="mb-4"
+      >
+        <Tabs.ListContainer>
+          <Tabs.List aria-label="فیلتر نظرات">
+            <Tabs.Tab id="pending">
+              در انتظار تأیید
+              <Tabs.Indicator />
+            </Tabs.Tab>
+            <Tabs.Tab id="all">
+              <Tabs.Separator />
+              همه‌ی نظرات تأییدشده
+              <Tabs.Indicator />
+            </Tabs.Tab>
+          </Tabs.List>
+        </Tabs.ListContainer>
+      </Tabs>
 
       <DataTable
         columns={columns as Parameters<typeof DataTable>[0]["columns"]}
@@ -162,25 +197,7 @@ export default function ReviewsPage() {
         description="این نظر کاملاً حذف می‌شود. مطمئنید؟"
       />
 
-      <FormModal
-        isOpen={!!replyTarget}
-        onClose={() => setReplyTarget(null)}
-        title="پاسخ به نظر"
-        onSubmit={handleReplySubmit}
-        isPending={replyMut.isPending}
-      >
-        {replyTarget?.comment && (
-          <p className="text-sm text-gray-500 bg-gray-50 rounded-md p-3">{replyTarget.comment}</p>
-        )}
-        <FormField
-          as="textarea"
-          label="پاسخ مدیر"
-          value={replyBody}
-          onChange={(e) => setReplyBody(e.target.value)}
-          rows={4}
-          required
-        />
-      </FormModal>
+      <ReplyModal target={replyTarget} onClose={() => setReplyTarget(null)} />
     </div>
   );
 }
