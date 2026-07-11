@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { RiStarFill, RiUserLine } from "react-icons/ri";
 
@@ -29,15 +30,16 @@ export default function CourseCard({ course }: { course: CourseCardData }) {
   return (
     <div className="group/course flex flex-col bg-white rounded-lg min-h-[402px] h-full">
       {/* Thumbnail */}
-      <Link href={course.href} className="block relative">
-        <img
+      <Link href={course.href} className="block relative aspect-video overflow-hidden rounded-lg">
+        <Image
           src={course.image}
           alt={course.title}
-          className="w-full aspect-video object-cover rounded-lg group-hover/course:brightness-110 transition-all"
-          loading="lazy"
+          fill
+          sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 90vw"
+          className="object-cover group-hover/course:brightness-110 transition-all"
         />
         {course.discount && (
-          <span className="absolute top-2.5 end-2.5 flex items-center gap-x-0.5 px-2.5 py-1 bg-[var(--cta)] text-white text-xs font-extrabold rounded-full shadow-md shadow-black/25 tracking-wide">
+          <span className="absolute top-2.5 end-2.5 flex items-center gap-x-0.5 px-2.5 py-1 bg-[var(--brand)] text-white text-xs font-extrabold rounded-lg tracking-wide">
             <span className="text-sm">{course.discount}</span><span className="text-xs">٪</span>
           </span>
         )}

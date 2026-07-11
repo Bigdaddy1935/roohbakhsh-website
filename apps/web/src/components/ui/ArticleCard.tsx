@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { RiStarFill, RiUserLine, RiArrowLeftLine } from "react-icons/ri";
 
@@ -18,12 +19,13 @@ export default function ArticleCard({ article }: { article: ArticleCardData }) {
   return (
     <div className="group/blog flex flex-col gap-y-3 sm:gap-y-4 h-full rounded-lg bg-white">
       {/* Image */}
-      <Link href={article.href} className="block">
-        <img
+      <Link href={article.href} className="block relative aspect-video overflow-hidden rounded-lg">
+        <Image
           src={article.image}
           alt={article.title}
-          loading="lazy"
-          className="block w-full object-cover aspect-video rounded-lg group-hover/blog:brightness-110 transition-all"
+          fill
+          sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 90vw"
+          className="object-cover group-hover/blog:brightness-110 transition-all"
         />
       </Link>
 
