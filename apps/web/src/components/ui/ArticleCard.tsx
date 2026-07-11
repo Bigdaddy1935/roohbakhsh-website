@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { RiStarFill, RiUserLine, RiArrowLeftLine } from "react-icons/ri";
 
@@ -16,6 +17,7 @@ export type ArticleCardData = {
 };
 
 export default function ArticleCard({ article }: { article: ArticleCardData }) {
+  const t = useTranslations("Common");
   return (
     <div className="group/blog flex flex-col gap-y-3 sm:gap-y-4 h-full rounded-lg bg-white">
       {/* Image */}
@@ -70,7 +72,7 @@ export default function ArticleCard({ article }: { article: ArticleCardData }) {
           href={article.href}
           className="absolute -bottom-5 inset-x-3 sm:inset-x-4 flex items-center justify-center gap-x-2 h-10 sm:h-11 rounded-lg bg-[var(--brand)] text-white text-[13px] font-bold hover:opacity-90 transition-opacity"
         >
-          مطالعة
+          {t("read_article")}
           <RiArrowLeftLine size={14} />
         </Link>
       </div>

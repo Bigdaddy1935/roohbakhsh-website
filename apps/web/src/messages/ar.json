@@ -13,7 +13,8 @@
   "Common": {
     "login_required_toast": "يجب تسجيل الدخول أولاً",
     "favorite_added_toast": "تمت الإضافة إلى المفضلة",
-    "favorite_removed_toast": "تمت الإزالة من المفضلة"
+    "favorite_removed_toast": "تمت الإزالة من المفضلة",
+    "read_article": "مطالعة"
   },
   "Home": {
     "hero": {

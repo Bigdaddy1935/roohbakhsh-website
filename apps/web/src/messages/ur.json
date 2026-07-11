@@ -13,7 +13,8 @@
   "Common": {
     "login_required_toast": "پہلے لاگ ان کرنا ضروری ہے",
     "favorite_added_toast": "پسندیدہ میں شامل کر دیا گیا",
-    "favorite_removed_toast": "پسندیدہ سے ہٹا دیا گیا"
+    "favorite_removed_toast": "پسندیدہ سے ہٹا دیا گیا",
+    "read_article": "مطالعہ کریں"
   },
   "Home": {
     "hero": {
