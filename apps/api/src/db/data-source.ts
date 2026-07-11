@@ -6,7 +6,7 @@ import * as path from "path";
 dotenv.config({
   path: path.resolve(
     __dirname,
-    "../../../",
+    "../../",
     process.env.NODE_ENV === "production"
       ? ".env.production"
       : ".env.developer",
