@@ -73,7 +73,7 @@ export function useResendVerification() {
 }
 
 export function useChangePassword() {
-  return useMutation<void, Error, { currentPassword: string; newPassword: string }>({
+  return useMutation<void, Error, { newPassword: string }>({
     mutationFn: (data) => api.post<void>("/auth/change-password", data),
   });
 }

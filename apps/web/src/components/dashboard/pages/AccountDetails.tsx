@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useLocale } from "next-intl";
 import {
   RiUser3Line, RiCalendar2Line,
-  RiPhoneLine, RiMailLine, RiShieldKeyholeLine, RiLockPasswordLine, RiEyeLine, RiEyeOffLine,
+  RiPhoneLine, RiMailLine, RiShieldKeyholeLine, RiEyeLine, RiEyeOffLine,
 } from "react-icons/ri";
 import { AccountPageSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { useMe, useChangePassword } from "@/hooks/queries/use-auth";
@@ -87,10 +87,8 @@ export default function AccountDetails() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
 
-  const [currentPwd, setCurrentPwd] = useState("");
   const [newPwd, setNewPwd] = useState("");
   const [confirmPwd, setConfirmPwd] = useState("");
-  const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [pwdError, setPwdError] = useState("");
   const [pwdSuccess, setPwdSuccess] = useState(false);
@@ -110,9 +108,9 @@ export default function AccountDetails() {
     if (newPwd.length < 8) { setPwdError(ui.errorShort); return; }
     if (newPwd !== confirmPwd) { setPwdError(ui.errorMismatch); return; }
     try {
-      await changePassword.mutateAsync({ currentPassword: currentPwd, newPassword: newPwd });
+      await changePassword.mutateAsync({ newPassword: newPwd });
       setPwdSuccess(true);
-      setCurrentPwd(""); setNewPwd(""); setConfirmPwd("");
+      setNewPwd(""); setConfirmPwd("");
     } catch {
       setPwdError(ui.errorWrong);
     }
@@ -141,52 +139,33 @@ export default function AccountDetails() {
         </div>
       </div>
 
-      <div className="max-w-xl flex flex-col gap-y-7">
+      <div className="flex flex-col lg:flex-row gap-7">
         {/* Profile info */}
-        <section>
+        <section className="flex-1">
           <h2 className="text-sm font-bold text-[var(--ink)] mb-4 flex items-center gap-x-2">
             <RiUser3Line size={16} className="text-[var(--brand)]" />
             {ui.profileInfo}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3">
             <FieldRow label={ui.name} value={name} icon={RiUser3Line} />
             <FieldRow label={ui.email} value={email} icon={RiMailLine} />
-            <div className="sm:col-span-2">
-              <FieldRow label={ui.phone} value={phone} icon={RiPhoneLine} dir="ltr" />
-            </div>
+            <FieldRow label={ui.phone} value={phone} icon={RiPhoneLine} dir="ltr" />
           </div>
         </section>
 
+        {/* Divider */}
+        <div className="hidden lg:block w-px bg-gray-200 self-stretch" />
+
         {/* Change password */}
-        <section>
+        <section className="flex-1">
           <h2 className="text-sm font-bold text-[var(--ink)] mb-4 flex items-center gap-x-2">
             <RiShieldKeyholeLine size={16} className="text-[var(--brand)]" />
             {ui.security}
           </h2>
           <form onSubmit={handleChangePassword} className="flex flex-col gap-y-3">
-            {/* current password */}
-            <div className="flex flex-col gap-y-1.5">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wide">{ui.currentPassword}</label>
-              <div className="relative">
-                <RiLockPasswordLine size={16} className="absolute top-1/2 -translate-y-1/2 end-3 text-gray-400" />
-                <input
-                  type={showCurrent ? "text" : "password"}
-                  value={currentPwd}
-                  onChange={(e) => setCurrentPwd(e.target.value)}
-                  required
-                  className="w-full h-11 rounded-md border border-gray-200 px-4 pe-10 text-sm outline-none focus:border-[var(--brand)] transition-colors"
-                />
-                <button type="button" onClick={() => setShowCurrent(v => !v)} className="absolute top-1/2 -translate-y-1/2 start-3 text-gray-400">
-                  {showCurrent ? <RiEyeOffLine size={16} /> : <RiEyeLine size={16} />}
-                </button>
-              </div>
-            </div>
-
-            {/* new password */}
             <div className="flex flex-col gap-y-1.5">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wide">{ui.newPassword}</label>
               <div className="relative">
-                <RiLockPasswordLine size={16} className="absolute top-1/2 -translate-y-1/2 end-3 text-gray-400" />
                 <input
                   type={showNew ? "text" : "password"}
                   value={newPwd}
@@ -200,7 +179,6 @@ export default function AccountDetails() {
               </div>
             </div>
 
-            {/* confirm */}
             <div className="flex flex-col gap-y-1.5">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wide">{ui.confirmPassword}</label>
               <input

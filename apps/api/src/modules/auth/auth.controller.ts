@@ -220,7 +220,7 @@ export class AuthController {
     @Request() req: { user: User },
     @Body() dto: ChangePasswordDto,
   ) {
-    return this.authService.changePassword(req.user.id, dto.currentPassword, dto.newPassword);
+    return this.authService.changePassword(req.user.id, dto.newPassword);
   }
 
   // ── Me ───────────────────────────────────────────────────────────────────
