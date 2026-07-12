@@ -31,7 +31,7 @@ import { useCourse, useCourseSections } from "@/hooks/queries/use-courses";
 import { useCourseProgress, useWatchLesson } from "@/hooks/queries/use-progress";
 import { useMyFavorites, useToggleFavorite } from "@/hooks/queries/use-favorites";
 import {
-  useLessonReviews, useCreateLessonReview,
+  useCourseReviews, useCreateCourseReview,
   useApproveReview, useRejectReview, useReplyToReview, usePendingReviews,
 } from "@/hooks/queries/use-reviews";
 import { useMe } from "@/hooks/queries/use-auth";
@@ -207,19 +207,19 @@ function AdminReviewActions({ review, t }: { review: ReviewRecord; t: (k: string
   );
 }
 
-function QASection({ lessonId, t }: { lessonId: string; t: (k: string) => string }) {
+function QASection({ courseSlug, t }: { courseSlug: string; t: (k: string) => string }) {
   const locale = useLocale() as "ar" | "ur";
-  const { data, isLoading } = useLessonReviews(lessonId, { limit: 10 });
+  const { data, isLoading } = useCourseReviews(courseSlug, { limit: 10 });
   const { data: me } = useMe();
   const isAdmin = me?.role === "admin";
   const { data: pendingData } = usePendingReviews({ limit: 100 });
-  const createReview = useCreateLessonReview();
+  const createReview = useCreateCourseReview();
   const [formOpen, setFormOpen] = useState(false);
   const [comment, setComment] = useState("");
 
   const approvedReviews = data?.items ?? [];
   const pendingForLesson = isAdmin
-    ? (pendingData?.items ?? []).filter((p) => p.target.type === "lesson" && p.target.id === lessonId)
+    ? (pendingData?.items ?? []).filter((p) => p.target.type === "course" && p.target.slug === courseSlug)
     : [];
   const reviewMap = new Map<string, (typeof approvedReviews)[number]>();
   for (const r of approvedReviews) reviewMap.set(r.id, r);
@@ -232,7 +232,7 @@ function QASection({ lessonId, t }: { lessonId: string; t: (k: string) => string
   function handleSubmit() {
     if (!comment.trim()) return;
     createReview.mutate(
-      { lessonId, comment: comment.trim() },
+      { courseSlug, comment: comment.trim() },
       {
         onSuccess: () => {
           toast.success(t("review_submitted_toast"));
@@ -709,7 +709,7 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
             </div>
 
             <div ref={qaRef}>
-              <QASection lessonId={lesson.id} t={t} />
+              <QASection courseSlug={courseId} t={t} />
             </div>
           </main>
 

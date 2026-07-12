@@ -686,6 +686,8 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
 
   const allSections = sections ?? [];
   const totalLessons = allSections.reduce((s, sec) => s + sec.lessons.length, 0);
+  const firstLessonId = allSections[0]?.lessons[0]?.id;
+  const continueHref = firstLessonId ? `/courses/${course.slug}/lessons/${firstLessonId}` : `/courses/${course.slug}`;
   const hoursTotal = Math.round(course.durationMinutes / 60 * 10) / 10;
   const free = isFree(course.effectivePrice);
   const thumb = course.thumbnailUrl?.[locale] ?? course.thumbnailUrl?.ar ?? "";
@@ -774,7 +776,7 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
                   <CourseFavoriteButton courseId={course.id} t={t} />
                   {course.hasPurchased ? (
                     <Link
-                      href={`/courses/${course.slug}/lessons`}
+                      href={continueHref}
                       className="flex items-center justify-center gap-x-2 h-11 px-5 rounded-lg bg-[var(--cta)] text-white font-bold text-sm hover:opacity-90 active:scale-[0.98] transition-all shrink-0"
                     >
                       <RiPlayCircleLine size={18} />
