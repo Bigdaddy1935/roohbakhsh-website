@@ -3,8 +3,8 @@ import { ApiProperty } from "@nestjs/swagger";
 import type { ToggleFavoriteRequest, FavoriteType } from "@roohbakhsh/shared";
 
 export class ToggleFavoriteDto implements ToggleFavoriteRequest {
-  @ApiProperty({ enum: ["course", "article"], example: "course", description: "نوع آیتم" })
-  @IsIn(["course", "article"])
+  @ApiProperty({ enum: ["course", "article", "lesson"], example: "course", description: "نوع آیتم" })
+  @IsIn(["course", "article", "lesson"])
   type!: FavoriteType;
 
   @ApiProperty({ description: "UUID دوره یا مقاله" })

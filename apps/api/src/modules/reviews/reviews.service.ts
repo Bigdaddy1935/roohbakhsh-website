@@ -31,7 +31,7 @@ export class ReviewsService {
     const course = await this.courseBySlug(courseSlug);
 
     const saved = await this.repo.save(
-      this.repo.create({ courseId: course.id, userId, rating: dto.rating, comment: dto.comment ?? null }),
+      this.repo.create({ courseId: course.id, userId, rating: dto.rating ?? 5, comment: dto.comment ?? null }),
     );
     return this.toContract(await this.withUser(saved.id));
   }

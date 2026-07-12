@@ -1,13 +1,14 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IsInt, Min, Max, IsOptional, IsString, MaxLength } from "class-validator";
 import type { CreateReviewRequest } from "@roohbakhsh/shared";
 
 export class CreateReviewDto implements CreateReviewRequest {
-  @ApiProperty({ example: 5, minimum: 1, maximum: 5, description: "امتیاز از ۱ تا ۵" })
+  @ApiPropertyOptional({ example: 5, minimum: 1, maximum: 5, description: "امتیاز از ۱ تا ۵ — اختیاری برای Q&A درس" })
+  @IsOptional()
   @IsInt()
   @Min(1)
   @Max(5)
-  rating!: number;
+  rating?: number;
 
   @ApiPropertyOptional({ example: "دوره بسیار مفید و کاربردی بود.", nullable: true, maxLength: 2000 })
   @IsOptional()
