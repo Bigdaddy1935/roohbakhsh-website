@@ -90,6 +90,7 @@ export default function AccountDetails() {
   const [newPwd, setNewPwd] = useState("");
   const [confirmPwd, setConfirmPwd] = useState("");
   const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [pwdError, setPwdError] = useState("");
   const [pwdSuccess, setPwdSuccess] = useState(false);
 
@@ -171,7 +172,7 @@ export default function AccountDetails() {
                   value={newPwd}
                   onChange={(e) => setNewPwd(e.target.value)}
                   required
-                  className="w-full h-11 rounded-md border border-gray-200 px-4 pe-10 text-sm outline-none focus:border-[var(--brand)] transition-colors"
+                  className="w-full h-11 rounded-md border border-gray-200 px-4 ps-10 text-sm outline-none focus:border-[var(--brand)] transition-colors"
                 />
                 <button type="button" onClick={() => setShowNew(v => !v)} className="absolute top-1/2 -translate-y-1/2 start-3 text-gray-400">
                   {showNew ? <RiEyeOffLine size={16} /> : <RiEyeLine size={16} />}
@@ -181,13 +182,18 @@ export default function AccountDetails() {
 
             <div className="flex flex-col gap-y-1.5">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wide">{ui.confirmPassword}</label>
-              <input
-                type="password"
-                value={confirmPwd}
-                onChange={(e) => setConfirmPwd(e.target.value)}
-                required
-                className="w-full h-11 rounded-md border border-gray-200 px-4 text-sm outline-none focus:border-[var(--brand)] transition-colors"
-              />
+              <div className="relative">
+                <input
+                  type={showConfirm ? "text" : "password"}
+                  value={confirmPwd}
+                  onChange={(e) => setConfirmPwd(e.target.value)}
+                  required
+                  className="w-full h-11 rounded-md border border-gray-200 px-4 ps-10 text-sm outline-none focus:border-[var(--brand)] transition-colors"
+                />
+                <button type="button" onClick={() => setShowConfirm(v => !v)} className="absolute top-1/2 -translate-y-1/2 start-3 text-gray-400">
+                  {showConfirm ? <RiEyeOffLine size={16} /> : <RiEyeLine size={16} />}
+                </button>
+              </div>
             </div>
 
             {pwdError && <p className="text-xs text-red-500">{pwdError}</p>}
