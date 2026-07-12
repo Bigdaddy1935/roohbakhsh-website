@@ -123,8 +123,12 @@ export class CourseService {
     );
   }
 
-  async findOne(slug: string, userId?: string): Promise<CourseRecord> {
-    const course = await this.repo.findOne({ where: { slug, isPublished: true }, relations: { instructor: true } });
+  async findOne(slugOrId: string, userId?: string): Promise<CourseRecord> {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
+    const where = isUuid
+      ? { id: slugOrId, isPublished: true }
+      : { slug: slugOrId, isPublished: true };
+    const course = await this.repo.findOne({ where, relations: { instructor: true } });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
     const stats = await this.statsForCourse(course.id);
     const hasPurchased = await this.courseAccessService.hasPurchased(userId, course.id);
