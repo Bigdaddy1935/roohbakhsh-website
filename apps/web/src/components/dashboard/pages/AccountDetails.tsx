@@ -172,9 +172,9 @@ export default function AccountDetails() {
                   value={newPwd}
                   onChange={(e) => setNewPwd(e.target.value)}
                   required
-                  className="w-full h-11 rounded-md border border-gray-200 px-4 ps-10 text-sm outline-none focus:border-[var(--brand)] transition-colors"
+                  className="w-full h-11 rounded-md border border-gray-200 px-4 pe-10 text-sm outline-none focus:border-[var(--brand)] transition-colors"
                 />
-                <button type="button" onClick={() => setShowNew(v => !v)} className="absolute top-1/2 -translate-y-1/2 start-3 text-gray-400">
+                <button type="button" onClick={() => setShowNew(v => !v)} className="absolute top-1/2 -translate-y-1/2 end-3 text-gray-400">
                   {showNew ? <RiEyeOffLine size={16} /> : <RiEyeLine size={16} />}
                 </button>
               </div>
@@ -188,9 +188,9 @@ export default function AccountDetails() {
                   value={confirmPwd}
                   onChange={(e) => setConfirmPwd(e.target.value)}
                   required
-                  className="w-full h-11 rounded-md border border-gray-200 px-4 ps-10 text-sm outline-none focus:border-[var(--brand)] transition-colors"
+                  className="w-full h-11 rounded-md border border-gray-200 px-4 pe-10 text-sm outline-none focus:border-[var(--brand)] transition-colors"
                 />
-                <button type="button" onClick={() => setShowConfirm(v => !v)} className="absolute top-1/2 -translate-y-1/2 start-3 text-gray-400">
+                <button type="button" onClick={() => setShowConfirm(v => !v)} className="absolute top-1/2 -translate-y-1/2 end-3 text-gray-400">
                   {showConfirm ? <RiEyeOffLine size={16} /> : <RiEyeLine size={16} />}
                 </button>
               </div>
