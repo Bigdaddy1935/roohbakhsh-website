@@ -196,7 +196,7 @@ export default function AccountDetails() {
             <button
               type="submit"
               disabled={changePassword.isPending}
-              className="h-11 px-6 rounded-md bg-[var(--brand)] text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-60 self-start"
+              className="h-11 px-6 rounded-md bg-[var(--brand)] text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-60 self-end"
             >
               {changePassword.isPending ? ui.saving : ui.changePassword}
             </button>
