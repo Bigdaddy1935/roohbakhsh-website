@@ -122,18 +122,18 @@ export default function AccountDetails() {
   return (
     <div className="bg-white p-4 sm:p-5 lg:rounded-lg lg:p-7 min-h-full">
       {/* Profile hero */}
-      <div className="flex items-center gap-x-4 sm:gap-x-5 p-5 sm:p-6 rounded-lg bg-gradient-to-l from-[var(--brand)]/5 to-[var(--brand)]/10 mb-7">
-        <div className="size-16 sm:size-20 rounded-lg bg-[var(--brand)] flex items-center justify-center shrink-0 shadow-lg shadow-[var(--brand)]/30">
-          <RiUser3Line size={32} className="text-white" />
+      <div className="flex items-center gap-x-4 pb-6 mb-6 border-b border-gray-100">
+        <div className="size-14 rounded-full bg-[var(--brand)]/10 border-2 border-[var(--brand)]/20 flex items-center justify-center shrink-0">
+          <RiUser3Line size={24} className="text-[var(--brand)]" />
         </div>
         <div className="min-w-0">
-          <h1 className="text-lg sm:text-xl font-extrabold text-[var(--ink)] truncate">
+          <h1 className="text-base font-bold text-[var(--ink)] truncate">
             {user?.fullName ?? "—"}
           </h1>
-          <p className="text-sm text-gray-500 truncate mt-0.5">{user?.email ?? "—"}</p>
+          <p className="text-sm text-gray-400 truncate mt-0.5">{user?.email ?? "—"}</p>
           {user?.createdAt && (
-            <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-x-1.5">
-              <RiCalendar2Line size={12} />
+            <p className="text-xs text-gray-400 mt-1 flex items-center gap-x-1.5">
+              <RiCalendar2Line size={11} />
               {ui.memberSince} {user.createdAt.slice(0, 10)}
             </p>
           )}
