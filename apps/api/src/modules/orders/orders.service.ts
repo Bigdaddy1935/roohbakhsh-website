@@ -13,7 +13,9 @@ import { OrderItem } from "./entities/order-item.entity";
 import { CartService } from "../cart/cart.service";
 import { CouponService } from "../coupon/coupon.service";
 import { Course } from "../courses/entities/course.entity";
+import { User } from "../auth/entities/user.entity";
 import { CourseAccessService } from "../courses/course-access.service";
+import { MailService } from "../mail/mail.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
 
 @Injectable()
@@ -25,9 +27,12 @@ export class OrdersService {
     private readonly itemRepo: Repository<OrderItem>,
     @InjectRepository(Course)
     private readonly courseRepo: Repository<Course>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
     private readonly cartService: CartService,
     private readonly couponService: CouponService,
     private readonly courseAccessService: CourseAccessService,
+    private readonly mailService: MailService,
   ) {}
 
   async create(userId: string, dto: CreateOrderDto): Promise<OrderRecord> {
@@ -112,6 +117,9 @@ export class OrdersService {
     // Clear the cart
     await this.cartService.clearCart(userId);
 
+    // Send order confirmation email (fire-and-forget — don't block the response)
+    this.sendOrderConfirmationEmail(userId, saved).catch(() => undefined);
+
     return this.toContract(saved);
   }
 
@@ -151,6 +159,35 @@ export class OrdersService {
     const order = await this.orderRepo.findOne({ where: { id } });
     if (!order) throw new NotFoundException("ORDER_NOT_FOUND");
     return order;
+  }
+
+  private async sendOrderConfirmationEmail(userId: string, order: Order): Promise<void> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) return;
+
+    const courseList = order.items
+      .map((i) => `<li>${i.titleSnapshot?.ar ?? i.titleSnapshot?.ur ?? ""}</li>`)
+      .join("");
+
+    const totalFormatted = new Intl.NumberFormat("fa-IR").format(
+      order.total.amountMinor / 100,
+    );
+
+    await this.mailService.send({
+      to: user.email,
+      subject: "تأیید سفارش — آکادمی روح‌بخش",
+      html: `
+        <div dir="rtl" style="font-family: Arial, sans-serif;">
+          <h2>سفارش شما ثبت شد</h2>
+          <p>با سلام ${user.fullName}،</p>
+          <p>سفارش شما با موفقیت ثبت گردید. لطفاً مبلغ را واریز کرده و رسید پرداخت را ارسال نمایید.</p>
+          <p><strong>شماره سفارش:</strong> ${order.id}</p>
+          <ul>${courseList}</ul>
+          <p><strong>مبلغ کل:</strong> ${totalFormatted} تومان</p>
+          <p>پس از تأیید پرداخت، دسترسی به دوره‌ها فعال می‌شود.</p>
+        </div>
+      `,
+    });
   }
 
   private effectivePrice(course: Course): Money | null {

@@ -17,8 +17,10 @@ import type {
 } from "@roohbakhsh/shared";
 import { toPaginated } from "../../common/utils/paginate";
 import { Payment } from "./entities/payment.entity";
+import { User } from "../auth/entities/user.entity";
 import { OrdersService } from "../orders/orders.service";
 import { InvoicesService } from "../invoices/invoices.service";
+import { MailService } from "../mail/mail.service";
 import { EnvConfig } from "../../config/env";
 import { FtpUploaderService } from "../../common/ftp/ftp-uploader.service";
 import { SubmitCardToCardDto } from "./dto/submit-card-to-card.dto";
@@ -38,8 +40,11 @@ export class PaymentsService {
   constructor(
     @InjectRepository(Payment)
     private readonly repo: Repository<Payment>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
     private readonly ordersService: OrdersService,
     private readonly invoicesService: InvoicesService,
+    private readonly mailService: MailService,
     private readonly config: ConfigService<EnvConfig>,
     private readonly ftpUploader: FtpUploaderService,
   ) {}
@@ -112,6 +117,7 @@ export class PaymentsService {
       await this.ordersService.updateStatus(orderId, "paid");
       const freeOrder = await this.ordersService.findEntity(orderId);
       await this.invoicesService.createFromOrder(freeOrder, "FREE");
+      this.sendPaymentConfirmedEmail(userId, freeOrder).catch(() => undefined);
 
       return { paymentId: payment.id, gatewayUrl: null, requiresPayment: false };
     }
@@ -219,6 +225,7 @@ export class PaymentsService {
       await this.ordersService.updateStatus(payment.orderId, "paid");
       const order = await this.ordersService.findEntity(payment.orderId);
       await this.invoicesService.createFromOrder(order, refId);
+      this.sendPaymentConfirmedEmail(payment.userId, order).catch(() => undefined);
       this.logger.log(`Payment ${payment.id} verified. RefID: ${refId}`);
       return { message: "PAYMENT_SUCCESS", refId };
     }
@@ -256,6 +263,7 @@ export class PaymentsService {
     await this.ordersService.updateStatus(payment.orderId, "paid");
     const order = await this.ordersService.findEntity(payment.orderId);
     await this.invoicesService.createFromOrder(order, refId);
+    this.sendPaymentConfirmedEmail(payment.userId, order).catch(() => undefined);
 
     this.logger.log(`Manual payment ${payment.id} approved by admin. RefID: ${refId}`);
     return this.toContract({ ...payment, status: "paid", refId });
@@ -291,6 +299,34 @@ export class PaymentsService {
       skip: (page - 1) * limit,
     });
     return toPaginated(items.map((p) => this.toContract(p)), total, page, limit);
+  }
+
+  private async sendPaymentConfirmedEmail(userId: string, order: import("../orders/entities/order.entity").Order): Promise<void> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) return;
+
+    const courseList = (order.items ?? [])
+      .map((i) => `<li>${i.titleSnapshot?.ar ?? i.titleSnapshot?.ur ?? ""}</li>`)
+      .join("");
+
+    const totalFormatted = new Intl.NumberFormat("fa-IR").format(
+      order.total.amountMinor / 100,
+    );
+
+    await this.mailService.send({
+      to: user.email,
+      subject: "پرداخت تأیید شد — آکادمی روح‌بخش",
+      html: `
+        <div dir="rtl" style="font-family: Arial, sans-serif;">
+          <h2>پرداخت شما تأیید شد</h2>
+          <p>با سلام ${user.fullName}،</p>
+          <p>پرداخت شما با موفقیت تأیید گردید. دسترسی به دوره‌های زیر برای شما فعال شده است:</p>
+          <ul>${courseList}</ul>
+          <p><strong>مبلغ پرداختی:</strong> ${totalFormatted} تومان</p>
+          <p>اکنون می‌توانید وارد حساب کاربری خود شوید و دوره‌ها را شروع کنید.</p>
+        </div>
+      `,
+    });
   }
 
   private toContract(p: Payment): PaymentRecord {
