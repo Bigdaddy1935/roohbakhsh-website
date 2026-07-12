@@ -135,7 +135,7 @@ export default function DashboardHome() {
             <p className="text-sm">{ui.noCourses}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
             {data.recentViews.slice(0, 4).map((v) => {
               const progress = progressByCourseId.get(v.courseId) ?? 0;
               return (
@@ -144,11 +144,19 @@ export default function DashboardHome() {
                   href={`/courses/${v.courseId}`}
                   className="group flex flex-col rounded-md overflow-hidden hover:shadow-md transition-all duration-200"
                 >
-                  <div className="aspect-video bg-gradient-to-br from-[var(--brand)]/20 to-[var(--brand)]/5 flex items-center justify-center">
-                    <RiPlayCircleLine
-                      size={32}
-                      className="text-[var(--brand)]/40 group-hover:text-[var(--brand)]/70 transition-colors"
-                    />
+                  <div className="aspect-video bg-gradient-to-br from-[var(--brand)]/20 to-[var(--brand)]/5 relative flex items-center justify-center overflow-hidden">
+                    {v.thumbnailUrl?.[locale] || v.thumbnailUrl?.ar ? (
+                      <img
+                        src={v.thumbnailUrl[locale] ?? v.thumbnailUrl.ar ?? ""}
+                        alt={v.title[locale] ?? ""}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    ) : (
+                      <RiPlayCircleLine
+                        size={32}
+                        className="text-[var(--brand)]/40 group-hover:text-[var(--brand)]/70 transition-colors"
+                      />
+                    )}
                   </div>
                   <div className="p-3 bg-gray-50 flex-1">
                     <p className="text-xs font-semibold text-[var(--ink)] line-clamp-2 mb-2 leading-relaxed">
