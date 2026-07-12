@@ -72,6 +72,12 @@ export function useResendVerification() {
   });
 }
 
+export function useChangePassword() {
+  return useMutation<void, Error, { currentPassword: string; newPassword: string }>({
+    mutationFn: (data) => api.post<void>("/auth/change-password", data),
+  });
+}
+
 export function useLogout() {
   const qc = useQueryClient();
   return useMutation<void, Error, void>({

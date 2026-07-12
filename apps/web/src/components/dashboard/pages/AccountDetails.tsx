@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import { useLocale } from "next-intl";
 import {
   RiUser3Line, RiCalendar2Line,
-  RiPhoneLine, RiMailLine, RiShieldKeyholeLine,
+  RiPhoneLine, RiMailLine, RiShieldKeyholeLine, RiLockPasswordLine, RiEyeLine, RiEyeOffLine,
 } from "react-icons/ri";
 import { AccountPageSkeleton } from "@/components/dashboard/DashboardSkeleton";
-import { useMe } from "@/hooks/queries/use-auth";
+import { useMe, useChangePassword } from "@/hooks/queries/use-auth";
 
 const UI = {
   ar: {
@@ -19,8 +19,16 @@ const UI = {
     joined: "تاريخ الانضمام",
     profileInfo: "المعلومات الشخصية",
     security: "الأمان",
-    notAvailable: "تعديل المعلومات الشخصية وكلمة المرور غير متاح حالياً — سيتم إضافته قريباً.",
     memberSince: "عضو منذ",
+    currentPassword: "كلمة المرور الحالية",
+    newPassword: "كلمة المرور الجديدة",
+    confirmPassword: "تأكيد كلمة المرور الجديدة",
+    changePassword: "تغيير كلمة المرور",
+    saving: "جارٍ الحفظ...",
+    successMsg: "تم تغيير كلمة المرور بنجاح",
+    errorWrong: "كلمة المرور الحالية غير صحيحة",
+    errorMismatch: "كلمة المرور الجديدة غير متطابقة",
+    errorShort: "كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل",
   },
   ur: {
     title: "ذاتی اکاؤنٹ",
@@ -31,8 +39,16 @@ const UI = {
     joined: "شمولیت کی تاریخ",
     profileInfo: "ذاتی معلومات",
     security: "سیکیورٹی",
-    notAvailable: "ذاتی معلومات اور پاسورڈ میں ترمیم ابھی دستیاب نہیں — جلد شامل ہوگا۔",
     memberSince: "رکن بمطابق",
+    currentPassword: "موجودہ پاسورڈ",
+    newPassword: "نیا پاسورڈ",
+    confirmPassword: "نئے پاسورڈ کی تصدیق",
+    changePassword: "پاسورڈ تبدیل کریں",
+    saving: "محفوظ ہو رہا ہے...",
+    successMsg: "پاسورڈ کامیابی سے تبدیل ہو گیا",
+    errorWrong: "موجودہ پاسورڈ غلط ہے",
+    errorMismatch: "نئے پاسورڈ مطابقت نہیں رکھتے",
+    errorShort: "نیا پاسورڈ کم از کم 8 حروف کا ہونا چاہیے",
   },
 };
 
@@ -65,10 +81,19 @@ export default function AccountDetails() {
   const locale = useLocale() as "ar" | "ur";
   const ui = UI[locale];
   const { data: user, isLoading } = useMe();
+  const changePassword = useChangePassword();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+
+  const [currentPwd, setCurrentPwd] = useState("");
+  const [newPwd, setNewPwd] = useState("");
+  const [confirmPwd, setConfirmPwd] = useState("");
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [pwdError, setPwdError] = useState("");
+  const [pwdSuccess, setPwdSuccess] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -77,6 +102,21 @@ export default function AccountDetails() {
       setPhone(user.phone ?? "");
     }
   }, [user]);
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPwdError("");
+    setPwdSuccess(false);
+    if (newPwd.length < 8) { setPwdError(ui.errorShort); return; }
+    if (newPwd !== confirmPwd) { setPwdError(ui.errorMismatch); return; }
+    try {
+      await changePassword.mutateAsync({ currentPassword: currentPwd, newPassword: newPwd });
+      setPwdSuccess(true);
+      setCurrentPwd(""); setNewPwd(""); setConfirmPwd("");
+    } catch {
+      setPwdError(ui.errorWrong);
+    }
+  }
 
   if (isLoading) return <AccountPageSkeleton />;
 
@@ -115,6 +155,74 @@ export default function AccountDetails() {
               <FieldRow label={ui.phone} value={phone} icon={RiPhoneLine} dir="ltr" />
             </div>
           </div>
+        </section>
+
+        {/* Change password */}
+        <section>
+          <h2 className="text-sm font-bold text-[var(--ink)] mb-4 flex items-center gap-x-2">
+            <RiShieldKeyholeLine size={16} className="text-[var(--brand)]" />
+            {ui.security}
+          </h2>
+          <form onSubmit={handleChangePassword} className="flex flex-col gap-y-3">
+            {/* current password */}
+            <div className="flex flex-col gap-y-1.5">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wide">{ui.currentPassword}</label>
+              <div className="relative">
+                <RiLockPasswordLine size={16} className="absolute top-1/2 -translate-y-1/2 end-3 text-gray-400" />
+                <input
+                  type={showCurrent ? "text" : "password"}
+                  value={currentPwd}
+                  onChange={(e) => setCurrentPwd(e.target.value)}
+                  required
+                  className="w-full h-11 rounded-md border border-gray-200 px-4 pe-10 text-sm outline-none focus:border-[var(--brand)] transition-colors"
+                />
+                <button type="button" onClick={() => setShowCurrent(v => !v)} className="absolute top-1/2 -translate-y-1/2 start-3 text-gray-400">
+                  {showCurrent ? <RiEyeOffLine size={16} /> : <RiEyeLine size={16} />}
+                </button>
+              </div>
+            </div>
+
+            {/* new password */}
+            <div className="flex flex-col gap-y-1.5">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wide">{ui.newPassword}</label>
+              <div className="relative">
+                <RiLockPasswordLine size={16} className="absolute top-1/2 -translate-y-1/2 end-3 text-gray-400" />
+                <input
+                  type={showNew ? "text" : "password"}
+                  value={newPwd}
+                  onChange={(e) => setNewPwd(e.target.value)}
+                  required
+                  className="w-full h-11 rounded-md border border-gray-200 px-4 pe-10 text-sm outline-none focus:border-[var(--brand)] transition-colors"
+                />
+                <button type="button" onClick={() => setShowNew(v => !v)} className="absolute top-1/2 -translate-y-1/2 start-3 text-gray-400">
+                  {showNew ? <RiEyeOffLine size={16} /> : <RiEyeLine size={16} />}
+                </button>
+              </div>
+            </div>
+
+            {/* confirm */}
+            <div className="flex flex-col gap-y-1.5">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wide">{ui.confirmPassword}</label>
+              <input
+                type="password"
+                value={confirmPwd}
+                onChange={(e) => setConfirmPwd(e.target.value)}
+                required
+                className="w-full h-11 rounded-md border border-gray-200 px-4 text-sm outline-none focus:border-[var(--brand)] transition-colors"
+              />
+            </div>
+
+            {pwdError && <p className="text-xs text-red-500">{pwdError}</p>}
+            {pwdSuccess && <p className="text-xs text-emerald-600">{ui.successMsg}</p>}
+
+            <button
+              type="submit"
+              disabled={changePassword.isPending}
+              className="h-11 px-6 rounded-md bg-[var(--brand)] text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-60 self-start"
+            >
+              {changePassword.isPending ? ui.saving : ui.changePassword}
+            </button>
+          </form>
         </section>
       </div>
     </div>
