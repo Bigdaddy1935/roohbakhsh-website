@@ -22,5 +22,6 @@ import { LessonController } from "./lesson.controller";
   ],
   controllers: [CourseController, SectionController, LessonController],
   providers: [CourseService, SectionService, LessonService, CourseAccessService],
+  exports: [CourseAccessService],
 })
 export class CoursesModule {}

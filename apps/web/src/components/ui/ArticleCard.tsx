@@ -32,7 +32,7 @@ export default function ArticleCard({ article }: { article: ArticleCardData }) {
       </Link>
 
       {/* Body */}
-      <div className="flex flex-col gap-y-5 justify-between h-full px-3 sm:px-4 pb-10 sm:pb-12 cursor-default relative">
+      <div className="flex flex-col gap-y-5 justify-between flex-1 px-3 sm:px-4 pb-10 sm:pb-12 cursor-default relative">
         {/* Title + excerpt */}
         <div className="flex flex-col items-start gap-y-1">
           <Link

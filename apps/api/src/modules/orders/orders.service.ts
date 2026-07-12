@@ -13,6 +13,7 @@ import { OrderItem } from "./entities/order-item.entity";
 import { CartService } from "../cart/cart.service";
 import { CouponService } from "../coupon/coupon.service";
 import { Course } from "../courses/entities/course.entity";
+import { CourseAccessService } from "../courses/course-access.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
 
 @Injectable()
@@ -26,6 +27,7 @@ export class OrdersService {
     private readonly courseRepo: Repository<Course>,
     private readonly cartService: CartService,
     private readonly couponService: CouponService,
+    private readonly courseAccessService: CourseAccessService,
   ) {}
 
   async create(userId: string, dto: CreateOrderDto): Promise<OrderRecord> {
@@ -39,6 +41,13 @@ export class OrdersService {
     );
     if (courses.length !== courseIds.length) {
       throw new NotFoundException("COURSE_NOT_FOUND");
+    }
+
+    // دفاع در عمق — حتی اگر از مسیر دیگری غیر از addItem به سبد اضافه شده باشد
+    for (const courseId of courseIds) {
+      if (await this.courseAccessService.hasPurchased(userId, courseId)) {
+        throw new BadRequestException("COURSE_ALREADY_PURCHASED");
+      }
     }
 
     // Compute subtotal (all items must share the same currency)

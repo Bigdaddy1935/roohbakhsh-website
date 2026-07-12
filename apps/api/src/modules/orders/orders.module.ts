@@ -5,6 +5,7 @@ import { OrderItem } from "./entities/order-item.entity";
 import { Course } from "../courses/entities/course.entity";
 import { CartModule } from "../cart/cart.module";
 import { CouponModule } from "../coupon/coupon.module";
+import { CoursesModule } from "../courses/courses.module";
 import { OrdersService } from "./orders.service";
 import { OrdersController } from "./orders.controller";
 
@@ -13,6 +14,7 @@ import { OrdersController } from "./orders.controller";
     TypeOrmModule.forFeature([Order, OrderItem, Course]),
     CartModule,
     CouponModule,
+    CoursesModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],

@@ -1,6 +1,6 @@
 import {
   Controller, Get, Post, Patch, Delete,
-  Param, Body, Query, UseGuards, HttpCode, HttpStatus,
+  Param, Body, Query, Request, UseGuards, HttpCode, HttpStatus,
 } from "@nestjs/common";
 import {
   ApiTags, ApiOperation, ApiResponse,
@@ -10,6 +10,7 @@ import { CourseService } from "./course.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
 import { Public } from "../auth/decorators/public.decorator";
+import { OptionalJwtAuthGuard } from "../auth/guards/optional-jwt-auth.guard";
 import { RolesGuard, Roles } from "../../common/guards/roles.guard";
 import { ApiErrorSchema } from "../../common/swagger/api-error.schema";
 import { CourseSchema } from "../../common/swagger/course.schema";
@@ -41,17 +42,23 @@ export class CourseController {
   }
 
   @Public()
+  @UseGuards(OptionalJwtAuthGuard)
   @Get(":slug")
   @ApiOperation({
     summary: "مشخصات یک دوره",
-    description: "یک دوره را با slug آن برمی‌گرداند. شامل اطلاعات استاد.",
+    description:
+      "یک دوره را با slug آن برمی‌گرداند. شامل اطلاعات استاد. " +
+      "اگر کاربر لاگین باشد، فیلد `hasPurchased` نشان می‌دهد آیا قبلاً این دوره را خریده است.",
   })
   @ApiHeader(LANG_HEADER)
   @ApiParam({ name: "slug", description: "slug دوره", example: "tafsir-quran-mobtadi" })
   @ApiResponse({ status: 200, description: "دوره پیدا شد", type: CourseSchema })
   @ApiResponse({ status: 404, description: "دوره پیدا نشد — کد: COURSE_NOT_FOUND", type: ApiErrorSchema })
-  findOne(@Param("slug") slug: string) {
-    return this.courseService.findOne(slug);
+  findOne(
+    @Param("slug") slug: string,
+    @Request() req: { user: { id: string } | null },
+  ) {
+    return this.courseService.findOne(slug, req.user?.id);
   }
 
   @UseGuards(RolesGuard)

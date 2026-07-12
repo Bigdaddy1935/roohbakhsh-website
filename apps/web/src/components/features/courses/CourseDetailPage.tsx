@@ -772,14 +772,24 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
                 {/* buttons */}
                 <div className="flex items-center gap-x-2">
                   <CourseFavoriteButton courseId={course.id} t={t} />
-                  <button
-                    onClick={() => addToCart(course.id)}
-                    disabled={addingToCart}
-                    className="flex items-center justify-center gap-x-2 h-11 px-5 rounded-lg bg-[var(--brand)] text-white font-bold text-sm hover:opacity-90 active:scale-[0.98] transition-all shrink-0 disabled:opacity-60"
-                  >
-                    {addingToCart ? <RiLoader4Line size={18} className="animate-spin" /> : <RiShoppingCartLine size={18} />}
-                    {t("add_to_cart")}
-                  </button>
+                  {course.hasPurchased ? (
+                    <Link
+                      href={`/courses/${course.slug}/lessons`}
+                      className="flex items-center justify-center gap-x-2 h-11 px-5 rounded-lg bg-[var(--cta)] text-white font-bold text-sm hover:opacity-90 active:scale-[0.98] transition-all shrink-0"
+                    >
+                      <RiPlayCircleLine size={18} />
+                      {t("continue_learning")}
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() => addToCart(course.id)}
+                      disabled={addingToCart}
+                      className="flex items-center justify-center gap-x-2 h-11 px-5 rounded-lg bg-[var(--brand)] text-white font-bold text-sm hover:opacity-90 active:scale-[0.98] transition-all shrink-0 disabled:opacity-60"
+                    >
+                      {addingToCart ? <RiLoader4Line size={18} className="animate-spin" /> : <RiShoppingCartLine size={18} />}
+                      {t("add_to_cart")}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

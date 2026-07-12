@@ -8,6 +8,7 @@ import { Repository } from "typeorm";
 import type { CartRecord, Money } from "@roohbakhsh/shared";
 import { CartItem } from "./entities/cart-item.entity";
 import { Course } from "../courses/entities/course.entity";
+import { CourseAccessService } from "../courses/course-access.service";
 import { AddToCartDto } from "./dto/add-to-cart.dto";
 
 @Injectable()
@@ -17,6 +18,7 @@ export class CartService {
     private readonly repo: Repository<CartItem>,
     @InjectRepository(Course)
     private readonly courseRepo: Repository<Course>,
+    private readonly courseAccessService: CourseAccessService,
   ) {}
 
   async getCart(userId: string): Promise<CartRecord> {
@@ -33,6 +35,9 @@ export class CartService {
 
     const exists = await this.repo.findOne({ where: { userId, courseId: dto.courseId } });
     if (exists) throw new ConflictException("COURSE_ALREADY_IN_CART");
+
+    const alreadyPurchased = await this.courseAccessService.hasPurchased(userId, dto.courseId);
+    if (alreadyPurchased) throw new ConflictException("COURSE_ALREADY_PURCHASED");
 
     const item = this.repo.create({ userId, courseId: dto.courseId, course });
     await this.repo.save(item);

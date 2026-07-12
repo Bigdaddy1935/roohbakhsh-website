@@ -14,6 +14,7 @@ import { Instructor } from "../instructor/entities/instructor.entity";
 import { Category } from "../category/entities/category.entity";
 import { OrderItem } from "../orders/entities/order-item.entity";
 import { ReviewsService } from "../reviews/reviews.service";
+import { CourseAccessService } from "./course-access.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
 
@@ -47,6 +48,7 @@ export class CourseService {
     @InjectRepository(OrderItem)
     private readonly orderItemRepo: Repository<OrderItem>,
     private readonly reviewsService: ReviewsService,
+    private readonly courseAccessService: CourseAccessService,
   ) {}
 
   async findAll(page: number, limit: number, q?: string): Promise<Paginated<CourseRecord>> {
@@ -78,7 +80,7 @@ export class CourseService {
       this.participantCountsForCourses(courseIds),
     ]);
     return toPaginated(
-      items.map((c) => this.toContract(c, this.mergeStats(c.id, lessonStats, ratingStats, participantStats))),
+      items.map((c) => this.toContract(c, this.mergeStats(c.id, lessonStats, ratingStats, participantStats), false)),
       total,
       page,
       limit,
@@ -114,18 +116,19 @@ export class CourseService {
       this.participantCountsForCourses(courseIds),
     ]);
     return toPaginated(
-      items.map((c) => this.toContract(c, this.mergeStats(c.id, lessonStats, ratingStats, participantStats))),
+      items.map((c) => this.toContract(c, this.mergeStats(c.id, lessonStats, ratingStats, participantStats), false)),
       total,
       page,
       limit,
     );
   }
 
-  async findOne(slug: string): Promise<CourseRecord> {
+  async findOne(slug: string, userId?: string): Promise<CourseRecord> {
     const course = await this.repo.findOne({ where: { slug, isPublished: true }, relations: { instructor: true } });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
     const stats = await this.statsForCourse(course.id);
-    return this.toContract(course, stats);
+    const hasPurchased = await this.courseAccessService.hasPurchased(userId, course.id);
+    return this.toContract(course, stats, hasPurchased);
   }
 
   /** مشخصات یک دوره با slug — شامل پیش‌نویس. فقط برای پنل ادمین. */
@@ -133,7 +136,7 @@ export class CourseService {
     const course = await this.repo.findOne({ where: { slug }, relations: { instructor: true } });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
     const stats = await this.statsForCourse(course.id);
-    return this.toContract(course, stats);
+    return this.toContract(course, stats, false);
   }
 
   /** lessonCount/durationMinutes از lessons، averageRating/reviewCount از reviews، participantCount از سفارش‌های paid — هیچ‌کدام denormalize نشده. */
@@ -246,7 +249,7 @@ export class CourseService {
     });
 
     const saved = await this.repo.save(course);
-    return this.toContract(saved, EMPTY_STATS);
+    return this.toContract(saved, EMPTY_STATS, false);
   }
 
   async update(id: string, dto: UpdateCourseDto): Promise<CourseRecord> {
@@ -289,7 +292,7 @@ export class CourseService {
 
     const saved = await this.repo.save(course);
     const stats = await this.statsForCourse(saved.id);
-    return this.toContract(saved, stats);
+    return this.toContract(saved, stats, false);
   }
 
   async remove(id: string): Promise<void> {
@@ -314,7 +317,7 @@ export class CourseService {
     };
   }
 
-  private toContract(course: Course, stats: CourseStats): CourseRecord {
+  private toContract(course: Course, stats: CourseStats, hasPurchased: boolean): CourseRecord {
     const discount = this.buildDiscount(course);
     const effectivePrice: Money | null =
       discount?.isActive ? discount.price : course.price;
@@ -346,6 +349,7 @@ export class CourseService {
         avatarUrl: course.instructor.avatarUrl,
       },
       categoryId: course.categoryId,
+      hasPurchased,
       createdAt: course.createdAt.toISOString(),
       updatedAt: course.updatedAt.toISOString(),
     };
