@@ -19,7 +19,7 @@ export class SectionService {
   ) {}
 
   async findByCourse(courseSlug: string, userId?: string, isAdmin?: boolean): Promise<SectionRecord[]> {
-    const course = isAdmin ? await this.courseBySlug(courseSlug) : await this.publishedCourseBySlug(courseSlug);
+    const course = isAdmin ? await this.courseBySlugOrId(courseSlug) : await this.publishedCourseBySlugOrId(courseSlug);
     const sections = await this.sectionRepo.find({
       where: { courseId: course.id },
       relations: { lessons: true },
@@ -30,7 +30,7 @@ export class SectionService {
   }
 
   async findOne(courseSlug: string, sectionId: string, userId?: string, isAdmin?: boolean): Promise<SectionRecord> {
-    const course = isAdmin ? await this.courseBySlug(courseSlug) : await this.publishedCourseBySlug(courseSlug);
+    const course = isAdmin ? await this.courseBySlugOrId(courseSlug) : await this.publishedCourseBySlugOrId(courseSlug);
     const section = await this.sectionRepo.findOne({
       where: { id: sectionId, courseId: course.id },
       relations: { lessons: true },
@@ -42,7 +42,7 @@ export class SectionService {
   }
 
   async create(courseSlug: string, dto: CreateSectionDto): Promise<SectionRecord> {
-    const course = await this.courseBySlug(courseSlug);
+    const course = await this.courseBySlugOrId(courseSlug);
     const section = this.sectionRepo.create({
       courseId: course.id,
       title: dto.title,
@@ -54,7 +54,7 @@ export class SectionService {
   }
 
   async update(courseSlug: string, sectionId: string, dto: UpdateSectionDto): Promise<SectionRecord> {
-    const course = await this.courseBySlug(courseSlug);
+    const course = await this.courseBySlugOrId(courseSlug);
     const section = await this.sectionRepo.findOne({
       where: { id: sectionId, courseId: course.id },
       relations: { lessons: true },
@@ -69,7 +69,7 @@ export class SectionService {
   }
 
   async remove(courseSlug: string, sectionId: string): Promise<void> {
-    const course = await this.courseBySlug(courseSlug);
+    const course = await this.courseBySlugOrId(courseSlug);
     const section = await this.sectionRepo.findOne({ where: { id: sectionId, courseId: course.id } });
     if (!section) throw new NotFoundException("SECTION_NOT_FOUND");
     await this.sectionRepo.remove(section);
@@ -86,15 +86,22 @@ export class SectionService {
     );
   }
 
-  private async courseBySlug(slug: string): Promise<Course> {
-    const course = await this.courseRepo.findOne({ where: { slug } });
+  private isUuid(val: string): boolean {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+  }
+
+  private async courseBySlugOrId(slugOrId: string): Promise<Course> {
+    const where = this.isUuid(slugOrId) ? { id: slugOrId } : { slug: slugOrId };
+    const course = await this.courseRepo.findOne({ where });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
     return course;
   }
 
-  /** برای مسیرهای عمومی — دوره‌ی پیش‌نویس هم مثل نبود آن ۴۰۴ برمی‌گرداند. */
-  private async publishedCourseBySlug(slug: string): Promise<Course> {
-    const course = await this.courseRepo.findOne({ where: { slug, isPublished: true } });
+  private async publishedCourseBySlugOrId(slugOrId: string): Promise<Course> {
+    const where = this.isUuid(slugOrId)
+      ? { id: slugOrId, isPublished: true }
+      : { slug: slugOrId, isPublished: true };
+    const course = await this.courseRepo.findOne({ where });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
     return course;
   }

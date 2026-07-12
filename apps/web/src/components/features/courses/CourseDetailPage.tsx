@@ -775,13 +775,20 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
                 <div className="flex items-center gap-x-2">
                   <CourseFavoriteButton courseId={course.id} t={t} />
                   {course.hasPurchased ? (
-                    <Link
-                      href={continueHref}
-                      className="flex items-center justify-center gap-x-2 h-11 px-5 rounded-lg bg-[var(--cta)] text-white font-bold text-sm hover:opacity-90 active:scale-[0.98] transition-all shrink-0"
-                    >
-                      <RiPlayCircleLine size={18} />
-                      {t("continue_learning")}
-                    </Link>
+                    loadingSections ? (
+                      <div className="flex items-center justify-center gap-x-2 h-11 px-5 rounded-lg bg-[var(--cta)]/60 text-white font-bold text-sm shrink-0 cursor-wait">
+                        <RiPlayCircleLine size={18} />
+                        {t("continue_learning")}
+                      </div>
+                    ) : (
+                      <Link
+                        href={continueHref}
+                        className="flex items-center justify-center gap-x-2 h-11 px-5 rounded-lg bg-[var(--cta)] text-white font-bold text-sm hover:opacity-90 active:scale-[0.98] transition-all shrink-0"
+                      >
+                        <RiPlayCircleLine size={18} />
+                        {t("continue_learning")}
+                      </Link>
+                    )
                   ) : (
                     <button
                       onClick={() => addToCart(course.id)}
