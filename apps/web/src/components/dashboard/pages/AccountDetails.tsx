@@ -130,7 +130,6 @@ export default function AccountDetails() {
           <h1 className="text-base font-bold text-[var(--ink)] truncate">
             {user?.fullName ?? "—"}
           </h1>
-          <p className="text-sm text-gray-400 truncate mt-0.5">{user?.email ?? "—"}</p>
           {user?.createdAt && (
             <p className="text-xs text-gray-400 mt-1 flex items-center gap-x-1.5">
               <RiCalendar2Line size={11} />
@@ -143,11 +142,11 @@ export default function AccountDetails() {
       <div className="flex flex-col lg:flex-row gap-7">
         {/* Profile info */}
         <section className="flex-1">
-          <h2 className="text-sm font-bold text-[var(--ink)] mb-4 flex items-center gap-x-2">
+          <h2 className="text-sm font-bold text-[var(--ink)] mb-7 flex items-center gap-x-2">
             <RiUser3Line size={16} className="text-[var(--brand)]" />
             {ui.profileInfo}
           </h2>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-5">
             <FieldRow label={ui.name} value={name} icon={RiUser3Line} />
             <FieldRow label={ui.email} value={email} icon={RiMailLine} />
             <FieldRow label={ui.phone} value={phone} icon={RiPhoneLine} dir="ltr" />
@@ -159,11 +158,11 @@ export default function AccountDetails() {
 
         {/* Change password */}
         <section className="flex-1">
-          <h2 className="text-sm font-bold text-[var(--ink)] mb-4 flex items-center gap-x-2">
+          <h2 className="text-sm font-bold text-[var(--ink)] mb-7 flex items-center gap-x-2">
             <RiShieldKeyholeLine size={16} className="text-[var(--brand)]" />
             {ui.security}
           </h2>
-          <form onSubmit={handleChangePassword} className="flex flex-col gap-y-3">
+          <form onSubmit={handleChangePassword} className="flex flex-col gap-y-5">
             <div className="flex flex-col gap-y-1.5">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wide">{ui.newPassword}</label>
               <div className="relative">
@@ -202,7 +201,7 @@ export default function AccountDetails() {
             <button
               type="submit"
               disabled={changePassword.isPending}
-              className="h-11 px-6 rounded-md bg-[var(--brand)] text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-60 self-end"
+              className="h-11 px-6 rounded-md bg-[var(--brand)] text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-60 self-end mt-2"
             >
               {changePassword.isPending ? ui.saving : ui.changePassword}
             </button>

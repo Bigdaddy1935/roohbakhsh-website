@@ -77,39 +77,41 @@ export default function MyCourses() {
           {courses.map((c) => (
             <div
               key={c.courseId}
-              className="group flex flex-col rounded-lg overflow-hidden bg-gray-50 hover:shadow-lg transition-all duration-300"
+              className="group flex flex-col rounded-lg overflow-hidden border border-gray-200 hover:border-[var(--brand)]/40 transition-colors duration-300 bg-white p-3"
             >
               {/* Thumbnail */}
-              <div className="aspect-video bg-gradient-to-br from-[var(--brand)]/20 via-[var(--brand)]/10 to-transparent flex items-center justify-center">
+              <div className="aspect-video bg-[var(--brand)]/8 flex items-center justify-center rounded-lg overflow-hidden">
                 <RiPlayCircleLine
-                  size={40}
-                  className="text-[var(--brand)]/40 group-hover:text-[var(--brand)]/70 transition-colors duration-300"
+                  size={36}
+                  className="text-[var(--brand)]/30 group-hover:text-[var(--brand)]/60 transition-colors duration-300"
                 />
               </div>
 
               {/* Content */}
-              <div className="p-4 flex-1 flex flex-col gap-y-3">
+              <div className="px-4 pt-4 pb-3 flex-1 flex flex-col gap-y-3">
                 <p className="text-sm font-semibold text-[var(--ink)] line-clamp-2 leading-relaxed">
                   {c.title[locale]}
                 </p>
                 {/* Progress */}
-                <div className="flex items-center gap-x-2 mt-auto">
-                  <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div className="flex items-center gap-x-2 mt-4">
+                  <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
                     <div className="h-full bg-[var(--brand)] rounded-full w-0" />
                   </div>
-                  <span className="text-[11px] text-gray-400 shrink-0">0%</span>
+                  <span className="text-xs text-gray-500 shrink-0 font-medium">0%</span>
                 </div>
               </div>
 
               {/* Continue button */}
-              <Link
-                href={`/courses/${c.courseId}`}
-                className="flex items-center justify-center gap-x-2 py-3 bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
-              >
-                <RiPlayCircleLine size={16} />
-                {ui.continueLearning}
-                <RiArrowLeftSLine size={16} />
-              </Link>
+              <div className="px-0 pb-0 pt-3">
+                <Link
+                  href={`/courses/${c.courseId}`}
+                  className="flex items-center justify-center gap-x-2 h-9 rounded-md bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+                >
+                  <RiPlayCircleLine size={15} />
+                  {ui.continueLearning}
+                  <RiArrowLeftSLine size={15} />
+                </Link>
+              </div>
             </div>
           ))}
         </div>

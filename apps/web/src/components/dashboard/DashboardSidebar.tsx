@@ -75,7 +75,7 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
     <>
       {/* User card */}
       <div className="flex items-center gap-x-3 p-3 mb-5 rounded-lg bg-gradient-to-l from-[var(--brand)]/8 to-[var(--brand)]/4">
-        <div className="size-10 rounded-md bg-[var(--brand)] flex items-center justify-center shrink-0 shadow-md shadow-[var(--brand)]/30">
+        <div className="size-10 rounded-md bg-[var(--brand)] flex items-center justify-center shrink-0">
           <RiUserLine size={20} className="text-white" />
         </div>
         <div className="flex flex-col min-w-0">
@@ -92,7 +92,7 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
       </p>
 
       {/* Nav */}
-      <nav className="flex flex-col gap-y-0.5">
+      <nav className="flex flex-col gap-y-1">
         {NAV.map(({ key, href, Icon }) => {
           const active = isActive(href);
           return (
@@ -107,12 +107,12 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
               }`}
             >
               <span className="relative shrink-0">
-                <Icon size={20} />
+                <Icon size={22} />
                 {key === "notifications" && hasUnread && (
                   <span className="absolute -top-0.5 -end-0.5 size-2 rounded-full bg-[var(--cta)]" />
                 )}
               </span>
-              <span className={`text-sm ${active ? "font-bold" : "font-medium"}`}>
+              <span className={`text-[15px] ${active ? "font-bold" : "font-medium"}`}>
                 {ui[key]}
               </span>
               {active && (
@@ -131,8 +131,8 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
           disabled={logout.isPending}
           className="flex items-center gap-x-3 px-3 py-2.5 w-full rounded-md text-red-400 hover:bg-red-50 hover:text-red-500 transition-all duration-200 disabled:opacity-60 cursor-pointer"
         >
-          <RiShutDownLine size={20} />
-          <span className="text-sm font-medium">
+          <RiShutDownLine size={22} />
+          <span className="text-[15px] font-medium">
             {logout.isPending ? `${ui.logout}...` : ui.logout}
           </span>
         </button>
