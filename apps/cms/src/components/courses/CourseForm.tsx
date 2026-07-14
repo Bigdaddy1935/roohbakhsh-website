@@ -11,7 +11,7 @@ import TextEditor from "@/components/ui/TextEditor";
 import DateField from "@/components/ui/DateField";
 import SwitchField from "@/components/ui/SwitchField";
 import SelectField from "@/components/ui/SelectField";
-import ImageUploadField from "@/components/ui/ImageUploadField";
+import GalleryImageField from "@/components/ui/GalleryImageField";
 import { RiArrowRightLine, RiSaveLine } from "react-icons/ri";
 
 export interface CourseFormValues {
@@ -130,12 +130,13 @@ export default function CourseForm({ title, initialValues, onSubmit, isPending }
             <h2 className="text-sm font-bold text-gray-600 border-b border-gray-100 pb-3">
               رسانه — {locale === "ar" ? "عربی" : "اردو"}
             </h2>
-            <ImageUploadField
+            <GalleryImageField
               label=""
               value={thumbnail}
               onChange={(url) =>
                 locale === "ar" ? set("thumbnailAr", url) : set("thumbnailUr", url)
               }
+              category="courses"
             />
             <FormField
               label="ویدیوی معرفی"

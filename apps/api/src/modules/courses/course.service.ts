@@ -315,7 +315,7 @@ export class CourseService {
     const hasFavorite = await this.favoriteRepo.exists({ where: { type: "course", targetId: id } });
     if (hasFavorite) throw new BadRequestException("COURSE_IN_FAVORITES");
 
-    const lessonIds = (await this.lessonRepo.find({ where: { courseId: id }, select: ["id"] })).map((l) => l.id);
+    const lessonIds = (await this.lessonRepo.find({ where: { courseId: id }, select: { id: true } })).map((l) => l.id);
     if (lessonIds.length > 0) {
       const hasProgress = await this.lessonProgressRepo.exists({ where: lessonIds.map((lid) => ({ courseId: id, lessonId: lid })) });
       if (hasProgress) throw new BadRequestException("COURSE_HAS_LESSON_PROGRESS");

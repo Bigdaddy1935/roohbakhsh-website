@@ -8,7 +8,7 @@ import LocalizedInput from "@/components/ui/LocalizedInput";
 import FormField from "@/components/ui/FormField";
 import SelectField from "@/components/ui/SelectField";
 import TextEditor from "@/components/ui/TextEditor";
-import ImageUploadField from "@/components/ui/ImageUploadField";
+import GalleryImageField from "@/components/ui/GalleryImageField";
 import { RiArrowRightLine, RiSaveLine } from "react-icons/ri";
 
 export interface ArticleFormValues {
@@ -160,16 +160,18 @@ export default function ArticleForm({ title, initialValues, onSubmit, isPending 
               تصویر کاور — {locale === "ar" ? "عربی" : "اردو"}
             </h2>
             {locale === "ar" ? (
-              <ImageUploadField
+              <GalleryImageField
                 label=""
                 value={form.thumbnailAr}
                 onChange={(url) => set("thumbnailAr", url)}
+                category="articles"
               />
             ) : (
-              <ImageUploadField
+              <GalleryImageField
                 label=""
                 value={form.thumbnailUr}
                 onChange={(url) => set("thumbnailUr", url)}
+                category="articles"
               />
             )}
           </div>

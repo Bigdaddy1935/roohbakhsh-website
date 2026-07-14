@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Localized, StaffType } from "@roohbakhsh/shared";
 import LocalizedInput from "@/components/ui/LocalizedInput";
 import FormField from "@/components/ui/FormField";
-import ImageUploadField from "@/components/ui/ImageUploadField";
+import GalleryImageField from "@/components/ui/GalleryImageField";
 import { RiArrowRightLine, RiSaveLine } from "react-icons/ri";
 
 export interface InstructorFormValues {
@@ -98,7 +98,7 @@ export default function InstructorForm({ title, initialValues, onSubmit, isPendi
           </div>
           <div className="bg-white rounded-[20px] p-6 space-y-5">
             <h2 className="text-sm font-bold text-gray-600 border-b border-gray-100 pb-3">تصویر</h2>
-            <ImageUploadField label="تصویر پروفایل" value={form.avatarUrl} onChange={(url) => set("avatarUrl", url)} />
+            <GalleryImageField label="تصویر پروفایل" value={form.avatarUrl} onChange={(url) => set("avatarUrl", url)} category="staff" />
           </div>
         </div>
       </div>

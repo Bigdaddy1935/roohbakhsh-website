@@ -8,6 +8,7 @@ import {
   RiBookOpenLine,
   RiUserStarLine,
   RiPriceTagLine,
+  RiImageLine,
   RiArticleLine,
   RiTeamLine,
   RiShoppingCartLine,
@@ -23,6 +24,7 @@ import { useLogout } from "@/hooks/queries/use-auth";
 const NAV_ITEMS = [
   { href: "/dashboard", label: "داشبورد", icon: RiDashboardLine, exact: true },
   { href: "/dashboard/courses", label: "دوره‌ها", icon: RiBookOpenLine },
+  { href: "/dashboard/gallery", label: "گالری", icon: RiImageLine },
   { href: "/dashboard/instructors", label: "کارمندان", icon: RiUserStarLine },
   { href: "/dashboard/categories", label: "دسته‌بندی‌ها", icon: RiPriceTagLine },
   { href: "/dashboard/articles", label: "مقالات", icon: RiArticleLine },
