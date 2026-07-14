@@ -35,7 +35,13 @@ async function bootstrap() {
   const corsOrigins = envConfig.get("CORS_ORIGINS", { infer: true })!.split(",").map((o) => o.trim());
   app.enableCors({ origin: corsOrigins, credentials: true });
   // فایل‌های آپلودشده روی دیسک لوکال (fallback وقتی FTP در دسترس نیست) — خارج از پیشوند /api
-  app.useStaticAssets(join(process.cwd(), "uploads"), { prefix: "/uploads" });
+  // سرآیند Cross-Origin-Resource-Policy: cross-origin لازم است تا CMS (پورت دیگر) بتواند تصاویر را load کند
+  app.useStaticAssets(join(process.cwd(), "uploads"), {
+    prefix: "/uploads",
+    setHeaders: (res) => {
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    },
+  });
   app.setGlobalPrefix("api");
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
