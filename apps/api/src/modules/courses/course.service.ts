@@ -13,6 +13,8 @@ import { Lesson } from "./entities/lesson.entity";
 import { Instructor } from "../instructor/entities/instructor.entity";
 import { Category } from "../category/entities/category.entity";
 import { OrderItem } from "../orders/entities/order-item.entity";
+import { Favorite } from "../favorites/entities/favorite.entity";
+import { LessonProgress } from "../progress/entities/lesson-progress.entity";
 import { ReviewsService } from "../reviews/reviews.service";
 import { CourseAccessService } from "./course-access.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
@@ -47,6 +49,10 @@ export class CourseService {
     private readonly categoryRepo: Repository<Category>,
     @InjectRepository(OrderItem)
     private readonly orderItemRepo: Repository<OrderItem>,
+    @InjectRepository(Favorite)
+    private readonly favoriteRepo: Repository<Favorite>,
+    @InjectRepository(LessonProgress)
+    private readonly lessonProgressRepo: Repository<LessonProgress>,
     private readonly reviewsService: ReviewsService,
     private readonly courseAccessService: CourseAccessService,
   ) {}
@@ -302,6 +308,22 @@ export class CourseService {
   async remove(id: string): Promise<void> {
     const course = await this.repo.findOne({ where: { id } });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
+
+    const hasOrders = await this.orderItemRepo.exists({ where: { courseId: id } });
+    if (hasOrders) throw new BadRequestException("COURSE_HAS_ORDERS");
+
+    const hasFavorite = await this.favoriteRepo.exists({ where: { type: "course", targetId: id } });
+    if (hasFavorite) throw new BadRequestException("COURSE_IN_FAVORITES");
+
+    const lessonIds = (await this.lessonRepo.find({ where: { courseId: id }, select: ["id"] })).map((l) => l.id);
+    if (lessonIds.length > 0) {
+      const hasProgress = await this.lessonProgressRepo.exists({ where: lessonIds.map((lid) => ({ courseId: id, lessonId: lid })) });
+      if (hasProgress) throw new BadRequestException("COURSE_HAS_LESSON_PROGRESS");
+
+      const hasLessonFavorite = await this.favoriteRepo.exists({ where: lessonIds.map((lid) => ({ type: "lesson" as const, targetId: lid })) });
+      if (hasLessonFavorite) throw new BadRequestException("COURSE_HAS_LESSON_IN_FAVORITES");
+    }
+
     await this.repo.remove(course);
   }
 

@@ -81,21 +81,21 @@ export default function DashboardPage() {
     <div>
       <PageHeader title="داشبورد" description="نگاه کلی به وضعیت آکادمی روح‌بخش" />
 
-      <AdminMonthlyChart />
-
       {isLoading ? (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4 mb-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="bg-white border border-gray-100 rounded-[20px] p-5 h-24 animate-pulse" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4 mb-6">
           {cards.map((card) => (
             <StatCard key={card.label} {...card} />
           ))}
         </div>
       )}
+
+      <AdminMonthlyChart />
     </div>
   );
 }

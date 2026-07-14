@@ -1,25 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { Key } from "@heroui/react";
 import type { User, UserRole } from "@roohbakhsh/shared";
 import { useUsers } from "@/hooks/queries/use-users";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 import { Select, ListBox } from "@heroui/react";
-import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
-import StatusBadge from "@/components/ui/StatusBadge";
 import SwitchField from "@/components/ui/SwitchField";
+import { RiUserAddLine } from "react-icons/ri";
 
-const ROLE_MAP = {
-  admin: { label: "ادمین", color: "bg-purple-50 text-purple-700" },
-  instructor: { label: "استاد", color: "bg-blue-50 text-blue-700" },
-  user: { label: "کاربر", color: "bg-gray-100 text-gray-500" },
-};
 
 export default function UsersPage() {
   const [page, setPage] = useState(1);
+  const router = useRouter();
   const { data, isLoading } = useUsers({ page, limit: 15 });
   const qc = useQueryClient();
 
@@ -59,6 +55,7 @@ export default function UsersPage() {
             <ListBox className="text-right" dir="rtl">
               <ListBox.Item id="user" textValue="کاربر" className="text-right" dir="rtl">کاربر<ListBox.ItemIndicator /></ListBox.Item>
               <ListBox.Item id="instructor" textValue="استاد" className="text-right" dir="rtl">استاد<ListBox.ItemIndicator /></ListBox.Item>
+              <ListBox.Item id="author" textValue="نویسنده" className="text-right" dir="rtl">نویسنده<ListBox.ItemIndicator /></ListBox.Item>
               <ListBox.Item id="admin" textValue="ادمین" className="text-right" dir="rtl">ادمین<ListBox.ItemIndicator /></ListBox.Item>
             </ListBox>
           </Select.Popover>
@@ -76,16 +73,23 @@ export default function UsersPage() {
         />
       ),
     },
-    {
-      key: "createdAt",
-      label: "تاریخ عضویت",
-      render: (r: User) => (r as User & { createdAt?: string }).createdAt?.slice(0, 10) ?? "-",
-    },
   ];
 
   return (
-    <div>
-      <PageHeader title="کاربران" description="مدیریت کاربران سایت" />
+    <div className="space-y-6">
+      <div className="flex items-center justify-between bg-white border border-gray-100 rounded-[20px] px-5 h-[105px]">
+        <div>
+          <h1 className="text-xl font-extrabold text-[var(--ink)]">کاربران</h1>
+          <p className="text-sm text-gray-400 mt-0.5">مدیریت کاربران سایت</p>
+        </div>
+        <button
+          onClick={() => router.push("/dashboard/users/new")}
+          className="flex items-center gap-2 px-5 py-2.5 text-sm rounded-full bg-[var(--brand)] text-white hover:opacity-90 transition-colors"
+        >
+          <RiUserAddLine size={16} />
+          افزودن کاربر
+        </button>
+      </div>
 
       <DataTable
         columns={columns as Parameters<typeof DataTable>[0]["columns"]}
@@ -95,6 +99,7 @@ export default function UsersPage() {
         totalPages={totalPages}
         onPageChange={setPage}
       />
+
     </div>
   );
 }

@@ -23,7 +23,7 @@ import { useLogout } from "@/hooks/queries/use-auth";
 const NAV_ITEMS = [
   { href: "/dashboard", label: "داشبورد", icon: RiDashboardLine, exact: true },
   { href: "/dashboard/courses", label: "دوره‌ها", icon: RiBookOpenLine },
-  { href: "/dashboard/instructors", label: "اساتید", icon: RiUserStarLine },
+  { href: "/dashboard/instructors", label: "کارمندان", icon: RiUserStarLine },
   { href: "/dashboard/categories", label: "دسته‌بندی‌ها", icon: RiPriceTagLine },
   { href: "/dashboard/articles", label: "مقالات", icon: RiArticleLine },
   { href: "/dashboard/users", label: "کاربران", icon: RiTeamLine },
@@ -47,10 +47,10 @@ const Sidebar = forwardRef<HTMLElement>(function Sidebar(_props, ref) {
   }
 
   return (
-    <aside ref={ref} className="w-[var(--sidebar-w)] shrink-0 bg-white border border-gray-100 rounded-[20px] max-h-[90vh] flex flex-col overflow-hidden self-center">
+    <aside ref={ref} className="w-[var(--sidebar-w)] shrink-0 bg-white border border-gray-100 rounded-[20px] max-h-[90vh] flex flex-col overflow-hidden sticky top-12">
 
       {/* Logo */}
-      <div className="flex items-center justify-center py-6 px-4 border-b border-gray-100">
+      <div className="flex items-center justify-center h-[105px] px-4 border-b border-gray-100 shrink-0">
         <img src="https://roohbakhshac.ir/logo.png" alt="روح‌بخش" className="h-14 object-contain" />
       </div>
 

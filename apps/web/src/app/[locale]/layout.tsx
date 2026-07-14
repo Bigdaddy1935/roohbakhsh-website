@@ -7,6 +7,7 @@ import type { Locale } from "@roohbakhsh/shared";
 import { dirForLocale } from "@/core/utils/dir";
 import { SITE_URL } from "@/lib/seo";
 import { Toaster } from "sonner";
+import ServiceWorkerRegister from "@/components/core/ServiceWorkerRegister";
 import "@/core/styles/globals.css";
 
 const almarai = Almarai({
@@ -76,6 +77,7 @@ export default async function LocaleLayout({
       <body>
         <QueryProvider>
           <NextIntlClientProvider messages={messages}>
+            <ServiceWorkerRegister />
             {children}
             <Toaster
               position="top-center"

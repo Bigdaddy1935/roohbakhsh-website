@@ -150,12 +150,13 @@ export function useCreateLesson(courseSlug: string, sectionId: string) {
   });
 }
 
-export function useUpdateLesson(courseSlug: string, sectionId: string, lessonId: string) {
+export function useUpdateLesson(courseSlug: string, sectionId: string) {
   const qc = useQueryClient();
-  return useMutation<Lesson, Error, UpdateLessonRequest>({
-    mutationFn: (body) =>
+  return useMutation<Lesson, Error, UpdateLessonRequest & { lessonId: string }>({
+    mutationFn: ({ lessonId, ...body }) =>
       api.patch<Lesson>(`/courses/${courseSlug}/sections/${sectionId}/lessons/${lessonId}`, body),
-    onSuccess: () => {
+    onSuccess: (_data, { lessonId }) => {
+      qc.invalidateQueries({ queryKey: courseKeys.sections(courseSlug) });
       qc.invalidateQueries({ queryKey: courseKeys.lessons(courseSlug, sectionId) });
       qc.invalidateQueries({ queryKey: courseKeys.lesson(courseSlug, sectionId, lessonId) });
     },

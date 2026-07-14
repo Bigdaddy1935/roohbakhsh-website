@@ -35,6 +35,7 @@ export class InstructorService {
       slug: dto.slug,
       avatarUrl: dto.avatarUrl,
       bio: dto.bio ?? null,
+      staffType: dto.staffType ?? "instructor",
     });
     return this.toContract(await this.repo.save(inst));
   }
@@ -51,6 +52,7 @@ export class InstructorService {
     if (dto.slug !== undefined) inst.slug = dto.slug;
     if (dto.avatarUrl !== undefined) inst.avatarUrl = dto.avatarUrl;
     if (dto.bio !== undefined) inst.bio = dto.bio ?? null;
+    if (dto.staffType !== undefined) inst.staffType = dto.staffType;
 
     return this.toContract(await this.repo.save(inst));
   }
@@ -73,6 +75,7 @@ export class InstructorService {
       slug: inst.slug,
       avatarUrl: inst.avatarUrl,
       bio: inst.bio,
+      staffType: inst.staffType,
       createdAt: inst.createdAt.toISOString(),
       updatedAt: inst.updatedAt.toISOString(),
     };

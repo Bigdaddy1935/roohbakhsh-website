@@ -822,12 +822,12 @@ interface ReviewWithTarget extends ReviewRecord {
 |--------|------|------|-------|
 | `POST` | `/tickets` | کاربر یا مهمان | ثبت تیکت جدید — مهمان باید `guestEmail` بفرستد |
 | `GET` | `/tickets/mine` | کاربر لاگین‌شده | تیکت‌های من (صفحه‌بندی) |
-| `GET` | `/tickets` | Admin | همه‌ی تیکت‌ها (صفحه‌بندی) |
+| `GET` | `/tickets` | Admin | همه‌ی تیکت‌ها (صفحه‌بندی) — پاسخ `PaginatedAdminTickets` با اطلاعات کاربر |
 | `GET` | `/tickets/:id` | صاحب تیکت یا admin | جزئیات یک تیکت با همه‌ی پیام‌ها |
 | `POST` | `/tickets/:id/reply` | صاحب تیکت یا admin | پاسخ — پاسخ admin وضعیت را `answered` می‌کند |
 | `POST` | `/tickets/:id/close` | صاحب تیکت یا admin | بستن تیکت |
 
-### شیء Ticket
+### شیء Ticket / AdminTicket
 
 ```ts
 interface Ticket {
@@ -839,6 +839,11 @@ interface Ticket {
   createdAt: ISODate;
   updatedAt: ISODate;
   messages: { id: string; body: string; authorType: "user" | "support"; createdAt: ISODate }[];
+}
+
+// نسخه‌ی Admin — برگشتی از GET /tickets (ادمین)
+interface AdminTicket extends Ticket {
+  user: { id: string; fullName: string; email: string } | null;
 }
 ```
 

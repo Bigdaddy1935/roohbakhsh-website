@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
-import type { PaginatedOrders } from "@roohbakhsh/shared";
+import type { PaginatedAdminOrders } from "@roohbakhsh/shared";
 
 export const orderKeys = {
   adminList: (params?: Record<string, unknown>) => ["orders", "admin-list", params] as const,
@@ -14,8 +14,8 @@ export function useOrdersAdmin(params?: { page?: number; limit?: number }) {
   if (params?.limit) qs.set("limit", String(params.limit));
   const query = qs.toString() ? `?${qs}` : "";
 
-  return useQuery<PaginatedOrders>({
+  return useQuery<PaginatedAdminOrders>({
     queryKey: orderKeys.adminList(params),
-    queryFn: () => api.get<PaginatedOrders>(`/orders${query}`),
+    queryFn: () => api.get<PaginatedAdminOrders>(`/orders${query}`),
   });
 }

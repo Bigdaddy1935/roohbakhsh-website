@@ -46,7 +46,7 @@ function SectionCard({ section, courseSlug }: { section: SectionRecord; courseSl
   const updateSectionMut = useUpdateSection(courseSlug, section.id);
   const deleteSectionMut = useDeleteSection(courseSlug);
   const createLessonMut = useCreateLesson(courseSlug, section.id);
-  const updateLessonMut = useUpdateLesson(courseSlug, section.id, editingLesson?.id ?? "");
+  const updateLessonMut = useUpdateLesson(courseSlug, section.id);
   const deleteLessonMut = useDeleteLesson(courseSlug, section.id);
 
   function openEditSection() {
@@ -91,7 +91,7 @@ function SectionCard({ section, courseSlug }: { section: SectionRecord; courseSl
       durationMinutes: Number(lessonForm.durationMinutes) || 0,
       isFreePreview: lessonForm.isFreePreview,
     };
-    if (editingLesson) await updateLessonMut.mutateAsync(payload);
+    if (editingLesson) await updateLessonMut.mutateAsync({ ...payload, lessonId: editingLesson.id });
     else await createLessonMut.mutateAsync(payload);
     setLessonModalOpen(false);
   }

@@ -10,7 +10,7 @@ import type { FavoriteItem } from "./favorite";
 import type { CourseProgress } from "./progress";
 import type { NotificationItem } from "./notification";
 
-export type UserRole = "user" | "instructor" | "admin";
+export type UserRole = "user" | "instructor" | "author" | "admin";
 
 /** کاربر — همان چیزی که در داشبورد کاربری نمایش داده می‌شود. */
 export interface User {

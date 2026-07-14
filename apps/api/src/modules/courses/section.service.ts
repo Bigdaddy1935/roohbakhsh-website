@@ -1,12 +1,15 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import type { SectionRecord } from "@roohbakhsh/shared";
 import { Section } from "./entities/section.entity";
+import { Lesson } from "./entities/lesson.entity";
 import { Course } from "./entities/course.entity";
 import { CreateSectionDto } from "./dto/create-section.dto";
 import { UpdateSectionDto } from "./dto/update-section.dto";
 import { CourseAccessService } from "./course-access.service";
+import { LessonProgress } from "../progress/entities/lesson-progress.entity";
+import { Favorite } from "../favorites/entities/favorite.entity";
 
 @Injectable()
 export class SectionService {
@@ -15,6 +18,12 @@ export class SectionService {
     private readonly sectionRepo: Repository<Section>,
     @InjectRepository(Course)
     private readonly courseRepo: Repository<Course>,
+    @InjectRepository(Lesson)
+    private readonly lessonRepo: Repository<Lesson>,
+    @InjectRepository(LessonProgress)
+    private readonly progressRepo: Repository<LessonProgress>,
+    @InjectRepository(Favorite)
+    private readonly favoriteRepo: Repository<Favorite>,
     private readonly courseAccess: CourseAccessService,
   ) {}
 
@@ -72,6 +81,24 @@ export class SectionService {
     const course = await this.courseBySlugOrId(courseSlug);
     const section = await this.sectionRepo.findOne({ where: { id: sectionId, courseId: course.id } });
     if (!section) throw new NotFoundException("SECTION_NOT_FOUND");
+
+    const lessons = await this.lessonRepo.find({ where: { sectionId }, select: { id: true } });
+    const lessonIds = lessons.map((l) => l.id);
+
+    if (lessonIds.length > 0) {
+      const hasProgress = await this.progressRepo
+        .createQueryBuilder("p")
+        .where("p.lessonId IN (:...ids)", { ids: lessonIds })
+        .getExists();
+      if (hasProgress) throw new BadRequestException("SECTION_LESSONS_HAVE_PROGRESS");
+
+      const hasFavorite = await this.favoriteRepo
+        .createQueryBuilder("f")
+        .where("f.type = 'lesson' AND f.targetId IN (:...ids)", { ids: lessonIds })
+        .getExists();
+      if (hasFavorite) throw new BadRequestException("SECTION_LESSONS_IN_FAVORITES");
+    }
+
     await this.sectionRepo.remove(section);
     await this.reorderSections(course.id);
   }

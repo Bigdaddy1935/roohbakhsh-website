@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import type { PaymentRecord } from "@roohbakhsh/shared";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import type { AdminPaymentRecord } from "@roohbakhsh/shared";
 import { usePaymentLogs, usePaymentsPending, useApprovePayment, useRejectPayment } from "@/hooks/queries/use-payments";
-import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -15,79 +15,78 @@ const STATUS_MAP = {
   failed: { label: "ناموفق", color: "bg-red-50 text-red-700" },
 };
 
-function PendingManualPayments() {
+function PendingTab() {
   const { data, isLoading } = usePaymentsPending({ page: 1, limit: 50 });
   const approveMut = useApprovePayment();
   const rejectMut = useRejectPayment();
-  const [rejectTarget, setRejectTarget] = useState<PaymentRecord | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<AdminPaymentRecord | null>(null);
 
   const items = data?.items ?? [];
 
-  if (!isLoading && items.length === 0) return null;
+  if (isLoading) return <p className="text-sm text-gray-400 py-10 text-center">در حال بارگذاری...</p>;
+
+  if (items.length === 0)
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
+        <p className="text-sm text-gray-400">پرداخت کارت‌به‌کارت منتظر تأیید وجود ندارد</p>
+      </div>
+    );
 
   return (
-    <div className="bg-white border border-gray-100 rounded-[20px] p-6 mb-6">
-      <h2 className="text-base font-bold text-[var(--ink)] mb-4">پرداخت‌های کارت‌به‌کارت منتظر تأیید</h2>
-
-      {isLoading ? (
-        <p className="text-sm text-gray-400">در حال بارگذاری...</p>
-      ) : (
-        <div className="flex flex-col gap-3">
-          {items.map((p) => (
-            <div key={p.id} className="border border-gray-100 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-                <div>
-                  <span className="block text-xs text-gray-400 mb-0.5">مبلغ</span>
-                  <span className="font-bold text-[var(--ink)]">{p.amount.amountMinor.toLocaleString("fa-IR")} {p.amount.currency}</span>
-                </div>
-                <div>
-                  <span className="block text-xs text-gray-400 mb-0.5">کد رهگیری</span>
-                  <span className="font-mono text-xs">{p.trackingCode ?? "-"}</span>
-                </div>
-                <div>
-                  <span className="block text-xs text-gray-400 mb-0.5">شماره کارت مبدأ</span>
-                  <span className="font-mono text-xs" dir="ltr">{p.sourceCardNumber ?? "-"}</span>
-                </div>
-                <div>
-                  <span className="block text-xs text-gray-400 mb-0.5">زمان تراکنش</span>
-                  <span className="text-xs">{p.transferredAt ? p.transferredAt.slice(0, 16).replace("T", " ") : "-"}</span>
-                </div>
+    <>
+      <div className="flex flex-col gap-3">
+        {items.map((p) => (
+          <div key={p.id} className="bg-white border border-gray-100 rounded-[20px] p-5 flex flex-col gap-4">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="font-bold text-[var(--ink)] text-sm">{p.user?.fullName ?? "-"}</p>
+                <p className="text-xs text-gray-400">{p.user?.email ?? ""}</p>
               </div>
-
+              <span className="font-bold text-[var(--brand)] text-sm whitespace-nowrap">{p.amount.amountMinor.toLocaleString("fa-IR")} {p.amount.currency}</span>
+            </div>
+            {p.courses.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {p.courses.map((c) => (
+                  <span key={c.id} className="px-2.5 py-1 text-xs rounded-full bg-gray-50 border border-gray-100 text-gray-600">{c.title}</span>
+                ))}
+              </div>
+            )}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+              <div>
+                <span className="block text-xs text-gray-400 mb-0.5">کد رهگیری</span>
+                <span className="font-mono text-xs">{p.trackingCode ?? "-"}</span>
+              </div>
+              <div>
+                <span className="block text-xs text-gray-400 mb-0.5">شماره کارت مبدأ</span>
+                <span className="font-mono text-xs" dir="ltr">{p.sourceCardNumber ?? "-"}</span>
+              </div>
+              <div>
+                <span className="block text-xs text-gray-400 mb-0.5">زمان تراکنش</span>
+                <span className="text-xs">{p.transferredAt ? new Intl.DateTimeFormat("fa-IR", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(p.transferredAt)) : "-"}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 border-t border-gray-100 pt-3">
               {p.receiptImageUrl && (
-                <a
-                  href={p.receiptImageUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1.5 text-xs text-[var(--brand)] hover:underline shrink-0"
-                >
+                <a href={p.receiptImageUrl} target="_blank" rel="noreferrer"
+                  className="flex items-center gap-1.5 text-xs text-[var(--brand)] hover:underline">
                   <RiImageLine size={16} />
                   مشاهده رسید
                 </a>
               )}
-
-              <div className="flex gap-2 shrink-0">
-                <button
-                  onClick={() => approveMut.mutate(p.id)}
-                  disabled={approveMut.isPending || rejectMut.isPending}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
-                >
-                  <RiCheckLine size={16} />
-                  تأیید
+              <div className="flex gap-2 mr-auto">
+                <button onClick={() => approveMut.mutate(p.id)} disabled={approveMut.isPending || rejectMut.isPending}
+                  className="flex items-center gap-1.5 px-4 py-1.5 text-xs rounded-full bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50">
+                  <RiCheckLine size={15} /> تأیید
                 </button>
-                <button
-                  onClick={() => setRejectTarget(p)}
-                  disabled={approveMut.isPending || rejectMut.isPending}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50"
-                >
-                  <RiCloseLine size={16} />
-                  رد
+                <button onClick={() => setRejectTarget(p)} disabled={approveMut.isPending || rejectMut.isPending}
+                  className="flex items-center gap-1.5 px-4 py-1.5 text-xs rounded-full bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50">
+                  <RiCloseLine size={15} /> رد
                 </button>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        ))}
+      </div>
 
       <ConfirmModal
         isOpen={!!rejectTarget}
@@ -97,11 +96,11 @@ function PendingManualPayments() {
         title="رد پرداخت"
         description="کاربر باید دوباره اطلاعات پرداخت را ارسال کند. مطمئنید؟"
       />
-    </div>
+    </>
   );
 }
 
-export default function PaymentsPage() {
+function LogsTab() {
   const [page, setPage] = useState(1);
   const { data, isLoading } = usePaymentLogs({ page, limit: 15 });
 
@@ -110,57 +109,107 @@ export default function PaymentsPage() {
 
   const columns = [
     {
-      key: "id",
-      label: "شناسه",
-      render: (r: PaymentRecord) => (
-        <span className="font-mono text-xs">{r.id.slice(0, 8)}</span>
+      key: "user",
+      label: "کاربر",
+      render: (r: AdminPaymentRecord) => (
+        <div>
+          <p className="text-sm font-medium text-[var(--ink)]">{r.user?.fullName ?? "-"}</p>
+          <p className="text-xs text-gray-400">{r.user?.email ?? ""}</p>
+        </div>
       ),
     },
     {
-      key: "orderId",
-      label: "سفارش",
-      render: (r: PaymentRecord) => (
-        <span className="font-mono text-xs">{r.orderId.slice(0, 8)}</span>
-      ),
+      key: "courses",
+      label: "دوره‌ها",
+      render: (r: AdminPaymentRecord) =>
+        r.courses.length > 0 ? (
+          <div className="flex flex-col gap-0.5">
+            {r.courses.map((c) => (
+              <span key={c.id} className="text-xs text-gray-600">{c.title}</span>
+            ))}
+          </div>
+        ) : <span className="text-xs text-gray-400">-</span>,
     },
-    { key: "userId", label: "کاربر", render: (r: PaymentRecord) => r.userId },
     {
       key: "method",
       label: "روش",
-      render: (r: PaymentRecord) => (r.method === "card_to_card" ? "کارت‌به‌کارت" : "درگاه"),
+      render: (r: AdminPaymentRecord) => (r.method === "card_to_card" ? "کارت‌به‌کارت" : "درگاه"),
     },
     {
       key: "amount",
       label: "مبلغ",
-      render: (r: PaymentRecord) =>
-        r.amount ? `${r.amount.amountMinor} ${r.amount.currency}` : "-",
+      render: (r: AdminPaymentRecord) =>
+        r.amount ? `${r.amount.amountMinor.toLocaleString("fa-IR")} ${r.amount.currency}` : "-",
     },
     {
       key: "status",
       label: "وضعیت",
-      render: (r: PaymentRecord) => <StatusBadge status={r.status} map={STATUS_MAP} />,
+      render: (r: AdminPaymentRecord) => <StatusBadge status={r.status} map={STATUS_MAP} />,
     },
     {
       key: "createdAt",
       label: "تاریخ",
-      render: (r: PaymentRecord) => r.createdAt.slice(0, 10),
+      render: (r: AdminPaymentRecord) => new Intl.DateTimeFormat("fa-IR", { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(r.createdAt)),
     },
   ];
 
   return (
-    <div>
-      <PageHeader title="پرداخت‌ها" description="بررسی و تأیید تراکنش‌های پرداخت" />
+    <DataTable
+      columns={columns as Parameters<typeof DataTable>[0]["columns"]}
+      data={items}
+      isLoading={isLoading}
+      page={page}
+      totalPages={totalPages}
+      onPageChange={setPage}
+    />
+  );
+}
 
-      <PendingManualPayments />
+type Tab = "logs" | "pending";
 
-      <DataTable
-        columns={columns as Parameters<typeof DataTable>[0]["columns"]}
-        data={items}
-        isLoading={isLoading}
-        page={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-      />
+export default function PaymentsPage() {
+  const searchParams = useSearchParams();
+  const [tab, setTab] = useState<Tab>(() =>
+    searchParams.get("tab") === "pending" ? "pending" : "logs"
+  );
+
+  useEffect(() => {
+    if (searchParams.get("tab") === "pending") setTab("pending");
+  }, [searchParams]);
+  const { data: pendingData } = usePaymentsPending({ page: 1, limit: 50 });
+  const pendingCount = pendingData?.total ?? 0;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between bg-white border border-gray-100 rounded-[20px] px-5 h-[105px]">
+        <div>
+          <h1 className="text-xl font-extrabold text-[var(--ink)]">پرداخت‌ها</h1>
+          <p className="text-sm text-gray-400 mt-0.5">بررسی و تأیید تراکنش‌های پرداخت</p>
+        </div>
+        <div className="flex gap-1 bg-gray-100 rounded-full p-1">
+          <button
+            onClick={() => setTab("logs")}
+            className={`px-4 py-1.5 text-sm rounded-full transition-colors ${tab === "logs" ? "bg-white text-[var(--ink)] font-bold shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+          >
+            همه تراکنش‌ها
+          </button>
+          <button
+            onClick={() => setTab("pending")}
+            className={`relative px-4 py-1.5 text-sm rounded-full transition-colors ${tab === "pending" ? "bg-white text-[var(--ink)] font-bold shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+          >
+            منتظر تأیید
+            {pendingCount > 0 && (
+              <span className="absolute -top-1 -left-1 w-4 h-4 text-[10px] flex items-center justify-center rounded-full bg-[var(--cta)] text-white font-bold">
+                {pendingCount}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
+
+      <div>
+        {tab === "logs" ? <LogsTab /> : <PendingTab />}
+      </div>
     </div>
   );
 }

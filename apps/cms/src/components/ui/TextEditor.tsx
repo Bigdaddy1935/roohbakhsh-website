@@ -58,7 +58,7 @@ export default function TextEditor({
       window.tinymce!.init({
         target: textareaRef.current,
         language: "fa",
-        height: 700,
+        height: 530,
         directionality: "rtl",
         content_style: `
           @font-face {

@@ -1,18 +1,19 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Modal } from "@heroui/react";
 import type { CouponRecord } from "@roohbakhsh/shared";
-import { useCoupons, useCreateCoupon, useUpdateCoupon, useDeleteCoupon } from "@/hooks/queries/use-coupons";
+import { useCoupons, useDeleteCoupon, useUpdateCoupon } from "@/hooks/queries/use-coupons";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
-import FormModal from "@/components/ui/FormModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
+import StatusBadge from "@/components/ui/StatusBadge";
 import FormField from "@/components/ui/FormField";
 import DateField from "@/components/ui/DateField";
 import SwitchField from "@/components/ui/SwitchField";
-import SelectField from "@/components/ui/SelectField";
-import StatusBadge from "@/components/ui/StatusBadge";
-import { RiEditLine, RiDeleteBinLine } from "react-icons/ri";
+import { RiEditLine, RiDeleteBinLine, RiSaveLine, RiCloseLine } from "react-icons/ri";
+import { toast } from "sonner";
 
 const ACTIVE_MAP = {
   true: { label: "فعال", color: "bg-green-50 text-green-700" },
@@ -23,47 +24,68 @@ const TYPE_MAP = {
   fixed: { label: "ثابت", color: "bg-yellow-50 text-yellow-700" },
 };
 
-const emptyCreate = { code: "", discountType: "percentage" as "percentage" | "fixed", discountValue: "", currency: "USD" as "USD" | "EUR" | "IRR", maxUses: "", expiresAt: "", isActive: true };
-const emptyEdit = { maxUses: "", expiresAt: "", isActive: true };
+function EditModal({ coupon, onClose }: { coupon: CouponRecord; onClose: () => void }) {
+  const updateMut = useUpdateCoupon(coupon.id);
+  const [maxUses, setMaxUses] = useState(coupon.maxUses != null ? String(coupon.maxUses) : "");
+  const [expiresAt, setExpiresAt] = useState(coupon.expiresAt ?? "");
+  const [isActive, setIsActive] = useState(coupon.isActive);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      await updateMut.mutateAsync({ maxUses: maxUses ? Number(maxUses) : null, expiresAt: expiresAt || null, isActive });
+      toast.success("کوپن با موفقیت ویرایش شد.");
+      onClose();
+    } catch {
+      toast.error("خطا در ویرایش کوپن.");
+    }
+  }
+
+  return (
+    <Modal isOpen onOpenChange={(open) => !open && onClose()}>
+      <Modal.Backdrop isDismissable={false}>
+        <Modal.Container placement="center" className="max-w-md w-full mx-4">
+          <Modal.Dialog className="bg-white rounded-[20px]">
+            <form onSubmit={handleSubmit}>
+              <Modal.Header className="flex items-center justify-between pb-4">
+                <div>
+                  <Modal.Heading className="text-base font-bold text-[var(--ink)]">ویرایش کوپن: {coupon.code}</Modal.Heading>
+                  <p className="text-xs text-gray-400 mt-0.5">تنظیمات کوپن را ویرایش کنید</p>
+                </div>
+                <Modal.CloseTrigger onClick={onClose} className="size-8 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors cursor-pointer">
+                  <RiCloseLine size={18} />
+                </Modal.CloseTrigger>
+              </Modal.Header>
+              <Modal.Body className="space-y-4">
+                <FormField label="حداکثر استفاده" type="number" value={maxUses} onChange={(e) => setMaxUses(e.target.value)} dir="ltr" />
+                <DateField label="تاریخ انقضا" value={expiresAt} onChange={setExpiresAt} />
+                <SwitchField label="فعال باشد" checked={isActive} onChange={setIsActive} />
+              </Modal.Body>
+              <Modal.Footer className="flex gap-2 justify-end pt-4">
+                <button type="button" onClick={onClose} className="px-4 py-2 text-sm rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">انصراف</button>
+                <button type="submit" disabled={updateMut.isPending} className="flex items-center gap-2 px-4 py-2 text-sm rounded-md bg-[var(--brand)] text-white hover:bg-[var(--brand)]/90 disabled:opacity-50 transition-colors">
+                  <RiSaveLine size={15} />
+                  {updateMut.isPending ? "در حال ذخیره..." : "ذخیره"}
+                </button>
+              </Modal.Footer>
+            </form>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
+    </Modal>
+  );
+}
 
 export default function CouponsPage() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const { data, isLoading } = useCoupons({ page, limit: 15 });
-  const createMut = useCreateCoupon();
   const deleteMut = useDeleteCoupon();
-
-  const [createOpen, setCreateOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<CouponRecord | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<CouponRecord | null>(null);
-  const [createForm, setCreateForm] = useState(emptyCreate);
-  const [editForm, setEditForm] = useState(emptyEdit);
+  const [editTarget, setEditTarget] = useState<CouponRecord | null>(null);
 
-  const updateMut = useUpdateCoupon(editTarget?.id ?? "");
   const items = data?.items ?? [];
   const totalPages = data?.totalPages ?? 1;
-
-  async function handleCreate(e: FormEvent) {
-    e.preventDefault();
-    await createMut.mutateAsync({
-      code: createForm.code, discountType: createForm.discountType,
-      discountValue: Number(createForm.discountValue), currency: createForm.currency,
-      maxUses: createForm.maxUses ? Number(createForm.maxUses) : undefined,
-      expiresAt: createForm.expiresAt || undefined, isActive: createForm.isActive,
-    });
-    setCreateOpen(false);
-    setCreateForm(emptyCreate);
-  }
-
-  async function handleEdit(e: FormEvent) {
-    e.preventDefault();
-    await updateMut.mutateAsync({ maxUses: editForm.maxUses ? Number(editForm.maxUses) : null, expiresAt: editForm.expiresAt || null, isActive: editForm.isActive });
-    setEditTarget(null);
-  }
-
-  function openEdit(item: CouponRecord) {
-    setEditTarget(item);
-    setEditForm({ maxUses: item.maxUses != null ? String(item.maxUses) : "", expiresAt: item.expiresAt ?? "", isActive: item.isActive });
-  }
 
   const columns = [
     { key: "code", label: "کد" },
@@ -76,8 +98,12 @@ export default function CouponsPage() {
       key: "actions", label: "عملیات",
       render: (r: CouponRecord) => (
         <div className="flex gap-2">
-          <button onClick={() => openEdit(r)} className="p-2 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors"><RiEditLine size={19} /></button>
-          <button onClick={() => setDeleteTarget(r)} className="p-2 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><RiDeleteBinLine size={19} /></button>
+          <button onClick={() => setEditTarget(r)} className="p-2 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors">
+            <RiEditLine size={19} />
+          </button>
+          <button onClick={() => setDeleteTarget(r)} className="p-2 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors">
+            <RiDeleteBinLine size={19} />
+          </button>
         </div>
       ),
     },
@@ -85,52 +111,9 @@ export default function CouponsPage() {
 
   return (
     <div>
-      <PageHeader title="کوپن‌های تخفیف" description="مدیریت کدهای تخفیف" onAdd={() => setCreateOpen(true)} addLabel="کوپن جدید" />
+      <PageHeader title="کوپن‌های تخفیف" description="مدیریت کدهای تخفیف" onAdd={() => router.push("/dashboard/coupons/new")} addLabel="کوپن جدید" />
       <DataTable columns={columns} data={items} isLoading={isLoading} page={page} totalPages={totalPages} onPageChange={setPage} />
-
-      <FormModal isOpen={createOpen} onClose={() => setCreateOpen(false)} title="کوپن جدید" onSubmit={handleCreate} isPending={createMut.isPending}>
-        <FormField label="کد کوپن" value={createForm.code} onChange={(e) => setCreateForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))} required dir="ltr" />
-        <SelectField
-          label="نوع تخفیف"
-          value={createForm.discountType}
-          onChange={(v) => setCreateForm((f) => ({ ...f, discountType: v as typeof f.discountType }))}
-          options={[
-            { value: "percentage", label: "درصدی" },
-            { value: "fixed", label: "ثابت" },
-          ]}
-          required
-        />
-        <FormField label="مقدار" type="number" value={createForm.discountValue} onChange={(e) => setCreateForm((f) => ({ ...f, discountValue: e.target.value }))} required dir="ltr" />
-        <SelectField
-          label="ارز"
-          value={createForm.currency}
-          onChange={(v) => setCreateForm((f) => ({ ...f, currency: v as typeof f.currency }))}
-          options={[
-            { value: "USD", label: "USD" },
-            { value: "EUR", label: "EUR" },
-            { value: "IRR", label: "IRR" },
-          ]}
-          required
-        />
-        <FormField label="حداکثر استفاده" type="number" value={createForm.maxUses} onChange={(e) => setCreateForm((f) => ({ ...f, maxUses: e.target.value }))} dir="ltr" />
-        <DateField label="تاریخ انقضا" value={createForm.expiresAt} onChange={(v) => setCreateForm((f) => ({ ...f, expiresAt: v }))} />
-        <SwitchField
-          label="فعال باشد"
-          checked={createForm.isActive}
-          onChange={(checked) => setCreateForm((f) => ({ ...f, isActive: checked }))}
-        />
-      </FormModal>
-
-      <FormModal isOpen={!!editTarget} onClose={() => setEditTarget(null)} title={`ویرایش کوپن: ${editTarget?.code ?? ""}`} onSubmit={handleEdit} isPending={updateMut.isPending}>
-        <FormField label="حداکثر استفاده" type="number" value={editForm.maxUses} onChange={(e) => setEditForm((f) => ({ ...f, maxUses: e.target.value }))} dir="ltr" />
-        <DateField label="تاریخ انقضا" value={editForm.expiresAt} onChange={(v) => setEditForm((f) => ({ ...f, expiresAt: v }))} />
-        <SwitchField
-          label="فعال باشد"
-          checked={editForm.isActive}
-          onChange={(checked) => setEditForm((f) => ({ ...f, isActive: checked }))}
-        />
-      </FormModal>
-
+      {editTarget && <EditModal coupon={editTarget} onClose={() => setEditTarget(null)} />}
       <ConfirmModal
         isOpen={!!deleteTarget} onClose={() => setDeleteTarget(null)}
         onConfirm={async () => { if (deleteTarget) { await deleteMut.mutateAsync(deleteTarget.id); setDeleteTarget(null); } }}

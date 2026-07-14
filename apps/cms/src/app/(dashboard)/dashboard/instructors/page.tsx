@@ -1,80 +1,44 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import type { InstructorDetail, Localized } from "@roohbakhsh/shared";
-import {
-  useInstructors,
-  useCreateInstructor,
-  useUpdateInstructor,
-  useDeleteInstructor,
-} from "@/hooks/queries/use-instructors";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import type { InstructorRecord } from "@roohbakhsh/shared";
+import { useInstructors, useDeleteInstructor } from "@/hooks/queries/use-instructors";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
-import FormModal from "@/components/ui/FormModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import LocalizedInput from "@/components/ui/LocalizedInput";
-import FormField from "@/components/ui/FormField";
-import ImageUploadField from "@/components/ui/ImageUploadField";
 import { RiEditLine, RiDeleteBinLine } from "react-icons/ri";
-
-const emptyForm = {
-  name: { ar: "", ur: "" } as Localized,
-  slug: "",
-  avatarUrl: "",
-  bio: { ar: "", ur: "" } as Localized,
-};
+import Link from "next/link";
 
 export default function InstructorsPage() {
+  const router = useRouter();
   const { data, isLoading } = useInstructors();
-  const createMut = useCreateInstructor();
   const deleteMut = useDeleteInstructor();
+  const [deleteTarget, setDeleteTarget] = useState<InstructorRecord | null>(null);
 
-  const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<InstructorDetail | null>(null);
-  const [form, setForm] = useState(emptyForm);
-  const [deleteTarget, setDeleteTarget] = useState<InstructorDetail | null>(null);
-
-  const updateMut = useUpdateInstructor(editing?.id ?? "");
   const items = data ?? [];
 
-  function openCreate() {
-    setEditing(null);
-    setForm(emptyForm);
-    setFormOpen(true);
-  }
-
-  function openEdit(item: InstructorDetail) {
-    setEditing(item);
-    setForm({
-      name: { ar: item.name.ar, ur: item.name.ur },
-      slug: item.slug,
-      avatarUrl: item.avatarUrl ?? "",
-      bio: { ar: item.bio?.ar ?? "", ur: item.bio?.ur ?? "" },
-    });
-    setFormOpen(true);
-  }
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    const payload = { name: form.name, slug: form.slug, avatarUrl: form.avatarUrl || undefined, bio: form.bio };
-    if (editing) await updateMut.mutateAsync(payload);
-    else await createMut.mutateAsync(payload);
-    setFormOpen(false);
-  }
-
-  const isPending = createMut.isPending || updateMut.isPending;
-
   const columns = [
-    { key: "name", label: "نام (عربی)", render: (r: InstructorDetail) => r.name.ar },
+    { key: "name", label: "نام (عربی)", render: (r: InstructorRecord) => r.name.ar },
     { key: "slug", label: "Slug" },
+    {
+      key: "staffType",
+      label: "نوع",
+      render: (r: InstructorRecord) =>
+        r.staffType === "author" ? (
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-50 text-purple-700">نویسنده</span>
+        ) : (
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700">استاد</span>
+        ),
+    },
     {
       key: "actions",
       label: "عملیات",
-      render: (r: InstructorDetail) => (
+      render: (r: InstructorRecord) => (
         <div className="flex gap-2">
-          <button onClick={() => openEdit(r)} className="p-2 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors">
+          <Link href={`/dashboard/instructors/${r.id}/edit`} className="p-2 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors">
             <RiEditLine size={19} />
-          </button>
+          </Link>
           <button onClick={() => setDeleteTarget(r)} className="p-2 rounded-md text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors">
             <RiDeleteBinLine size={19} />
           </button>
@@ -85,23 +49,20 @@ export default function InstructorsPage() {
 
   return (
     <div>
-      <PageHeader title="اساتید" description="مدیریت اساتید" onAdd={openCreate} addLabel="استاد جدید" />
-
+      <PageHeader
+        title="کارمندان"
+        description="مدیریت اساتید و نویسندگان"
+        onAdd={() => router.push("/dashboard/instructors/new")}
+        addLabel="کارمند جدید"
+      />
       <DataTable columns={columns} data={items} isLoading={isLoading} page={1} totalPages={1} onPageChange={() => {}} />
-
-      <FormModal isOpen={formOpen} onClose={() => setFormOpen(false)} title={editing ? "ویرایش استاد" : "استاد جدید"} onSubmit={handleSubmit} isPending={isPending}>
-        <LocalizedInput label="نام" value={form.name} onChange={(v) => setForm((f) => ({ ...f, name: v }))} required />
-        <FormField label="Slug" value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} required dir="ltr" />
-        <ImageUploadField label="تصویر" value={form.avatarUrl} onChange={(url) => setForm((f) => ({ ...f, avatarUrl: url }))} />
-        <LocalizedInput label="بیوگرافی" value={form.bio} onChange={(v) => setForm((f) => ({ ...f, bio: v }))} multiline />
-      </FormModal>
 
       <ConfirmModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={async () => { if (deleteTarget) { await deleteMut.mutateAsync(deleteTarget.id); setDeleteTarget(null); } }}
         isPending={deleteMut.isPending}
-        title="حذف استاد"
+        title="حذف کارمند"
         description={`آیا از حذف "${deleteTarget?.name.ar}" مطمئن هستید؟`}
       />
     </div>

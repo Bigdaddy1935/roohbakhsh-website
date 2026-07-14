@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import type { Lesson as LessonContract, Paginated } from "@roohbakhsh/shared";
@@ -9,6 +9,8 @@ import { Course } from "./entities/course.entity";
 import { CreateLessonDto } from "./dto/create-lesson.dto";
 import { UpdateLessonDto } from "./dto/update-lesson.dto";
 import { CourseAccessService } from "./course-access.service";
+import { LessonProgress } from "../progress/entities/lesson-progress.entity";
+import { Favorite } from "../favorites/entities/favorite.entity";
 
 @Injectable()
 export class LessonService {
@@ -19,6 +21,10 @@ export class LessonService {
     private readonly sectionRepo: Repository<Section>,
     @InjectRepository(Course)
     private readonly courseRepo: Repository<Course>,
+    @InjectRepository(LessonProgress)
+    private readonly progressRepo: Repository<LessonProgress>,
+    @InjectRepository(Favorite)
+    private readonly favoriteRepo: Repository<Favorite>,
     private readonly courseAccess: CourseAccessService,
   ) {}
 
@@ -102,6 +108,12 @@ export class LessonService {
     const section = await this.sectionByIdAndCourseSlug(courseSlug, sectionId);
     const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, sectionId: section.id } });
     if (!lesson) throw new NotFoundException("LESSON_NOT_FOUND");
+
+    const hasProgress = await this.progressRepo.exists({ where: { lessonId } });
+    if (hasProgress) throw new BadRequestException("LESSON_HAS_PROGRESS");
+
+    const hasFavorite = await this.favoriteRepo.exists({ where: { type: "lesson", targetId: lessonId } });
+    if (hasFavorite) throw new BadRequestException("LESSON_IN_FAVORITES");
 
     await this.lessonRepo.remove(lesson);
   }

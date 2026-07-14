@@ -33,7 +33,7 @@ export default function ImageUploadField({ label, value, onChange, required }: I
 
       <div
         onClick={() => !uploadMut.isPending && inputRef.current?.click()}
-        className={`group relative w-full aspect-video max-w-xs rounded-md border overflow-hidden transition-colors ${
+        className={`group relative w-full h-[220px] rounded-[12px] border overflow-hidden transition-colors ${
           uploadMut.isPending
             ? "border-gray-200 cursor-wait"
             : "border-dashed border-gray-300 hover:border-[var(--brand)] cursor-pointer"
@@ -64,7 +64,7 @@ export default function ImageUploadField({ label, value, onChange, required }: I
             </button>
           </>
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 text-gray-400 bg-gray-50">
+          <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 text-gray-400 bg-white">
             {uploadMut.isPending ? (
               <>
                 <RiLoader4Line size={24} className="animate-spin text-[var(--brand)]" />

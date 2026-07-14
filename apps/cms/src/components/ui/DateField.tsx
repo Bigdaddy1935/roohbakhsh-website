@@ -1,6 +1,7 @@
 "use client";
 
 import { Calendar, DateField as HeroDateField, DatePicker } from "@heroui/react";
+import { I18nProvider } from "react-aria-components";
 import { parseDate, type CalendarDate, type DateValue } from "@internationalized/date";
 
 interface DateFieldProps {
@@ -28,14 +29,15 @@ export default function DateField({ label, value, onChange, required }: DateFiel
         {required && <span className="text-red-500 mr-1">*</span>}
       </span>
 
-      <DatePicker
-        aria-label={label}
-        value={toCalendarDate(value)}
-        onChange={(v: DateValue | null) => onChange(v ? v.toString() : "")}
-      >
+      <I18nProvider locale="ar-SA-u-ca-islamic-umalqura">
+        <DatePicker
+          aria-label={label}
+          value={toCalendarDate(value)}
+          onChange={(v: DateValue | null) => onChange(v ? v.toString() : "")}
+        >
         <HeroDateField.Group
           fullWidth
-          className="rounded-md border border-gray-200 bg-white px-3 py-2 focus-within:border-[var(--brand)] transition-colors"
+          className="rounded-md border border-gray-200 bg-white px-3 h-[48px] shadow-none focus-within:border-[var(--brand)] transition-colors"
         >
           <HeroDateField.Input>
             {(segment) => <HeroDateField.Segment segment={segment} />}
@@ -69,7 +71,8 @@ export default function DateField({ label, value, onChange, required }: DateFiel
             </Calendar.YearPickerGrid>
           </Calendar>
         </DatePicker.Popover>
-      </DatePicker>
+        </DatePicker>
+      </I18nProvider>
     </div>
   );
 }

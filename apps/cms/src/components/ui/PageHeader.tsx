@@ -27,7 +27,7 @@ export default function PageHeader({
         <button
           type="button"
           onClick={onAdd}
-          className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md bg-[var(--brand)] text-white hover:opacity-90"
+          className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-full bg-[var(--brand)] text-white hover:opacity-90"
         >
           <RiAddLine className="text-base" />
           {addLabel}

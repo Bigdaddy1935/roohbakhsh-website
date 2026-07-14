@@ -37,7 +37,7 @@ export default function SelectField({
       <Label className="text-sm font-medium text-gray-700">
         {label}
       </Label>
-      <Select.Trigger className="shadow-none border border-gray-200 rounded-md bg-white px-3 py-2.5 text-sm">
+      <Select.Trigger className="shadow-none border border-gray-200 rounded-md bg-white px-3 h-[48px] text-sm flex items-center">
         <Select.Value />
         <Select.Indicator />
       </Select.Trigger>

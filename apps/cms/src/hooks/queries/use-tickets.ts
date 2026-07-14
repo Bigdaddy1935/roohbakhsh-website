@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
-import type { Ticket, PaginatedTickets, ReplyTicketRequest } from "@roohbakhsh/shared";
+import type { Ticket, AdminTicket, PaginatedAdminTickets, ReplyTicketRequest } from "@roohbakhsh/shared";
 
 export const ticketKeys = {
   list: (params?: Record<string, unknown>) => ["tickets", "admin-list", params] as const,
@@ -15,9 +15,9 @@ export function useTicketsAdmin(params?: { page?: number; limit?: number }) {
   if (params?.limit) qs.set("limit", String(params.limit));
   const query = qs.toString() ? `?${qs}` : "";
 
-  return useQuery<PaginatedTickets>({
+  return useQuery<PaginatedAdminTickets>({
     queryKey: ticketKeys.list(params),
-    queryFn: () => api.get<PaginatedTickets>(`/tickets${query}`),
+    queryFn: () => api.get<PaginatedAdminTickets>(`/tickets${query}`),
   });
 }
 

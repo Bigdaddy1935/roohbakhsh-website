@@ -2,6 +2,7 @@ import type { ISODate, Localized, Paginated } from "./common";
 import type { InstructorSummary } from "./instructor";
 
 export type ArticleStatus = "draft" | "published";
+export type ArticleRobots = "index" | "noindex";
 
 export interface ArticleRecord {
   id: string;
@@ -10,6 +11,10 @@ export interface ArticleRecord {
   summary: Localized;
   body: Localized;
   thumbnailUrl: Localized<string | null>;
+  metaTitle: Localized | null;
+  metaDescription: Localized | null;
+  metaKeywords: Localized | null;
+  robots: ArticleRobots;
   instructorId: string;
   instructor: InstructorSummary;
   categoryId: string | null;
@@ -31,6 +36,10 @@ export interface CreateArticleRequest {
   summary: Localized;
   body: Localized;
   thumbnailUrl?: Localized<string | null>;
+  metaTitle?: Localized | null;
+  metaDescription?: Localized | null;
+  metaKeywords?: Localized | null;
+  robots?: ArticleRobots;
   instructorId: string;
   categoryId?: string | null;
   status?: ArticleStatus;
@@ -42,6 +51,10 @@ export interface UpdateArticleRequest {
   summary?: Localized;
   body?: Localized;
   thumbnailUrl?: Localized<string | null>;
+  metaTitle?: Localized | null;
+  metaDescription?: Localized | null;
+  metaKeywords?: Localized | null;
+  robots?: ArticleRobots;
   instructorId?: string;
   categoryId?: string | null;
   status?: ArticleStatus;

@@ -5,7 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from "typeorm";
-import type { Localized } from "@roohbakhsh/shared";
+import type { Localized, StaffType } from "@roohbakhsh/shared";
 
 @Entity("instructors")
 export class Instructor {
@@ -23,6 +23,9 @@ export class Instructor {
 
   @Column({ type: "json", nullable: true, default: null })
   bio!: Localized | null;
+
+  @Column({ name: "staff_type", type: "enum", enum: ["instructor", "author"], default: "instructor" })
+  staffType!: StaffType;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt!: Date;

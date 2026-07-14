@@ -30,6 +30,24 @@ export default function ArticlesPage() {
   const columns = [
     { key: "title", label: "عنوان (عربی)", render: (r: ArticleRecord) => r.title.ar },
     { key: "slug", label: "Slug" },
+    {
+      key: "langs",
+      label: "زبان‌ها",
+      render: (r: ArticleRecord) => {
+        const hasAr = !!(r.title.ar && r.summary.ar && r.body.ar);
+        const hasUr = !!(r.title.ur && r.summary.ur && r.body.ur);
+        return (
+          <div className="flex gap-1.5">
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${hasAr ? "bg-green-50 text-green-700" : "bg-gray-100 text-gray-400"}`}>
+              AR {hasAr ? "✓" : "—"}
+            </span>
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${hasUr ? "bg-green-50 text-green-700" : "bg-orange-50 text-orange-500"}`}>
+              UR {hasUr ? "✓" : "—"}
+            </span>
+          </div>
+        );
+      },
+    },
     { key: "instructor", label: "نویسنده", render: (r: ArticleRecord) => instructors?.find((i) => i.id === r.instructorId)?.name.ar ?? "-" },
     { key: "status", label: "وضعیت", render: (r: ArticleRecord) => <StatusBadge status={r.status ?? "draft"} map={STATUS_MAP} /> },
     {

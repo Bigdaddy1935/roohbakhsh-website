@@ -3,11 +3,14 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
 } from "typeorm";
 import type { TicketStatus } from "@roohbakhsh/shared";
 import { TicketMessage } from "./ticket-message.entity";
+import { User } from "../../auth/entities/user.entity";
 
 @Entity("tickets")
 export class Ticket {
@@ -30,6 +33,10 @@ export class Ticket {
     default: "open",
   })
   status!: TicketStatus;
+
+  @ManyToOne(() => User, { nullable: true, eager: false })
+  @JoinColumn({ name: "user_id" })
+  user!: User | null;
 
   @OneToMany(() => TicketMessage, (m) => m.ticket, { cascade: ["insert"] })
   messages!: TicketMessage[];

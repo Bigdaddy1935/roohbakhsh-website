@@ -10,14 +10,17 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import type {
   PaymentRecord,
+  AdminPaymentRecord,
   InitiatePaymentResponse,
   Paginated,
   PaymentDestinationAccount,
   UploadReceiptResponse,
 } from "@roohbakhsh/shared";
+import { In } from "typeorm";
 import { toPaginated } from "../../common/utils/paginate";
 import { Payment } from "./entities/payment.entity";
 import { User } from "../auth/entities/user.entity";
+import { Order } from "../orders/entities/order.entity";
 import { OrdersService } from "../orders/orders.service";
 import { InvoicesService } from "../invoices/invoices.service";
 import { MailService } from "../mail/mail.service";
@@ -42,6 +45,8 @@ export class PaymentsService {
     private readonly repo: Repository<Payment>,
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    @InjectRepository(Order)
+    private readonly orderRepo: Repository<Order>,
     private readonly ordersService: OrdersService,
     private readonly invoicesService: InvoicesService,
     private readonly mailService: MailService,
@@ -240,14 +245,14 @@ export class PaymentsService {
   }
 
   /** پرداخت‌های کارت‌به‌کارت که منتظر تأیید دستی ادمین هستند. */
-  async findPendingManual(page: number, limit: number): Promise<Paginated<PaymentRecord>> {
+  async findPendingManual(page: number, limit: number): Promise<Paginated<AdminPaymentRecord>> {
     const [items, total] = await this.repo.findAndCount({
       where: { method: "card_to_card", status: "pending" },
       order: { createdAt: "DESC" },
       take: limit,
       skip: (page - 1) * limit,
     });
-    return toPaginated(items.map((p) => this.toContract(p)), total, page, limit);
+    return toPaginated(await this.toAdminContracts(items), total, page, limit);
   }
 
   /** تأیید دستی پرداخت کارت‌به‌کارت توسط ادمین — سفارش paid می‌شود و فاکتور ساخته می‌شود. */
@@ -282,13 +287,13 @@ export class PaymentsService {
     return this.toContract({ ...payment, status: "failed" });
   }
 
-  async findLogs(page: number, limit: number): Promise<Paginated<PaymentRecord>> {
+  async findLogs(page: number, limit: number): Promise<Paginated<AdminPaymentRecord>> {
     const [items, total] = await this.repo.findAndCount({
       order: { createdAt: "DESC" },
       take: limit,
       skip: (page - 1) * limit,
     });
-    return toPaginated(items.map((p) => this.toContract(p)), total, page, limit);
+    return toPaginated(await this.toAdminContracts(items), total, page, limit);
   }
 
   async findMyPayments(userId: string, page: number, limit: number): Promise<Paginated<PaymentRecord>> {
@@ -326,6 +331,34 @@ export class PaymentsService {
           <p>اکنون می‌توانید وارد حساب کاربری خود شوید و دوره‌ها را شروع کنید.</p>
         </div>
       `,
+    });
+  }
+
+  private async toAdminContracts(payments: Payment[]): Promise<AdminPaymentRecord[]> {
+    if (payments.length === 0) return [];
+
+    const userIds = [...new Set(payments.map((p) => p.userId).filter(Boolean))];
+    const orderIds = [...new Set(payments.map((p) => p.orderId).filter(Boolean))];
+
+    const [users, orders] = await Promise.all([
+      userIds.length ? this.userRepo.find({ where: { id: In(userIds) } }) : Promise.resolve([]),
+      orderIds.length ? this.orderRepo.find({ where: { id: In(orderIds) }, relations: { items: true } }) : Promise.resolve([]),
+    ]);
+
+    const userMap = new Map(users.map((u) => [u.id, u]));
+    const orderMap = new Map(orders.map((o) => [o.id, o]));
+
+    return payments.map((p) => {
+      const user = userMap.get(p.userId);
+      const order = orderMap.get(p.orderId);
+      return {
+        ...this.toContract(p),
+        user: user ? { id: user.id, fullName: user.fullName, email: user.email } : null,
+        courses: (order?.items ?? []).map((item) => ({
+          id: item.courseId,
+          title: item.titleSnapshot?.ar ?? item.titleSnapshot?.ur ?? item.courseId,
+        })),
+      };
     });
   }
 

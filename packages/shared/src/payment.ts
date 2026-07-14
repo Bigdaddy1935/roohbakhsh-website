@@ -36,6 +36,13 @@ export interface InitiatePaymentResponse {
 
 export type PaginatedPayments = Paginated<PaymentRecord>;
 
+export interface AdminPaymentRecord extends PaymentRecord {
+  user: { id: string; fullName: string; email: string } | null;
+  courses: { id: string; title: string }[];
+}
+
+export type PaginatedAdminPayments = Paginated<AdminPaymentRecord>;
+
 export interface PaymentDestinationAccount {
   bankName: string;
   accountNumber: string;

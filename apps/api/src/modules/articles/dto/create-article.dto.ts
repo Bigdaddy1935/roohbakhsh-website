@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsString, IsNotEmpty, IsOptional, IsEnum, IsObject, ValidateNested, IsUrl, IsUUID } from "class-validator";
 import { Type } from "class-transformer";
-import type { ArticleStatus, Localized } from "@roohbakhsh/shared";
+import type { ArticleStatus, ArticleRobots, Localized } from "@roohbakhsh/shared";
 
 class LocalizedNullableDto {
   @ApiPropertyOptional({ example: "https://cdn.example.com/ar/img.jpg", nullable: true })
@@ -25,6 +25,18 @@ class LocalizedDto {
   @IsString()
   @IsNotEmpty()
   ur!: string;
+}
+
+class LocalizedOptionalDto {
+  @ApiPropertyOptional({ example: "النص" })
+  @IsOptional()
+  @IsString()
+  ar?: string;
+
+  @ApiPropertyOptional({ example: "متن" })
+  @IsOptional()
+  @IsString()
+  ur?: string;
 }
 
 export class CreateArticleDto {
@@ -61,6 +73,32 @@ export class CreateArticleDto {
   @Type(() => LocalizedNullableDto)
   @IsObject()
   thumbnailUrl?: Localized<string | null>;
+
+  @ApiPropertyOptional({ type: LocalizedOptionalDto, description: "عنوان SEO مقاله — اگر خالی بماند از title استفاده می‌شود", nullable: true })
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => LocalizedOptionalDto)
+  metaTitle?: Localized | null;
+
+  @ApiPropertyOptional({ type: LocalizedOptionalDto, description: "توضیحات متا — اگر خالی بماند از summary استفاده می‌شود", nullable: true })
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => LocalizedOptionalDto)
+  metaDescription?: Localized | null;
+
+  @ApiPropertyOptional({ type: LocalizedOptionalDto, description: "کلیدواژه‌های SEO — per locale، با کاما جدا", nullable: true })
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => LocalizedOptionalDto)
+  metaKeywords?: Localized | null;
+
+  @ApiPropertyOptional({ enum: ["index", "noindex"], default: "index", description: "دستور robots برای این صفحه" })
+  @IsOptional()
+  @IsEnum(["index", "noindex"])
+  robots?: ArticleRobots;
 
   @ApiPropertyOptional({ enum: ["draft", "published"], default: "draft" })
   @IsOptional()

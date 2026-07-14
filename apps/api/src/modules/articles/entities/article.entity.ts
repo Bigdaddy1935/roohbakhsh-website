@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from "typeorm";
-import type { Localized, ArticleStatus } from "@roohbakhsh/shared";
+import type { Localized, ArticleStatus, ArticleRobots } from "@roohbakhsh/shared";
 import { Instructor } from "../../instructor/entities/instructor.entity";
 import { Category } from "../../category/entities/category.entity";
 
@@ -33,6 +33,18 @@ export class Article {
 
   @Column({ name: "thumbnail_url", type: "json", nullable: true, default: null })
   thumbnailUrl!: Localized<string | null> | null;
+
+  @Column({ name: "meta_title", type: "json", nullable: true, default: null })
+  metaTitle!: Localized | null;
+
+  @Column({ name: "meta_description", type: "json", nullable: true, default: null })
+  metaDescription!: Localized | null;
+
+  @Column({ name: "meta_keywords", type: "json", nullable: true, default: null })
+  metaKeywords!: Localized | null;
+
+  @Column({ name: "robots", type: "enum", enum: ["index", "noindex"], default: "index" })
+  robots!: ArticleRobots;
 
   @ManyToOne(() => Instructor, { onDelete: "RESTRICT", eager: false, nullable: false })
   @JoinColumn({ name: "instructor_id" })

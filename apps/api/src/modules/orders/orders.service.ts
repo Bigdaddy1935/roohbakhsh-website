@@ -6,7 +6,8 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import type { OrderRecord, Money, Paginated } from "@roohbakhsh/shared";
+import { In } from "typeorm";
+import type { OrderRecord, AdminOrderRecord, Money, Paginated } from "@roohbakhsh/shared";
 import { toPaginated } from "../../common/utils/paginate";
 import { Order } from "./entities/order.entity";
 import { OrderItem } from "./entities/order-item.entity";
@@ -123,13 +124,25 @@ export class OrdersService {
     return this.toContract(saved);
   }
 
-  async findAll(page: number, limit: number): Promise<Paginated<OrderRecord>> {
+  async findAll(page: number, limit: number): Promise<Paginated<AdminOrderRecord>> {
     const [items, total] = await this.orderRepo.findAndCount({
       order: { createdAt: "DESC" },
       take: limit,
       skip: (page - 1) * limit,
     });
-    return toPaginated(items.map((o) => this.toContract(o)), total, page, limit);
+    const userIds = [...new Set(items.map((o) => o.userId).filter(Boolean))];
+    const users = userIds.length
+      ? await this.userRepo.find({ where: { id: In(userIds) } })
+      : [];
+    const userMap = new Map(users.map((u) => [u.id, u]));
+    const contracts = items.map((o) => {
+      const user = userMap.get(o.userId);
+      return {
+        ...this.toContract(o),
+        user: user ? { id: user.id, fullName: user.fullName, email: user.email } : null,
+      };
+    });
+    return toPaginated(contracts, total, page, limit);
   }
 
   async findMine(userId: string, page: number, limit: number): Promise<Paginated<OrderRecord>> {

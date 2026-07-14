@@ -29,6 +29,13 @@ export interface TicketMessage {
 
 export type PaginatedTickets = Paginated<Ticket>;
 
+/** نسخه‌ی ادمین تیکت — شامل اطلاعات کاربر. */
+export interface AdminTicket extends Ticket {
+  user: { id: ID; fullName: string; email: string } | null;
+}
+
+export type PaginatedAdminTickets = Paginated<AdminTicket>;
+
 export interface CreateTicketRequest {
   subject: string;
   body: string;
