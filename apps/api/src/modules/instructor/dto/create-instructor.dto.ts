@@ -26,7 +26,7 @@ export class CreateInstructorDto implements CreateInstructorRequest {
 
   @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/avatars/ahmad.webp", description: "لینک تصویر پروفایل استاد (اختیاری)" })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   avatarUrl?: string;
 
   @ApiPropertyOptional({ type: LocalizedDto, description: "بیوگرافی کوتاه (اختیاری)" })

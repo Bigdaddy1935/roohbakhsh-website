@@ -5,7 +5,7 @@ export type MediaCategory = "courses" | "articles" | "staff" | "categories" | "o
 export const MEDIA_CATEGORIES: { value: MediaCategory; label: string }[] = [
   { value: "courses",    label: "دوره‌ها" },
   { value: "articles",   label: "مقالات" },
-  { value: "staff",      label: "کارمندان" },
+  { value: "staff",      label: "پروفایل" },
   { value: "categories", label: "دسته‌بندی‌ها" },
   { value: "other",      label: "دیگر" },
 ];

@@ -28,7 +28,7 @@ export class UpdateInstructorDto implements UpdateInstructorRequest {
 
   @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/avatars/ahmad.webp" })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   avatarUrl?: string;
 
   @ApiPropertyOptional({ type: LocalizedDto, description: "بیوگرافی استاد — null برای حذف" })

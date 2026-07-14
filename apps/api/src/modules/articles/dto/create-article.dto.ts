@@ -6,12 +6,12 @@ import type { ArticleStatus, ArticleRobots, Localized } from "@roohbakhsh/shared
 class LocalizedNullableDto {
   @ApiPropertyOptional({ example: "https://cdn.example.com/ar/img.jpg", nullable: true })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   ar!: string | null;
 
   @ApiPropertyOptional({ example: "https://cdn.example.com/ur/img.jpg", nullable: true })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   ur!: string | null;
 }
 

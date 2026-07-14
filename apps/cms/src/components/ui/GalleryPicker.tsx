@@ -5,7 +5,19 @@ import { Modal } from "@heroui/react";
 import type { MediaCategory, MediaItem } from "@roohbakhsh/shared";
 import { MEDIA_CATEGORIES } from "@roohbakhsh/shared";
 import { useMedia, useUploadMedia, useDeleteMedia } from "@/hooks/queries/use-media";
-import { RiUploadCloud2Line, RiDeleteBinLine, RiImageLine, RiCheckLine, RiCloseLine } from "react-icons/ri";
+import {
+  RiUploadCloud2Line, RiDeleteBinLine, RiImageLine,
+  RiCheckLine, RiCloseLine, RiVideoLine, RiArticleLine,
+  RiUserLine, RiLayoutGridLine, RiFolderLine,
+} from "react-icons/ri";
+
+const CATEGORY_ICONS: Record<string, React.ElementType> = {
+  courses:    RiVideoLine,
+  articles:   RiArticleLine,
+  staff:      RiUserLine,
+  categories: RiLayoutGridLine,
+  other:      RiFolderLine,
+};
 
 interface Props {
   isOpen: boolean;
@@ -53,140 +65,150 @@ export default function GalleryPicker({ isOpen, onClose, onSelect, defaultCatego
   return (
     <Modal isOpen={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <Modal.Backdrop isDismissable>
-        <Modal.Container placement="center" className="w-full max-w-3xl mx-4">
-          <Modal.Dialog className="bg-white rounded-[20px] overflow-hidden">
+        <Modal.Container
+          placement="center"
+          style={{ width: "90vw", height: "90vh", maxWidth: "1200px", margin: "auto" }}
+        >
+          <Modal.Dialog
+            style={{ width: "100%", height: "100%", maxWidth: "100%", borderRadius: 20 }}
+            className="flex flex-col bg-white overflow-hidden shadow-2xl"
+          >
 
-            {/* هدر */}
-            <Modal.Header className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <Modal.Heading className="text-base font-bold text-gray-800">انتخاب از گالری</Modal.Heading>
-              <Modal.CloseTrigger
-                onClick={handleClose}
-                className="size-8 flex items-center justify-center rounded-[10px] text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors cursor-pointer"
-              >
-                <RiCloseLine size={18} />
-              </Modal.CloseTrigger>
-            </Modal.Header>
+            {/* ── هدر ── */}
+            <Modal.Header className="shrink-0 flex items-center justify-between gap-4 px-6 py-3 border-b border-gray-100">
+              <Modal.Heading className="text-lg font-bold text-gray-800">انتخاب از گالری</Modal.Heading>
 
-            <Modal.Body className="p-0">
-              {/* نوار ابزار */}
-              <div className="px-6 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between gap-3 flex-wrap">
-                {/* دسته‌بندی‌ها */}
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  {MEDIA_CATEGORIES.map((cat) => (
-                    <button
-                      key={cat.value}
-                      type="button"
-                      onClick={() => { setCategory(cat.value); setSelected(null); }}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
-                        category === cat.value
-                          ? "bg-[var(--brand)] text-white"
-                          : "bg-white text-gray-500 border border-gray-200 hover:border-[var(--brand)] hover:text-[var(--brand)]"
-                      }`}
-                    >
-                      {cat.label}
-                    </button>
-                  ))}
-                </div>
-
-                {/* سمت چپ: locale + آپلود */}
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center bg-white border border-gray-200 rounded-full p-0.5">
+              <div className="flex items-center gap-3 mr-auto">
+                {category !== "staff" && (
+                  <div className="flex items-center bg-gray-100 rounded-full p-0.5 gap-0.5">
                     {(["ar", "ur"] as const).map((l) => (
-                      <button
-                        key={l}
-                        type="button"
+                      <button key={l} type="button"
                         onClick={() => { setLocale(l); setSelected(null); }}
-                        className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
-                          locale === l ? "bg-[var(--brand)] text-white" : "text-gray-500 hover:text-gray-700"
+                        className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                          locale === l ? "bg-white text-[var(--brand)] shadow-sm" : "text-gray-500"
                         }`}
                       >
                         {l === "ar" ? "عربی" : "اردو"}
                       </button>
                     ))}
                   </div>
+                )}
 
-                  <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
-                  <button
-                    type="button"
-                    disabled={uploading}
-                    onClick={() => fileRef.current?.click()}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[var(--brand)] text-white hover:opacity-90 disabled:opacity-60 transition-opacity"
-                  >
-                    <RiUploadCloud2Line size={13} />
-                    {uploading ? "آپلود..." : "آپلود تصویر"}
-                  </button>
-                </div>
+                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+                <button type="button" disabled={uploading} onClick={() => fileRef.current?.click()}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-[var(--brand)] text-white hover:opacity-90 disabled:opacity-60 transition-opacity"
+                >
+                  <RiUploadCloud2Line size={16} />
+                  {uploading ? "آپلود..." : "آپلود تصویر"}
+                </button>
               </div>
 
-              {/* گرید تصاویر */}
-              <div className="p-5" style={{ minHeight: 280 }}>
+              <Modal.CloseTrigger onClick={handleClose}
+                className="size-9 flex items-center justify-center rounded-[10px] text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors cursor-pointer"
+              >
+                <RiCloseLine size={20} />
+              </Modal.CloseTrigger>
+            </Modal.Header>
+
+            {/* ── بدنه: سایدبار + گرید ── */}
+            <div className="flex flex-1 overflow-hidden">
+
+              {/* سایدبار */}
+              <aside className="w-56 shrink-0 bg-gray-50 border-l border-gray-100 flex flex-col py-4 gap-1 overflow-y-auto">
+                <p className="px-5 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">دسته‌بندی</p>
+                {MEDIA_CATEGORIES.map((cat) => {
+                  const Icon = CATEGORY_ICONS[cat.value];
+                  const isActive = category === cat.value;
+                  return (
+                    <button key={cat.value} type="button"
+                      onClick={() => { setCategory(cat.value); setSelected(null); }}
+                      className={`flex items-center gap-3 mx-2 px-3 py-2.5 rounded-[10px] text-sm font-medium transition-colors text-right w-[calc(100%-16px)] ${
+                        isActive
+                          ? "bg-[var(--brand)]/10 text-[var(--brand)]"
+                          : "text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                      }`}
+                    >
+                      <Icon size={18} className={isActive ? "text-[var(--brand)]" : "text-gray-400"} />
+                      <span className="flex-1">{cat.label}</span>
+                      {isActive && data?.total != null && (
+                        <span className="text-xs bg-[var(--brand)]/15 text-[var(--brand)] font-bold px-2 py-0.5 rounded-full">
+                          {data.total}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </aside>
+
+              {/* ناحیه تصاویر */}
+              <main className="flex-1 overflow-y-auto p-6 bg-white">
                 {isLoading ? (
-                  <div className="grid grid-cols-5 gap-3">
-                    {Array.from({ length: 10 }).map((_, i) => (
-                      <div key={i} className="aspect-square rounded-[10px] bg-gray-100 animate-pulse" />
+                  <div className="grid grid-cols-4 xl:grid-cols-5 gap-4">
+                    {Array.from({ length: 12 }).map((_, i) => (
+                      <div key={i} className="aspect-square rounded-[14px] bg-gray-100 animate-pulse" />
                     ))}
                   </div>
                 ) : items.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center gap-2 py-16 text-gray-300">
-                    <RiImageLine size={44} />
-                    <p className="text-sm font-medium text-gray-400">هیچ تصویری در این دسته وجود ندارد</p>
-                    <p className="text-xs text-gray-300">برای آپلود از دکمه بالا استفاده کنید</p>
+                  <div className="flex flex-col items-center justify-center h-full gap-3 text-gray-300">
+                    <RiImageLine size={52} />
+                    <p className="text-base font-medium text-gray-400">تصویری در این دسته وجود ندارد</p>
+                    <p className="text-sm text-gray-300">برای آپلود از دکمه بالا استفاده کنید</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-5 gap-3 max-h-72 overflow-y-auto">
+                  <div className="grid grid-cols-4 xl:grid-cols-5 gap-4">
                     {items.map((item: MediaItem) => (
-                      <div
-                        key={item.id}
+                      <div key={item.id}
                         onClick={() => setSelected(selected === item.url ? null : item.url)}
-                        className={`group relative aspect-square rounded-[10px] overflow-hidden cursor-pointer transition-all ${
-                          selected === item.url
-                            ? "ring-2 ring-[var(--brand)] ring-offset-1"
-                            : "hover:ring-2 hover:ring-gray-300 hover:ring-offset-1"
-                        }`}
+                        style={selected === item.url
+                          ? { boxShadow: "0 0 0 3px var(--brand)", borderRadius: 14, background: "color-mix(in srgb, var(--brand) 12%, transparent)" }
+                          : { borderRadius: 14 }}
+                        className="group relative aspect-square cursor-pointer transition-all p-1"
                       >
-                        <img src={item.url} alt={item.originalName} className="w-full h-full object-cover bg-gray-100" />
+                        <div className="w-full h-full rounded-[14px] overflow-hidden bg-gray-50">
+                          <img src={item.url} alt={item.originalName}
+                            className="w-full h-full object-cover group-hover:opacity-85 transition-opacity"
+                          />
+                        </div>
 
                         {selected === item.url && (
-                          <div className="absolute inset-0 bg-[var(--brand)]/15 flex items-center justify-center">
-                            <div className="size-6 rounded-full bg-[var(--brand)] flex items-center justify-center shadow">
-                              <RiCheckLine size={13} className="text-white" />
+                          <div className="absolute inset-0 rounded-[14px] bg-[var(--brand)]/20 flex items-center justify-center pointer-events-none">
+                            <div className="size-8 rounded-full bg-[var(--brand)] flex items-center justify-center shadow-lg">
+                              <RiCheckLine size={16} className="text-white" />
                             </div>
                           </div>
                         )}
 
-                        <button
-                          type="button"
+                        <button type="button"
                           onClick={(e) => { e.stopPropagation(); deleteMut.mutate(item.id); }}
                           disabled={deleteMut.isPending}
-                          className="absolute top-1 left-1 size-6 rounded-full bg-red-500 text-white items-center justify-center hidden group-hover:flex transition-all shadow"
+                          className="absolute top-2 left-2 size-7 rounded-full bg-red-500 text-white items-center justify-center hidden group-hover:flex shadow transition-all"
                         >
-                          <RiDeleteBinLine size={11} />
+                          <RiDeleteBinLine size={12} />
                         </button>
+
+                        <p className="absolute bottom-0 inset-x-0 rounded-b-[14px] bg-black/50 text-white text-xs px-2 py-1.5 truncate opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                          {item.originalName}
+                        </p>
                       </div>
                     ))}
                   </div>
                 )}
-              </div>
-            </Modal.Body>
+              </main>
+            </div>
 
-            {/* فوتر */}
-            <Modal.Footer className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50">
-              <span className="text-xs text-gray-400">
-                {selected ? "یک تصویر انتخاب شده" : `${data?.total ?? 0} تصویر`}
+            {/* ── فوتر ── */}
+            <Modal.Footer className="shrink-0 flex items-center justify-between px-6 py-3 border-t border-gray-100 bg-white">
+              <span className="text-sm text-gray-400">
+                {selected ? "یک تصویر انتخاب شده" : `${data?.total ?? 0} تصویر در این دسته`}
               </span>
               <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={handleClose}
-                  className="px-4 py-2 rounded-[10px] text-sm text-gray-500 hover:bg-gray-200 transition-colors"
+                <button type="button" onClick={handleClose}
+                  className="px-5 py-2.5 rounded-[10px] text-sm font-medium text-gray-500 hover:bg-gray-200 transition-colors"
                 >
                   انصراف
                 </button>
-                <button
-                  type="button"
-                  disabled={!selected}
-                  onClick={handleConfirm}
-                  className="px-5 py-2 rounded-[10px] text-sm font-bold bg-[var(--brand)] text-white hover:opacity-90 disabled:opacity-40 transition-opacity"
+                <button type="button" disabled={!selected} onClick={handleConfirm}
+                  className="px-6 py-2.5 rounded-[10px] text-sm font-bold bg-[var(--brand)] text-white hover:opacity-90 disabled:opacity-40 transition-opacity"
                 >
                   انتخاب
                 </button>

@@ -74,21 +74,23 @@ export default function GalleryPage() {
 
         <div className="h-5 w-px bg-gray-200" />
 
-        {/* زبان */}
-        <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
-          {(["ar", "ur"] as const).map((l) => (
-            <button
-              key={l}
-              type="button"
-              onClick={() => setLocale(l)}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${
-                locale === l ? "bg-white text-[var(--brand)] shadow-sm" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              {l === "ar" ? "عربی" : "اردو"}
-            </button>
-          ))}
-        </div>
+        {/* زبان — برای پروفایل لازم نیست */}
+        {category !== "staff" && (
+          <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
+            {(["ar", "ur"] as const).map((l) => (
+              <button
+                key={l}
+                type="button"
+                onClick={() => setLocale(l)}
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${
+                  locale === l ? "bg-white text-[var(--brand)] shadow-sm" : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                {l === "ar" ? "عربی" : "اردو"}
+              </button>
+            ))}
+          </div>
+        )}
 
         <span className="text-xs text-gray-400 mr-auto">{data?.total ?? 0} تصویر</span>
       </div>
