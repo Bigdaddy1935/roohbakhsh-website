@@ -68,6 +68,13 @@ export class NotificationsService {
     await this.readRepo.save(toInsert.map((n) => this.readRepo.create({ userId, notificationId: n.id })));
   }
 
+  async remove(id: string): Promise<void> {
+    const notification = await this.repo.findOne({ where: { id } });
+    if (!notification) throw new NotFoundException("NOTIFICATION_NOT_FOUND");
+    await this.readRepo.delete({ notificationId: id });
+    await this.repo.delete(id);
+  }
+
   private toItem(row: Notification): Omit<NotificationItem, "isRead"> {
     return {
       id: row.id,

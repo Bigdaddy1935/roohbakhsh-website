@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
+import { toast } from "sonner";
 import { useArticleAdminById, useUpdateArticle } from "@/hooks/queries/use-articles";
 import ArticleForm, { type ArticleFormValues } from "@/components/articles/ArticleForm";
 
@@ -25,6 +26,7 @@ export default function EditArticlePage() {
       instructorId: values.instructorId || "",
       status: values.status,
     });
+    toast.success("مقاله با موفقیت ذخیره شد.");
     router.push("/dashboard/articles");
   }
 

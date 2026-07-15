@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
+import { toast } from "sonner";
 import type { InstructorRecord } from "@roohbakhsh/shared";
 import { useInstructor, useUpdateInstructor } from "@/hooks/queries/use-instructors";
 import InstructorForm, { type InstructorFormValues } from "@/components/instructors/InstructorForm";
@@ -20,6 +21,7 @@ export default function EditInstructorPage() {
       bio: values.bio,
       staffType: values.staffType,
     });
+    toast.success("اطلاعات استاد با موفقیت ذخیره شد.");
     router.push("/dashboard/instructors");
   }
 

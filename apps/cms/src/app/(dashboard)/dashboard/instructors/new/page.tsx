@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useCreateInstructor } from "@/hooks/queries/use-instructors";
 import InstructorForm, { type InstructorFormValues } from "@/components/instructors/InstructorForm";
 
@@ -24,6 +25,7 @@ export default function NewInstructorPage() {
       bio: values.bio,
       staffType: values.staffType,
     });
+    toast.success("استاد با موفقیت ایجاد شد.");
     router.push("/dashboard/instructors");
   }
 

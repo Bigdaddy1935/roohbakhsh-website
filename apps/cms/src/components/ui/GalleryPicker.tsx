@@ -11,7 +11,7 @@ import {
   RiUserLine, RiLayoutGridLine, RiFolderLine,
 } from "react-icons/ri";
 
-const CATEGORY_ICONS: Record<string, React.ElementType> = {
+const CATEGORY_ICONS: Record<string, React.ElementType<object>> = {
   courses:    RiVideoLine,
   articles:   RiArticleLine,
   staff:      RiUserLine,
@@ -67,11 +67,10 @@ export default function GalleryPicker({ isOpen, onClose, onSelect, defaultCatego
       <Modal.Backdrop isDismissable>
         <Modal.Container
           placement="center"
-          style={{ width: "90vw", height: "90vh", maxWidth: "1200px", margin: "auto" }}
+          className="!w-[90vw] !h-[90vh] !max-w-[1200px] !mx-auto"
         >
           <Modal.Dialog
-            style={{ width: "100%", height: "100%", maxWidth: "100%", borderRadius: 20 }}
-            className="flex flex-col bg-white overflow-hidden shadow-2xl"
+            className="flex flex-col bg-white overflow-hidden shadow-2xl rounded-[20px] w-full h-full"
           >
 
             {/* ── هدر ── */}
@@ -117,7 +116,7 @@ export default function GalleryPicker({ isOpen, onClose, onSelect, defaultCatego
               <aside className="w-56 shrink-0 bg-gray-50 border-l border-gray-100 flex flex-col py-4 gap-1 overflow-y-auto">
                 <p className="px-5 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">دسته‌بندی</p>
                 {MEDIA_CATEGORIES.map((cat) => {
-                  const Icon = CATEGORY_ICONS[cat.value];
+                  const Icon = CATEGORY_ICONS[cat.value] as React.ElementType<{ size?: number; className?: string }>;
                   const isActive = category === cat.value;
                   return (
                     <button key={cat.value} type="button"

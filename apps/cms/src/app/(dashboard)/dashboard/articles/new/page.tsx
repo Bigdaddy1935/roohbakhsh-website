@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useCreateArticle } from "@/hooks/queries/use-articles";
 import ArticleForm, { type ArticleFormValues } from "@/components/articles/ArticleForm";
 
@@ -40,6 +41,7 @@ export default function NewArticlePage() {
       instructorId: values.instructorId || "",
       status: values.status,
     });
+    toast.success("مقاله با موفقیت ایجاد شد.");
     router.push("/dashboard/articles");
   }
 

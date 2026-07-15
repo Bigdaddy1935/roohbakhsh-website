@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useCreateCourse } from "@/hooks/queries/use-courses";
 import CourseForm, { type CourseFormValues } from "@/components/courses/CourseForm";
 
@@ -44,6 +45,7 @@ export default function NewCoursePage() {
       discountPrice: values.discountPriceAmountMinor ? { amountMinor: Number(values.discountPriceAmountMinor), currency: values.priceCurrency } : null,
       discountExpiresAt: values.discountExpiresAt ? new Date(values.discountExpiresAt).toISOString() : null,
     });
+    toast.success("دوره با موفقیت ایجاد شد.");
     router.push("/dashboard/courses");
   }
 

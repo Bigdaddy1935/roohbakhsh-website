@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
+import { toast } from "sonner";
 import { useCourse, useUpdateCourse } from "@/hooks/queries/use-courses";
 import CourseForm, { type CourseFormValues } from "@/components/courses/CourseForm";
 
@@ -27,6 +28,7 @@ export default function EditCoursePage() {
       discountExpiresAt: values.discountExpiresAt ? new Date(values.discountExpiresAt).toISOString() : null,
       isPublished: values.isPublished,
     });
+    toast.success("دوره با موفقیت ذخیره شد.");
     router.push("/dashboard/courses");
   }
 

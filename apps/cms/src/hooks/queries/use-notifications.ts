@@ -12,6 +12,14 @@ export function useSendNotification() {
   });
 }
 
+export function useDeleteNotification() {
+  const qc = useQueryClient();
+  return useMutation<void, Error, string>({
+    mutationFn: (id) => api.delete<void>(`/notifications/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
+  });
+}
+
 /** تاریخچه‌ی همه‌ی اعلانات ارسال‌شده (صفحه‌بندی‌شده، جدیدترین اول). */
 export function useNotificationsHistory(params?: { page?: number; limit?: number }) {
   const qs = new URLSearchParams();

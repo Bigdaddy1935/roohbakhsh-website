@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query, Request, UseGuards, HttpCode, HttpStatus } from "@nestjs/common";
+import { Controller, Get, Post, Delete, Body, Param, Query, Request, UseGuards, HttpCode, HttpStatus } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiResponse, ApiHeader, ApiBearerAuth, ApiCookieAuth } from "@nestjs/swagger";
 import { NotificationsService } from "./notifications.service";
 import { CreateNotificationDto } from "./dto/create-notification.dto";
@@ -65,5 +65,17 @@ export class NotificationsController {
   @ApiResponse({ status: 204, description: "ثبت شد" })
   markAllRead(@Request() req: { user: { id: string } }) {
     return this.svc.markAllRead(req.user.id);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles("admin")
+  @Delete(":id")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiHeader(LANG_HEADER)
+  @ApiOperation({ summary: "حذف اعلان 🔒 admin" })
+  @ApiResponse({ status: 204, description: "اعلان حذف شد" })
+  @ApiResponse({ status: 404, description: "NOTIFICATION_NOT_FOUND", type: ApiErrorSchema })
+  remove(@Param("id") id: string) {
+    return this.svc.remove(id);
   }
 }
