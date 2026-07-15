@@ -42,7 +42,7 @@ export function useCourses(params?: { page?: number; limit?: number; q?: string 
 
   return useQuery<Paginated<CourseRecord>>({
     queryKey: courseKeys.list(params),
-    queryFn: () => api.get<Paginated<CourseRecord>>(`/courses${query}`),
+    queryFn: () => api.get<Paginated<CourseRecord>>(`/courses/admin/all${query}`),
     enabled: !params?.q || params.q.trim().length >= 3,
   });
 }
@@ -50,7 +50,7 @@ export function useCourses(params?: { page?: number; limit?: number; q?: string 
 export function useCourse(slug: string) {
   return useQuery<CourseRecord>({
     queryKey: courseKeys.detail(slug),
-    queryFn: () => api.get<CourseRecord>(`/courses/${slug}`),
+    queryFn: () => api.get<CourseRecord>(`/courses/admin/${slug}`),
     enabled: !!slug,
   });
 }
@@ -150,12 +150,13 @@ export function useCreateLesson(courseSlug: string, sectionId: string) {
   });
 }
 
-export function useUpdateLesson(courseSlug: string, sectionId: string, lessonId: string) {
+export function useUpdateLesson(courseSlug: string, sectionId: string) {
   const qc = useQueryClient();
-  return useMutation<Lesson, Error, UpdateLessonRequest>({
-    mutationFn: (body) =>
+  return useMutation<Lesson, Error, UpdateLessonRequest & { lessonId: string }>({
+    mutationFn: ({ lessonId, ...body }) =>
       api.patch<Lesson>(`/courses/${courseSlug}/sections/${sectionId}/lessons/${lessonId}`, body),
-    onSuccess: () => {
+    onSuccess: (_data, { lessonId }) => {
+      qc.invalidateQueries({ queryKey: courseKeys.sections(courseSlug) });
       qc.invalidateQueries({ queryKey: courseKeys.lessons(courseSlug, sectionId) });
       qc.invalidateQueries({ queryKey: courseKeys.lesson(courseSlug, sectionId, lessonId) });
     },

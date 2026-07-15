@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import type { Ticket } from "@roohbakhsh/shared";
+import type { AdminTicket as Ticket } from "@roohbakhsh/shared";
 import {
   useTicketsAdmin,
   useTicket,
@@ -40,68 +40,65 @@ export default function TicketsPage() {
     setReplyBody("");
   }
 
+  function formatDate(iso: string) {
+    return new Intl.DateTimeFormat("fa-IR", {
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit",
+    }).format(new Date(iso));
+  }
+
   if (selectedId && ticket) {
     return (
-      <div>
-        <div className="flex items-center gap-2 mb-6">
-          <button
-            onClick={() => setSelectedId(null)}
-            className="p-1.5 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100"
-          >
-            <RiArrowRightLine />
-          </button>
-          <div>
-            <h1 className="text-xl font-extrabold text-[var(--ink)]">{ticket.subject}</h1>
-            <StatusBadge status={ticket.status} map={STATUS_MAP} />
+      <div className="space-y-6">
+        <div className="flex items-center justify-between bg-white border border-gray-100 rounded-[20px] px-5 h-[105px]">
+          <div className="flex items-center gap-x-3">
+            <button onClick={() => setSelectedId(null)} className="p-2 rounded-[20px] text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+              <RiArrowRightLine size={20} />
+            </button>
+            <div>
+              <h1 className="text-lg font-bold text-gray-800">{ticket.subject}</h1>
+              <div className="mt-0.5"><StatusBadge status={ticket.status} map={STATUS_MAP} /></div>
+            </div>
           </div>
           {ticket.status !== "closed" && (
-            <button
-              onClick={() => closeMut.mutate(ticket.id)}
-              disabled={closeMut.isPending}
-              className="mr-auto px-3 py-1.5 text-sm rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
-            >
+            <button onClick={() => closeMut.mutate(ticket.id)} disabled={closeMut.isPending}
+              className="px-4 py-2 text-sm rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors">
               بستن تیکت
             </button>
           )}
         </div>
 
-        <div className="space-y-3 mb-6">
+        <div className="bg-white rounded-[20px] p-6 space-y-3 min-h-[300px]">
           {ticket.messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`rounded-lg p-4 text-sm ${
+            <div key={msg.id} className={`flex flex-col gap-1 ${msg.authorType === "support" ? "items-start" : "items-end"}`}>
+              <span className="text-xs text-gray-400 px-1">
+                {msg.authorType === "support" ? "پشتیبانی" : "کاربر"} · {formatDate(msg.createdAt)}
+              </span>
+              <div className={`max-w-[70%] rounded-[16px] px-4 py-3 text-sm leading-relaxed ${
                 msg.authorType === "support"
-                  ? "bg-[var(--brand)]/10 mr-8"
-                  : "bg-gray-50 ml-8"
-              }`}
-            >
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-medium text-gray-500">
-                  {msg.authorType === "support" ? "پشتیبانی" : "کاربر"}
-                </span>
-                <span className="text-xs text-gray-400">{msg.createdAt.slice(0, 10)}</span>
+                  ? "bg-[var(--brand)]/10 text-[var(--ink)] rounded-ss-none"
+                  : "bg-gray-100 text-[var(--ink)] rounded-se-none"
+              }`}>
+                {msg.body}
               </div>
-              <p className="text-[var(--ink)] leading-relaxed">{msg.body}</p>
             </div>
           ))}
         </div>
 
         {ticket.status !== "closed" && (
-          <form onSubmit={handleReply} className="space-y-3">
+          <form onSubmit={handleReply} className="bg-white rounded-[20px] p-6 space-y-4">
+            <h2 className="text-sm font-bold text-gray-600 border-b border-gray-100 pb-3">پاسخ به تیکت</h2>
             <textarea
               value={replyBody}
               onChange={(e) => setReplyBody(e.target.value)}
               rows={4}
               placeholder="متن پاسخ را وارد کنید..."
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[var(--brand)]"
+              className="w-full border border-gray-200 rounded-[12px] px-4 py-3 text-sm focus:outline-none focus:border-[var(--brand)] resize-none transition-colors"
             />
             <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={replyMut.isPending || !replyBody.trim()}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md bg-[var(--brand)] text-white hover:opacity-90 disabled:opacity-50"
-              >
-                <RiSendPlaneLine />
+              <button type="submit" disabled={replyMut.isPending || !replyBody.trim()}
+                className="flex items-center gap-2 px-5 py-2.5 text-sm rounded-full bg-[var(--brand)] text-white hover:opacity-90 disabled:opacity-50 transition-colors">
+                <RiSendPlaneLine size={15} />
                 {replyMut.isPending ? "در حال ارسال..." : "ارسال پاسخ"}
               </button>
             </div>
@@ -112,17 +109,17 @@ export default function TicketsPage() {
   }
 
   const columns = [
-    { key: "subject", label: "موضوع", render: (r: Ticket) => r.subject },
+    {
+      key: "contact",
+      label: "کاربر",
+      render: (r: Ticket) => r.user?.fullName ?? r.guestEmail ?? "-",
+    },
     {
       key: "status",
       label: "وضعیت",
       render: (r: Ticket) => <StatusBadge status={r.status} map={STATUS_MAP} />,
     },
-    {
-      key: "contact",
-      label: "ایمیل/کاربر",
-      render: (r: Ticket) => r.guestEmail ?? r.userId ?? "-",
-    },
+    { key: "subject", label: "موضوع", render: (r: Ticket) => r.subject },
     {
       key: "createdAt",
       label: "تاریخ",

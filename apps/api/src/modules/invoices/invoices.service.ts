@@ -51,10 +51,16 @@ export class InvoicesService {
   }
 
   async findOneByNumber(invoiceNumber: string, userId: string): Promise<InvoiceRecord> {
+    const invoice = await this.findEntityByNumber(invoiceNumber, userId);
+    return this.toContract(invoice);
+  }
+
+  /** نسخه‌ی entity خام — برای تولید PDF لازم است (نه شکل contract). */
+  async findEntityByNumber(invoiceNumber: string, userId: string): Promise<Invoice> {
     const invoice = await this.repo.findOne({ where: { invoiceNumber } });
     if (!invoice) throw new NotFoundException("INVOICE_NOT_FOUND");
     if (invoice.userId !== userId) throw new NotFoundException("INVOICE_NOT_FOUND");
-    return this.toContract(invoice);
+    return invoice;
   }
 
   private toContract(i: Invoice): InvoiceRecord {

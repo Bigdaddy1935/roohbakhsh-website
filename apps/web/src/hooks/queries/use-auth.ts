@@ -8,6 +8,8 @@ import type {
   LoginRequest,
   RegisterRequest,
   ResetPasswordRequest,
+  VerifyEmailRequest,
+  ResendVerificationRequest,
   User,
 } from "@roohbakhsh/shared";
 
@@ -55,6 +57,24 @@ export function useForgotPassword() {
 export function useResetPassword() {
   return useMutation<void, Error, ResetPasswordRequest>({
     mutationFn: (body) => api.post<void>("/auth/reset-password", body),
+  });
+}
+
+export function useVerifyEmail() {
+  return useMutation<void, Error, VerifyEmailRequest>({
+    mutationFn: (body) => api.post<void>("/auth/verify-email", body),
+  });
+}
+
+export function useResendVerification() {
+  return useMutation<void, Error, ResendVerificationRequest>({
+    mutationFn: (body) => api.post<void>("/auth/resend-verification", body),
+  });
+}
+
+export function useChangePassword() {
+  return useMutation<void, Error, { newPassword: string }>({
+    mutationFn: (data) => api.post<void>("/auth/change-password", data),
   });
 }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
+import { toast } from "sonner";
 import { useArticleAdminById, useUpdateArticle } from "@/hooks/queries/use-articles";
 import ArticleForm, { type ArticleFormValues } from "@/components/articles/ArticleForm";
 
@@ -17,9 +18,15 @@ export default function EditArticlePage() {
       slug: values.slug,
       summary: values.summary,
       body: { ar: values.bodyAr, ur: values.bodyUr },
+      thumbnailUrl: { ar: values.thumbnailAr || null, ur: values.thumbnailUr || null },
+      metaTitle: (values.metaTitle.ar || values.metaTitle.ur) ? values.metaTitle : undefined,
+      metaDescription: (values.metaDescription.ar || values.metaDescription.ur) ? values.metaDescription : undefined,
+      metaKeywords: (values.metaKeywords.ar || values.metaKeywords.ur) ? values.metaKeywords : undefined,
+      robots: values.robots,
       instructorId: values.instructorId || "",
       status: values.status,
     });
+    toast.success("مقاله با موفقیت ذخیره شد.");
     router.push("/dashboard/articles");
   }
 
@@ -33,6 +40,12 @@ export default function EditArticlePage() {
     summary: { ar: article.summary?.ar ?? "", ur: article.summary?.ur ?? "" },
     bodyAr: article.body?.ar ?? "",
     bodyUr: article.body?.ur ?? "",
+    thumbnailAr: article.thumbnailUrl?.ar ?? "",
+    thumbnailUr: article.thumbnailUrl?.ur ?? "",
+    metaTitle: { ar: article.metaTitle?.ar ?? "", ur: article.metaTitle?.ur ?? "" },
+    metaDescription: { ar: article.metaDescription?.ar ?? "", ur: article.metaDescription?.ur ?? "" },
+    metaKeywords: { ar: article.metaKeywords?.ar ?? "", ur: article.metaKeywords?.ur ?? "" },
+    robots: article.robots ?? "index",
     instructorId: article.instructorId ?? "",
     status: article.status as "draft" | "published",
   };

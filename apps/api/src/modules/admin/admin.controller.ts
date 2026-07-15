@@ -1,5 +1,5 @@
-import { Controller, Get, UseGuards } from "@nestjs/common";
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiHeader } from "@nestjs/swagger";
+import { Controller, Get, Query, UseGuards } from "@nestjs/common";
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiHeader, ApiQuery } from "@nestjs/swagger";
 import { AdminService } from "./admin.service";
 import { RolesGuard, Roles } from "../../common/guards/roles.guard";
 import { ApiErrorSchema } from "../../common/swagger/api-error.schema";
@@ -24,5 +24,20 @@ export class AdminController {
   @ApiResponse({ status: 403, description: "دسترسی ندارید", type: ApiErrorSchema })
   getStats() {
     return this.adminService.getStats();
+  }
+
+  @Get("stats/monthly")
+  @ApiOperation({
+    summary: "آمار ماهانه‌ی یک سال شمسی (جلالی) 🔒 admin",
+    description:
+      "تعداد سفارش‌های paid، کاربران ثبت‌نام‌شده، جمع درآمد به‌تفکیک ارز، و تعداد نظرات (چه تأییدشده چه نشده) — برای هر ماه از سال شمسی درخواستی. برای نمودار داشبورد.",
+  })
+  @ApiHeader(LANG_HEADER)
+  @ApiQuery({ name: "year", required: false, type: Number, example: 1405, description: "سال شمسی (جلالی) — پیش‌فرض سال جاری" })
+  @ApiResponse({ status: 200, description: "AdminMonthlyStats" })
+  @ApiResponse({ status: 401, description: "احراز هویت نشده", type: ApiErrorSchema })
+  @ApiResponse({ status: 403, description: "دسترسی ندارید", type: ApiErrorSchema })
+  getMonthlyStats(@Query("year") year?: string) {
+    return this.adminService.getMonthlyStats(year ? Number(year) : undefined);
   }
 }

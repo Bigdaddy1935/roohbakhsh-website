@@ -1,8 +1,10 @@
 // ──────────────────────────────────────────────────────────────
-// اساتید — CMS (read) + NestJS API (CRUD)
+// کارمندان (اساتید + نویسندگان) — CMS (read) + NestJS API (CRUD)
 // ──────────────────────────────────────────────────────────────
 
 import type { ID, ISODate, Localized } from "./common";
+
+export type StaffType = "instructor" | "author";
 
 /** نسخه‌ی خلاصه — وقتی داخل کارت دوره نمایش داده می‌شود. */
 export interface InstructorSummary {
@@ -25,13 +27,14 @@ export interface SocialLink {
 
 // ── NestJS API contract ────────────────────────────────────────
 
-/** پاسخ API بک‌اند (NestJS) برای یک استاد. */
+/** پاسخ API بک‌اند (NestJS) برای یک کارمند (استاد یا نویسنده). */
 export interface InstructorRecord {
   id: ID;
   name: Localized;
   slug: string;
   avatarUrl: string | null;
   bio: Localized | null;
+  staffType: StaffType;
   createdAt: ISODate;
   updatedAt: ISODate;
 }
@@ -41,6 +44,7 @@ export interface CreateInstructorRequest {
   slug: string;
   avatarUrl?: string;
   bio?: Localized;
+  staffType?: StaffType;
 }
 
 export interface UpdateInstructorRequest {
@@ -48,4 +52,5 @@ export interface UpdateInstructorRequest {
   slug?: string;
   avatarUrl?: string;
   bio?: Localized | null;
+  staffType?: StaffType;
 }

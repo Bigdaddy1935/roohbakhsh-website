@@ -31,6 +31,6 @@ export class CreateNotificationDto implements CreateNotificationRequest {
     description: "لینکی که با کلیک روی اعلان باز می‌شود (اختیاری)",
   })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   link?: string | null;
 }

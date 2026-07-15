@@ -13,7 +13,10 @@ import { Lesson } from "./entities/lesson.entity";
 import { Instructor } from "../instructor/entities/instructor.entity";
 import { Category } from "../category/entities/category.entity";
 import { OrderItem } from "../orders/entities/order-item.entity";
+import { Favorite } from "../favorites/entities/favorite.entity";
+import { LessonProgress } from "../progress/entities/lesson-progress.entity";
 import { ReviewsService } from "../reviews/reviews.service";
+import { CourseAccessService } from "./course-access.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
 
@@ -46,10 +49,52 @@ export class CourseService {
     private readonly categoryRepo: Repository<Category>,
     @InjectRepository(OrderItem)
     private readonly orderItemRepo: Repository<OrderItem>,
+    @InjectRepository(Favorite)
+    private readonly favoriteRepo: Repository<Favorite>,
+    @InjectRepository(LessonProgress)
+    private readonly lessonProgressRepo: Repository<LessonProgress>,
     private readonly reviewsService: ReviewsService,
+    private readonly courseAccessService: CourseAccessService,
   ) {}
 
   async findAll(page: number, limit: number, q?: string): Promise<Paginated<CourseRecord>> {
+    const search = q?.trim();
+    if (search && search.length < 3) {
+      throw new BadRequestException("SEARCH_QUERY_TOO_SHORT");
+    }
+
+    const qb = this.repo
+      .createQueryBuilder("course")
+      .leftJoinAndSelect("course.instructor", "instructor")
+      .where("course.isPublished = :isPublished", { isPublished: true })
+      .orderBy("course.createdAt", "DESC")
+      .take(limit)
+      .skip((page - 1) * limit);
+
+    if (search) {
+      qb.andWhere(
+        "(JSON_UNQUOTE(JSON_EXTRACT(course.title, '$.ar')) LIKE :q OR JSON_UNQUOTE(JSON_EXTRACT(course.title, '$.ur')) LIKE :q)",
+        { q: `%${search}%` },
+      );
+    }
+
+    const [items, total] = await qb.getManyAndCount();
+    const courseIds = items.map((c) => c.id);
+    const [lessonStats, ratingStats, participantStats] = await Promise.all([
+      this.lessonStatsForCourses(courseIds),
+      this.reviewsService.ratingSummaries(courseIds),
+      this.participantCountsForCourses(courseIds),
+    ]);
+    return toPaginated(
+      items.map((c) => this.toContract(c, this.mergeStats(c.id, lessonStats, ratingStats, participantStats), false)),
+      total,
+      page,
+      limit,
+    );
+  }
+
+  /** لیست کامل دوره‌ها (شامل پیش‌نویس) — فقط برای پنل ادمین. */
+  async findAllAdmin(page: number, limit: number, q?: string): Promise<Paginated<CourseRecord>> {
     const search = q?.trim();
     if (search && search.length < 3) {
       throw new BadRequestException("SEARCH_QUERY_TOO_SHORT");
@@ -77,18 +122,31 @@ export class CourseService {
       this.participantCountsForCourses(courseIds),
     ]);
     return toPaginated(
-      items.map((c) => this.toContract(c, this.mergeStats(c.id, lessonStats, ratingStats, participantStats))),
+      items.map((c) => this.toContract(c, this.mergeStats(c.id, lessonStats, ratingStats, participantStats), false)),
       total,
       page,
       limit,
     );
   }
 
-  async findOne(slug: string): Promise<CourseRecord> {
+  async findOne(slugOrId: string, userId?: string): Promise<CourseRecord> {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
+    const where = isUuid
+      ? { id: slugOrId, isPublished: true }
+      : { slug: slugOrId, isPublished: true };
+    const course = await this.repo.findOne({ where, relations: { instructor: true } });
+    if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
+    const stats = await this.statsForCourse(course.id);
+    const hasPurchased = await this.courseAccessService.hasPurchased(userId, course.id);
+    return this.toContract(course, stats, hasPurchased);
+  }
+
+  /** مشخصات یک دوره با slug — شامل پیش‌نویس. فقط برای پنل ادمین. */
+  async findOneAdmin(slug: string): Promise<CourseRecord> {
     const course = await this.repo.findOne({ where: { slug }, relations: { instructor: true } });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
     const stats = await this.statsForCourse(course.id);
-    return this.toContract(course, stats);
+    return this.toContract(course, stats, false);
   }
 
   /** lessonCount/durationMinutes از lessons، averageRating/reviewCount از reviews، participantCount از سفارش‌های paid — هیچ‌کدام denormalize نشده. */
@@ -201,7 +259,7 @@ export class CourseService {
     });
 
     const saved = await this.repo.save(course);
-    return this.toContract(saved, EMPTY_STATS);
+    return this.toContract(saved, EMPTY_STATS, false);
   }
 
   async update(id: string, dto: UpdateCourseDto): Promise<CourseRecord> {
@@ -244,12 +302,28 @@ export class CourseService {
 
     const saved = await this.repo.save(course);
     const stats = await this.statsForCourse(saved.id);
-    return this.toContract(saved, stats);
+    return this.toContract(saved, stats, false);
   }
 
   async remove(id: string): Promise<void> {
     const course = await this.repo.findOne({ where: { id } });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
+
+    const hasOrders = await this.orderItemRepo.exists({ where: { courseId: id } });
+    if (hasOrders) throw new BadRequestException("COURSE_HAS_ORDERS");
+
+    const hasFavorite = await this.favoriteRepo.exists({ where: { type: "course", targetId: id } });
+    if (hasFavorite) throw new BadRequestException("COURSE_IN_FAVORITES");
+
+    const lessonIds = (await this.lessonRepo.find({ where: { courseId: id }, select: { id: true } })).map((l) => l.id);
+    if (lessonIds.length > 0) {
+      const hasProgress = await this.lessonProgressRepo.exists({ where: lessonIds.map((lid) => ({ courseId: id, lessonId: lid })) });
+      if (hasProgress) throw new BadRequestException("COURSE_HAS_LESSON_PROGRESS");
+
+      const hasLessonFavorite = await this.favoriteRepo.exists({ where: lessonIds.map((lid) => ({ type: "lesson" as const, targetId: lid })) });
+      if (hasLessonFavorite) throw new BadRequestException("COURSE_HAS_LESSON_IN_FAVORITES");
+    }
+
     await this.repo.remove(course);
   }
 
@@ -269,7 +343,7 @@ export class CourseService {
     };
   }
 
-  private toContract(course: Course, stats: CourseStats): CourseRecord {
+  private toContract(course: Course, stats: CourseStats, hasPurchased: boolean): CourseRecord {
     const discount = this.buildDiscount(course);
     const effectivePrice: Money | null =
       discount?.isActive ? discount.price : course.price;
@@ -301,6 +375,7 @@ export class CourseService {
         avatarUrl: course.instructor.avatarUrl,
       },
       categoryId: course.categoryId,
+      hasPurchased,
       createdAt: course.createdAt.toISOString(),
       updatedAt: course.updatedAt.toISOString(),
     };

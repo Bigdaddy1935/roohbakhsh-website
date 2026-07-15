@@ -16,12 +16,12 @@ class LocalizedDto implements Localized {
 class LocalizedNullableDto {
   @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.ac/ar/category.webp", nullable: true })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   ar!: string | null;
 
   @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.ac/ur/category.webp", nullable: true })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   ur!: string | null;
 }
 

@@ -16,28 +16,44 @@ _charsetEncodings[192] = "utf8"; // UTF8_UNICODE_CI    → utf8
 _charsetEncodings[246] = "utf8"; // UTF8MB4_UNICODE_520_CI → utf8
 
 import { NestFactory } from "@nestjs/core";
+import { NestExpressApplication } from "@nestjs/platform-express";
 import { ValidationPipe } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
 import { AppModule } from "./app.module";
+import type { EnvConfig } from "./config/env";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const envConfig = app.get(ConfigService<EnvConfig>);
 
+  // CSP غیرفعال است تا Swagger UI (که از اسکریپت/استایل inline استفاده می‌کند) بشکند نشود.
+  app.use(helmet({ contentSecurityPolicy: false }));
   app.use(cookieParser());
-  app.enableCors({ origin: true, credentials: true });
+  const corsOrigins = envConfig.get("CORS_ORIGINS", { infer: true })!.split(",").map((o) => o.trim());
+  app.enableCors({ origin: corsOrigins, credentials: true });
+  // فایل‌های آپلودشده روی دیسک لوکال (fallback وقتی FTP در دسترس نیست) — خارج از پیشوند /api
+  // سرآیند Cross-Origin-Resource-Policy: cross-origin لازم است تا CMS (پورت دیگر) بتواند تصاویر را load کند
+  app.useStaticAssets(join(process.cwd(), "uploads"), {
+    prefix: "/uploads",
+    setHeaders: (res) => {
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    },
+  });
   app.setGlobalPrefix("api");
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
-  const config = new DocumentBuilder()
+  const swaggerConfig = new DocumentBuilder()
     .setTitle("Roohbakhsh API")
     .setDescription("قرارداد API آکادمی روح‌بخش")
     .setVersion("0.1.0")
     .addBearerAuth()
     .addCookieAuth("access_token")
     .build();
-  const doc = SwaggerModule.createDocument(app, config);
+  const doc = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup("api/docs", app, doc);
 
   await app.listen(3001);

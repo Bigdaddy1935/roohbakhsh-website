@@ -5,6 +5,7 @@ import type { FavoriteItem, FavoriteStatus, Paginated } from "@roohbakhsh/shared
 import { Favorite } from "./entities/favorite.entity";
 import { Course } from "../courses/entities/course.entity";
 import { Article } from "../articles/entities/article.entity";
+import { Lesson } from "../courses/entities/lesson.entity";
 import { ToggleFavoriteDto } from "./dto/toggle-favorite.dto";
 import { toPaginated } from "../../common/utils/paginate";
 
@@ -17,6 +18,8 @@ export class FavoritesService {
     private readonly courseRepo: Repository<Course>,
     @InjectRepository(Article)
     private readonly articleRepo: Repository<Article>,
+    @InjectRepository(Lesson)
+    private readonly lessonRepo: Repository<Lesson>,
   ) {}
 
   /** اضافه/حذف از علاقه‌مندی‌ها — هر بار صدا زدن وضعیت را toggle می‌کند. */
@@ -24,9 +27,12 @@ export class FavoritesService {
     if (dto.type === "course") {
       const exists = await this.courseRepo.findOne({ where: { id: dto.id } });
       if (!exists) throw new NotFoundException("COURSE_NOT_FOUND");
-    } else {
+    } else if (dto.type === "article") {
       const exists = await this.articleRepo.findOne({ where: { id: dto.id } });
       if (!exists) throw new NotFoundException("ARTICLE_NOT_FOUND");
+    } else {
+      const exists = await this.lessonRepo.findOne({ where: { id: dto.id } });
+      if (!exists) throw new NotFoundException("LESSON_NOT_FOUND");
     }
 
     const existing = await this.repo.findOne({
@@ -67,17 +73,16 @@ export class FavoritesService {
 
     const courseIds = favorites.filter((f) => f.type === "course").map((f) => f.targetId);
     const articleIds = favorites.filter((f) => f.type === "article").map((f) => f.targetId);
+    const lessonIds = favorites.filter((f) => f.type === "lesson").map((f) => f.targetId);
 
-    const [courses, articles] = await Promise.all([
-      courseIds.length
-        ? this.courseRepo.find({ where: courseIds.map((id) => ({ id })) })
-        : Promise.resolve([]),
-      articleIds.length
-        ? this.articleRepo.find({ where: articleIds.map((id) => ({ id })) })
-        : Promise.resolve([]),
+    const [courses, articles, lessons] = await Promise.all([
+      courseIds.length ? this.courseRepo.find({ where: courseIds.map((id) => ({ id })) }) : Promise.resolve([]),
+      articleIds.length ? this.articleRepo.find({ where: articleIds.map((id) => ({ id })) }) : Promise.resolve([]),
+      lessonIds.length ? this.lessonRepo.find({ where: lessonIds.map((id) => ({ id })), relations: { course: true } }) : Promise.resolve([]),
     ]);
     const courseMap = new Map(courses.map((c) => [c.id, c]));
     const articleMap = new Map(articles.map((a) => [a.id, a]));
+    const lessonMap = new Map(lessons.map((l) => [l.id, l]));
 
     const items: FavoriteItem[] = [];
     for (const fav of favorites) {
@@ -90,6 +95,17 @@ export class FavoritesService {
           slug: course.slug,
           title: course.title,
           thumbnailUrl: course.thumbnailUrl ?? { ar: null, ur: null },
+          createdAt: fav.createdAt.toISOString(),
+        });
+      } else if (fav.type === "lesson") {
+        const lesson = lessonMap.get(fav.targetId);
+        if (!lesson) continue;
+        items.push({
+          type: "lesson",
+          id: lesson.id,
+          slug: lesson.id,
+          courseSlug: lesson.course?.slug,
+          title: lesson.title,
           createdAt: fav.createdAt.toISOString(),
         });
       } else {

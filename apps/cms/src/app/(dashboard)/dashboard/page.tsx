@@ -2,6 +2,7 @@
 
 import { useAdminStats } from "@/hooks/queries/use-admin-stats";
 import PageHeader from "@/components/ui/PageHeader";
+import AdminMonthlyChart from "@/components/dashboard/AdminMonthlyChart";
 import {
   RiUserLine,
   RiBookOpenLine,
@@ -21,7 +22,7 @@ interface StatCardProps {
 
 function StatCard({ label, value, sub, icon, color }: StatCardProps) {
   return (
-    <div className="bg-white border border-gray-100 rounded-lg p-5 flex items-start gap-4">
+    <div className="bg-white border border-gray-100 rounded-[20px] p-5 flex items-start gap-4">
       <div className={`p-3 rounded-md ${color}`}>{icon}</div>
       <div className="flex flex-col gap-0.5">
         <span className="text-2xl font-extrabold text-[var(--ink)]">
@@ -47,7 +48,6 @@ export default function DashboardPage() {
     {
       label: "دوره‌ها",
       value: data?.totalCourses,
-      sub: data ? `${data.publishedCourses} منتشرشده` : undefined,
       icon: <RiBookOpenLine size={20} className="text-[var(--brand)]" />,
       color: "bg-emerald-50",
     },
@@ -82,18 +82,20 @@ export default function DashboardPage() {
       <PageHeader title="داشبورد" description="نگاه کلی به وضعیت آکادمی روح‌بخش" />
 
       {isLoading ? (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4 mb-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="bg-white border border-gray-100 rounded-lg p-5 h-24 animate-pulse" />
+            <div key={i} className="bg-white border border-gray-100 rounded-[20px] p-5 h-24 animate-pulse" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4 mb-6">
           {cards.map((card) => (
             <StatCard key={card.label} {...card} />
           ))}
         </div>
       )}
+
+      <AdminMonthlyChart />
     </div>
   );
 }

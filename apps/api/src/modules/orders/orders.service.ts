@@ -6,13 +6,17 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import type { OrderRecord, Money, Paginated } from "@roohbakhsh/shared";
+import { In } from "typeorm";
+import type { OrderRecord, AdminOrderRecord, Money, Paginated } from "@roohbakhsh/shared";
 import { toPaginated } from "../../common/utils/paginate";
 import { Order } from "./entities/order.entity";
 import { OrderItem } from "./entities/order-item.entity";
 import { CartService } from "../cart/cart.service";
 import { CouponService } from "../coupon/coupon.service";
 import { Course } from "../courses/entities/course.entity";
+import { User } from "../auth/entities/user.entity";
+import { CourseAccessService } from "../courses/course-access.service";
+import { MailService } from "../mail/mail.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
 
 @Injectable()
@@ -24,8 +28,12 @@ export class OrdersService {
     private readonly itemRepo: Repository<OrderItem>,
     @InjectRepository(Course)
     private readonly courseRepo: Repository<Course>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
     private readonly cartService: CartService,
     private readonly couponService: CouponService,
+    private readonly courseAccessService: CourseAccessService,
+    private readonly mailService: MailService,
   ) {}
 
   async create(userId: string, dto: CreateOrderDto): Promise<OrderRecord> {
@@ -39,6 +47,13 @@ export class OrdersService {
     );
     if (courses.length !== courseIds.length) {
       throw new NotFoundException("COURSE_NOT_FOUND");
+    }
+
+    // دفاع در عمق — حتی اگر از مسیر دیگری غیر از addItem به سبد اضافه شده باشد
+    for (const courseId of courseIds) {
+      if (await this.courseAccessService.hasPurchased(userId, courseId)) {
+        throw new BadRequestException("COURSE_ALREADY_PURCHASED");
+      }
     }
 
     // Compute subtotal (all items must share the same currency)
@@ -103,16 +118,31 @@ export class OrdersService {
     // Clear the cart
     await this.cartService.clearCart(userId);
 
+    // Send order confirmation email (fire-and-forget — don't block the response)
+    this.sendOrderConfirmationEmail(userId, saved).catch(() => undefined);
+
     return this.toContract(saved);
   }
 
-  async findAll(page: number, limit: number): Promise<Paginated<OrderRecord>> {
+  async findAll(page: number, limit: number): Promise<Paginated<AdminOrderRecord>> {
     const [items, total] = await this.orderRepo.findAndCount({
       order: { createdAt: "DESC" },
       take: limit,
       skip: (page - 1) * limit,
     });
-    return toPaginated(items.map((o) => this.toContract(o)), total, page, limit);
+    const userIds = [...new Set(items.map((o) => o.userId).filter(Boolean))];
+    const users = userIds.length
+      ? await this.userRepo.find({ where: { id: In(userIds) } })
+      : [];
+    const userMap = new Map(users.map((u) => [u.id, u]));
+    const contracts = items.map((o) => {
+      const user = userMap.get(o.userId);
+      return {
+        ...this.toContract(o),
+        user: user ? { id: user.id, fullName: user.fullName, email: user.email } : null,
+      };
+    });
+    return toPaginated(contracts, total, page, limit);
   }
 
   async findMine(userId: string, page: number, limit: number): Promise<Paginated<OrderRecord>> {
@@ -142,6 +172,35 @@ export class OrdersService {
     const order = await this.orderRepo.findOne({ where: { id } });
     if (!order) throw new NotFoundException("ORDER_NOT_FOUND");
     return order;
+  }
+
+  private async sendOrderConfirmationEmail(userId: string, order: Order): Promise<void> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) return;
+
+    const courseList = order.items
+      .map((i) => `<li>${i.titleSnapshot?.ar ?? i.titleSnapshot?.ur ?? ""}</li>`)
+      .join("");
+
+    const totalFormatted = new Intl.NumberFormat("fa-IR").format(
+      order.total.amountMinor / 100,
+    );
+
+    await this.mailService.send({
+      to: user.email,
+      subject: "تأیید سفارش — آکادمی روح‌بخش",
+      html: `
+        <div dir="rtl" style="font-family: Arial, sans-serif;">
+          <h2>سفارش شما ثبت شد</h2>
+          <p>با سلام ${user.fullName}،</p>
+          <p>سفارش شما با موفقیت ثبت گردید. لطفاً مبلغ را واریز کرده و رسید پرداخت را ارسال نمایید.</p>
+          <p><strong>شماره سفارش:</strong> ${order.id}</p>
+          <ul>${courseList}</ul>
+          <p><strong>مبلغ کل:</strong> ${totalFormatted} تومان</p>
+          <p>پس از تأیید پرداخت، دسترسی به دوره‌ها فعال می‌شود.</p>
+        </div>
+      `,
+    });
   }
 
   private effectivePrice(course: Course): Money | null {

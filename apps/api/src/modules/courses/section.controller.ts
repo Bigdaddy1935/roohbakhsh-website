@@ -1,6 +1,6 @@
 import {
   Controller, Get, Post, Patch, Delete,
-  Param, Body, UseGuards, HttpCode, HttpStatus,
+  Param, Body, Request, UseGuards, HttpCode, HttpStatus,
 } from "@nestjs/common";
 import {
   ApiTags, ApiOperation, ApiResponse,
@@ -10,6 +10,7 @@ import { SectionService } from "./section.service";
 import { CreateSectionDto } from "./dto/create-section.dto";
 import { UpdateSectionDto } from "./dto/update-section.dto";
 import { Public } from "../auth/decorators/public.decorator";
+import { OptionalJwtAuthGuard } from "../auth/guards/optional-jwt-auth.guard";
 import { RolesGuard, Roles } from "../../common/guards/roles.guard";
 import { ApiErrorSchema } from "../../common/swagger/api-error.schema";
 import { LANG_HEADER } from "../../common/swagger/lang-header";
@@ -22,26 +23,32 @@ export class SectionController {
   constructor(private readonly sectionService: SectionService) {}
 
   @Public()
+  @UseGuards(OptionalJwtAuthGuard)
   @Get()
   @ApiOperation({
     summary: "سرفصل‌های یک دوره (با درس‌هایشان)",
     description:
       "تمام سرفصل‌های دوره را به‌ترتیب `order` برمی‌گرداند. " +
-      "هر سرفصل شامل لیست درس‌هایش است. نیازی به احراز هویت نیست.",
+      "هر سرفصل شامل لیست درس‌هایش است. نیازی به احراز هویت نیست، ولی " +
+      "`videoUrl` فقط برای درس‌های `isFreePreview: true`، خریداران دوره، یا admin مقدار واقعی دارد — در غیر این صورت null است.",
   })
   @ApiHeader(LANG_HEADER)
   @ApiParam({ name: "courseSlug", description: "slug دوره", example: "tafsir-quran-mobtadi" })
   @ApiResponse({ status: 200, description: "لیست سرفصل‌ها — SectionRecord[]" })
   @ApiResponse({ status: 404, description: "دوره پیدا نشد — کد: COURSE_NOT_FOUND", type: ApiErrorSchema })
-  findAll(@Param("courseSlug") courseSlug: string) {
-    return this.sectionService.findByCourse(courseSlug);
+  findAll(
+    @Param("courseSlug") courseSlug: string,
+    @Request() req: { user: { id: string; role: string } | null },
+  ) {
+    return this.sectionService.findByCourse(courseSlug, req.user?.id, req.user?.role === "admin");
   }
 
   @Public()
+  @UseGuards(OptionalJwtAuthGuard)
   @Get(":sectionId")
   @ApiOperation({
     summary: "مشخصات یک سرفصل",
-    description: "یک سرفصل را با تمام درس‌هایش برمی‌گرداند.",
+    description: "یک سرفصل را با تمام درس‌هایش برمی‌گرداند. همان قانون دسترسی به `videoUrl` بالا صدق می‌کند.",
   })
   @ApiHeader(LANG_HEADER)
   @ApiParam({ name: "courseSlug", description: "slug دوره" })
@@ -51,8 +58,9 @@ export class SectionController {
   findOne(
     @Param("courseSlug") courseSlug: string,
     @Param("sectionId") sectionId: string,
+    @Request() req: { user: { id: string; role: string } | null },
   ) {
-    return this.sectionService.findOne(courseSlug, sectionId);
+    return this.sectionService.findOne(courseSlug, sectionId, req.user?.id, req.user?.role === "admin");
   }
 
   @UseGuards(RolesGuard)

@@ -22,3 +22,4 @@ export * from "./favorite";
 export * from "./progress";
 export * from "./notification";
 export * from "./admin";
+export * from "./media";

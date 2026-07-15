@@ -20,6 +20,7 @@ import {
   ApiBody,
 } from "@nestjs/swagger";
 import type { Response } from "express";
+import { Throttle } from "@nestjs/throttler";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
@@ -28,6 +29,7 @@ import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { VerifyEmailDto } from "./dto/verify-email.dto";
 import { ResendVerificationDto } from "./dto/resend-verification.dto";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { Public } from "./decorators/public.decorator";
 import { User } from "./entities/user.entity";
@@ -45,6 +47,7 @@ export class AuthController {
   // ── Register ────────────────────────────────────────────────────────────
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post("register")
   @ApiOperation({
     summary: "ثبت‌نام کاربر جدید",
@@ -67,6 +70,7 @@ export class AuthController {
   // ── Login ────────────────────────────────────────────────────────────────
 
   @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post("login")
   @ApiOperation({
     summary: "ورود کاربر",
@@ -129,6 +133,7 @@ export class AuthController {
   // ── Forgot password ─────────────────────────────────────────────────────
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post("forgot-password")
   @ApiOperation({
@@ -147,6 +152,7 @@ export class AuthController {
   // ── Reset password ───────────────────────────────────────────────────────
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post("reset-password")
   @ApiOperation({
@@ -185,6 +191,7 @@ export class AuthController {
   // ── Resend verification ──────────────────────────────────────────────────
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post("resend-verification")
   @ApiOperation({
@@ -198,6 +205,22 @@ export class AuthController {
   @ApiResponse({ status: 400, description: "خطای اعتبارسنجی — کد: VALIDATION_ERROR", type: ApiErrorSchema })
   resendVerification(@Body() dto: ResendVerificationDto) {
     return this.authService.resendVerification(dto);
+  }
+
+  // ── Change password ──────────────────────────────────────────────────────
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post("change-password")
+  @ApiOperation({ summary: "تغییر رمز عبور (کاربر لاگین‌شده)" })
+  @ApiHeader(LANG_HEADER)
+  @ApiResponse({ status: 204, description: "رمز عبور تغییر یافت" })
+  @ApiResponse({ status: 401, description: "رمز عبور فعلی اشتباه — کد: INVALID_CREDENTIALS", type: ApiErrorSchema })
+  changePassword(
+    @Request() req: { user: User },
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.authService.changePassword(req.user.id, dto.newPassword);
   }
 
   // ── Me ───────────────────────────────────────────────────────────────────

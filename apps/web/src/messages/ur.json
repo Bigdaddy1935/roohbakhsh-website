@@ -1,8 +1,20 @@
 {
+  "Meta": {
+    "site_name": "اکادمی روح بخش",
+    "default_title": "بین الاقوامی اسلامی اکادمی روح بخش",
+    "default_description": "اکادمی روح بخش قرآن کریم، فقہ، عقیدہ، اسلامی تاریخ اور عربی زبان سیکھنے کے لیے آپ کی پہلی منزل ہے — جدید طریقوں اور تصدیق شدہ سرٹیفکیٹس کے ساتھ۔",
+    "courses_title": "کورسز",
+    "courses_description": "اکادمی روح بخش کے تمام دستیاب اسلامی کورسز دیکھیں۔",
+    "articles_title": "مضامین",
+    "articles_description": "اکادمی روح بخش کی جانب سے تازہ ترین مضامین اور اسلامی معلومات۔",
+    "about_title": "ہمارے بارے میں",
+    "about_description": "بین الاقوامی اسلامی اکادمی روح بخش اور اس کے مشن کے بارے میں جانیں۔"
+  },
   "Common": {
     "login_required_toast": "پہلے لاگ ان کرنا ضروری ہے",
     "favorite_added_toast": "پسندیدہ میں شامل کر دیا گیا",
-    "favorite_removed_toast": "پسندیدہ سے ہٹا دیا گیا"
+    "favorite_removed_toast": "پسندیدہ سے ہٹا دیا گیا",
+    "read_article": "مطالعہ کریں"
   },
   "Home": {
     "hero": {
@@ -148,20 +160,27 @@
     "enroll_btn": "ابھی داخلہ لیں"
   },
   "CourseDetail": {
+    "not_found_title": "کورس نہیں ملا",
+    "not_found_desc": "ممکن ہے یہ کورس فی الحال شائع نہ ہو، حذف کر دیا گیا ہو، یا لنک درست نہ ہو۔",
+    "not_found_back": "تمام کورسز پر واپس جائیں",
     "breadcrumb_home": "ہوم",
     "breadcrumb_courses": "کورسز",
     "discount_badge": "حیرت انگیز چھوٹ",
     "original_price": "اصل قیمت",
     "add_to_cart": "کارٹ میں ڈالیں",
+    "continue_learning": "سیکھنا جاری رکھیں",
     "currency": "ر.س",
     "students": "رجسٹرڈ طالب علم",
     "hours": "تعلیمی گھنٹے",
     "lessons": "سبق",
     "updated": "آخری اپڈیٹ",
     "rating": "کورس کی ریٹنگ",
-    "status_complete": "مکمل",
-    "status_label": "کورس کی درجہ بندی",
-    "watch_mode": "صرف آن لائن",
+    "run_status_ongoing": "جاری ہے",
+    "run_status_upcoming": "جلد آ رہا ہے",
+    "run_status_completed": "مکمل",
+    "status_label": "کورس کی حیثیت",
+    "access_online_only": "صرف آن لائن",
+    "access_downloadable": "ڈاؤن لوڈ کے قابل",
     "watch_label": "دیکھنے کا طریقہ",
     "progress_label": "کورس کی تکمیل",
     "share": "شیئر کریں",
@@ -327,10 +346,10 @@
   },
   "About": {
     "hero": {
-      "badge": "ہمارے بارے میں",
       "breadcrumb_home": "ہوم",
       "breadcrumb_about": "ہمارے بارے میں",
-      "title": "روح‌بخش بین الاقوامی اسلامی اکیڈمی",
+      "title_1": "روح‌بخش بین الاقوامی",
+      "title_2": "اسلامی اکیڈمی",
       "subtitle": "اسلامی علوم پیشہ ورانہ طریقے سے سیکھنے کا آپ کا پہلا مرکز۔ ہم اسلامی روایت کی اصالت اور جدید تعلیمی طریقوں کو یکجا کرتے ہیں۔",
       "stat_1_value": "+5000", "stat_1_label": "رجسٹرڈ طالب علم",
       "stat_2_value": "+60",   "stat_2_label": "معتمد کورسز",
@@ -387,6 +406,7 @@
   "LessonPage": {
     "not_found": "سبق نہیں ملا",
     "no_video": "اس سبق کے لیے ابھی کوئی ویڈیو موجود نہیں",
+    "download_lesson": "ویڈیو ڈاؤن لوڈ کریں",
     "lesson_list": "کورس کے اسباق",
     "total_lessons": "کل اسباق",
     "course_duration": "کورس کا دورانیہ",

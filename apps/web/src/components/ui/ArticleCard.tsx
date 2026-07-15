@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { RiStarFill, RiUserLine, RiArrowLeftLine } from "react-icons/ri";
 
@@ -15,20 +17,22 @@ export type ArticleCardData = {
 };
 
 export default function ArticleCard({ article }: { article: ArticleCardData }) {
+  const t = useTranslations("Common");
   return (
     <div className="group/blog flex flex-col gap-y-3 sm:gap-y-4 h-full rounded-lg bg-white">
       {/* Image */}
-      <Link href={article.href} className="block">
-        <img
+      <Link href={article.href} className="block relative aspect-video overflow-hidden rounded-lg">
+        <Image
           src={article.image}
           alt={article.title}
-          loading="lazy"
-          className="block w-full object-cover aspect-video rounded-lg group-hover/blog:brightness-110 transition-all"
+          fill
+          sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 90vw"
+          className="object-cover group-hover/blog:brightness-110 transition-all"
         />
       </Link>
 
       {/* Body */}
-      <div className="flex flex-col gap-y-5 justify-between h-full px-3 sm:px-4 pb-10 sm:pb-12 cursor-default relative">
+      <div className="flex flex-col gap-y-5 justify-between flex-1 px-3 sm:px-4 pb-10 sm:pb-12 cursor-default relative">
         {/* Title + excerpt */}
         <div className="flex flex-col items-start gap-y-1">
           <Link
@@ -68,7 +72,7 @@ export default function ArticleCard({ article }: { article: ArticleCardData }) {
           href={article.href}
           className="absolute -bottom-5 inset-x-3 sm:inset-x-4 flex items-center justify-center gap-x-2 h-10 sm:h-11 rounded-lg bg-[var(--brand)] text-white text-[13px] font-bold hover:opacity-90 transition-opacity"
         >
-          مطالعة
+          {t("read_article")}
           <RiArrowLeftLine size={14} />
         </Link>
       </div>

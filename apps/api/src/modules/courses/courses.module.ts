@@ -6,20 +6,24 @@ import { Lesson } from "./entities/lesson.entity";
 import { Instructor } from "../instructor/entities/instructor.entity";
 import { Category } from "../category/entities/category.entity";
 import { OrderItem } from "../orders/entities/order-item.entity";
+import { LessonProgress } from "../progress/entities/lesson-progress.entity";
+import { Favorite } from "../favorites/entities/favorite.entity";
 import { ReviewsModule } from "../reviews/reviews.module";
 import { CourseService } from "./course.service";
 import { SectionService } from "./section.service";
 import { LessonService } from "./lesson.service";
+import { CourseAccessService } from "./course-access.service";
 import { CourseController } from "./course.controller";
 import { SectionController } from "./section.controller";
 import { LessonController } from "./lesson.controller";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Course, Section, Lesson, Instructor, Category, OrderItem]),
+    TypeOrmModule.forFeature([Course, Section, Lesson, Instructor, Category, OrderItem, LessonProgress, Favorite]),
     ReviewsModule,
   ],
   controllers: [CourseController, SectionController, LessonController],
-  providers: [CourseService, SectionService, LessonService],
+  providers: [CourseService, SectionService, LessonService, CourseAccessService],
+  exports: [CourseAccessService],
 })
 export class CoursesModule {}

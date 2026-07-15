@@ -28,3 +28,9 @@ export interface CreateOrderRequest {
 }
 
 export type PaginatedOrders = Paginated<OrderRecord>;
+
+export interface AdminOrderRecord extends OrderRecord {
+  user: { id: string; fullName: string; email: string } | null;
+}
+
+export type PaginatedAdminOrders = Paginated<AdminOrderRecord>;

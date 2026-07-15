@@ -12,6 +12,7 @@ import {
   RiUserLine, RiTimeLine, RiBookOpenLine,
   RiCalendarLine, RiStarFill,
   RiCheckboxCircleLine, RiWifiLine,
+  RiSearchLine,
   RiShareLine, RiTelegramLine, RiInstagramLine, RiTwitterXLine,
   RiShoppingCartLine,
   RiGiftLine, RiMessageLine,
@@ -30,6 +31,7 @@ import {
 } from "@/hooks/queries/use-reviews";
 import { useMe } from "@/hooks/queries/use-auth";
 import { useMyFavorites, useToggleFavorite } from "@/hooks/queries/use-favorites";
+import { useRecordView } from "@/hooks/queries/use-recently-viewed";
 import { tokenStore } from "@/lib/api-client";
 import { formatMoney, isFree, discountPercent } from "@/lib/format";
 import VideoPlayer from "@/components/ui/VideoPlayer";
@@ -169,7 +171,7 @@ function StarsInput({ value, onChange }: { value: number; onChange: (v: number) 
   );
 }
 
-function AdminReviewActions({ review, courseSlug, t }: { review: ReviewRecord; courseSlug: string; t: (k: string) => string }) {
+function AdminReviewActions({ review, t }: { review: ReviewRecord; t: (k: string) => string }) {
   const approveReview = useApproveReview();
   const rejectReview = useRejectReview();
   const replyToReview = useReplyToReview();
@@ -184,7 +186,7 @@ function AdminReviewActions({ review, courseSlug, t }: { review: ReviewRecord; c
   function handleSubmitReply() {
     if (!reply.trim()) return;
     replyToReview.mutate(
-      { courseSlug, reviewId: review.id, reply: reply.trim() },
+      { reviewId: review.id, reply: reply.trim() },
       {
         onSuccess: () => { toast.success(t("reply_submitted_toast")); setReplyOpen(false); },
         onError: () => toast.error(t("reply_submit_error_toast")),
@@ -421,7 +423,7 @@ function ReviewsSection({ courseId, courseSlug, t }: { courseId: string; courseS
                 </div>
               )}
 
-              {isAdmin && <AdminReviewActions review={r} courseSlug={courseSlug} t={t} />}
+              {isAdmin && <AdminReviewActions review={r} t={t} />}
             </div>
           ))}
         </div>
@@ -591,6 +593,7 @@ function ChapterRow({
       {open && (
         <div className="flex flex-col gap-y-2.5 sm:ps-4 mt-3">
           {section.lessons.map((lesson, idx) => {
+            const hasAccess = !!(lesson.videoUrl[locale] ?? lesson.videoUrl.ar ?? lesson.videoUrl.ur);
             const rowCls = "flex items-center justify-between gap-x-4 md:gap-x-6 border border-gray-100 hover:border-[var(--brand)]/40 pe-3.5 ps-1.5 py-3 rounded-lg group transition-colors flex-1 min-w-0";
             const rowContent = (
               <>
@@ -603,7 +606,7 @@ function ChapterRow({
                 </div>
                 <div className="flex items-center gap-x-2 md:gap-x-3 text-gray-400 group-hover:text-[var(--ink)] shrink-0 transition-colors">
                   <span className="text-sm">{fmtDuration(lesson.durationMinutes)}</span>
-                  {lesson.isFreePreview
+                  {hasAccess
                     ? <RiPlayCircleLine size={18} className="text-[var(--brand)]" />
                     : <RiLockLine size={16} />
                   }
@@ -613,7 +616,7 @@ function ChapterRow({
 
             return (
               <div key={lesson.id} className="flex items-center gap-x-2">
-                {lesson.isFreePreview ? (
+                {hasAccess ? (
                   <Link href={`/courses/${courseSlug}/lessons/${lesson.id}`} className={rowCls}>
                     {rowContent}
                   </Link>
@@ -650,30 +653,57 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
   const { data: sections, isLoading: loadingSections } = useCourseSections(courseSlug);
   const { mutate: addToCart, isPending: addingToCart } = useAddToCart();
   const { data: progress } = useCourseProgress(courseSlug);
+  const { mutate: recordView } = useRecordView();
+
+  useEffect(() => {
+    if (course && typeof window !== "undefined" && tokenStore.getAccess()) {
+      recordView({ type: "course", id: course.id });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- فقط وقتی course.id عوض شد یک بار ثبت شود
+  }, [course?.id]);
 
   if (loadingCourse) {
     return <CourseDetailSkeleton />;
   }
 
   if (!course) {
-    return <div className="container py-32 text-center text-gray-400">Course not found.</div>;
+    return (
+      <div className="container py-24 sm:py-32 flex flex-col items-center text-center gap-y-4">
+        <div className="size-16 rounded-lg bg-gray-100 flex items-center justify-center">
+          <RiSearchLine size={32} className="text-gray-300" />
+        </div>
+        <p className="font-bold text-[var(--ink)]">{t("not_found_title")}</p>
+        <p className="text-sm text-gray-400 max-w-sm">{t("not_found_desc")}</p>
+        <Link
+          href="/courses"
+          className="flex items-center gap-x-1.5 h-10 px-5 rounded-lg bg-[var(--brand)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+        >
+          {t("not_found_back")}
+        </Link>
+      </div>
+    );
   }
 
   const allSections = sections ?? [];
   const totalLessons = allSections.reduce((s, sec) => s + sec.lessons.length, 0);
+  const firstLessonId = allSections[0]?.lessons[0]?.id;
+  const continueHref = firstLessonId ? `/courses/${course.slug}/lessons/${firstLessonId}` : `/courses/${course.slug}`;
   const hoursTotal = Math.round(course.durationMinutes / 60 * 10) / 10;
   const free = isFree(course.effectivePrice);
   const thumb = course.thumbnailUrl?.[locale] ?? course.thumbnailUrl?.ar ?? "";
   const introVideo = course.introVideoUrl?.[locale] ?? course.introVideoUrl?.ar ?? null;
   const discPct = discountPercent(course.price, course.effectivePrice);
 
+  const runStatusVal = t(`run_status_${course.runStatus}`);
+  const accessTypeVal = t(`access_${course.accessType}`);
+
   const stats = [
-    { icon: <RiCheckboxCircleLine size={28} className="text-[var(--brand)]" />, val: t("status_complete"), label: t("status_label") },
+    { icon: <RiCheckboxCircleLine size={28} className="text-[var(--brand)]" />, val: runStatusVal, label: t("status_label") },
     { icon: <RiTimeLine size={28} className="text-[var(--brand)]" />, val: `${hoursTotal}`, label: t("hours") },
     { icon: <RiUserLine size={28} className="text-[var(--brand)]" />, val: course.participantCount.toLocaleString(locale === "ar" ? "ar-EG" : "ur"), label: t("students") },
     { icon: <RiStarFill size={28} className="text-amber-400" />, val: course.averageRating ? course.averageRating.toFixed(1) : "—", label: t("rating") },
     { icon: <RiCalendarLine size={28} className="text-[var(--brand)]" />, val: course.updatedAt.slice(0, 10), label: t("updated") },
-    { icon: <RiWifiLine size={28} className="text-[var(--brand)]" />, val: t("watch_mode"), label: t("watch_label") },
+    { icon: <RiWifiLine size={28} className="text-[var(--brand)]" />, val: accessTypeVal, label: t("watch_label") },
   ];
 
   return (
@@ -744,14 +774,31 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
                 {/* buttons */}
                 <div className="flex items-center gap-x-2">
                   <CourseFavoriteButton courseId={course.id} t={t} />
-                  <button
-                    onClick={() => addToCart(course.id)}
-                    disabled={addingToCart}
-                    className="flex items-center justify-center gap-x-2 h-11 px-5 rounded-lg bg-[var(--brand)] text-white font-bold text-sm hover:opacity-90 active:scale-[0.98] transition-all shrink-0 disabled:opacity-60"
-                  >
-                    {addingToCart ? <RiLoader4Line size={18} className="animate-spin" /> : <RiShoppingCartLine size={18} />}
-                    {t("add_to_cart")}
-                  </button>
+                  {course.hasPurchased ? (
+                    loadingSections ? (
+                      <div className="flex items-center justify-center gap-x-2 h-11 px-5 rounded-lg bg-[var(--cta)]/60 text-white font-bold text-sm shrink-0 cursor-wait">
+                        <RiPlayCircleLine size={18} />
+                        {t("continue_learning")}
+                      </div>
+                    ) : (
+                      <Link
+                        href={continueHref}
+                        className="flex items-center justify-center gap-x-2 h-11 px-5 rounded-lg bg-[var(--cta)] text-white font-bold text-sm hover:opacity-90 active:scale-[0.98] transition-all shrink-0"
+                      >
+                        <RiPlayCircleLine size={18} />
+                        {t("continue_learning")}
+                      </Link>
+                    )
+                  ) : (
+                    <button
+                      onClick={() => addToCart(course.id)}
+                      disabled={addingToCart}
+                      className="flex items-center justify-center gap-x-2 h-11 px-5 rounded-lg bg-[var(--brand)] text-white font-bold text-sm hover:opacity-90 active:scale-[0.98] transition-all shrink-0 disabled:opacity-60"
+                    >
+                      {addingToCart ? <RiLoader4Line size={18} className="animate-spin" /> : <RiShoppingCartLine size={18} />}
+                      {t("add_to_cart")}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

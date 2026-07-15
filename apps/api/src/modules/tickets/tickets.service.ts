@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import type { Ticket as TicketContract, Paginated } from "@roohbakhsh/shared";
+import type { Ticket as TicketContract, AdminTicket, Paginated } from "@roohbakhsh/shared";
 import { toPaginated } from "../../common/utils/paginate";
 import { Ticket } from "./entities/ticket.entity";
 import { TicketMessage } from "./entities/ticket-message.entity";
@@ -46,14 +46,14 @@ export class TicketsService {
     return toPaginated(items.map((t) => this.toContract(t)), total, page, limit);
   }
 
-  async findAllAdmin(page: number, limit: number): Promise<Paginated<TicketContract>> {
+  async findAllAdmin(page: number, limit: number): Promise<Paginated<AdminTicket>> {
     const [items, total] = await this.repo.findAndCount({
-      relations: { messages: true },
+      relations: { messages: true, user: true },
       order: { createdAt: "DESC" },
       take: limit,
       skip: (page - 1) * limit,
     });
-    return toPaginated(items.map((t) => this.toContract(t)), total, page, limit);
+    return toPaginated(items.map((t) => this.toAdminContract(t)), total, page, limit);
   }
 
   async findOne(id: string, userId: string | null, isAdmin: boolean): Promise<TicketContract> {
@@ -134,6 +134,13 @@ export class TicketsService {
           authorType: m.authorType,
           createdAt: m.createdAt.toISOString(),
         })),
+    };
+  }
+
+  private toAdminContract(t: Ticket): AdminTicket {
+    return {
+      ...this.toContract(t),
+      user: t.user ? { id: t.user.id, fullName: t.user.fullName, email: t.user.email } : null,
     };
   }
 }

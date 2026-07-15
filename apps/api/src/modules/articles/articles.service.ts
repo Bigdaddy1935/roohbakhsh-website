@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  BadRequestException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -13,6 +14,7 @@ import { Category } from "../category/entities/category.entity";
 import { ReviewsService } from "../reviews/reviews.service";
 import { CreateArticleDto } from "./dto/create-article.dto";
 import { UpdateArticleDto } from "./dto/update-article.dto";
+import { Favorite } from "../favorites/entities/favorite.entity";
 
 const EMPTY_RATING: CourseRatingSummary = { averageRating: null, reviewCount: 0 };
 
@@ -25,6 +27,8 @@ export class ArticlesService {
     private readonly instructorRepo: Repository<Instructor>,
     @InjectRepository(Category)
     private readonly categoryRepo: Repository<Category>,
+    @InjectRepository(Favorite)
+    private readonly favoriteRepo: Repository<Favorite>,
     private readonly reviewsService: ReviewsService,
   ) {}
 
@@ -47,6 +51,10 @@ export class ArticlesService {
       bodyAr: dto.body.ar,
       bodyUr: dto.body.ur,
       thumbnailUrl: dto.thumbnailUrl ?? null,
+      metaTitle: dto.metaTitle ?? null,
+      metaDescription: dto.metaDescription ?? null,
+      metaKeywords: dto.metaKeywords ?? null,
+      robots: dto.robots ?? "index",
       instructorId: dto.instructorId,
       instructor,
       categoryId: dto.categoryId ?? null,
@@ -140,6 +148,10 @@ export class ArticlesService {
       article.bodyUr = dto.body.ur;
     }
     if (dto.thumbnailUrl !== undefined) article.thumbnailUrl = dto.thumbnailUrl ?? null;
+    if (dto.metaTitle !== undefined) article.metaTitle = dto.metaTitle ?? null;
+    if (dto.metaDescription !== undefined) article.metaDescription = dto.metaDescription ?? null;
+    if (dto.metaKeywords !== undefined) article.metaKeywords = dto.metaKeywords ?? null;
+    if (dto.robots) article.robots = dto.robots;
     if (dto.status && dto.status !== article.status) {
       article.status = dto.status;
       if (dto.status === "published" && !article.publishedAt) {
@@ -155,6 +167,10 @@ export class ArticlesService {
   async remove(id: string): Promise<void> {
     const article = await this.repo.findOne({ where: { id } });
     if (!article) throw new NotFoundException("ARTICLE_NOT_FOUND");
+
+    const hasFavorite = await this.favoriteRepo.exists({ where: { type: "article", targetId: id } });
+    if (hasFavorite) throw new BadRequestException("ARTICLE_IN_FAVORITES");
+
     await this.repo.remove(article);
   }
 
@@ -166,6 +182,10 @@ export class ArticlesService {
       summary: a.summary,
       body: { ar: a.bodyAr, ur: a.bodyUr },
       thumbnailUrl: a.thumbnailUrl ?? { ar: null, ur: null },
+      metaTitle: a.metaTitle ?? null,
+      metaDescription: a.metaDescription ?? null,
+      metaKeywords: a.metaKeywords ?? null,
+      robots: a.robots ?? "index",
       instructorId: a.instructorId,
       instructor: {
         id: a.instructor.id,

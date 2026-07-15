@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/navigation";
@@ -129,11 +130,13 @@ export default function HeroSection() {
 
             {/* ── Hero image ── */}
             <div className="flex-1 w-full max-w-md lg:max-w-none flex items-end justify-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src="https://sabzlearn.ir/young-man.webp"
                 alt="طالب يتعلم العلوم الإسلامية"
-                className="w-full max-w-[520px] object-contain drop-shadow-2xl"
+                width={520}
+                height={560}
+                className="w-full h-auto max-w-[520px] object-contain drop-shadow-2xl"
+                priority
               />
             </div>
 

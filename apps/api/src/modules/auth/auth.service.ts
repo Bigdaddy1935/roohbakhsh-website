@@ -161,6 +161,14 @@ export class AuthService {
     await this.sendVerificationEmail(user);
   }
 
+  async changePassword(userId: string, newPassword: string): Promise<void> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException("INVALID_CREDENTIALS");
+    user.passwordHash = await bcrypt.hash(newPassword, 12);
+    await this.userRepo.save(user);
+    await this.refreshRepo.delete({ userId: user.id });
+  }
+
   // ── helpers ──────────────────────────────────────────────────────────────
 
   private async sendVerificationEmail(user: User): Promise<void> {

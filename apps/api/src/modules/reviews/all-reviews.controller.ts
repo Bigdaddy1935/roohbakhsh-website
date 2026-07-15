@@ -3,7 +3,10 @@ import {
   Get,
   Post,
   Param,
+  Body,
   Query,
+  HttpCode,
+  HttpStatus,
   UseGuards,
   ParseIntPipe,
   DefaultValuePipe,
@@ -19,6 +22,7 @@ import {
   ApiCookieAuth,
 } from "@nestjs/swagger";
 import { ReviewsService } from "./reviews.service";
+import { ReplyReviewDto } from "./dto/reply-review.dto";
 import { Public } from "../auth/decorators/public.decorator";
 import { RolesGuard, Roles } from "../../common/guards/roles.guard";
 import { ApiErrorSchema } from "../../common/swagger/api-error.schema";
@@ -85,5 +89,40 @@ export class AllReviewsController {
   @ApiResponse({ status: 404, description: "REVIEW_NOT_FOUND", type: ApiErrorSchema })
   approve(@Param("id") id: string) {
     return this.svc.approve(id);
+  }
+
+  @Post(":id/reject")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBearerAuth()
+  @ApiCookieAuth("access_token")
+  @UseGuards(RolesGuard)
+  @Roles("admin")
+  @ApiOperation({
+    summary: "رد یک نظر — فقط admin",
+    description: "نظر کاملاً حذف می‌شود.",
+  })
+  @ApiParam({ name: "id", description: "UUID نظر" })
+  @ApiResponse({ status: 204, description: "نظر حذف شد" })
+  @ApiResponse({ status: 403, description: "دسترسی فقط برای admin", type: ApiErrorSchema })
+  @ApiResponse({ status: 404, description: "REVIEW_NOT_FOUND", type: ApiErrorSchema })
+  reject(@Param("id") id: string) {
+    return this.svc.reject(id);
+  }
+
+  @Post(":id/reply")
+  @ApiBearerAuth()
+  @ApiCookieAuth("access_token")
+  @UseGuards(RolesGuard)
+  @Roles("admin")
+  @ApiOperation({
+    summary: "ثبت/ویرایش پاسخ مدیر روی یک نظر — فقط admin",
+    description: "چه نظر روی دوره باشد چه روی مقاله، فارغ از نوع هدف. اگر قبلاً پاسخی ثبت شده باشد، بازنویسی می‌شود.",
+  })
+  @ApiParam({ name: "id", description: "UUID نظر" })
+  @ApiResponse({ status: 201, description: "پاسخ ثبت شد" })
+  @ApiResponse({ status: 403, description: "دسترسی فقط برای admin", type: ApiErrorSchema })
+  @ApiResponse({ status: 404, description: "REVIEW_NOT_FOUND", type: ApiErrorSchema })
+  reply(@Param("id") id: string, @Body() dto: ReplyReviewDto) {
+    return this.svc.replyById(id, dto);
   }
 }

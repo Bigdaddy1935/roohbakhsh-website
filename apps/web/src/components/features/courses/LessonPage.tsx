@@ -23,6 +23,7 @@ import {
   RiCloseLine,
   RiReplyLine,
   RiSendPlaneLine,
+  RiDownloadLine,
 } from "react-icons/ri";
 import VideoPlayer from "@/components/ui/VideoPlayer";
 import { toast } from "sonner";
@@ -30,10 +31,11 @@ import { useCourse, useCourseSections } from "@/hooks/queries/use-courses";
 import { useCourseProgress, useWatchLesson } from "@/hooks/queries/use-progress";
 import { useMyFavorites, useToggleFavorite } from "@/hooks/queries/use-favorites";
 import {
-  useLessonReviews, useCreateLessonReview,
+  useCourseReviews, useCreateCourseReview,
   useApproveReview, useRejectReview, useReplyToReview, usePendingReviews,
 } from "@/hooks/queries/use-reviews";
 import { useMe } from "@/hooks/queries/use-auth";
+import { useRecordView } from "@/hooks/queries/use-recently-viewed";
 import { tokenStore } from "@/lib/api-client";
 import type { SectionRecord, Lesson, ReviewRecord } from "@roohbakhsh/shared";
 
@@ -98,7 +100,7 @@ function SidebarChapter({
         <div className="mt-2 flex flex-col gap-y-0.5">
           {section.lessons.map((lesson, idx) => {
             const active = lesson.id === activeLessonId;
-            const locked = !lesson.isFreePreview;
+            const locked = !(lesson.videoUrl[locale] ?? lesson.videoUrl.ar ?? lesson.videoUrl.ur);
             const itemClass = `flex items-center gap-x-2.5 px-3 py-2 rounded-md text-sm transition-colors flex-1 min-w-0 ${active ? "bg-[var(--brand)]/10 text-[var(--brand)] font-semibold" : locked ? "text-gray-400 cursor-default" : "text-gray-600 hover:bg-gray-100"}`;
             return (
               <div key={lesson.id} className="flex items-center gap-x-1.5">
@@ -126,7 +128,7 @@ function SidebarChapter({
   );
 }
 
-function AdminReviewActions({ review, courseSlug, t }: { review: ReviewRecord; courseSlug: string; t: (k: string) => string }) {
+function AdminReviewActions({ review, t }: { review: ReviewRecord; t: (k: string) => string }) {
   const approveReview = useApproveReview();
   const rejectReview = useRejectReview();
   const replyToReview = useReplyToReview();
@@ -141,7 +143,7 @@ function AdminReviewActions({ review, courseSlug, t }: { review: ReviewRecord; c
   function handleSubmitReply() {
     if (!reply.trim()) return;
     replyToReview.mutate(
-      { courseSlug, reviewId: review.id, reply: reply.trim() },
+      { reviewId: review.id, reply: reply.trim() },
       { onSuccess: () => { toast.success(t("reply_submitted_toast")); setReplyOpen(false); } },
     );
   }
@@ -205,19 +207,19 @@ function AdminReviewActions({ review, courseSlug, t }: { review: ReviewRecord; c
   );
 }
 
-function QASection({ lessonId, courseSlug, t }: { lessonId: string; courseSlug: string; t: (k: string) => string }) {
+function QASection({ courseSlug, t }: { courseSlug: string; t: (k: string) => string }) {
   const locale = useLocale() as "ar" | "ur";
-  const { data, isLoading } = useLessonReviews(lessonId, { limit: 10 });
+  const { data, isLoading } = useCourseReviews(courseSlug, { limit: 10 });
   const { data: me } = useMe();
   const isAdmin = me?.role === "admin";
   const { data: pendingData } = usePendingReviews({ limit: 100 });
-  const createReview = useCreateLessonReview();
+  const createReview = useCreateCourseReview();
   const [formOpen, setFormOpen] = useState(false);
   const [comment, setComment] = useState("");
 
   const approvedReviews = data?.items ?? [];
   const pendingForLesson = isAdmin
-    ? (pendingData?.items ?? []).filter((p) => p.target.type === "lesson" && p.target.id === lessonId)
+    ? (pendingData?.items ?? []).filter((p) => p.target.type === "course" && p.target.slug === courseSlug)
     : [];
   const reviewMap = new Map<string, (typeof approvedReviews)[number]>();
   for (const r of approvedReviews) reviewMap.set(r.id, r);
@@ -230,7 +232,7 @@ function QASection({ lessonId, courseSlug, t }: { lessonId: string; courseSlug: 
   function handleSubmit() {
     if (!comment.trim()) return;
     createReview.mutate(
-      { lessonId, comment: comment.trim() },
+      { courseSlug, comment: comment.trim() },
       {
         onSuccess: () => {
           toast.success(t("review_submitted_toast"));
@@ -376,7 +378,7 @@ function QASection({ lessonId, courseSlug, t }: { lessonId: string; courseSlug: 
                 </div>
               )}
 
-              {isAdmin && <AdminReviewActions review={r} courseSlug={courseSlug} t={t} />}
+              {isAdmin && <AdminReviewActions review={r} t={t} />}
             </div>
           ))}
         </div>
@@ -398,6 +400,14 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
   const watchLesson = useWatchLesson();
   const { data: favorites } = useMyFavorites();
   const toggleFavorite = useToggleFavorite();
+  const { mutate: recordView } = useRecordView();
+
+  useEffect(() => {
+    if (isAuthed && lessonId) {
+      recordView({ type: "lesson", id: lessonId });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- فقط وقتی lessonId عوض شد یک بار ثبت شود
+  }, [lessonId]);
 
   if (loadingCourse || loadingSections) {
     return (
@@ -528,7 +538,9 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
     return <div className="container py-32 text-center text-gray-400">{t("not_found")}</div>;
   }
 
-  if (!lesson.isFreePreview) {
+  const videoUrl = lesson.videoUrl[locale] ?? lesson.videoUrl.ar ?? lesson.videoUrl.ur;
+
+  if (!videoUrl) {
     return (
       <div className="container py-32 flex flex-col items-center text-center gap-y-4">
         <div className="size-16 rounded-lg bg-gray-100 flex items-center justify-center">
@@ -548,7 +560,6 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
 
   const totalLessons = allLessons.length;
   const hoursTotal = Math.round(course.durationMinutes / 60 * 10) / 10;
-  const videoUrl = lesson.videoUrl[locale] ?? lesson.videoUrl.ar ?? lesson.videoUrl.ur;
 
   const isLessonFavorite = !!favorites?.some((f) => f.type === "lesson" && f.id === lesson.id);
   const isLessonWatched = !!progress?.watchedLessonIds?.includes(lesson.id);
@@ -603,6 +614,19 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
             </div>
           )}
         </div>
+
+        {videoUrl && course.accessType === "downloadable" && (
+          <a
+            href={videoUrl}
+            download
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-x-1.5 w-fit mt-3 h-9 px-4 rounded-lg border border-[var(--brand)]/30 text-[var(--brand)] text-sm font-semibold hover:bg-[var(--brand)]/5 transition-colors"
+          >
+            <RiDownloadLine size={16} />
+            {t("download_lesson")}
+          </a>
+        )}
       </div>
 
       <div className="container pb-14 pt-8">
@@ -685,7 +709,7 @@ export default function LessonPage({ courseId, lessonId }: { courseId: string; l
             </div>
 
             <div ref={qaRef}>
-              <QASection lessonId={lesson.id} courseSlug={courseId} t={t} />
+              <QASection courseSlug={courseId} t={t} />
             </div>
           </main>
 

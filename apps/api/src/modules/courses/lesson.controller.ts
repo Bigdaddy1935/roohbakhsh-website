@@ -1,6 +1,6 @@
 import {
   Controller, Get, Post, Patch, Delete,
-  Param, Body, Query, UseGuards, HttpCode, HttpStatus,
+  Param, Body, Query, Request, UseGuards, HttpCode, HttpStatus,
 } from "@nestjs/common";
 import {
   ApiTags, ApiOperation, ApiResponse,
@@ -10,6 +10,7 @@ import { LessonService } from "./lesson.service";
 import { CreateLessonDto } from "./dto/create-lesson.dto";
 import { UpdateLessonDto } from "./dto/update-lesson.dto";
 import { Public } from "../auth/decorators/public.decorator";
+import { OptionalJwtAuthGuard } from "../auth/guards/optional-jwt-auth.guard";
 import { RolesGuard, Roles } from "../../common/guards/roles.guard";
 import { ApiErrorSchema } from "../../common/swagger/api-error.schema";
 import { LessonSchema } from "../../common/swagger/course.schema";
@@ -24,10 +25,13 @@ export class LessonController {
   constructor(private readonly lessonService: LessonService) {}
 
   @Public()
+  @UseGuards(OptionalJwtAuthGuard)
   @Get()
   @ApiOperation({
     summary: "درس‌های یک سرفصل",
-    description: "درس‌های یک سرفصل را صفحه‌بندی‌شده و به‌ترتیب `order` برمی‌گرداند.",
+    description:
+      "درس‌های یک سرفصل را صفحه‌بندی‌شده و به‌ترتیب `order` برمی‌گرداند. " +
+      "`videoUrl` فقط برای درس‌های `isFreePreview: true`، خریداران دوره، یا admin مقدار واقعی دارد.",
   })
   @ApiHeader(LANG_HEADER)
   @ApiParam({ name: "courseSlug", description: "slug دوره", example: "tafsir-quran-mobtadi" })
@@ -38,15 +42,20 @@ export class LessonController {
     @Param("courseSlug") courseSlug: string,
     @Param("sectionId") sectionId: string,
     @Query() query: PaginationDto,
+    @Request() req: { user: { id: string; role: string } | null },
   ) {
-    return this.lessonService.findBySection(courseSlug, sectionId, query.page ?? 1, query.limit ?? 50);
+    return this.lessonService.findBySection(
+      courseSlug, sectionId, query.page ?? 1, query.limit ?? 50,
+      req.user?.id, req.user?.role === "admin",
+    );
   }
 
   @Public()
+  @UseGuards(OptionalJwtAuthGuard)
   @Get(":lessonId")
   @ApiOperation({
     summary: "مشخصات یک درس",
-    description: "یک درس مشخص از یک سرفصل را برمی‌گرداند.",
+    description: "یک درس مشخص از یک سرفصل را برمی‌گرداند. همان قانون دسترسی به `videoUrl` بالا صدق می‌کند.",
   })
   @ApiHeader(LANG_HEADER)
   @ApiParam({ name: "courseSlug", description: "slug دوره" })
@@ -58,8 +67,9 @@ export class LessonController {
     @Param("courseSlug") courseSlug: string,
     @Param("sectionId") sectionId: string,
     @Param("lessonId") lessonId: string,
+    @Request() req: { user: { id: string; role: string } | null },
   ) {
-    return this.lessonService.findOne(courseSlug, sectionId, lessonId);
+    return this.lessonService.findOne(courseSlug, sectionId, lessonId, req.user?.id, req.user?.role === "admin");
   }
 
   @UseGuards(RolesGuard)

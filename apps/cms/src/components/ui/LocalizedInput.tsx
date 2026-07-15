@@ -2,7 +2,8 @@
 
 import type { Localized } from "@roohbakhsh/shared";
 
-const inputCls = "w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--brand)] bg-white transition-colors";
+const inputCls = "w-full h-[48px] border border-gray-200 rounded-md px-3 text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--brand)] bg-white transition-colors";
+const textareaCls = "w-full min-h-[140px] border border-gray-200 rounded-md px-3 py-2.5 text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--brand)] bg-white transition-colors resize-y";
 
 interface LocalizedInputProps {
   label: string;
@@ -12,6 +13,8 @@ interface LocalizedInputProps {
   required?: boolean;
   multiline?: boolean;
   layout?: "stacked" | "grid";
+  /** اگر داده بشه فقط همون locale نمایش داده می‌شه (برای فرم‌هایی با تب زبان) */
+  locale?: "ar" | "ur";
 }
 
 export default function LocalizedInput({
@@ -22,7 +25,40 @@ export default function LocalizedInput({
   required,
   multiline,
   layout = "stacked",
+  locale,
 }: LocalizedInputProps) {
+  if (locale) {
+    const inputValue = value[locale] ?? "";
+    const inputPlaceholder = placeholder?.[locale];
+    return (
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-gray-700">
+          {label}
+          {required && <span className="text-red-500 mr-1">*</span>}
+        </span>
+        {multiline ? (
+          <textarea
+            value={inputValue}
+            onChange={(e) => onChange({ ...value, [locale]: e.target.value })}
+            placeholder={inputPlaceholder}
+            required={required}
+            dir="rtl"
+            className={textareaCls}
+          />
+        ) : (
+          <input
+            value={inputValue}
+            onChange={(e) => onChange({ ...value, [locale]: e.target.value })}
+            placeholder={inputPlaceholder}
+            required={required}
+            dir="rtl"
+            className={inputCls}
+          />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-2">
       <span className="text-sm font-medium text-gray-700">
@@ -38,9 +74,8 @@ export default function LocalizedInput({
               onChange={(e) => onChange({ ...value, ar: e.target.value })}
               placeholder={placeholder?.ar}
               required={required}
-              rows={3}
               dir="rtl"
-              className={inputCls}
+              className={textareaCls}
             />
           ) : (
             <input
@@ -60,9 +95,8 @@ export default function LocalizedInput({
               value={value.ur}
               onChange={(e) => onChange({ ...value, ur: e.target.value })}
               placeholder={placeholder?.ur}
-              rows={3}
               dir="rtl"
-              className={inputCls}
+              className={textareaCls}
             />
           ) : (
             <input

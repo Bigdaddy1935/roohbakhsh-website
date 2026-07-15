@@ -29,13 +29,13 @@ export default function FormModal({
 
   return (
     <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <Modal.Backdrop>
+      <Modal.Backdrop isDismissable={false}>
         <Modal.Container
           placement="center"
           className={
             isCover
               ? "!w-[95vw] !h-[92vh] !max-w-none !m-auto"
-              : "max-w-2xl w-full mx-4"
+              : "max-w-4xl w-full mx-4"
           }
         >
           <Modal.Dialog
@@ -56,7 +56,7 @@ export default function FormModal({
             <form onSubmit={onSubmit} className="flex flex-col min-h-0 flex-1">
               <Modal.Body
                 className={`flex flex-col gap-4 overflow-y-auto ${
-                  isCover ? "flex-1" : "max-h-[60vh]"
+                  isCover ? "flex-1" : "max-h-[70vh]"
                 }`}
               >
                 {children}

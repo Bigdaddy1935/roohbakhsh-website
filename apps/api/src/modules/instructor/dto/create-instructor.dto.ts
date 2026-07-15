@@ -1,7 +1,7 @@
-import { IsString, IsOptional, ValidateNested, IsObject, IsUrl } from "class-validator";
+import { IsString, IsOptional, ValidateNested, IsObject, IsUrl, IsEnum } from "class-validator";
 import { Type } from "class-transformer";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import type { CreateInstructorRequest, Localized } from "@roohbakhsh/shared";
+import type { CreateInstructorRequest, Localized, StaffType } from "@roohbakhsh/shared";
 
 class LocalizedDto implements Localized {
   @ApiProperty({ example: "الشيخ أحمد" })
@@ -26,13 +26,18 @@ export class CreateInstructorDto implements CreateInstructorRequest {
 
   @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/avatars/ahmad.webp", description: "لینک تصویر پروفایل استاد (اختیاری)" })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   avatarUrl?: string;
 
-  @ApiPropertyOptional({ type: LocalizedDto, description: "بیوگرافی کوتاه استاد (اختیاری)" })
+  @ApiPropertyOptional({ type: LocalizedDto, description: "بیوگرافی کوتاه (اختیاری)" })
   @IsOptional()
   @ValidateNested()
   @Type(() => LocalizedDto)
   @IsObject()
   bio?: Localized;
+
+  @ApiPropertyOptional({ enum: ["instructor", "author"], default: "instructor", description: "نوع کارمند: استاد یا نویسنده" })
+  @IsOptional()
+  @IsEnum(["instructor", "author"])
+  staffType?: StaffType;
 }

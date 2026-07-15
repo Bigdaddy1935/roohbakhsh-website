@@ -21,6 +21,19 @@ export function useReviewsPending(params?: { page?: number; limit?: number }) {
   });
 }
 
+/** همه‌ی نظرات تأییدشده (دوره + مقاله) — برای مرور تاریخچه. */
+export function useAllReviews(params?: { page?: number; limit?: number }) {
+  const qs = new URLSearchParams();
+  if (params?.page) qs.set("page", String(params.page));
+  if (params?.limit) qs.set("limit", String(params.limit));
+  const query = qs.toString() ? `?${qs}` : "";
+
+  return useQuery<Paginated<ReviewWithTarget>>({
+    queryKey: reviewKeys.all(params),
+    queryFn: () => api.get<Paginated<ReviewWithTarget>>(`/reviews${query}`),
+  });
+}
+
 export function useApproveReview() {
   const qc = useQueryClient();
   return useMutation<unknown, Error, string>({
@@ -40,7 +53,7 @@ export function useRejectReview() {
 export function useReplyReview() {
   const qc = useQueryClient();
   return useMutation<unknown, Error, { id: string; body: string }>({
-    mutationFn: ({ id, body }) => api.post(`/reviews/${id}/reply`, { body }),
+    mutationFn: ({ id, body }) => api.post(`/reviews/${id}/reply`, { reply: body }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["reviews"] }),
   });
 }
@@ -49,7 +62,7 @@ export function useReplyCourseReview() {
   const qc = useQueryClient();
   return useMutation<unknown, Error, { courseSlug: string; reviewId: string; body: string }>({
     mutationFn: ({ courseSlug, reviewId, body }) =>
-      api.post(`/courses/${courseSlug}/reviews/${reviewId}/reply`, { body }),
+      api.post(`/courses/${courseSlug}/reviews/${reviewId}/reply`, { reply: body }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["reviews"] }),
   });
 }

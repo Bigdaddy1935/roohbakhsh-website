@@ -159,6 +159,8 @@ export interface CourseRecord {
   instructorId: ID;
   instructor: InstructorSummary;
   categoryId: ID | null;
+  /** آیا کاربر جاری (لاگین‌شده) این دوره را قبلاً با سفارش paid خریده است؟ برای مهمان همیشه false. */
+  hasPurchased: boolean;
   createdAt: ISODate;
   updatedAt: ISODate;
 }

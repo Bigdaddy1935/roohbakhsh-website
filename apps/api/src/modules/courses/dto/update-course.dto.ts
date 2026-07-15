@@ -19,24 +19,24 @@ class LocalizedDto implements Localized {
 class LocalizedNullableDto {
   @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/ar/c01.webp", nullable: true })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   ar!: string | null;
 
   @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/ur/c01.webp", nullable: true })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   ur!: string | null;
 }
 
 class LocalizedVideoUrlDto {
   @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/videos/ar/intro.mp4", nullable: true })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   ar!: string | null;
 
   @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/videos/ur/intro.mp4", nullable: true })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   ur!: string | null;
 }
 

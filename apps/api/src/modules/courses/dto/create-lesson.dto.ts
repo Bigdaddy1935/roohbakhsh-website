@@ -16,12 +16,12 @@ class LocalizedDto implements Localized {
 class LocalizedVideoUrlDto {
   @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/videos/ar/lesson01.mp4", nullable: true })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   ar!: string | null;
 
   @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/videos/ur/lesson01.mp4", nullable: true })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   ur!: string | null;
 }
 

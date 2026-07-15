@@ -31,7 +31,7 @@ export class ReviewsService {
     const course = await this.courseBySlug(courseSlug);
 
     const saved = await this.repo.save(
-      this.repo.create({ courseId: course.id, userId, rating: dto.rating, comment: dto.comment ?? null }),
+      this.repo.create({ courseId: course.id, userId, rating: dto.rating ?? 5, comment: dto.comment ?? null }),
     );
     return this.toContract(await this.withUser(saved.id));
   }
@@ -140,6 +140,23 @@ export class ReviewsService {
     if (!review) throw new NotFoundException("REVIEW_NOT_FOUND");
 
     review.isApproved = true;
+    return this.toContract(await this.repo.save(review));
+  }
+
+  /** رد یک نظر توسط admin — نظر کاملاً حذف می‌شود. */
+  async reject(reviewId: string): Promise<void> {
+    const review = await this.repo.findOne({ where: { id: reviewId } });
+    if (!review) throw new NotFoundException("REVIEW_NOT_FOUND");
+    await this.repo.remove(review);
+  }
+
+  /** ثبت/ویرایش پاسخ مدیر روی یک نظر — چه دوره چه مقاله، فارغ از نوع هدف. */
+  async replyById(reviewId: string, dto: ReplyReviewDto): Promise<ReviewRecord> {
+    const review = await this.repo.findOne({ where: { id: reviewId }, relations: { user: true } });
+    if (!review) throw new NotFoundException("REVIEW_NOT_FOUND");
+
+    review.instructorReply = dto.reply;
+    review.repliedAt = new Date();
     return this.toContract(await this.repo.save(review));
   }
 

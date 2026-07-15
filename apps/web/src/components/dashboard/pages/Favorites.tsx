@@ -79,13 +79,13 @@ export default function Favorites() {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-y-1.5">
-          {items.map((item) => {
+        <div className="flex flex-col">
+          {items.map((item, idx) => {
             const cfg = TYPE_CONFIG[item.type];
             return (
               <div
                 key={`${item.type}-${item.id}`}
-                className="flex items-center gap-x-3 sm:gap-x-4 p-3 rounded-md hover:bg-gray-50 transition-colors group"
+                className={`flex items-center gap-x-3 sm:gap-x-4 py-4 px-1 hover:bg-gray-50 transition-colors group ${idx < items.length - 1 ? "border-b border-gray-100" : ""}`}
               >
                 <div className={`size-11 sm:size-12 shrink-0 rounded-md ${cfg.bg} flex items-center justify-center`}>
                   <cfg.Icon size={22} className={cfg.color} />

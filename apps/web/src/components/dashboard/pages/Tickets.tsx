@@ -139,7 +139,7 @@ export default function Tickets() {
           {tickets.map((tk) => {
             const cfg = STATUS_CFG[tk.status];
             return (
-              <div key={tk.id} className="group p-4 sm:p-5 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+              <div key={tk.id} className="group p-4 sm:p-5 rounded-lg border border-gray-200 hover:border-[var(--brand)]/40 transition-colors">
                 <div className="flex items-start justify-between gap-x-3 mb-3">
                   <div className="flex items-start gap-x-3 min-w-0">
                     <div className={`size-8 shrink-0 rounded-lg ${cfg.badge} flex items-center justify-center mt-0.5`}>

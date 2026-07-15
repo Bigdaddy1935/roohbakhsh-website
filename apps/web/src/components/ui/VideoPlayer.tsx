@@ -48,8 +48,8 @@ export default function VideoPlayer({ url, poster, onPlay }: { url: string; post
 
   // Pause video (audio+video) when component unmounts
   useEffect(() => {
+    const v = videoRef.current;
     return () => {
-      const v = videoRef.current;
       if (v) { v.pause(); v.src = ""; v.load(); }
     };
   }, []);

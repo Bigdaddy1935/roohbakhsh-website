@@ -10,7 +10,7 @@ export class Favorite {
   @Column({ name: "user_id", type: "varchar" })
   userId!: string;
 
-  @Column({ type: "enum", enum: ["course", "article"] })
+  @Column({ type: "enum", enum: ["course", "article", "lesson"] })
   type!: FavoriteType;
 
   @Column({ name: "target_id", type: "varchar" })

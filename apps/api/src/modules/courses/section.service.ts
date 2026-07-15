@@ -1,11 +1,15 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import type { SectionRecord } from "@roohbakhsh/shared";
 import { Section } from "./entities/section.entity";
+import { Lesson } from "./entities/lesson.entity";
 import { Course } from "./entities/course.entity";
 import { CreateSectionDto } from "./dto/create-section.dto";
 import { UpdateSectionDto } from "./dto/update-section.dto";
+import { CourseAccessService } from "./course-access.service";
+import { LessonProgress } from "../progress/entities/lesson-progress.entity";
+import { Favorite } from "../favorites/entities/favorite.entity";
 
 @Injectable()
 export class SectionService {
@@ -14,31 +18,40 @@ export class SectionService {
     private readonly sectionRepo: Repository<Section>,
     @InjectRepository(Course)
     private readonly courseRepo: Repository<Course>,
+    @InjectRepository(Lesson)
+    private readonly lessonRepo: Repository<Lesson>,
+    @InjectRepository(LessonProgress)
+    private readonly progressRepo: Repository<LessonProgress>,
+    @InjectRepository(Favorite)
+    private readonly favoriteRepo: Repository<Favorite>,
+    private readonly courseAccess: CourseAccessService,
   ) {}
 
-  async findByCourse(courseSlug: string): Promise<SectionRecord[]> {
-    const course = await this.courseBySlug(courseSlug);
+  async findByCourse(courseSlug: string, userId?: string, isAdmin?: boolean): Promise<SectionRecord[]> {
+    const course = isAdmin ? await this.courseBySlugOrId(courseSlug) : await this.publishedCourseBySlugOrId(courseSlug);
     const sections = await this.sectionRepo.find({
       where: { courseId: course.id },
       relations: { lessons: true },
       order: { order: "ASC", lessons: { order: "ASC" } },
     });
-    return sections.map((s) => this.toContract(s));
+    const hasPurchased = isAdmin || (await this.courseAccess.hasPurchased(userId, course.id));
+    return sections.map((s) => this.toContract(s, hasPurchased));
   }
 
-  async findOne(courseSlug: string, sectionId: string): Promise<SectionRecord> {
-    const course = await this.courseBySlug(courseSlug);
+  async findOne(courseSlug: string, sectionId: string, userId?: string, isAdmin?: boolean): Promise<SectionRecord> {
+    const course = isAdmin ? await this.courseBySlugOrId(courseSlug) : await this.publishedCourseBySlugOrId(courseSlug);
     const section = await this.sectionRepo.findOne({
       where: { id: sectionId, courseId: course.id },
       relations: { lessons: true },
       order: { lessons: { order: "ASC" } },
     });
     if (!section) throw new NotFoundException("SECTION_NOT_FOUND");
-    return this.toContract(section);
+    const hasPurchased = isAdmin || (await this.courseAccess.hasPurchased(userId, course.id));
+    return this.toContract(section, hasPurchased);
   }
 
   async create(courseSlug: string, dto: CreateSectionDto): Promise<SectionRecord> {
-    const course = await this.courseBySlug(courseSlug);
+    const course = await this.courseBySlugOrId(courseSlug);
     const section = this.sectionRepo.create({
       courseId: course.id,
       title: dto.title,
@@ -46,11 +59,11 @@ export class SectionService {
     });
     const saved = await this.sectionRepo.save(section);
     saved.lessons = [];
-    return this.toContract(saved);
+    return this.toContract(saved, true);
   }
 
   async update(courseSlug: string, sectionId: string, dto: UpdateSectionDto): Promise<SectionRecord> {
-    const course = await this.courseBySlug(courseSlug);
+    const course = await this.courseBySlugOrId(courseSlug);
     const section = await this.sectionRepo.findOne({
       where: { id: sectionId, courseId: course.id },
       relations: { lessons: true },
@@ -61,13 +74,31 @@ export class SectionService {
     if (dto.title !== undefined) section.title = dto.title;
     if (dto.order !== undefined) section.order = dto.order;
 
-    return this.toContract(await this.sectionRepo.save(section));
+    return this.toContract(await this.sectionRepo.save(section), true);
   }
 
   async remove(courseSlug: string, sectionId: string): Promise<void> {
-    const course = await this.courseBySlug(courseSlug);
+    const course = await this.courseBySlugOrId(courseSlug);
     const section = await this.sectionRepo.findOne({ where: { id: sectionId, courseId: course.id } });
     if (!section) throw new NotFoundException("SECTION_NOT_FOUND");
+
+    const lessons = await this.lessonRepo.find({ where: { sectionId }, select: { id: true } });
+    const lessonIds = lessons.map((l) => l.id);
+
+    if (lessonIds.length > 0) {
+      const hasProgress = await this.progressRepo
+        .createQueryBuilder("p")
+        .where("p.lessonId IN (:...ids)", { ids: lessonIds })
+        .getExists();
+      if (hasProgress) throw new BadRequestException("SECTION_LESSONS_HAVE_PROGRESS");
+
+      const hasFavorite = await this.favoriteRepo
+        .createQueryBuilder("f")
+        .where("f.type = 'lesson' AND f.targetId IN (:...ids)", { ids: lessonIds })
+        .getExists();
+      if (hasFavorite) throw new BadRequestException("SECTION_LESSONS_IN_FAVORITES");
+    }
+
     await this.sectionRepo.remove(section);
     await this.reorderSections(course.id);
   }
@@ -82,13 +113,27 @@ export class SectionService {
     );
   }
 
-  private async courseBySlug(slug: string): Promise<Course> {
-    const course = await this.courseRepo.findOne({ where: { slug } });
+  private isUuid(val: string): boolean {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+  }
+
+  private async courseBySlugOrId(slugOrId: string): Promise<Course> {
+    const where = this.isUuid(slugOrId) ? { id: slugOrId } : { slug: slugOrId };
+    const course = await this.courseRepo.findOne({ where });
     if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
     return course;
   }
 
-  private toContract(section: Section): SectionRecord {
+  private async publishedCourseBySlugOrId(slugOrId: string): Promise<Course> {
+    const where = this.isUuid(slugOrId)
+      ? { id: slugOrId, isPublished: true }
+      : { slug: slugOrId, isPublished: true };
+    const course = await this.courseRepo.findOne({ where });
+    if (!course) throw new NotFoundException("COURSE_NOT_FOUND");
+    return course;
+  }
+
+  private toContract(section: Section, hasPurchased = false): SectionRecord {
     return {
       id: section.id,
       courseId: section.courseId,
@@ -97,7 +142,7 @@ export class SectionService {
       lessons: (section.lessons ?? []).map((l) => ({
         id: l.id,
         title: l.title,
-        videoUrl: l.videoUrl ?? { ar: null, ur: null },
+        videoUrl: l.isFreePreview || hasPurchased ? (l.videoUrl ?? { ar: null, ur: null }) : { ar: null, ur: null },
         order: l.order,
         durationMinutes: l.durationMinutes,
         isFreePreview: l.isFreePreview,

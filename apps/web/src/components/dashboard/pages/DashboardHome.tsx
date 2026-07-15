@@ -135,33 +135,41 @@ export default function DashboardHome() {
             <p className="text-sm">{ui.noCourses}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {data.recentViews.slice(0, 4).map((v) => {
               const progress = progressByCourseId.get(v.courseId) ?? 0;
               return (
                 <Link
                   key={`${v.type}-${v.id}`}
                   href={`/courses/${v.courseId}`}
-                  className="group flex flex-col rounded-md overflow-hidden hover:shadow-md transition-all duration-200"
+                  className="group flex flex-col rounded-lg border border-gray-200 hover:border-[var(--brand)]/40 transition-colors duration-300 bg-white p-3"
                 >
-                  <div className="aspect-video bg-gradient-to-br from-[var(--brand)]/20 to-[var(--brand)]/5 flex items-center justify-center">
-                    <RiPlayCircleLine
-                      size={32}
-                      className="text-[var(--brand)]/40 group-hover:text-[var(--brand)]/70 transition-colors"
-                    />
+                  <div className="aspect-video bg-[var(--brand)]/8 relative flex items-center justify-center rounded-md overflow-hidden">
+                    {v.thumbnailUrl?.[locale] || v.thumbnailUrl?.ar ? (
+                      <img
+                        src={v.thumbnailUrl[locale] ?? v.thumbnailUrl.ar ?? ""}
+                        alt={v.title[locale] ?? ""}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    ) : (
+                      <RiPlayCircleLine
+                        size={32}
+                        className="text-[var(--brand)]/30 group-hover:text-[var(--brand)]/60 transition-colors"
+                      />
+                    )}
                   </div>
-                  <div className="p-3 bg-gray-50 flex-1">
-                    <p className="text-xs font-semibold text-[var(--ink)] line-clamp-2 mb-2 leading-relaxed">
+                  <div className="pt-3 flex-1">
+                    <p className="text-xs font-semibold text-[var(--ink)] line-clamp-2 leading-relaxed">
                       {v.title[locale]}
                     </p>
-                    <div className="flex items-center gap-x-2">
-                      <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="flex items-center gap-x-2 mt-4">
+                      <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-[var(--brand)] rounded-full transition-all"
                           style={{ width: `${progress}%` }}
                         />
                       </div>
-                      <span className="text-[10px] text-gray-400 shrink-0">{progress}%</span>
+                      <span className="text-xs text-gray-500 shrink-0 font-medium">{progress}%</span>
                     </div>
                   </div>
                 </Link>

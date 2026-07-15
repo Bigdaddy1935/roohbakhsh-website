@@ -1,7 +1,7 @@
-import { IsString, IsOptional, ValidateNested, IsObject, IsUrl } from "class-validator";
+import { IsString, IsOptional, ValidateNested, IsObject, IsUrl, IsEnum } from "class-validator";
 import { Type } from "class-transformer";
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import type { UpdateInstructorRequest, Localized } from "@roohbakhsh/shared";
+import type { UpdateInstructorRequest, Localized, StaffType } from "@roohbakhsh/shared";
 
 class LocalizedDto implements Localized {
   @ApiPropertyOptional({ example: "الشيخ أحمد" })
@@ -28,7 +28,7 @@ export class UpdateInstructorDto implements UpdateInstructorRequest {
 
   @ApiPropertyOptional({ example: "https://cdn.roohbakhsh.com/avatars/ahmad.webp" })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   avatarUrl?: string;
 
   @ApiPropertyOptional({ type: LocalizedDto, description: "بیوگرافی استاد — null برای حذف" })
@@ -37,4 +37,9 @@ export class UpdateInstructorDto implements UpdateInstructorRequest {
   @Type(() => LocalizedDto)
   @IsObject()
   bio?: Localized | null;
+
+  @ApiPropertyOptional({ enum: ["instructor", "author"], description: "نوع کارمند" })
+  @IsOptional()
+  @IsEnum(["instructor", "author"])
+  staffType?: StaffType;
 }

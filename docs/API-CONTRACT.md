@@ -140,6 +140,18 @@
 - **پاسخ:** `200 Paginated<User>`
 - **خطاها:** `401 Unauthorized` | `403 FORBIDDEN`
 
+### `PATCH /api/users/:id/role` 🔒 admin
+role کاربر را به `user` / `instructor` / `admin` تغییر می‌دهد.
+- **بدنه:** `{ role: "user" | "instructor" | "admin" }`
+- **پاسخ:** `200 User`
+- **خطا:** `404 USER_NOT_FOUND`
+
+### `PATCH /api/users/:id/status` 🔒 admin
+کاربر را فعال یا غیرفعال می‌کند. کاربر غیرفعال (`isActive: false`) دیگر نمی‌تواند لاگین کند و توکن دسترسی فعلی‌اش هم بلافاصله بی‌اثر می‌شود (چون `JwtStrategy` در هر درخواست `isActive` را دوباره از دیتابیس چک می‌کند — نه فقط هنگام لاگین).
+- **بدنه:** `{ isActive: boolean }`
+- **پاسخ:** `200 User`
+- **خطا:** `404 USER_NOT_FOUND`
+
 ---
 
 # بخش ۳-ب — دسته‌بندی (منبع: NestJS)
@@ -229,12 +241,23 @@
 
 ### `GET /api/courses`
 لیست صفحه‌بندی‌شده دوره‌ها با اطلاعات خلاصه استاد. با پارامتر `q` می‌توان روی عنوان دوره (`title.ar` یا `title.ur`) سرچ کرد.
+**فقط دوره‌های `isPublished: true` را برمی‌گرداند** — این endpoint برای سایت عمومی است.
 - **Query:** `page` (پیش‌فرض ۱)، `limit` (پیش‌فرض ۱۲، حداکثر ۱۰۰)، `q?` (سرچ روی عنوان — حداقل ۳ کاراکتر)
 - **پاسخ:** `200 Paginated<CourseRecord>`
 - **خطا:** `400 SEARCH_QUERY_TOO_SHORT` — اگر `q` ارسال شود ولی کمتر از ۳ کاراکتر باشد
 
 ### `GET /api/courses/:slug`
-مشخصات یک دوره با slug آن.
+مشخصات یک دوره با slug آن. **فقط اگر `isPublished: true` باشد** — دوره‌ی پیش‌نویس مثل نبودنش `404` می‌دهد.
+- **پاسخ:** `200 CourseRecord`
+- **خطا:** `404 COURSE_NOT_FOUND`
+
+### `GET /api/courses/admin/all` 🔒 admin
+لیست کامل دوره‌ها **شامل پیش‌نویس** — برای پنل CMS.
+- **Query:** همان `GET /api/courses`
+- **پاسخ:** `200 Paginated<CourseRecord>`
+
+### `GET /api/courses/admin/:slug` 🔒 admin
+مشخصات یک دوره با slug — **شامل پیش‌نویس** — برای پنل CMS.
 - **پاسخ:** `200 CourseRecord`
 - **خطا:** `404 COURSE_NOT_FOUND`
 
@@ -276,8 +299,16 @@ effectivePrice: Money|null  // قیمت واقعی: discountedPrice (اگر isAc
 
 > ساختار محتوا: **دوره → سرفصل → درس**
 > هر دوره یک یا چند سرفصل دارد. هر سرفصل یک یا چند درس دارد.
-> عملیات نوشتن فقط برای `role: admin` مجاز است. خواندن برای همه آزاد است.
+> عملیات نوشتن فقط برای `role: admin` مجاز است. خواندن برای همه آزاد است (auth اختیاری — `OptionalJwtAuthGuard`).
+> اگر دوره‌ی مالک سرفصل/درس `isPublished: false` باشد، مسیرهای خواندن عمومی `404 COURSE_NOT_FOUND` می‌دهند مگر درخواست از طرف `role: admin` باشد (برای این‌که پنل CMS بتواند روی دوره‌های پیش‌نویس هم کار کند).
 > `title` از نوع `Localized` است: `{ ar: string, ur: string }`.
+>
+> **⚠️ کنترل دسترسی به `videoUrl`:** فیلد `videoUrl` هر درس فقط در این حالت‌ها مقدار واقعی دارد؛ در غیر این صورت `{ ar: null, ur: null }` برمی‌گردد:
+> - `isFreePreview: true` (پیش‌نمایش رایگان — برای همه)
+> - کاربر لاگین‌شده‌ای که این دوره را با سفارش `paid` خریده باشد
+> - `role: admin`
+>
+> این محافظت مستقیماً در `SectionService`/`LessonService` اعمال می‌شود (نه فقط UI) — قبلاً این endpoint بدون هیچ محدودیتی لینک ویدیوی کامل همه‌ی درس‌های همه‌ی دوره‌ها (حتی پولی) را به کاربر مهمان برمی‌گرداند.
 
 ### `GET /api/courses/:courseSlug/sections`
 تمام سرفصل‌های یک دوره به‌ترتیب `order`، همراه با درس‌هایشان.
@@ -325,6 +356,7 @@ effectivePrice: Money|null  // قیمت واقعی: discountedPrice (اگر isAc
 > درس‌ها زیر سرفصل قرار دارند. مسیر کامل: `/api/courses/:courseSlug/sections/:sectionId/lessons`
 > پس از هر تغییر درس، `lessonCount` و `durationMinutes` دوره به‌صورت خودکار sync می‌شوند.
 > `title` از نوع `Localized` است.
+> همان قانون کنترل دسترسی به `videoUrl` که بالای بخش سرفصل‌ها توضیح داده شد، اینجا هم صدق می‌کند.
 
 ### `GET /api/courses/:courseSlug/sections/:sectionId/lessons`
 لیست صفحه‌بندی‌شده درس‌های یک سرفصل به‌ترتیب `order`.
@@ -551,6 +583,9 @@ Accept-Language: ar
 | GET | `/payments/manual/destination-info` | User | اطلاعات حساب مقصد برای پرداخت کارت‌به‌کارت |
 | POST | `/payments/upload-receipt` | User | آپلود تصویر رسید کارت‌به‌کارت روی FTP — لینک عمومی برمی‌گرداند |
 | POST | `/payments/manual/:orderId` | User | ثبت اطلاعات پرداخت کارت‌به‌کارت — وضعیت `pending` تا تأیید دستی ادمین |
+| GET | `/payments/manual/pending` | Admin | پرداخت‌های کارت‌به‌کارت منتظر تأیید (paginated) |
+| POST | `/payments/manual/:paymentId/approve` | Admin | تأیید پرداخت — سفارش `paid` می‌شود و فاکتور ساخته می‌شود |
+| POST | `/payments/manual/:paymentId/reject` | Admin | رد پرداخت — پرداخت `failed` می‌شود، کاربر باید دوباره ارسال کند |
 
 ### POST /payments/initiate/:orderId — response
 ```json
@@ -578,13 +613,19 @@ Amount must be in **Rials (IRR)**. Use `Money.amountMinor` with `currency: "IRR"
   "id": "uuid", "orderId": "uuid", "userId": "uuid",
   "amount": { "amountMinor": 350000, "currency": "IRR" },
   "status": "paid",
+  "method": "gateway",
   "authority": "A00000000000000000000000000000000000",
   "refId": "123456789",
   "gatewayUrl": "https://www.zarinpal.com/pg/StartPay/...",
   "description": "Order uuid",
+  "trackingCode": null,
+  "sourceCardNumber": null,
+  "transferredAt": null,
+  "receiptImageUrl": null,
   "createdAt": "...", "updatedAt": "..."
 }
 ```
+`method` یا `"gateway"` (زرین‌پال) یا `"card_to_card"` است. فیلدهای `trackingCode`/`sourceCardNumber`/`transferredAt`/`receiptImageUrl` فقط برای `method: "card_to_card"` مقدار دارند.
 
 ### GET /payments/manual/destination-info — response
 ```json
@@ -612,7 +653,13 @@ Amount must be in **Rials (IRR)**. Use `Money.amountMinor` with `currency: "IRR"
   "receiptImageUrl": "https://cdn.roohbakhsh.ac/receipts/uuid.jpg"
 }
 ```
-پرداخت با `method: "card_to_card"` و `status: "pending"` ثبت/به‌روزرسانی می‌شود — تأیید نهایی (تغییر به `paid`) دستی توسط ادمین انجام می‌شود (فعلاً از طریق دیتابیس/CMS؛ پنل تأیید مدیریتی در فاز بعد اضافه می‌شود).
+پرداخت با `method: "card_to_card"` و `status: "pending"` ثبت/به‌روزرسانی می‌شود — تأیید نهایی (تغییر به `paid`) دستی توسط ادمین در CMS (صفحه‌ی پرداخت‌ها) انجام می‌شود.
+
+### POST /payments/manual/:paymentId/approve — response
+پرداخت `status: "paid"` می‌شود، سفارش مرتبط `paid` می‌شود و فاکتور ساخته می‌شود (`refId: "MANUAL-<trackingCode>"`). خروجی همان Payment log object بالاست.
+
+### POST /payments/manual/:paymentId/reject — response
+پرداخت `status: "failed"` می‌شود. وضعیت سفارش تغییر نمی‌کند (همچنان `pending`) تا کاربر بتواند دوباره اطلاعات پرداخت را ارسال کند.
 
 ---
 
@@ -625,6 +672,7 @@ Amount must be in **Rials (IRR)**. Use `Money.amountMinor` with `currency: "IRR"
 |-----|------|-------|
 | `GET /invoices/mine` | user | لیست فاکتورهای کاربر (paginated) |
 | `GET /invoices/mine/:invoiceNumber` | user (owner) | جزئیات یک فاکتور |
+| `GET /invoices/mine/:invoiceNumber/pdf` | user (owner) | دانلود فاکتور به‌صورت PDF — با هدر `Accept-Language` زبان سند تعیین می‌شود (`ar` پیش‌فرض) |
 
 ### Invoice object
 ```json
@@ -713,6 +761,8 @@ interface ArticleRecord {
 | `GET` | `/reviews` | Public | همه‌ی نظرات **تأیید‌شده** دوره و مقاله با هم (صفحه‌بندی)، شامل اطلاعات هدف هر نظر |
 | `GET` | `/reviews/pending` | فقط admin | صف نظرات در انتظار تأیید (`isApproved: false`)، قدیمی‌ترین اول |
 | `POST` | `/reviews/:id/approve` | فقط admin | تأیید یک نظر — بعد از آن در لیست‌های عمومی نمایش داده می‌شود |
+| `POST` | `/reviews/:id/reject` | فقط admin | رد یک نظر — نظر کاملاً حذف می‌شود (پاسخ `204`) |
+| `POST` | `/reviews/:id/reply` | فقط admin | ثبت/ویرایش پاسخ روی هر نظری (دوره یا مقاله) بدون نیاز به دانستن courseSlug/articleSlug — معادل عمومی همان reply زیر §Courses |
 
 ### شیء ReviewRecord
 
@@ -772,12 +822,12 @@ interface ReviewWithTarget extends ReviewRecord {
 |--------|------|------|-------|
 | `POST` | `/tickets` | کاربر یا مهمان | ثبت تیکت جدید — مهمان باید `guestEmail` بفرستد |
 | `GET` | `/tickets/mine` | کاربر لاگین‌شده | تیکت‌های من (صفحه‌بندی) |
-| `GET` | `/tickets` | Admin | همه‌ی تیکت‌ها (صفحه‌بندی) |
+| `GET` | `/tickets` | Admin | همه‌ی تیکت‌ها (صفحه‌بندی) — پاسخ `PaginatedAdminTickets` با اطلاعات کاربر |
 | `GET` | `/tickets/:id` | صاحب تیکت یا admin | جزئیات یک تیکت با همه‌ی پیام‌ها |
 | `POST` | `/tickets/:id/reply` | صاحب تیکت یا admin | پاسخ — پاسخ admin وضعیت را `answered` می‌کند |
 | `POST` | `/tickets/:id/close` | صاحب تیکت یا admin | بستن تیکت |
 
-### شیء Ticket
+### شیء Ticket / AdminTicket
 
 ```ts
 interface Ticket {
@@ -789,6 +839,11 @@ interface Ticket {
   createdAt: ISODate;
   updatedAt: ISODate;
   messages: { id: string; body: string; authorType: "user" | "support"; createdAt: ISODate }[];
+}
+
+// نسخه‌ی Admin — برگشتی از GET /tickets (ادمین)
+interface AdminTicket extends Ticket {
+  user: { id: string; fullName: string; email: string } | null;
 }
 ```
 
@@ -990,6 +1045,38 @@ interface AdminStats {
 
 پاسخ: `AdminStats`
 خطاها: `401 Unauthorized`, `403 FORBIDDEN`
+
+### `GET /admin/stats/monthly?year=1405` 🔒 admin
+
+آمار ماهانه‌ی یک سال **شمسی (جلالی)** — برای نمودار داشبورد CMS. `year` اختیاری است (سال شمسی؛ پیش‌فرض سال شمسی جاری). تبدیل تاریخ با `jalaali-js` انجام می‌شود.
+
+```ts
+interface AdminMonthlyStats {
+  year: number;                            // سال شمسی، مثلاً 1405
+  months: string[];                        // نام ماه‌های شمسی، فروردین تا اسفند — طول ۱۲
+  paidOrdersCount: number[];                // تعداد سفارش‌های paid هر ماه — طول ۱۲
+  newUsersCount: number[];                  // تعداد کاربران ثبت‌نام‌شده هر ماه — طول ۱۲
+  revenueByCurrency: Record<string, number[]>; // جمع amountMinor سفارش‌های paid هر ماه، به‌تفکیک ارز (چون سفارش‌ها می‌توانند چند ارز داشته باشند) — مثلاً { "IRR": [12 عدد], "USD": [12 عدد] }
+  reviewsCount: number[];                   // تعداد کل نظرات ثبت‌شده هر ماه، چه تأییدشده چه نشده — طول ۱۲
+}
+```
+
+پاسخ: `AdminMonthlyStats`
+خطاها: `401 Unauthorized`, `403 FORBIDDEN`
+
+---
+
+## §20 — Media (آپلود تصویر عمومی)
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/media/upload` | Admin | آپلود تصویر عمومی (کاور دوره، آواتار استاد و...) روی FTP |
+
+### POST /media/upload — multipart/form-data (`file`) → response
+```json
+{ "url": "https://cdn.roohbakhsh.ac/media/uuid.jpg" }
+```
+فایل در پوشه‌ی `FTP_MEDIA_DIR` (پیش‌فرض `/media`، جدا از `/receipts` که مخصوص رسید پرداخت است) روی همان سرور FTP آپلود می‌شود. حداکثر حجم ۵ مگابایت، فرمت‌های مجاز: jpg/jpeg/png/webp. برای دوره‌ها و اساتید، ابتدا این endpoint صدا زده می‌شود تا `url` گرفته شود، سپس همان `url` در payload معمولی `POST/PATCH /courses` یا `/instructor` به‌عنوان `thumbnailUrl`/`avatarUrl` فرستاده می‌شود — این endpoint خودش رکورد دوره/استاد را تغییر نمی‌دهد.
 
 ---
 
