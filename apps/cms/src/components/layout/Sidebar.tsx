@@ -18,6 +18,7 @@ import {
   RiCoupon3Line,
   RiNotificationLine,
   RiLogoutBoxLine,
+  RiSettings4Line,
 } from "react-icons/ri";
 import { useLogout } from "@/hooks/queries/use-auth";
 
@@ -35,6 +36,7 @@ const NAV_ITEMS = [
   { href: "/dashboard/reviews", label: "نظرات", icon: RiStarLine },
   { href: "/dashboard/coupons", label: "کوپن‌ها", icon: RiCoupon3Line },
   { href: "/dashboard/notifications", label: "اعلان‌ها", icon: RiNotificationLine },
+  { href: "/dashboard/settings", label: "تنظیمات", icon: RiSettings4Line },
 ];
 
 const Sidebar = forwardRef<HTMLElement>(function Sidebar(_props, ref) {

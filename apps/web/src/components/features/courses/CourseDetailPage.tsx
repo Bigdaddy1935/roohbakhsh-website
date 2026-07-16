@@ -791,7 +791,13 @@ function CourseDetailContent({ courseSlug }: { courseSlug: string }) {
                     )
                   ) : (
                     <button
-                      onClick={() => addToCart(course.id)}
+                      onClick={() => {
+                        if (!tokenStore.getAccess()) {
+                          window.location.href = `/${locale}/signin`;
+                          return;
+                        }
+                        addToCart(course.id);
+                      }}
                       disabled={addingToCart}
                       className="flex items-center justify-center gap-x-2 h-11 px-5 rounded-lg bg-[var(--brand)] text-white font-bold text-sm hover:opacity-90 active:scale-[0.98] transition-all shrink-0 disabled:opacity-60"
                     >

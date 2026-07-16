@@ -6,6 +6,7 @@ import { Order } from "../orders/entities/order.entity";
 import { OrdersModule } from "../orders/orders.module";
 import { InvoicesModule } from "../invoices/invoices.module";
 import { MailModule } from "../mail/mail.module";
+import { SettingsModule } from "../settings/settings.module";
 import { PaymentsService } from "./payments.service";
 import { PaymentsController } from "./payments.controller";
 import { FtpUploaderService } from "../../common/ftp/ftp-uploader.service";
@@ -16,6 +17,7 @@ import { FtpUploaderService } from "../../common/ftp/ftp-uploader.service";
     OrdersModule,
     InvoicesModule,
     MailModule,
+    SettingsModule,
   ],
   controllers: [PaymentsController],
   providers: [PaymentsService, FtpUploaderService],

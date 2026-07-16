@@ -43,8 +43,7 @@ export function useInitiatePayment() {
 export function useDestinationAccount() {
   return useQuery<PaymentDestinationAccount>({
     queryKey: paymentKeys.destination,
-    queryFn: () => api.get<PaymentDestinationAccount>("/payments/manual/destination-info"),
-    enabled: typeof window !== "undefined" && !!tokenStore.getAccess(),
+    queryFn: () => api.get<PaymentDestinationAccount>("/settings/payment-destination"),
     staleTime: Infinity,
   });
 }

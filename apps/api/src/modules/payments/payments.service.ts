@@ -27,6 +27,7 @@ import { MailService } from "../mail/mail.service";
 import { EnvConfig } from "../../config/env";
 import { FtpUploaderService } from "../../common/ftp/ftp-uploader.service";
 import { SubmitCardToCardDto } from "./dto/submit-card-to-card.dto";
+import { SettingsService } from "../settings/settings.service";
 
 const ZARINPAL_REQUEST_URL = "https://api.zarinpal.com/pg/v4/payment/request.json";
 const ZARINPAL_VERIFY_URL  = "https://api.zarinpal.com/pg/v4/payment/verify.json";
@@ -52,16 +53,12 @@ export class PaymentsService {
     private readonly mailService: MailService,
     private readonly config: ConfigService<EnvConfig>,
     private readonly ftpUploader: FtpUploaderService,
+    private readonly settingsService: SettingsService,
   ) {}
 
   /** اطلاعات حساب مقصد آکادمی برای پرداخت کارت‌به‌کارت. */
-  getDestinationAccount(): PaymentDestinationAccount {
-    return {
-      bankName: this.config.get("PAYMENT_DESTINATION_BANK_NAME", { infer: true })!,
-      accountNumber: this.config.get("PAYMENT_DESTINATION_ACCOUNT_NUMBER", { infer: true }) ?? "",
-      cardNumber: this.config.get("PAYMENT_DESTINATION_CARD_NUMBER", { infer: true })!,
-      accountHolder: this.config.get("PAYMENT_DESTINATION_ACCOUNT_HOLDER", { infer: true })!,
-    };
+  getDestinationAccount(): Promise<PaymentDestinationAccount> {
+    return this.settingsService.getPaymentDestination();
   }
 
   /** آپلود تصویر رسید کارت‌به‌کارت روی FTP — لینک عمومی برمی‌گرداند. */
