@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsObject, IsInt, IsEnum, Min } from "class-validator";
+import { IsString, IsObject, IsInt, IsEnum, Min, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
 class MoneyDto {
@@ -20,6 +20,7 @@ export class ValidateCouponDto {
 
   @ApiProperty({ type: MoneyDto })
   @IsObject()
+  @ValidateNested()
   @Type(() => MoneyDto)
   orderTotal!: MoneyDto;
 }
