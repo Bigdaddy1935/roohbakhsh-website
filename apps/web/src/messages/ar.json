@@ -319,7 +319,16 @@
     "error_tracking_code_required": "يرجى إدخال رقم تتبع التحويل",
     "error_source_card_required": "يرجى إدخال رقم البطاقة المرسل منها",
     "error_transferred_at_required": "يرجى تحديد تاريخ ووقت التحويل",
-    "error_receipt_required": "يرجى رفع صورة الإيصال"
+    "error_receipt_required": "يرجى رفع صورة الإيصال",
+    "zarinpal_success_title": "تمّت عملية الدفع بنجاح",
+    "zarinpal_success_subtitle": "شكراً لك! تم تأكيد دفعتك وإضافة الدورة إلى حسابك.",
+    "zarinpal_ref_id": "رقم المرجع",
+    "zarinpal_go_to_dashboard": "الذهاب إلى لوحة التحكم",
+    "zarinpal_go_to_courses": "تصفح الدورات",
+    "zarinpal_failed_title": "فشلت عملية الدفع",
+    "zarinpal_failed_subtitle": "لم تتم عملية الدفع. يمكنك المحاولة مرة أخرى أو التواصل مع الدعم.",
+    "zarinpal_try_again": "الذهاب إلى السلة",
+    "zarinpal_contact_support": "تواصل مع الدعم"
   },
   "Terms": {
     "breadcrumb_home": "الرئيسية",

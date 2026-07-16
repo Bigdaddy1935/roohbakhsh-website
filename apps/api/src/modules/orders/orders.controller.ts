@@ -8,6 +8,7 @@ import {
   Request,
   UseGuards,
 } from "@nestjs/common";
+import { ApiQuery } from "@nestjs/swagger";
 import {
   ApiTags,
   ApiOperation,
@@ -60,10 +61,11 @@ export class OrdersController {
   @Get()
   @UseGuards(RolesGuard)
   @Roles("admin")
-  @ApiOperation({ summary: "List all orders (admin)", description: "Admin only — paginated" })
+  @ApiOperation({ summary: "List all orders (admin)", description: "Admin only — paginated. Pass courseId to filter enrollments for a specific course." })
+  @ApiQuery({ name: "courseId", required: false, description: "Filter paid orders containing this course UUID" })
   @ApiResponse({ status: 200, description: "Paginated orders" })
   @ApiResponse({ status: 403, description: "Forbidden" })
-  findAll(@Query() query: PaginationDto) {
-    return this.service.findAll(query.page ?? 1, query.limit ?? 12);
+  findAll(@Query() query: PaginationDto, @Query("courseId") courseId?: string) {
+    return this.service.findAll(query.page ?? 1, query.limit ?? 12, courseId);
   }
 }

@@ -159,7 +159,7 @@ export default function SignInForm() {
         </div>
 
         <div className="flex justify-start">
-          <Link href="/forgoat-password" className="text-xs text-[var(--brand)] hover:underline">{ui.forgot}</Link>
+          <Link href="/forgot-password" className="text-xs text-[var(--brand)] hover:underline">{ui.forgot}</Link>
         </div>
 
         <button type="submit" disabled={isPending}

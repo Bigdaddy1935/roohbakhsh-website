@@ -12,7 +12,10 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  Redirect,
 } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { EnvConfig } from "../../config/env";
 import { FileInterceptor } from "@nestjs/platform-express";
 import {
   ApiTags,
@@ -36,7 +39,14 @@ import { SubmitCardToCardDto } from "./dto/submit-card-to-card.dto";
 @ApiHeader(LANG_HEADER)
 @Controller("payments")
 export class PaymentsController {
-  constructor(private readonly service: PaymentsService) {}
+  private readonly frontendUrl: string;
+
+  constructor(
+    private readonly service: PaymentsService,
+    private readonly config: ConfigService<EnvConfig, true>,
+  ) {
+    this.frontendUrl = this.config.get("FRONTEND_URL", { infer: true });
+  }
 
   @Post("initiate/:orderId")
   @ApiBearerAuth()
@@ -57,19 +67,26 @@ export class PaymentsController {
 
   @Get("verify")
   @Public()
+  @Redirect("", 302)
   @ApiOperation({
     summary: "ZarinPal callback — verify payment",
-    description: "ZarinPal redirects here after payment. Verifies with ZarinPal API and updates order status.",
+    description: "ZarinPal redirects here after payment. Verifies with ZarinPal API and redirects user to frontend success or failed page.",
   })
   @ApiQuery({ name: "Authority", required: true, description: "ZarinPal authority code" })
   @ApiQuery({ name: "Status", required: true, enum: ["OK", "NOK"], description: "Payment status from ZarinPal" })
-  @ApiResponse({ status: 200, description: "Payment result — { message, refId? }" })
-  @ApiResponse({ status: 404, description: "PAYMENT_NOT_FOUND" })
-  verify(
+  @ApiResponse({ status: 302, description: "Redirect to frontend payment/success or payment/failed" })
+  async verify(
     @Query("Authority") authority: string,
     @Query("Status") status: string,
   ) {
-    return this.service.verify(authority, status);
+    try {
+      const result = await this.service.verify(authority, status);
+      const refId = result.refId;
+      const successUrl = `${this.frontendUrl}/ar/payment/success${refId ? `?refId=${refId}` : ""}`;
+      return { url: successUrl };
+    } catch {
+      return { url: `${this.frontendUrl}/ar/payment/failed` };
+    }
   }
 
   @Get("logs")

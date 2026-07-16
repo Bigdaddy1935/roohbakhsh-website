@@ -72,6 +72,23 @@ export class UsersService {
     };
   }
 
+  async findOne(id: string): Promise<UserContract> {
+    const user = await this.repo.findOne({ where: { id } });
+    if (!user) throw new NotFoundException("USER_NOT_FOUND");
+    return this.toContract(user);
+  }
+
+  async updateProfile(id: string, dto: { fullName?: string; phone?: string; avatarUrl?: string; preferredLocale?: "ar" | "ur" }): Promise<UserContract> {
+    const user = await this.repo.findOne({ where: { id } });
+    if (!user) throw new NotFoundException("USER_NOT_FOUND");
+    if (dto.fullName !== undefined) user.fullName = dto.fullName;
+    if (dto.phone !== undefined) user.phone = dto.phone;
+    if (dto.avatarUrl !== undefined) user.avatarUrl = dto.avatarUrl;
+    if (dto.preferredLocale !== undefined) user.preferredLocale = dto.preferredLocale;
+    await this.repo.save(user);
+    return this.toContract(user);
+  }
+
   async updateRole(id: string, role: UserRole): Promise<UserContract> {
     const user = await this.repo.findOne({ where: { id } });
     if (!user) throw new NotFoundException("USER_NOT_FOUND");
