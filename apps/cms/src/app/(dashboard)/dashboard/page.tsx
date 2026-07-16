@@ -22,13 +22,13 @@ interface StatCardProps {
 
 function StatCard({ label, value, sub, icon, color }: StatCardProps) {
   return (
-    <div className="bg-white border border-gray-100 rounded-[20px] p-5 flex items-start gap-4">
-      <div className={`p-3 rounded-md ${color}`}>{icon}</div>
-      <div className="flex flex-col gap-0.5">
+    <div className="bg-white border border-gray-100 rounded-[20px] p-3 md:p-5 flex flex-col md:flex-row items-center md:items-start gap-2 md:gap-4">
+      <div className={`p-3 rounded-md ${color} shrink-0`}>{icon}</div>
+      <div className="flex flex-col gap-0.5 items-center md:items-start">
         <span className="text-2xl font-extrabold text-[var(--ink)]">
           {value === undefined ? "—" : value.toLocaleString("fa-IR")}
         </span>
-        <span className="text-sm text-gray-500">{label}</span>
+        <span className="text-xs md:text-sm text-gray-500 text-center md:text-right">{label}</span>
         {sub && <span className="text-xs text-gray-400 mt-0.5">{sub}</span>}
       </div>
     </div>
@@ -82,13 +82,13 @@ export default function DashboardPage() {
       <PageHeader title="داشبورد" description="نگاه کلی به وضعیت آکادمی روح‌بخش" />
 
       {isLoading ? (
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="bg-white border border-gray-100 rounded-[20px] p-5 h-24 animate-pulse" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-6">
           {cards.map((card) => (
             <StatCard key={card.label} {...card} />
           ))}

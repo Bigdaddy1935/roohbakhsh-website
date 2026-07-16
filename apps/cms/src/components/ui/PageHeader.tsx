@@ -16,7 +16,7 @@ export default function PageHeader({
   addLabel = "افزودن",
 }: PageHeaderProps) {
   return (
-    <div className="flex items-center justify-between mb-6 bg-white border border-gray-100 rounded-[20px] px-5 h-[105px]">
+    <div className="flex items-center justify-between mb-4 bg-white border border-gray-100 rounded-[20px] px-4 md:px-5 h-[80px] md:h-[105px]">
       <div>
         <h1 className="text-xl font-extrabold text-[var(--ink)]">{title}</h1>
         {description && (

@@ -36,11 +36,11 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       <PageHeader title="تنظیمات" description="تنظیمات عمومی پنل" />
 
-      <div className="bg-white rounded-[20px] border border-gray-100 p-6">
-        <div className="flex items-center gap-2 mb-6 text-[var(--ink)] font-bold text-base">
+      <div className="bg-white rounded-[20px] border border-gray-100 p-5 pt-4">
+        <div className="flex items-center gap-2 mb-6 text-[var(--ink)] font-bold text-base border-b border-gray-100 pb-4">
           <RiBankCardLine size={20} className="text-[var(--brand)]" />
           اطلاعات حساب کارت‌به‌کارت
         </div>
