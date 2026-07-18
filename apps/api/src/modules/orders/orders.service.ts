@@ -124,12 +124,21 @@ export class OrdersService {
     return this.toContract(saved);
   }
 
-  async findAll(page: number, limit: number): Promise<Paginated<AdminOrderRecord>> {
-    const [items, total] = await this.orderRepo.findAndCount({
-      order: { createdAt: "DESC" },
-      take: limit,
-      skip: (page - 1) * limit,
-    });
+  async findAll(page: number, limit: number, courseId?: string): Promise<Paginated<AdminOrderRecord>> {
+    let query = this.orderRepo
+      .createQueryBuilder("order")
+      .leftJoinAndSelect("order.items", "item")
+      .orderBy("order.createdAt", "DESC")
+      .take(limit)
+      .skip((page - 1) * limit);
+
+    if (courseId) {
+      query = query
+        .innerJoin("order.items", "filterItem", "filterItem.course_id = :courseId", { courseId })
+        .andWhere("order.status = 'paid'");
+    }
+
+    const [items, total] = await query.getManyAndCount();
     const userIds = [...new Set(items.map((o) => o.userId).filter(Boolean))];
     const users = userIds.length
       ? await this.userRepo.find({ where: { id: In(userIds) } })

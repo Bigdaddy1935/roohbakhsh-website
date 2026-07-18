@@ -10,7 +10,7 @@ import DataTable from "@/components/ui/DataTable";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import StatusBadge from "@/components/ui/StatusBadge";
 import Link from "next/link";
-import { RiEditLine, RiDeleteBinLine, RiListCheck2 } from "react-icons/ri";
+import { RiEditLine, RiDeleteBinLine, RiListCheck2, RiGroupLine } from "react-icons/ri";
 
 const LEVEL_MAP = {
   beginner: { label: "مبتدی", color: "bg-green-50 text-green-700" },
@@ -56,6 +56,13 @@ export default function CoursesPage() {
       key: "actions", label: "عملیات",
       render: (r: CourseRecord) => (
         <div className="flex gap-2">
+          <Link
+            href={`/dashboard/courses/${r.slug}/enrollments`}
+            className="p-2 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors"
+            title="ثبت‌نام‌شدگان"
+          >
+            <RiGroupLine size={19} />
+          </Link>
           <Link
             href={`/dashboard/courses/${r.slug}/content`}
             className="p-2 rounded-md text-gray-500 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors"

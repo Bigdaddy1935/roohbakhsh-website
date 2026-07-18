@@ -140,6 +140,17 @@
 - **پاسخ:** `200 Paginated<User>`
 - **خطاها:** `401 Unauthorized` | `403 FORBIDDEN`
 
+### `GET /api/users/:id` 🔒 admin
+اطلاعات یک کاربر بر اساس UUID.
+- **پاسخ:** `200 User`
+- **خطا:** `404 USER_NOT_FOUND`
+
+### `PATCH /api/users/:id` 🔒 admin
+ویرایش پروفایل کاربر توسط ادمین (نام، شماره، آواتار، زبان ترجیحی). فیلدهای `role`/`isActive`/`email` از این مسیر قابل تغییر نیستند.
+- **بدنه:** `{ fullName?: string, phone?: string, avatarUrl?: string, preferredLocale?: "ar" | "ur" }`
+- **پاسخ:** `200 User`
+- **خطا:** `404 USER_NOT_FOUND`
+
 ### `PATCH /api/users/:id/role` 🔒 admin
 role کاربر را به `user` / `instructor` / `admin` تغییر می‌دهد.
 - **بدنه:** `{ role: "user" | "instructor" | "admin" }`
@@ -543,7 +554,7 @@ Accept-Language: ar
 | POST | `/orders` | User | Create order from cart (optional couponCode) |
 | GET | `/orders/mine` | User | List current user orders (paginated) |
 | GET | `/orders/mine/:id` | User | Get order detail |
-| GET | `/orders` | Admin | List all orders (paginated) |
+| GET | `/orders` | Admin | List all orders (paginated). Optional `?courseId=<uuid>` filters to paid orders containing that course — used for the CMS enrollment list. |
 
 ### POST /orders — request
 ```json
@@ -600,11 +611,13 @@ Accept-Language: ar
 ```
 سفارش بلافاصله `status: "paid"` می‌شود و فاکتور با `paymentRefId: "FREE"` ساخته می‌شود. فرانت اگر `requiresPayment: false` دید، نباید ریدایرکت کند — فقط پیام موفقیت نشان دهد.
 
-### GET /payments/verify?Authority=...&Status=OK — response
-```json
-{ "message": "PAYMENT_SUCCESS", "refId": "123456789" }
-```
-ZarinPal posts `Authority` + `Status` (OK | NOK) to this URL.  
+### GET /payments/verify?Authority=...&Status=OK — behavior
+ZarinPal redirects the user's browser here with `Authority` + `Status` (OK | NOK).
+این endpoint **پاسخ JSON نمی‌دهد**؛ به‌جای آن با کد `302` کاربر را به فرانت ریدایرکت می‌کند:
+- موفق: `{FRONTEND_URL}/{locale}/payment/success?refId=<refId>`
+- ناموفق/لغوشده: `{FRONTEND_URL}/{locale}/payment/failed`
+
+`locale` زبان ترجیحی خریدار (`ar` | `ur`) است. فقط پرداختِ واقعاً `paid` به صفحه‌ی success می‌رود؛ لغو کاربر (`Status=NOK`) یا خطای درگاه به `failed` می‌رود.  
 Amount must be in **Rials (IRR)**. Use `Money.amountMinor` with `currency: "IRR"` for course pricing.
 
 ### Payment log object
@@ -1077,6 +1090,28 @@ interface AdminMonthlyStats {
 { "url": "https://cdn.roohbakhsh.ac/media/uuid.jpg" }
 ```
 فایل در پوشه‌ی `FTP_MEDIA_DIR` (پیش‌فرض `/media`، جدا از `/receipts` که مخصوص رسید پرداخت است) روی همان سرور FTP آپلود می‌شود. حداکثر حجم ۵ مگابایت، فرمت‌های مجاز: jpg/jpeg/png/webp. برای دوره‌ها و اساتید، ابتدا این endpoint صدا زده می‌شود تا `url` گرفته شود، سپس همان `url` در payload معمولی `POST/PATCH /courses` یا `/instructor` به‌عنوان `thumbnailUrl`/`avatarUrl` فرستاده می‌شود — این endpoint خودش رکورد دوره/استاد را تغییر نمی‌دهد.
+
+---
+
+## §21 — Settings (تنظیمات)
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/settings/payment-destination` | Public | اطلاعات حساب مقصد کارت‌به‌کارت — به کاربر خریدار نمایش داده می‌شود |
+| PATCH | `/settings/payment-destination` | Admin | ویرایش اطلاعات حساب مقصد از پنل CMS |
+
+مقدار در جدول key-value `settings` (کلید `payment_destination`) ذخیره می‌شود؛ اگر رکوردی نبود، به مقادیر `PAYMENT_DESTINATION_*` در env فالبک می‌شود.
+
+### GET /settings/payment-destination — response (`PaymentDestinationAccount`)
+```json
+{ "bankName": "بانک ملی", "accountNumber": "0123456789", "cardNumber": "6037-XXXX-XXXX-XXXX", "accountHolder": "آکادمی بین‌المللی اسلامی روح‌بخش" }
+```
+
+### PATCH /settings/payment-destination — request (`Partial<PaymentDestinationAccount>`) 🔒 admin
+```json
+{ "cardNumber": "6037-XXXX-XXXX-XXXX", "accountHolder": "…", "bankName": "…", "accountNumber": "…" }
+```
+پاسخ: `200 PaymentDestinationAccount` (مقدار به‌روزشده).
 
 ---
 

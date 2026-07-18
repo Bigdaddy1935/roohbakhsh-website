@@ -86,7 +86,7 @@ export default function ResetPasswordForm() {
       <AuthCard>
         <div className="flex flex-col items-center text-center gap-y-4 py-4">
           <h1 className="text-xl font-extrabold text-[var(--ink)]">{ui.invalidToken}</h1>
-          <Link href="/forgoat-password" className="flex items-center gap-x-1 text-sm text-[var(--brand)] font-semibold hover:underline mt-2">
+          <Link href="/forgot-password" className="flex items-center gap-x-1 text-sm text-[var(--brand)] font-semibold hover:underline mt-2">
             <RiArrowRightSLine size={16} />
             {ui.requestNew}
           </Link>
@@ -120,7 +120,7 @@ export default function ResetPasswordForm() {
               {apiError?.code === "INVALID_RESET_TOKEN" && (
                 <>
                   {" "}
-                  <Link href="/forgoat-password" className="font-semibold underline">{ui.requestNew}</Link>
+                  <Link href="/forgot-password" className="font-semibold underline">{ui.requestNew}</Link>
                 </>
               )}
             </div>

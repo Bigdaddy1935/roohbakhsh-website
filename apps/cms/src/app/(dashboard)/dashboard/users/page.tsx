@@ -10,7 +10,8 @@ import { api } from "@/lib/api-client";
 import { Select, ListBox } from "@heroui/react";
 import DataTable from "@/components/ui/DataTable";
 import SwitchField from "@/components/ui/SwitchField";
-import { RiUserAddLine } from "react-icons/ri";
+import Link from "next/link";
+import { RiUserAddLine, RiEditLine } from "react-icons/ri";
 
 
 export default function UsersPage() {
@@ -33,8 +34,26 @@ export default function UsersPage() {
   const totalPages = data?.totalPages ?? 1;
 
   const columns = [
+    {
+      key: "avatar", label: "",
+      render: (r: User) => r.avatarUrl
+        ? <img src={r.avatarUrl} alt={r.fullName ?? ""} className="size-9 rounded-full object-cover" />
+        : <div className="size-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm font-bold">{(r.fullName ?? r.email)[0]?.toUpperCase()}</div>,
+    },
     { key: "fullName", label: "نام کامل", render: (r: User) => r.fullName ?? "-" },
     { key: "email", label: "ایمیل", render: (r: User) => r.email },
+    {
+      key: "edit", label: "",
+      render: (r: User) => (
+        <Link
+          href={`/dashboard/users/${r.id}/edit`}
+          className="p-2 rounded-md text-gray-400 hover:text-[var(--brand)] hover:bg-gray-100 transition-colors inline-flex"
+          title="ویرایش کاربر"
+        >
+          <RiEditLine size={17} />
+        </Link>
+      ),
+    },
     {
       key: "role",
       label: "نقش",

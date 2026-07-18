@@ -27,6 +27,7 @@ import { MailService } from "../mail/mail.service";
 import { EnvConfig } from "../../config/env";
 import { FtpUploaderService } from "../../common/ftp/ftp-uploader.service";
 import { SubmitCardToCardDto } from "./dto/submit-card-to-card.dto";
+import { SettingsService } from "../settings/settings.service";
 
 const ZARINPAL_REQUEST_URL = "https://api.zarinpal.com/pg/v4/payment/request.json";
 const ZARINPAL_VERIFY_URL  = "https://api.zarinpal.com/pg/v4/payment/verify.json";
@@ -52,16 +53,12 @@ export class PaymentsService {
     private readonly mailService: MailService,
     private readonly config: ConfigService<EnvConfig>,
     private readonly ftpUploader: FtpUploaderService,
+    private readonly settingsService: SettingsService,
   ) {}
 
   /** اطلاعات حساب مقصد آکادمی برای پرداخت کارت‌به‌کارت. */
-  getDestinationAccount(): PaymentDestinationAccount {
-    return {
-      bankName: this.config.get("PAYMENT_DESTINATION_BANK_NAME", { infer: true })!,
-      accountNumber: this.config.get("PAYMENT_DESTINATION_ACCOUNT_NUMBER", { infer: true }) ?? "",
-      cardNumber: this.config.get("PAYMENT_DESTINATION_CARD_NUMBER", { infer: true })!,
-      accountHolder: this.config.get("PAYMENT_DESTINATION_ACCOUNT_HOLDER", { infer: true })!,
-    };
+  getDestinationAccount(): Promise<PaymentDestinationAccount> {
+    return this.settingsService.getPaymentDestination();
   }
 
   /** آپلود تصویر رسید کارت‌به‌کارت روی FTP — لینک عمومی برمی‌گرداند. */
@@ -183,22 +180,35 @@ export class PaymentsService {
     return { paymentId: payment.id, gatewayUrl, requiresPayment: true };
   }
 
-  async verify(authority: string, status: string): Promise<{ message: string; refId?: string }> {
+  async verify(
+    authority: string,
+    status: string,
+  ): Promise<{ success: boolean; message: string; refId?: string; locale: "ar" | "ur" }> {
     const payment = await this.repo.findOne({ where: { authority } });
     if (!payment) {
       this.logger.warn(`ZarinPal callback with unknown authority: ${authority}`);
       throw new NotFoundException("PAYMENT_NOT_FOUND");
     }
 
+    // زبان خریدار برای ریدایرکت به صفحه‌ی نتیجه‌ی هم‌زبان
+    const buyer = await this.userRepo.findOne({ where: { id: payment.userId } });
+    const locale: "ar" | "ur" = buyer?.preferredLocale ?? "ar";
+
     if (payment.status !== "pending") {
-      return { message: "ALREADY_PROCESSED", refId: payment.refId ?? undefined };
+      // فقط پرداختِ واقعاً paid موفق است؛ پرداخت failed که دوباره callback بخورد نباید موفق تلقی شود
+      return {
+        success: payment.status === "paid",
+        message: "ALREADY_PROCESSED",
+        refId: payment.refId ?? undefined,
+        locale,
+      };
     }
 
     if (status !== "OK") {
       await this.repo.update(payment.id, { status: "failed" });
       await this.ordersService.updateStatus(payment.orderId, "failed");
       this.logger.log(`Payment ${payment.id} cancelled by user`);
-      return { message: "PAYMENT_CANCELLED" };
+      return { success: false, message: "PAYMENT_CANCELLED", locale };
     }
 
     const merchantId = this.config.get("ZARINPAL_MERCHANT_ID", { infer: true })!;
@@ -232,7 +242,7 @@ export class PaymentsService {
       await this.invoicesService.createFromOrder(order, refId);
       this.sendPaymentConfirmedEmail(payment.userId, order).catch(() => undefined);
       this.logger.log(`Payment ${payment.id} verified. RefID: ${refId}`);
-      return { message: "PAYMENT_SUCCESS", refId };
+      return { success: true, message: "PAYMENT_SUCCESS", refId, locale };
     }
 
     const errCode = verifyCode ?? "UNKNOWN";

@@ -28,7 +28,7 @@ export default function GalleryImageField({ label, value, onChange, category = "
               onClick={() => setOpen(true)}
               className="px-3 py-1.5 rounded-full bg-white text-xs font-medium text-gray-700 hover:bg-gray-100 transition-colors"
             >
-              تغییر
+              تغییر تصویر
             </button>
             <button
               type="button"
@@ -53,7 +53,7 @@ export default function GalleryImageField({ label, value, onChange, category = "
       <GalleryPicker
         isOpen={open}
         onClose={() => setOpen(false)}
-        onSelect={onChange}
+        onSelect={(url) => { onChange(url); }}
         defaultCategory={category}
       />
     </div>

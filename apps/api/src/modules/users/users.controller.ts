@@ -1,4 +1,5 @@
 ﻿import { Controller, Get, Patch, Post, Query, Param, Body, Request, UseGuards } from "@nestjs/common";
+import { UpdateUserDto } from "./dto/update-user.dto";
 import {
   ApiTags, ApiOperation, ApiResponse,
   ApiHeader, ApiBearerAuth, ApiCookieAuth, ApiParam,
@@ -51,6 +52,30 @@ export class UsersController {
   @ApiResponse({ status: 404, description: "کاربر یافت نشد — کد: USER_NOT_FOUND", type: ApiErrorSchema })
   bootstrapAdmin(@Body() body: { id: string }) {
     return this.usersService.bootstrapAdmin(body.id);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles("admin")
+  @Get(":id")
+  @ApiOperation({ summary: "اطلاعات یک کاربر 🔒 admin" })
+  @ApiHeader(LANG_HEADER)
+  @ApiParam({ name: "id", description: "UUID کاربر" })
+  @ApiResponse({ status: 200, description: "User" })
+  @ApiResponse({ status: 404, description: "USER_NOT_FOUND", type: ApiErrorSchema })
+  findOne(@Param("id") id: string) {
+    return this.usersService.findOne(id);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles("admin")
+  @Patch(":id")
+  @ApiOperation({ summary: "ویرایش اطلاعات کاربر 🔒 admin", description: "ویرایش نام، شماره، آواتار و زبان ترجیحی" })
+  @ApiHeader(LANG_HEADER)
+  @ApiParam({ name: "id", description: "UUID کاربر" })
+  @ApiResponse({ status: 200, description: "اطلاعات به‌روز شد — User" })
+  @ApiResponse({ status: 404, description: "USER_NOT_FOUND", type: ApiErrorSchema })
+  updateProfile(@Param("id") id: string, @Body() dto: UpdateUserDto) {
+    return this.usersService.updateProfile(id, dto);
   }
 
   @UseGuards(RolesGuard)

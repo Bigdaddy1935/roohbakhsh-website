@@ -319,7 +319,16 @@
     "error_tracking_code_required": "براہ کرم ٹرانسفر ٹریکنگ کوڈ درج کریں",
     "error_source_card_required": "براہ کرم بھیجنے والے کارڈ کا نمبر درج کریں",
     "error_transferred_at_required": "براہ کرم ٹرانسفر کی تاریخ اور وقت منتخب کریں",
-    "error_receipt_required": "براہ کرم رسید کی تصویر اپلوڈ کریں"
+    "error_receipt_required": "براہ کرم رسید کی تصویر اپلوڈ کریں",
+    "zarinpal_success_title": "ادائیگی کامیابی سے مکمل ہوئی",
+    "zarinpal_success_subtitle": "آپ کا شکریہ! آپ کی ادائیگی کی تصدیق ہو گئی اور کورس آپ کے اکاؤنٹ میں شامل کر دیا گیا۔",
+    "zarinpal_ref_id": "حوالہ نمبر",
+    "zarinpal_go_to_dashboard": "ڈیش بورڈ پر جائیں",
+    "zarinpal_go_to_courses": "کورسز دیکھیں",
+    "zarinpal_failed_title": "ادائیگی ناکام ہو گئی",
+    "zarinpal_failed_subtitle": "ادائیگی مکمل نہیں ہو سکی۔ آپ دوبارہ کوشش کر سکتے ہیں یا سپورٹ سے رابطہ کریں۔",
+    "zarinpal_try_again": "کارٹ پر واپس جائیں",
+    "zarinpal_contact_support": "سپورٹ سے رابطہ کریں"
   },
   "Terms": {
     "breadcrumb_home": "ہوم",
