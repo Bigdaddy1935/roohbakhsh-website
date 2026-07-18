@@ -30,8 +30,23 @@ roohbakhsh-starter/
 nvm use            # Node 20
 pnpm install       # نصب همه‌ی اپ‌ها
 cp apps/web/.env.local.example apps/web/.env.local
-pnpm dev           # web → :3000/ar   |   api → :3001/api/docs
+pnpm dev           # web → :3000/ar   |   api → :3001/api/docs   |   cms → :3002
 ```
+
+### تغییر پورت API (تداخل با پروژه‌ی دیگر)
+پورت API از متغیر `PORT` در `apps/api/.env.developer` خوانده می‌شود (پیش‌فرض `3001`).
+اگر روی همین سیستم پروژه‌ی دیگری هم روی `3001` اجرا می‌شود، پورت را عوض کن (مثلاً `3011`)
+و همان عدد را در این موارد هم به‌روزرسانی کن تا فرانت به API درست وصل شود:
+
+| فایل | متغیر | مقدار نمونه |
+|------|-------|-------------|
+| `apps/api/.env.developer` | `PORT` | `3011` |
+| `apps/api/.env.developer` | `PAYMENT_CALLBACK_BASE_URL` | `http://localhost:3011/api` |
+| `apps/api/.env.developer` | `API_PUBLIC_URL` | `http://localhost:3011` |
+| `apps/web/.env.local` | `NEXT_PUBLIC_API_BASE` | `http://localhost:3011/api` |
+| `apps/cms/.env.local` | `NEXT_PUBLIC_API_BASE` | `http://localhost:3011/api` |
+
+پورت‌های `web` (۳۰۰۰) و `cms` (۳۰۰۲) معمولاً نیازی به تغییر ندارند.
 
 > این اسکلت با تایپ‌چک تأیید شده. اپ‌های web/api حداقلی ولی واقعی‌اند؛ بعد از `pnpm install`
 > با `pnpm dev` بالا می‌آیند. (نصب پکیج‌ها در این محیط اجرا نشده — تیم خودش `pnpm install` می‌زند.)
