@@ -56,8 +56,9 @@ async function bootstrap() {
   const doc = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup("api/docs", app, doc);
 
-  await app.listen(3001);
+  const port = envConfig.get("PORT", { infer: true })!;
+  await app.listen(port);
   // eslint-disable-next-line no-console
-  console.log("API → http://localhost:3001/api   |   Docs → /api/docs");
+  console.log(`API → http://localhost:${port}/api   |   Docs → /api/docs`);
 }
 bootstrap();
