@@ -60,12 +60,12 @@
 ### `POST /api/auth/register`
 حساب ساخته می‌شود و یک **کد ۶ رقمی تأیید** (اعتبار ۲۴ ساعت) به ایمیل کاربر ارسال می‌شود. **کاربر لاگین نمی‌شود** — ابتدا باید ایمیل را با `POST /auth/verify-email` تأیید کند، سپس بتواند وارد شود.
 - **بدنه:** `RegisterRequest`
-- **پاسخ:** `201 No Content` — توکنی برنمی‌گردد.
+- **پاسخ:** `204 No Content` — توکنی برنمی‌گردد.
 - **خطاها:** `409 EMAIL_TAKEN` | `400 VALIDATION_ERROR`
 
 ### `POST /api/auth/login`
 - **بدنه:** `LoginRequest`
-- **پاسخ:** `200 AuthResponse` — توکن‌ها هم در بدنه و هم در کوکی برمی‌گردند.
+- **پاسخ:** `201 AuthResponse` — توکن‌ها هم در بدنه و هم در کوکی برمی‌گردند.
 - **خطاها:** `401 INVALID_CREDENTIALS` | `401 EMAIL_NOT_VERIFIED` (ایمیل هنوز تأیید نشده) | `400 VALIDATION_ERROR`
 
 ### `POST /api/auth/refresh`
@@ -99,7 +99,7 @@
 ### `POST /api/auth/verify-email`
 با **ایمیل + کد ۶ رقمی** ارسال‌شده هنگام `register`، فیلد `isEmailVerified` کاربر را `true` می‌کند. کد یک‌بارمصرف با اعتبار ۲۴ ساعت. **پس از تأیید موفق، کاربر بلافاصله لاگین می‌شود** و توکن‌ها برمی‌گردند.
 - **بدنه:** `VerifyEmailRequest { email, code }`
-- **پاسخ:** `200 AuthResponse` — توکن‌ها هم در بدنه و هم در کوکی برمی‌گردند.
+- **پاسخ:** `201 AuthResponse` — توکن‌ها هم در بدنه و هم در کوکی برمی‌گردند.
 - **خطاها:** `401 INVALID_VERIFICATION_TOKEN` (کد نامعتبر/منقضی) | `400 VALIDATION_ERROR`
 
 ### `POST /api/auth/resend-verification`
