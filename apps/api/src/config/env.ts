@@ -84,6 +84,10 @@ class EnvConfig {
   @IsString()
   MAIL_FROM?: string;
 
+  @IsOptional()
+  @IsString()
+  RESEND_API_KEY?: string;
+
   @IsString()
   FRONTEND_URL: string = "http://localhost:3000";
 

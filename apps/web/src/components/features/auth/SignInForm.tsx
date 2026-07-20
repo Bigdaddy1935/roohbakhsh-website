@@ -90,6 +90,10 @@ export default function SignInForm() {
         onSuccess: () => router.push("/dashboard"),
         onError: (err) => {
           const apiErr = err as unknown as ApiError;
+          if (apiErr?.code === "EMAIL_NOT_VERIFIED") {
+            router.push(`/verify-email?email=${encodeURIComponent(email.trim().toLowerCase())}`);
+            return;
+          }
           if (apiErr?.fields) {
             setFieldErrors({ email: apiErr.fields.email, password: apiErr.fields.password });
           }

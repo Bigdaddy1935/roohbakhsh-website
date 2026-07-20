@@ -71,7 +71,7 @@ export default function CourseEnrollmentsPage() {
             {course ? course.title.ar : slug} — {data?.total ?? "..."} ثبت‌نام
           </p>
         </div>
-        <div className="me-auto flex items-center gap-2 bg-[var(--brand)]/10 text-[var(--brand)] px-4 py-2 rounded-full text-sm font-semibold">
+        <div className="ms-auto flex items-center gap-2 bg-[var(--brand)]/10 text-[var(--brand)] px-4 py-2 rounded-full text-sm font-semibold">
           <RiUserLine size={16} />
           {data?.total ?? "..."} نفر
         </div>

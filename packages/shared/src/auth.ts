@@ -54,8 +54,9 @@ export interface ResetPasswordRequest {
 }
 
 export interface VerifyEmailRequest {
-  /** توکن خام ارسال‌شده در لینک ایمیل تأیید. */
-  token: string;
+  email: string;
+  /** کد تأیید ارسال‌شده به ایمیل. */
+  code: string;
 }
 
 export interface ResendVerificationRequest {

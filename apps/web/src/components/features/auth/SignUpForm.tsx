@@ -165,16 +165,18 @@ export default function SignUpForm() {
       return;
     }
 
+    const email = fields.email.trim().toLowerCase();
+
     register(
       {
         fullName: fields.fullName.trim(),
-        email: fields.email.trim().toLowerCase(),
+        email,
         phone: fields.phone.trim() || undefined,
         password: fields.password,
         preferredLocale: locale,
       },
       {
-        onSuccess: () => router.push("/dashboard"),
+        onSuccess: () => router.push(`/verify-email?email=${encodeURIComponent(email)}`),
         onError: (err) => {
           const apiErr = err as unknown as ApiError;
           // field-level errors from server

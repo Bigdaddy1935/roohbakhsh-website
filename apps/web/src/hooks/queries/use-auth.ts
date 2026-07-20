@@ -38,13 +38,8 @@ export function useLogin() {
 }
 
 export function useRegister() {
-  const qc = useQueryClient();
-  return useMutation<AuthResponse, Error, RegisterRequest>({
-    mutationFn: (body) => api.post<AuthResponse>("/auth/register", body),
-    onSuccess: (data) => {
-      tokenStore.set(data.accessToken, data.refreshToken);
-      qc.setQueryData(authKeys.me, data.user);
-    },
+  return useMutation<void, Error, RegisterRequest>({
+    mutationFn: (body) => api.post<void>("/auth/register", body),
   });
 }
 
@@ -61,8 +56,13 @@ export function useResetPassword() {
 }
 
 export function useVerifyEmail() {
-  return useMutation<void, Error, VerifyEmailRequest>({
-    mutationFn: (body) => api.post<void>("/auth/verify-email", body),
+  const qc = useQueryClient();
+  return useMutation<AuthResponse, Error, VerifyEmailRequest>({
+    mutationFn: (body) => api.post<AuthResponse>("/auth/verify-email", body),
+    onSuccess: (data) => {
+      tokenStore.set(data.accessToken, data.refreshToken);
+      qc.setQueryData(authKeys.me, data.user);
+    },
   });
 }
 
