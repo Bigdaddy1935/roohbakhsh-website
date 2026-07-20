@@ -7,7 +7,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
-import { randomBytes, createHash } from "crypto";
+import { randomBytes, randomInt, createHash } from "crypto";
 import * as bcrypt from "bcrypt";
 import type { Response } from "express";
 import type { AuthResponse, User as UserContract } from "@roohbakhsh/shared";
@@ -44,7 +44,7 @@ export class AuthService {
     private readonly mailService: MailService,
   ) {}
 
-  async register(dto: RegisterDto, res: Response): Promise<AuthResponse> {
+  async register(dto: RegisterDto): Promise<void> {
     const exists = await this.userRepo.findOne({ where: { email: dto.email } });
     if (exists) throw new ConflictException("EMAIL_TAKEN");
 
@@ -58,7 +58,6 @@ export class AuthService {
     });
     await this.userRepo.save(user);
     await this.sendVerificationEmail(user);
-    return this.buildAuthResponse(user, res);
   }
 
   async login(dto: LoginDto, res: Response): Promise<AuthResponse> {
@@ -69,6 +68,7 @@ export class AuthService {
 
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!valid) throw new UnauthorizedException("INVALID_CREDENTIALS");
+    if (!user.isEmailVerified) throw new UnauthorizedException("EMAIL_NOT_VERIFIED");
 
     return this.buildAuthResponse(user, res);
   }
@@ -137,8 +137,13 @@ export class AuthService {
     await this.refreshRepo.delete({ userId: stored.userId });
   }
 
-  async verifyEmail(dto: VerifyEmailDto): Promise<void> {
-    const hash = this.hashToken(dto.token);
+  async verifyEmail(dto: VerifyEmailDto, res: Response): Promise<AuthResponse> {
+    const user = await this.userRepo.findOne({
+      where: { email: dto.email, isActive: true },
+    });
+    if (!user) throw new UnauthorizedException("INVALID_VERIFICATION_TOKEN");
+
+    const hash = this.hashToken(`${user.id}:${dto.code}`);
     const stored = await this.emailVerificationRepo.findOne({
       where: { tokenHash: hash },
       relations: { user: true },
@@ -151,6 +156,7 @@ export class AuthService {
     stored.user.isEmailVerified = true;
     await this.userRepo.save(stored.user);
     await this.emailVerificationRepo.delete({ userId: stored.userId });
+    return this.buildAuthResponse(stored.user, res);
   }
 
   /** همیشه بدون افشای وجود/عدم‌وجود ایمیل پاسخ می‌دهد (جلوگیری از user enumeration). */
@@ -172,8 +178,8 @@ export class AuthService {
   // ── helpers ──────────────────────────────────────────────────────────────
 
   private async sendVerificationEmail(user: User): Promise<void> {
-    const rawToken = randomBytes(32).toString("hex");
-    const tokenHash = this.hashToken(rawToken);
+    const code = randomInt(100000, 1000000).toString();
+    const tokenHash = this.hashToken(`${user.id}:${code}`);
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + EMAIL_VERIFICATION_TTL_HOURS);
 
@@ -182,15 +188,14 @@ export class AuthService {
       this.emailVerificationRepo.create({ tokenHash, user, expiresAt }),
     );
 
-    const frontendUrl = this.config.get<string>("FRONTEND_URL");
     await this.mailService.send({
       to: user.email,
-      subject: "تأیید ایمیل — آکادمی روح‌بخش",
-      html: `<p>برای تأیید ایمیل خود روی لینک زیر بزنید (اعتبار ${EMAIL_VERIFICATION_TTL_HOURS} ساعت):</p>
-        <p><a href="${frontendUrl}/verify-email?token=${rawToken}">${frontendUrl}/verify-email?token=${rawToken}</a></p>`,
+      subject: "Email verification code - Roohbakhsh Academy",
+      html: `<p>Your Roohbakhsh Academy verification code is:</p>
+        <p style="font-size:24px;font-weight:700;letter-spacing:4px">${code}</p>
+        <p>This code expires in ${EMAIL_VERIFICATION_TTL_HOURS} hours.</p>`,
     });
   }
-
   private async buildAuthResponse(user: User, res: Response): Promise<AuthResponse> {
     const accessToken = this.jwtService.sign({ sub: user.id, email: user.email });
     const rawRefresh = randomBytes(40).toString("hex");

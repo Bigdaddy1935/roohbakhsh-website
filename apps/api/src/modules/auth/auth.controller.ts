@@ -48,6 +48,7 @@ export class AuthController {
 
   @Public()
   @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Post("register")
   @ApiOperation({
     summary: "ثبت‌نام کاربر جدید",
@@ -60,11 +61,8 @@ export class AuthController {
   @ApiResponse({ status: 201, description: "ثبت‌نام موفق", type: AuthResponseSchema })
   @ApiResponse({ status: 409, description: "ایمیل قبلاً ثبت شده — کد: EMAIL_TAKEN", type: ApiErrorSchema })
   @ApiResponse({ status: 400, description: "خطای اعتبارسنجی فیلدها — کد: VALIDATION_ERROR", type: ApiErrorSchema })
-  register(
-    @Body() dto: RegisterDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    return this.authService.register(dto, res);
+  register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto);
   }
 
   // ── Login ────────────────────────────────────────────────────────────────
@@ -172,7 +170,6 @@ export class AuthController {
   // ── Verify email ─────────────────────────────────────────────────────────
 
   @Public()
-  @HttpCode(HttpStatus.NO_CONTENT)
   @Post("verify-email")
   @ApiOperation({
     summary: "تأیید ایمیل با توکن",
@@ -184,8 +181,11 @@ export class AuthController {
   @ApiResponse({ status: 204, description: "ایمیل تأیید شد — بدنه‌ای برنمی‌گردد" })
   @ApiResponse({ status: 401, description: "توکن نامعتبر یا منقضی — کد: INVALID_VERIFICATION_TOKEN", type: ApiErrorSchema })
   @ApiResponse({ status: 400, description: "خطای اعتبارسنجی — کد: VALIDATION_ERROR", type: ApiErrorSchema })
-  verifyEmail(@Body() dto: VerifyEmailDto) {
-    return this.authService.verifyEmail(dto);
+  verifyEmail(
+    @Body() dto: VerifyEmailDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.verifyEmail(dto, res);
   }
 
   // ── Resend verification ──────────────────────────────────────────────────
