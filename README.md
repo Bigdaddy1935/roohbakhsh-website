@@ -46,7 +46,17 @@ pnpm dev           # web → :3000/ar   |   api → :3001/api/docs   |   cms →
 | `apps/web/.env.local` | `NEXT_PUBLIC_API_BASE` | `http://localhost:3011/api` |
 | `apps/cms/.env.local` | `NEXT_PUBLIC_API_BASE` | `http://localhost:3011/api` |
 
-پورت‌های `web` (۳۰۰۰) و `cms` (۳۰۰۲) معمولاً نیازی به تغییر ندارند.
+### تغییر پورت web / cms (تداخل با Docker یا سرویس دیگر)
+پورت اپ‌های Next هم configurable است (پیش‌فرض `web=3000`، `cms=3002`). اگر پورت اشغال بود
+(مثلاً Docker روی `3000`)، هنگام اجرا متغیر محیطی را بده — نیازی به ویرایش هیچ فایلی نیست:
+
+```
+WEB_PORT=3010 CMS_PORT=3012 pnpm dev
+```
+
+پورت‌ها از `${WEB_PORT:-3000}` / `${CMS_PORT:-3002}` در اسکریپت `dev` خوانده می‌شوند و در
+`turbo.json` به‌عنوان `passThroughEnv` عبور داده شده‌اند. اگر پورت web را عوض کردی، `FRONTEND_URL`
+در `apps/api/.env.developer` را هم متناظر تنظیم کن (برای ریدایرکت پرداخت و لینک‌های ایمیل).
 
 > این اسکلت با تایپ‌چک تأیید شده. اپ‌های web/api حداقلی ولی واقعی‌اند؛ بعد از `pnpm install`
 > با `pnpm dev` بالا می‌آیند. (نصب پکیج‌ها در این محیط اجرا نشده — تیم خودش `pnpm install` می‌زند.)

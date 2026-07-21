@@ -3,7 +3,8 @@
   "tasks": {
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "passThroughEnv": ["WEB_PORT", "CMS_PORT", "PORT"]
     },
     "build": {
       "dependsOn": ["^build"],
