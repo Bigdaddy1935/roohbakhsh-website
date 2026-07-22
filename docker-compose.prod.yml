@@ -1,0 +1,123 @@
+# استک پروداکشن آکادمی روح‌بخش — یک VPS، پشت Caddy با SSL خودکار
+# اجرا:  docker compose -f docker-compose.prod.yml up -d --build
+# مقادیر حساس از فایل .env (کنار همین فایل، در git نیست) خوانده می‌شوند.
+
+name: roohbakhsh
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+    networks: [internal]
+
+  # اجرای یک‌باره‌ی مایگریشن‌ها قبل از بالاآمدن api
+  migrate:
+    image: roohbakhsh-api:latest
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment: &api-env
+      NODE_ENV: production
+      PORT: "3001"
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_SYNCHRONIZE: "false"
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: "7d"
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      MAIL_FROM: ${MAIL_FROM}
+      FRONTEND_URL: https://roohbakhshac.org
+      CORS_ORIGINS: https://roohbakhshac.org,https://www.roohbakhshac.org,https://cms.roohbakhshac.org
+      API_PUBLIC_URL: https://api.roohbakhshac.org
+      ZARINPAL_MERCHANT_ID: ${ZARINPAL_MERCHANT_ID}
+      ZARINPAL_SANDBOX: "true"
+      PAYMENT_CALLBACK_BASE_URL: https://api.roohbakhshac.org/api
+      PAYMENT_DESTINATION_CARD_NUMBER: ${PAYMENT_DESTINATION_CARD_NUMBER}
+      PAYMENT_DESTINATION_ACCOUNT_NUMBER: ${PAYMENT_DESTINATION_ACCOUNT_NUMBER}
+      PAYMENT_DESTINATION_ACCOUNT_HOLDER: ${PAYMENT_DESTINATION_ACCOUNT_HOLDER}
+      PAYMENT_DESTINATION_BANK_NAME: ${PAYMENT_DESTINATION_BANK_NAME}
+      # آپلود روی دیسک لوکال (FTP خالی → fallback به /app/uploads)
+      FTP_HOST: ""
+      FTP_USER: ""
+      FTP_PASSWORD: ""
+      FTP_PUBLIC_BASE_URL: https://api.roohbakhshac.org/uploads
+    command: ["node", "-r", "reflect-metadata", "./node_modules/typeorm/cli.js", "migration:run", "-d", "dist/db/data-source.js"]
+    restart: "no"
+    networks: [internal]
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: roohbakhsh-api:latest
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment: *api-env
+    volumes:
+      - uploads:/app/uploads
+    networks: [internal]
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE: https://api.roohbakhshac.org/api
+        NEXT_PUBLIC_SITE_URL: https://roohbakhshac.org
+    image: roohbakhsh-web:latest
+    restart: unless-stopped
+    depends_on: [api]
+    networks: [internal]
+
+  cms:
+    build:
+      context: .
+      dockerfile: apps/cms/Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE: https://api.roohbakhshac.org/api
+    image: roohbakhsh-cms:latest
+    restart: unless-stopped
+    depends_on: [api]
+    networks: [internal]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on: [web, cms, api]
+    networks: [internal]
+
+volumes:
+  mysql-data:
+  uploads:
+  caddy-data:
+  caddy-config:
+
+networks:
+  internal:

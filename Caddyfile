@@ -1,0 +1,25 @@
+# Caddy — reverse proxy + HTTPS خودکار (Let's Encrypt)
+# دامنه‌ها باید به IP همین سرور resolve کنند و پورت‌های 80/443 باز باشند.
+
+# www → apex (canonical بدون www)
+www.roohbakhshac.org {
+	redir https://roohbakhshac.org{uri} permanent
+}
+
+# سایت اصلی
+roohbakhshac.org {
+	encode zstd gzip
+	reverse_proxy web:3000
+}
+
+# API (NestJS) — شامل /uploads هم که خود api سرو می‌کند
+api.roohbakhshac.org {
+	encode zstd gzip
+	reverse_proxy api:3001
+}
+
+# پنل CMS
+cms.roohbakhshac.org {
+	encode zstd gzip
+	reverse_proxy cms:3002
+}
