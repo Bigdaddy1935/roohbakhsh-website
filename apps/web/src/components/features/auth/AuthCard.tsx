@@ -30,7 +30,7 @@ export default function AuthCard({ children }: Props) {
       {/* Logo */}
       <Link href="/" className="relative z-10 mb-8 mt-4">
         <Image
-          src="https://roohbakhshac.ir/logo.png"
+          src="/logo.png"
           alt="روح‌بخش"
           width={240}
           height={80}

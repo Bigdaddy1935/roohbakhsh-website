@@ -131,7 +131,7 @@ export default function HeroSection() {
             {/* ── Hero image ── */}
             <div className="flex-1 w-full max-w-md lg:max-w-none flex items-end justify-center">
               <Image
-                src="https://sabzlearn.ir/young-man.webp"
+                src="/hero-student.png"
                 alt="طالب يتعلم العلوم الإسلامية"
                 width={520}
                 height={560}

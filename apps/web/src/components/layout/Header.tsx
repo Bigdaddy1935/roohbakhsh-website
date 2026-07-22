@@ -115,7 +115,7 @@ export default function Header() {
               <RiMenu2Line size={26} />
             </button>
             <Link href="/">
-              <Image src="https://roohbakhshac.ir/logo.png" alt="روح‌بخش" width={150} height={48} className="object-contain h-12 w-auto" priority />
+              <Image src="/logo.png" alt="روح‌بخش" width={150} height={48} className="object-contain h-12 w-auto" priority />
             </Link>
             <Link href="/cart" aria-label={t("cart")} className="relative">
               <svg xmlns="http://www.w3.org/2000/svg" className="size-7 text-[var(--ink)] hover:text-[var(--brand)] transition-colors" viewBox="0 0 24 24" fill="none"><g fill="none"><path d="M2 2H3.74001C4.82001 2 5.67 2.93 5.58 4L4.75 13.96C4.61 15.59 5.89999 16.99 7.53999 16.99H18.19C19.63 16.99 20.89 15.81 21 14.38L21.54 6.88C21.66 5.22 20.4 3.87 18.73 3.87H5.82001" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/><path d="M16.25 22C16.9404 22 17.5 21.4404 17.5 20.75C17.5 20.0596 16.9404 19.5 16.25 19.5C15.5596 19.5 15 20.0596 15 20.75C15 21.4404 15.5596 22 16.25 22Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/><path d="M8.25 22C8.94036 22 9.5 21.4404 9.5 20.75C9.5 20.0596 8.94036 19.5 8.25 19.5C7.55964 19.5 7 20.0596 7 20.75C7 21.4404 7.55964 22 8.25 22Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/><path d="M9 8H21" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/></g></svg>
@@ -129,7 +129,7 @@ export default function Header() {
 
           {/* Desktop logo */}
           <Link href="/" className="hidden md:block shrink-0">
-            <Image src="https://roohbakhshac.ir/logo.png" alt="روح‌بخش" width={160} height={52} className="object-contain h-13 w-auto" priority />
+            <Image src="/logo.png" alt="روح‌بخش" width={160} height={52} className="object-contain h-13 w-auto" priority />
           </Link>
 
           {/* Desktop Nav */}
@@ -353,7 +353,7 @@ export default function Header() {
       <div className={`fixed top-0 bottom-0 start-0 w-72 bg-[#F7F7F7] z-[70] overflow-y-auto transition-transform duration-300 ${drawerOpen ? "translate-x-0" : "translate-x-full"}`}>
         <div className="flex items-center justify-between h-[100px] bg-white px-5 border-b border-gray-200">
           <Link href="/" onClick={() => setDrawerOpen(false)}>
-            <Image src="https://roohbakhshac.ir/logo.png" alt="روح‌بخش" width={120} height={40} className="object-contain h-10 w-auto" />
+            <Image src="/logo.png" alt="روح‌بخش" width={120} height={40} className="object-contain h-10 w-auto" />
           </Link>
           <button type="button" onClick={() => setDrawerOpen(false)} className="text-gray-400 hover:text-[var(--ink)] transition-colors">
             <RiCloseLine size={24} />

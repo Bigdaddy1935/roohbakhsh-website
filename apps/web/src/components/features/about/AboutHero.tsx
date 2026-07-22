@@ -28,7 +28,7 @@ export default function AboutHero() {
           </div>
           <div className="flex-1 w-full max-w-md lg:max-w-none flex items-end justify-center">
             <Image
-              src="https://sabzlearn.ir/young-man.webp"
+              src="/hero-student.png"
               alt={t("title")}
               width={520}
               height={468}

@@ -34,7 +34,7 @@ export default function DashboardHeader({ onMenuClick }: Props) {
 
       {/* Logo — center on mobile, start on desktop */}
       <Link href="/" className="flex items-center">
-        <Image src="https://roohbakhshac.ir/logo.png" alt="روح‌بخش" width={140} height={48} className="h-12 w-auto" />
+        <Image src="/logo.png" alt="روح‌بخش" width={140} height={48} className="h-12 w-auto" />
       </Link>
 
       {/* End side: icons + date */}

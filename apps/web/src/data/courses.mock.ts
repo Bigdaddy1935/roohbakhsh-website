@@ -38,7 +38,7 @@ export const COURSE_SORT_OPTIONS = [
 ];
 
 const AVATARS = [
-  "https://roohbakhshac.ir/logo.png",
+  "/logo.png",
 ];
 
 export const COURSES: MockCourse[] = [
